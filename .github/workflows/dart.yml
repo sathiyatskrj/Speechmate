@@ -58,6 +58,7 @@ jobs:
           path: build/app/outputs/flutter-apk/${{ env.APP_NAME }}-${{ env.APP_VERSION }}.apk
 
       - name: Create GitHub Release
+       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           name: "${{ env.APP_NAME }}-${{ env.APP_VERSION }}"
