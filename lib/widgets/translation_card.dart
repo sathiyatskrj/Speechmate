@@ -1,60 +1,55 @@
 import 'package:flutter/material.dart';
 
 class TranslationCard extends StatelessWidget {
-  final String english;
   final String nicobarese;
+  final String english;
   final bool isError;
   final VoidCallback? onPlayAudio;
 
   TranslationCard({
     super.key,
-    required this.english,
     required this.nicobarese,
-    required this.isError,
+    required this.english,
+    this.isError = false,
     this.onPlayAudio,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 6),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              english,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    nicobarese,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isError ? Colors.red : Colors.black,
-                    ),
-                  ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                nicobarese,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
-                if (onPlayAudio != null)
-                  IconButton(
-                    icon: const Icon(Icons.volume_up),
-                    onPressed: onPlayAudio,
-                  ),
-              ],
+              ),
+              Text(
+                "English: $english",
+                style: const TextStyle(color: Colors.black54),
+              ),
+            ],
+          ),
+          if (onPlayAudio != null)
+            IconButton(
+              icon: const Icon(Icons.volume_up),
+              onPressed: onPlayAudio,
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
