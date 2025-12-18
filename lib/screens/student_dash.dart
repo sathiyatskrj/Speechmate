@@ -25,19 +25,16 @@ class _StudentDashState extends State<StudentDash> {
       "word": "Tree",
       "emoji": "🌳",
       "colors": [Color(0xFFFF7E79), Color(0xFFFFB677)],
-      "audio": "assets/audio/tree.mp3",
     },
     {
       "word": "Water",
       "emoji": "💧",
       "colors": [Color(0xFFFFA834), Color(0xFFFFD56F)],
-      "audio": "assets/audio/water.mp3",
     },
     {
       "word": "Sea",
       "emoji": "🌊",
       "colors": [Color(0xFF66CCFF), Color(0xFF0099FF)],
-      "audio": "assets/audio/sea.mp3",
     },
   ];
 
@@ -68,14 +65,14 @@ class _StudentDashState extends State<StudentDash> {
         colors: const [Color(0xFF94FFF8), Color(0xFF38BDF8)],
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
               "English → Nicobarese",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
 
             Search(
               controller: searchController,
@@ -83,14 +80,7 @@ class _StudentDashState extends State<StudentDash> {
               onClear: clearSearch,
             ),
 
-            const SizedBox(height: 25),
-
-            const Text(
-              "Some common words",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
             Wrap(
               spacing: 16,
@@ -106,10 +96,38 @@ class _StudentDashState extends State<StudentDash> {
                       result = dictionaryService.search(selectedWord);
                     });
 
-                    audioService.playAsset(w["audio"]);
+                    if (result != null && result!['audio'] != null) {
+                      audioService.play(
+                        category: result!['audio']['category'],
+                        file: result!['audio']['file'],
+                      );
+                    }
                   },
                 );
               }).toList(),
+            ),
+
+            const SizedBox(height: 30),
+
+            if (searchController.text.isNotEmpty)
+              TranslationCard(
+                nicobarese:
+                    result != null ? result!['nicobarese'] : "Word not found",
+                english: result != null ? result!['english'] : "",
+                isError: result == null,
+                onPlayAudio: result != null && result!['audio'] != null
+                    ? () => audioService.play(
+                          category: result!['audio']['category'],
+                          file: result!['audio']['file'],
+                        )
+                    : null,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}              }).toList(),
             ),
 
             const SizedBox(height: 30),
