@@ -23,23 +23,17 @@ jobs:
       - name: Verify Flutter
         run: flutter --version
 
-      - name: Go to Flutter project directory
-        run: cd Speechmate
-
       - name: Clean project
-        working-directory: Speechmate
         run: flutter clean
 
       - name: Get dependencies
-        working-directory: Speechmate
         run: flutter pub get
 
       - name: Build release APK
-        working-directory: Speechmate
         run: flutter build apk --release
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: SpeechMate-APK
-          path: Speechmate/build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
