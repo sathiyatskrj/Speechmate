@@ -54,17 +54,16 @@ class _StudentDashState extends State<StudentDash> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        colors: const [Color(0xFF94FFF8), Color(0xFF38BDF8)],
+        colors: [const Color(0xFF94FFF8), const Color(0xFF38BDF8)],
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// 🔹 Title
-              const Center(
+              Center(
                 child: Text(
                   "English → Nicobarese",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
                   ),
@@ -73,7 +72,6 @@ class _StudentDashState extends State<StudentDash> {
 
               const SizedBox(height: 25),
 
-              /// 🔹 Search Bar
               Search(
                 controller: searchController,
                 onSearch: performSearch,
@@ -82,7 +80,6 @@ class _StudentDashState extends State<StudentDash> {
 
               const SizedBox(height: 20),
 
-              /// 🔹 Translation Result
               if (searchController.text.isNotEmpty)
                 TranslationCard(
                   nicobarese:
@@ -96,10 +93,9 @@ class _StudentDashState extends State<StudentDash> {
 
               const SizedBox(height: 35),
 
-              /// 🔹 Learn Section
-              const Text(
+              Text(
                 "Learn",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -111,6 +107,80 @@ class _StudentDashState extends State<StudentDash> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: learnCategories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 1.2,
+                ),
+                itemBuilder: (context, index) {
+                  final item = learnCategories[index];
+
+                  return InkWell(
+                    onTap: () {
+                      if (item['route'] == 'nature') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NatureScreen(),
+                          ),
+                        );
+                      } else if (item['route'] == 'numbers') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NumbersScreen(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text("${item['title']} coming soon"),
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            item['emoji'] ?? "",
+                            style: const TextStyle(fontSize: 36),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            item['title'] ?? "",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}                itemCount: learnCategories.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 16,
