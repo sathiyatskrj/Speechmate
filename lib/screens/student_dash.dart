@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../widgets/background.dart';
-import '../widgets/common_word_card.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
 import '../services/audio_service.dart';
+import 'nature_screen.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -20,26 +20,32 @@ class _StudentDashState extends State<StudentDash> {
 
   Map<String, dynamic>? result;
 
-  final List<Map<String, dynamic>> commonWords = [
+  /// 🔹 Learn Categories
+  final List<Map<String, dynamic>> learnCategories = [
     {
-      "word": "Tree",
-      "emoji": "🌳",
-      "colors": [Color(0xFFFF7E79), Color(0xFFFFB677)],
+      "title": "Nature",
+      "emoji": "🌿",
+      "route": "nature",
     },
     {
-      "word": "Water",
-      "emoji": "💧",
-      "colors": [Color(0xFFFFA834), Color(0xFFFFD56F)],
+      "title": "My Body",
+      "emoji": "🧍",
     },
     {
-      "word": "Sea",
-      "emoji": "🌊",
-      "colors": [Color(0xFF66CCFF), Color(0xFF0099FF)],
+      "title": "Feelings",
+      "emoji": "😊",
     },
     {
-      "word": "Cold",
-      "emoji": "❄️",
-      "colors": [Color(0xFFFFA9A3), Color(0xFFFFD6A5)],
+      "title": "Numbers",
+      "emoji": "🔢",
+    },
+    {
+      "title": "Family",
+      "emoji": "👨‍👩‍👧",
+    },
+    {
+      "title": "Animals",
+      "emoji": "🐾",
     },
   ];
 
@@ -69,66 +75,119 @@ class _StudentDashState extends State<StudentDash> {
       body: Background(
         colors: const [Color(0xFF94FFF8), Color(0xFF38BDF8)],
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text(
-              "English → Nicobarese",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-            ),
-
-            const SizedBox(height: 30),
-
-            Search(
-              controller: searchController,
-              onSearch: performSearch,
-              onClear: clearSearch,
-            ),
-
-            const SizedBox(height: 30),
-
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Some common words",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: Text(
+                  "English → Nicobarese",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
 
-            const SizedBox(height: 15),
+              const SizedBox(height: 25),
 
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: commonWords.map((w) {
-                return CommonWordCard(
-                  word: w["word"],
-                  emoji: w["emoji"],
-                  gradient: List<Color>.from(w["colors"]),
-                  onWordSelected: (selectedWord) {
-                    FocusScope.of(context).unfocus();
-                    setState(() {
-                      searchController.text = selectedWord;
-                      result = dictionaryService.search(selectedWord);
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-
-            const SizedBox(height: 30),
-
-            if (searchController.text.isNotEmpty)
-              TranslationCard(
-                nicobarese:
-                    result != null ? result!['nicobarese'] : "Word not found",
-                english: result != null ? result!['english'] : "",
-                isError: result == null,
-                onPlayAudio: result != null && result!['audio'] != null
-                    ? () => audioService.play(result!['audio'])
-                    : null,
+              Search(
+                controller: searchController,
+                onSearch: performSearch,
+                onClear: clearSearch,
               ),
-          ],
+
+              const SizedBox(height: 20),
+
+              if (searchController.text.isNotEmpty)
+                TranslationCard(
+                  nicobarese:
+                      result != null ? result!['nicobarese'] : "Word not found",
+                  english: result != null ? result!['english'] : "",
+                  isError: result == null,
+                  onPlayAudio: result != null && result!['audio'] != null
+                      ? () => audioService.playAsset(result!['audio'])
+                      : null,
+                ),
+
+              const SizedBox(height: 35),
+
+              const Text(
+                "Learn",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: learnCategories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 1.2,
+                ),
+                itemBuilder: (context, index) {
+                  final item = learnCategories[index];
+
+                  return InkWell(
+                    onTap: () {
+                      if (item['route'] == 'nature') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NatureScreen(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text("${item['title']} coming soon"),
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            item['emoji'],
+                            style: const TextStyle(fontSize: 36),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            item['title'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
