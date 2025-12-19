@@ -3,16 +3,18 @@ import 'package:audioplayers/audioplayers.dart';
 class AudioService {
   final AudioPlayer _player = AudioPlayer();
 
-  /// Play audio directly from asset path
+  /// 🔊 Play from asset path string
   Future<void> playAsset(String assetPath) async {
     await _player.stop();
-    await _player.play(AssetSource(
-      assetPath.replaceFirst('assets/', ''),
-    ));
+
+    // Remove "assets/" because AssetSource assumes assets/
+    final cleanPath = assetPath.replaceFirst('assets/', '');
+
+    await _player.play(AssetSource(cleanPath));
   }
 
-  /// ✅ NEW METHOD – plays audio from JSON value
-  /// JSON format:
+  /// 🔊 Play audio from JSON
+  /// Supports:
   /// "audio": "assets/audio/numbers/one.mp3"
   Future<void> playFromJson(dynamic audio) async {
     if (audio == null) return;
