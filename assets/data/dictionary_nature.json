@@ -1,0 +1,17 @@
+[
+  {
+    "english": "Sun",
+    "nicobarese": "Tavūi",
+    "audio": {"category": "nature", "file": "sun.mp3"}
+  },
+  {
+    "english": "Tree",
+    "nicobarese": "Chōn",
+    "audio": {"category": "nature", "file": "tree.mp3"}
+  },
+  {
+    "english": "Sea",
+    "nicobarese": "Mai",
+    "audio": {"category": "nature", "file": "sea.mp3"}
+  }
+]
