@@ -5,7 +5,10 @@ class TranslationCard extends StatelessWidget {
   final String english;
   final bool isError;
 
-  // NEW (optional)
+  // NEW
+  final bool searchedNicobarese;
+
+  // Speaker
   final bool showSpeaker;
   final VoidCallback? onSpeakerTap;
 
@@ -14,13 +17,21 @@ class TranslationCard extends StatelessWidget {
     required this.nicobarese,
     required this.english,
     this.isError = false,
-    this.showSpeaker = false, // default OFF
+    this.searchedNicobarese = false, // default: English search
+    this.showSpeaker = false,
     this.onSpeakerTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+
+    // Decide what goes on top & bottom
+    final String topText = searchedNicobarese ? english : nicobarese;
+
+    final String bottomLabel = searchedNicobarese ? 'Nicobarese' : 'English';
+
+    final String bottomText = searchedNicobarese ? nicobarese : english;
 
     return Container(
       width: screenSize.width * 0.85,
@@ -29,24 +40,20 @@ class TranslationCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(2, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(2, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 🔊 + Nicobarese word row
+          // 🔊 + Top word
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Text(
-                  nicobarese,
+                  topText,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w600,
@@ -55,11 +62,9 @@ class TranslationCard extends StatelessWidget {
                 ),
               ),
 
-              // Speaker button (ONLY when enabled & not error)
               if (showSpeaker && !isError)
                 IconButton(
                   icon: const Icon(Icons.volume_up_rounded),
-                  color: Colors.black87,
                   onPressed: onSpeakerTap,
                 ),
             ],
@@ -68,11 +73,8 @@ class TranslationCard extends StatelessWidget {
           if (!isError) ...[
             const SizedBox(height: 8),
             Text(
-              "English: $english",
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
+              "$bottomLabel: $bottomText",
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ],
         ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:speechmate/screens/feelings_page.dart';
+import 'package:speechmate/screens/mybody_part.dart';
 import 'package:speechmate/screens/nature_page.dart';
 import '../widgets/background.dart';
 import '../widgets/learning_tiles.dart';
@@ -17,6 +19,7 @@ class StudentDash extends StatefulWidget {
 class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   final TextEditingController searchController = TextEditingController();
   final DictionaryService dictionaryService = DictionaryService();
+
   final List<Map<String, dynamic>> learningTiles = [
     {
       "word": "Numbers",
@@ -29,19 +32,20 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       "navigateTo": NaturePage(),
     },
     {
-      "word": "Body Parts",
+      "word": "Feelings",
       "colors": [Color(0xFF66CCFF), Color(0xFF0099FF)],
-      "navigateTo": null,
+      "navigateTo": FeelingsPage(),
     },
     {
-      "word": "Family",
+      "word": "Body Parts",
       "colors": [Color(0xFFB084FF), Color(0xFF7AA6FF)],
-      "navigateTo": null,
+      "navigateTo": BodyPartsScreen(),
     },
   ];
 
   Map<String, dynamic>? result;
   bool isLoading = false;
+  bool searchedNicobarese = false;
 
   @override
   void initState() {
@@ -50,22 +54,18 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     _loadDictionary();
   }
 
-  // Monitor app lifecycle
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Free memory when app goes to background or is paused
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       dictionaryService.unloadAll();
     }
 
-    // Reload when app comes back to foreground
     if (state == AppLifecycleState.resumed) {
       _loadDictionary();
     }
   }
 
-  // Load only the words dictionary for this screen
   Future<void> _loadDictionary() async {
     setState(() {
       isLoading = true;
@@ -78,7 +78,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     });
   }
 
-  // Perform search asynchronously
+  /// Perform search
   Future<void> performSearch() async {
     FocusScope.of(context).unfocus();
 
@@ -92,6 +92,15 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
     setState(() {
       result = searchResult;
+
+      if (searchResult != null) {
+        final query = searchController.text.trim().toLowerCase();
+        searchedNicobarese =
+            searchResult['nicobarese'].toString().toLowerCase() == query;
+      } else {
+        searchedNicobarese = false;
+      }
+
       isLoading = false;
     });
   }
@@ -100,6 +109,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     setState(() {
       searchController.clear();
       result = null;
+      searchedNicobarese = false;
     });
   }
 
@@ -107,14 +117,16 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        colors: [Color(0xFF94FFF8), Color(0xFF38BDF8)],
+        colors: const [Color(0xFF94FFF8), Color(0xFF38BDF8)],
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              "English → Nicobarese",
-              style: TextStyle(
+            Text(
+              searchedNicobarese
+                  ? "Nicobarese → English"
+                  : "English → Nicobarese",
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
@@ -131,9 +143,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
             const SizedBox(height: 30),
 
-            const Align(alignment: Alignment.centerLeft),
-            const SizedBox(height: 15),
-
             Wrap(
               spacing: 16,
               runSpacing: 16,
@@ -149,7 +158,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
             const SizedBox(height: 30),
 
-            // Show loading indicator while searching
             if (isLoading)
               const CircularProgressIndicator()
             else if (searchController.text.isNotEmpty)
@@ -158,6 +166,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                     result != null ? result!['nicobarese'] : "Word not found",
                 english: result != null ? result!['english'] : "",
                 isError: result == null,
+                searchedNicobarese: searchedNicobarese,
               ),
           ],
         ),
@@ -167,15 +176,9 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    // Remove lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
-
-    // Dispose controller
     searchController.dispose();
-
-    // Free memory when leaving this screen
     dictionaryService.unload(DictionaryType.words);
-
     super.dispose();
   }
 }

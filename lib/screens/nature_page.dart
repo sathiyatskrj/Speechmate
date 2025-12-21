@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../widgets/nature_button.dart';
+import '../widgets/tile_buttons.dart';
 
 class NaturePage extends StatelessWidget {
   NaturePage({super.key});
@@ -67,7 +67,7 @@ class NaturePage extends StatelessWidget {
           ),
           itemBuilder: (context, index) {
             final item = natureItems[index];
-            return NatureButton(
+            return TileButtons(
               emoji: item['emoji']!,
               text: item['text']!,
               color: colors[index],

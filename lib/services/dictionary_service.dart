@@ -1,12 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 
-enum DictionaryType {
-  words,
-  phrases,
-  nature,
-  numbers,
-}
+enum DictionaryType { words, phrases, nature, numbers }
 
 class DictionaryService {
   // Cache for loaded dictionaries
@@ -16,24 +11,18 @@ class DictionaryService {
   final Map<DictionaryType, String> _paths = {
     DictionaryType.words: 'assets/data/dictionary.json',
     DictionaryType.phrases: 'assets/data/dictionary_phrases.json',
-    DictionaryType.nature: 'assets/data/dictionary_nature.json',
-    DictionaryType.numbers: 'assets/data/dictionary_numbers.json',
   };
 
   /// Load a specific dictionary on-demand
   Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
-    // Return from cache if already loaded
     if (_cache.containsKey(type)) {
       return _cache[type]!;
     }
 
-    // Load from file
     final String path = _paths[type]!;
     final List<Map<String, dynamic>> data = await _loadJson(path);
 
-    // Cache the result
     _cache[type] = data;
-
     return data;
   }
 
@@ -42,7 +31,7 @@ class DictionaryService {
     await Future.wait(types.map((type) => loadDictionary(type)));
   }
 
-  /// Load all dictionaries (use when you need everything)
+  /// Load all dictionaries
   Future<void> loadAll() async {
     await loadMultiple(DictionaryType.values);
   }
@@ -59,7 +48,7 @@ class DictionaryService {
     return _cache.containsKey(type);
   }
 
-  /// Get a loaded dictionary (returns empty list if not loaded)
+  /// Get a loaded dictionary
   List<Map<String, dynamic>> getDictionary(DictionaryType type) {
     return _cache[type] ?? [];
   }
@@ -74,29 +63,29 @@ class DictionaryService {
     _cache.clear();
   }
 
-  /// Search in WORDS dictionary (english -> nicobarese)
+  /// 🔁 TWO-WAY search in WORDS dictionary (English <-> Nicobarese)
   Future<Map<String, dynamic>?> searchWord(String query) async {
     final words = await loadDictionary(DictionaryType.words);
-    query = query.trim().toLowerCase();
+    final q = query.trim().toLowerCase();
 
     try {
-      return words.firstWhere(
-            (e) => e['english'].toLowerCase() == query,
-      );
+      return words.firstWhere((e) {
+        final english = e['english']?.toString().toLowerCase() ?? '';
+        final nicobarese = e['nicobarese']?.toString().toLowerCase() ?? '';
+        return english == q || nicobarese == q;
+      });
     } catch (_) {
       return null;
     }
   }
 
-  /// Search in PHRASES dictionary
+  /// Search in PHRASES dictionary (unchanged)
   Future<Map<String, dynamic>?> searchPhrase(String query) async {
     final phrases = await loadDictionary(DictionaryType.phrases);
-    query = query.trim().toLowerCase();
+    final q = query.trim().toLowerCase();
 
     try {
-      return phrases.firstWhere(
-            (e) => e['text'].toLowerCase() == query,
-      );
+      return phrases.firstWhere((e) => e['text'].toString().toLowerCase() == q);
     } catch (_) {
       return null;
     }
@@ -112,11 +101,33 @@ class DictionaryService {
     return await loadDictionary(DictionaryType.numbers);
   }
 
-  /// Universal search (searches in words and phrases)
+  /// Universal search (words first, then phrases)
   Future<Map<String, dynamic>?> searchEverywhere(String query) async {
-    var result = await searchWord(query);
-    if (result != null) return result;
+    final q = query.trim().toLowerCase();
 
-    return await searchPhrase(query);
+    // 1️⃣ Try WORDS first
+    final wordResult = await searchWord(query);
+    if (wordResult != null) {
+      final isNicobarese =
+          wordResult['nicobarese'].toString().toLowerCase() == q;
+
+      return {
+        ...wordResult,
+        '_type': 'words',
+        '_searchedNicobarese': isNicobarese,
+      };
+    }
+
+    // 2️⃣ Try PHRASES
+    final phraseResult = await searchPhrase(query);
+    if (phraseResult != null) {
+      return {
+        ...phraseResult,
+        '_type': 'phrases',
+        '_searchedNicobarese': false, // phrases are one-way
+      };
+    }
+
+    return null;
   }
 }

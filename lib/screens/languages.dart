@@ -18,8 +18,8 @@ class Languages extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              "Select Language",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              "Select a Language to translate/learn",
+              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 40),
 

@@ -8,7 +8,8 @@ class InfoButton extends StatelessWidget {
   static const String _aboutText =
       'This application helps you learn and practice multiple languages. '
       'Select your preferred language to get started with your learning journey.';
-  static const String _createdBy = 'Development Team';
+  static const String _createdBy = 'T Sathiya Moorthy';
+  static const String _developedBy = 'Pratik Bairagi';
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +104,11 @@ class InfoButton extends StatelessWidget {
                       ),
                       SizedBox(height: 12),
                       Text(
-                        'Created by........$_createdBy',
+                        'Created by....$_createdBy',
+                        style: TextStyle(fontSize: 18, color: Colors.white70),
+                      ),
+                      Text(
+                        'Developed by....$_developedBy',
                         style: TextStyle(fontSize: 18, color: Colors.white70),
                       ),
                     ],

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/languages.dart';
 import 'package:flutter/services.dart';
+import 'package:speechmate/widgets/instant_popup_transition.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        pageTransitionsTheme: PageTransitionsTheme(
+          builders: {TargetPlatform.android: NoTransition()},
+        ),
+      ),
       home:
           languageSelected
               ? const Languages()

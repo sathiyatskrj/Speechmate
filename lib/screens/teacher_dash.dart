@@ -23,6 +23,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
   Map<String, dynamic>? result;
   List<Map<String, dynamic>> phrases = [];
   bool isLoading = false;
+  bool searchedNicobarese = false;
 
   @override
   void initState() {
@@ -61,7 +62,9 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     ]);
 
     // Get the phrases data
-    final loadedPhrases = await dictionaryService.getDictionary(DictionaryType.phrases);
+    final loadedPhrases = await dictionaryService.getDictionary(
+      DictionaryType.phrases,
+    );
 
     if (mounted) {
       setState(() {
@@ -82,11 +85,16 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     }
 
     // Search in both dictionaries
-    final searchResult = await dictionaryService.searchEverywhere(searchController.text);
+    final searchResult = await dictionaryService.searchEverywhere(
+      searchController.text,
+    );
 
     if (mounted) {
       setState(() {
         result = searchResult;
+
+        searchedNicobarese = searchResult?['_searchedNicobarese'] == true;
+
         isLoading = false;
       });
     }
@@ -108,9 +116,9 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     } catch (e) {
       // Handle audio playback error
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not play audio: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not play audio: $e')));
       }
     }
   }
@@ -136,79 +144,101 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
       body: Background(
         colors: [Color(0xFF38BDF8), Color(0xFF94FFF8)],
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Title
-            const Text(
-              "English → Nicobarese",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // SEARCH BAR
-            Search(
-              controller: searchController,
-              onSearch: performSearch,
-              onClear: clearSearch,
-            ),
-
-            const SizedBox(height: 5),
-
-            // Phrases list with audio
-            Expanded(
-              child: phrases.isEmpty
-                  ? const Center(child: Text('No phrases available'))
-                  : ListView(
-                padding: const EdgeInsets.only(bottom: 20),
-                children: [
-                  // Audio phrase cards
-                  ...phrases.map((item) {
-                    return AudioPhraseCard(
-                      text: item['text'] ?? 'Unknown phrase',
-                      onPlay: () {
-                        if (item['audio'] != null) {
-                          playAudio(
-                            item['audio']['category'] ?? '',
-                            item['audio']['file'] ?? '',
-                          );
-                        }
-                      },
-                    );
-                  }),
-
-                  // Translation result (AFTER audio cards)
-                  if (searchController.text.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: TranslationCard(
-                        nicobarese:
-                        result != null ? result!['nicobarese'] : "Word not found",
-                        english: result != null ? result!['english'] : "",
-                        isError: result == null,
-                        showSpeaker: true,
-                        onSpeakerTap: () {
-                          if (result != null &&
-                              result!['nicobarese'] != null) {
-                            ttsService.speakNicobarese(
-                              result!['nicobarese'],
-                            );
-                          }
-                        },
+        child:
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Title
+                    Text(
+                      searchedNicobarese
+                          ? "Nicobarese → English"
+                          : "English → Nicobarese",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
-                ],
-              ),
-            ),
-          ],
-        ),
+
+                    const SizedBox(height: 30),
+
+                    // SEARCH BAR
+                    Search(
+                      controller: searchController,
+                      onSearch: performSearch,
+                      onClear: clearSearch,
+                    ),
+
+                    const SizedBox(height: 5),
+
+                    // Phrases list with audio
+                    Expanded(
+                      child:
+                          phrases.isEmpty
+                              ? const Center(
+                                child: Text('No phrases available'),
+                              )
+                              : ListView(
+                                padding: const EdgeInsets.only(bottom: 20),
+                                children: [
+                                  // Audio phrase cards
+                                  ...phrases.map((item) {
+                                    return AudioPhraseCard(
+                                      text: item['text'] ?? 'Unknown phrase',
+                                      onPlay: () {
+                                        if (item['audio'] != null) {
+                                          playAudio(
+                                            item['audio']['category'] ?? '',
+                                            item['audio']['file'] ?? '',
+                                          );
+                                        }
+                                      },
+                                    );
+                                  }),
+
+                                  // Translation result (AFTER audio cards)
+                                  if (searchController.text.isNotEmpty &&
+                                      result != null &&
+                                      result!['_type'] == 'words')
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: TranslationCard(
+                                        nicobarese: result!['nicobarese'],
+                                        english: result!['english'],
+                                        isError: false,
+                                        searchedNicobarese: searchedNicobarese,
+                                        showSpeaker: true,
+                                        onSpeakerTap: () {
+                                          // 🔊 Speak only the searched language
+                                          if (searchedNicobarese) {
+                                            ttsService.speakEnglish(
+                                              result!['english'],
+                                            );
+                                          } else {
+                                            ttsService.speakNicobarese(
+                                              result!['nicobarese'],
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    )
+                                  else if (searchController.text.isNotEmpty &&
+                                      result == null)
+                                    const Padding(
+                                      padding: EdgeInsets.only(top: 16),
+                                      child: TranslationCard(
+                                        nicobarese: "Word not found",
+                                        english: "",
+                                        isError: true,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                    ),
+                  ],
+                ),
       ),
     );
   }
