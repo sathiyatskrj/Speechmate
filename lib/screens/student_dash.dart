@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:speechmate/screens/feelings_page.dart';
+import 'package:speechmate/screens/mybody_part.dart';
+import 'package:speechmate/screens/nature_page.dart';
 import '../widgets/background.dart';
+import '../widgets/learning_tiles.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
-import '../services/audio_service.dart';
-import 'nature_screen.dart';
-import 'numbers_screen.dart';
+import 'number_page.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -14,32 +16,92 @@ class StudentDash extends StatefulWidget {
   State<StudentDash> createState() => _StudentDashState();
 }
 
-class _StudentDashState extends State<StudentDash> {
+class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   final TextEditingController searchController = TextEditingController();
   final DictionaryService dictionaryService = DictionaryService();
-  final AudioService audioService = AudioService();
+
+  final List<Map<String, dynamic>> learningTiles = [
+    {
+      "word": "Numbers",
+      "colors": [Color(0xFFFF7E79), Color(0xFFFFB677)],
+      "navigateTo": NumberPage(),
+    },
+    {
+      "word": "Nature",
+      "colors": [Color(0xFF5ED87D), Color(0xFF92FF70)],
+      "navigateTo": NaturePage(),
+    },
+    {
+      "word": "Feelings",
+      "colors": [Color(0xFF66CCFF), Color(0xFF0099FF)],
+      "navigateTo": FeelingsPage(),
+    },
+    {
+      "word": "Body Parts",
+      "colors": [Color(0xFFB084FF), Color(0xFF7AA6FF)],
+      "navigateTo": BodyPartsScreen(),
+    },
+  ];
 
   Map<String, dynamic>? result;
-
-  final List<Map<String, String>> learnCategories = [
-    {"title": "Nature", "emoji": "🌿", "route": "nature"},
-    {"title": "Numbers", "emoji": "🔢", "route": "numbers"},
-    {"title": "My Body", "emoji": "🧍"},
-    {"title": "Feelings", "emoji": "😊"},
-    {"title": "Family", "emoji": "👨‍👩‍👧"},
-    {"title": "Animals", "emoji": "🐾"},
-  ];
+  bool isLoading = false;
+  bool searchedNicobarese = false;
 
   @override
   void initState() {
     super.initState();
-    dictionaryService.load();
+    WidgetsBinding.instance.addObserver(this);
+    _loadDictionary();
   }
 
-  void performSearch() {
-    FocusScope.of(context).unfocus();
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      dictionaryService.unloadAll();
+    }
+
+    if (state == AppLifecycleState.resumed) {
+      _loadDictionary();
+    }
+  }
+
+  Future<void> _loadDictionary() async {
     setState(() {
-      result = dictionaryService.search(searchController.text);
+      isLoading = true;
+    });
+
+    await dictionaryService.loadDictionary(DictionaryType.words);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  /// Perform search
+  Future<void> performSearch() async {
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      isLoading = true;
+    });
+
+    final searchResult = await dictionaryService.searchWord(
+      searchController.text,
+    );
+
+    setState(() {
+      result = searchResult;
+
+      if (searchResult != null) {
+        final query = searchController.text.trim().toLowerCase();
+        searchedNicobarese =
+            searchResult['nicobarese'].toString().toLowerCase() == query;
+      } else {
+        searchedNicobarese = false;
+      }
+
+      isLoading = false;
     });
   }
 
@@ -47,6 +109,7 @@ class _StudentDashState extends State<StudentDash> {
     setState(() {
       searchController.clear();
       result = null;
+      searchedNicobarese = false;
     });
   }
 
@@ -56,128 +119,66 @@ class _StudentDashState extends State<StudentDash> {
       body: Background(
         colors: const [Color(0xFF94FFF8), Color(0xFF38BDF8)],
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  "English → Nicobarese",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              searchedNicobarese
+                  ? "Nicobarese → English"
+                  : "English → Nicobarese",
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
+            ),
 
-              SizedBox(height: 25),
+            const SizedBox(height: 30),
 
-              Search(
-                controller: searchController,
-                onSearch: performSearch,
-                onClear: clearSearch,
+            Search(
+              controller: searchController,
+              onSearch: performSearch,
+              onClear: clearSearch,
+            ),
+
+            const SizedBox(height: 30),
+
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children:
+                  learningTiles.map((item) {
+                    return LearningTiles(
+                      word: item["word"],
+                      gradient: List<Color>.from(item["colors"]),
+                      navigateTo: item["navigateTo"],
+                    );
+                  }).toList(),
+            ),
+
+            const SizedBox(height: 30),
+
+            if (isLoading)
+              const CircularProgressIndicator()
+            else if (searchController.text.isNotEmpty)
+              TranslationCard(
+                nicobarese:
+                    result != null ? result!['nicobarese'] : "Word not found",
+                english: result != null ? result!['english'] : "",
+                isError: result == null,
+                searchedNicobarese: searchedNicobarese,
               ),
-
-              SizedBox(height: 20),
-
-              if (searchController.text.isNotEmpty)
-                TranslationCard(
-                  nicobarese:
-                      result != null ? result!['nicobarese'] : "Word not found",
-                  english: result != null ? result!['english'] : "",
-                  isError: result == null,
-                  onPlayAudio: result != null && result!['audio'] != null
-                      ? () => audioService.playAsset(result!['audio'])
-                      : null,
-                ),
-
-              SizedBox(height: 35),
-
-              Text(
-                "Learn",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              SizedBox(height: 15),
-
-              GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: learnCategories.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.2,
-                ),
-                itemBuilder: (context, index) {
-                  final item = learnCategories[index];
-
-                  return InkWell(
-                    onTap: () {
-                      if (item['route'] == 'nature') {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => NatureScreen(),
-                          ),
-                        );
-                      } else if (item['route'] == 'numbers') {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => NumbersScreen(),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                Text("${item['title']} coming soon"),
-                          ),
-                        );
-                      }
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 6,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            item['emoji']!,
-                            style: TextStyle(fontSize: 36),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            item['title']!,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    searchController.dispose();
+    dictionaryService.unload(DictionaryType.words);
+    super.dispose();
   }
 }

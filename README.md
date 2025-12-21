@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/screenshots/banner.png" width="100%">
+  <img src="github_readme_ss/banner.png" width="100%">
 </p>
 
 <h1 align="center" style="font-family: Arial, sans-serif; color: #FF6F61; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
@@ -52,14 +52,32 @@ The goal of SpeechMate is to make bilingual word lookup fast, accessible, and ea
 - 🔊 Text-to-Speech (TTS) support (Teacher Dashboard)
 - ⌨️ Auto-hide Keyboard after search
 - ⚠️ Graceful Error Handling (e.g., “Word not found”)
+- 🖼️ Images base learning for Students
+- 友 Language Selector
 
 # Screenshots
-
+>StartUp Screens
 <p align="center">
-  <img src="./assets/screenshots/img1.png" width="22%" style="margin: 1%" />
-  <img src="./assets/screenshots/img2.png" width="22%" style="margin: 1%" />
-  <img src="./assets/screenshots/img4.png" width="22%" style="margin: 1%" />
-  <img src="./assets/screenshots/img3.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/app_language.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/translate_language.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/role_selector.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/aboutus.png" width="22%" style="margin: 1%" />
+</p>
+
+>Student, Teachers roles Dashboards with Bothway word search
+<p align="center">
+  <img src="github_readme_ss/student_dash.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/teacher_dash.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/bothway_translate.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/bothway_translate2.png" width="22%" style="margin: 1%" />
+</p>
+
+>Different pages for student learnings role
+<p align="center">
+  <img src="github_readme_ss/numbers_page.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/nature_page.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/feelings_page.png" width="22%" style="margin: 1%" />
+  <img src="github_readme_ss/mybody_page.png" width="22%" style="margin: 1%" />
 </p>
 
 # ⚙️ How It Works / Technologies Used
@@ -98,3 +116,6 @@ The goal of SpeechMate is to make bilingual word lookup fast, accessible, and ea
 - Sentence translation
 - Voice input for search
 - More Nicobarese dialect support
+
+## Contributers
+- [Pratik](https://github.com/Lyco0) (Main Developer)

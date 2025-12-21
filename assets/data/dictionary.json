@@ -105,14 +105,7 @@
   {"english": "Practice", "nicobarese": "Harūnöreh"},
   {"english": "Improve", "nicobarese": "Halööktit"},
   {"english": "Understand", "nicobarese": "Akāk-el lāng"},
- {
-  "english": "Tree",
-  "nicobarese": "Chōn",
-  "audio": {
-    "category": "nature",
-    "file": "tree.mp3"
-  }
-},
+  {"english": "Tree", "nicobarese": "Chōn"},
   {"english": "Flower", "nicobarese": "Pūl"},
   {"english": "Leaf", "nicobarese": "Rōi-chōn"},
   {"english": "Fruit", "nicobarese": "Ròng-chōn"},
@@ -127,14 +120,7 @@
   {"english": "Soil", "nicobarese": "Tūmlat"},
   {"english": "Stone", "nicobarese": "Ihōng"},
   {"english": "Rock", "nicobarese": "Tökirööng ihōng"},
-  {
-  "english": "Sun",
-  "nicobarese": "Tavūi",
-  "audio": {
-    "category": "nature",
-    "file": "sun.mp3"
-  }
-},
+  {"english": "Sun", "nicobarese": "Tavūi"},
   {"english": "Moon", "nicobarese": "Chinget"},
   {"english": "Star", "nicobarese": "Taneūsömat"},
   {"english": "Sky", "nicobarese": "Hāliöngö"},
@@ -219,56 +205,6 @@
   {"english": "Down", "nicobarese": "Lātåreu"},
   {"english": "Left", "nicobarese": "Tāvë"},
   {"english": "Right", "nicobarese": "Lāhamö"},
- {
-  "english": "One",
-  "nicobarese": "Hēng",
-  "audio": { "category": "numbers", "file": "one.mp3" }
-},
-{
-  "english": "Two",
-  "nicobarese": "Net",
-  "audio": { "category": "numbers", "file": "two.mp3" }
-},
-{
-  "english": "Three",
-  "nicobarese": "Lui",
-  "audio": { "category": "numbers", "file": "three.mp3" }
-},
-{
-  "english": "Four",
-  "nicobarese": "Fen",
-  "audio": { "category": "numbers", "file": "four.mp3" }
-},
-{
-  "english": "Five",
-  "nicobarese": "Taneui",
-  "audio": { "category": "numbers", "file": "five.mp3" }
-},
-{
-  "english": "Six",
-  "nicobarese": "TA Fauöl",
-  "audio": { "category": "numbers", "file": "six.mp3" }
-},
-{
-  "english": "Seven",
-  "nicobarese": "Sat",
-  "audio": { "category": "numbers", "file": "seven.mp3" }
-},
-{
-  "english": "Eight",
-  "nicobarese": "Hēvöre",
-  "audio": { "category": "numbers", "file": "eight.mp3" }
-},
-{
-  "english": "Nine",
-  "nicobarese": "Mahchuhtöre",
-  "audio": { "category": "numbers", "file": "nine.mp3" }
-},
-{
-  "english": "Ten",
-  "nicobarese": "Söm",
-  "audio": { "category": "numbers", "file": "ten.mp3" }
-},
   {"english": "Many", "nicobarese": "Pòiyen"},
   {"english": "Few", "nicobarese": "Rāhēichyen"},
   {"english": "Big", "nicobarese": "Tökiröng"},

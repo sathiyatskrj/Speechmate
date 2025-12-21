@@ -4,51 +4,79 @@ class TranslationCard extends StatelessWidget {
   final String nicobarese;
   final String english;
   final bool isError;
-  final VoidCallback? onPlayAudio;
 
-  TranslationCard({
+  // NEW
+  final bool searchedNicobarese;
+
+  // Speaker
+  final bool showSpeaker;
+  final VoidCallback? onSpeakerTap;
+
+  const TranslationCard({
     super.key,
     required this.nicobarese,
     required this.english,
     this.isError = false,
-    this.onPlayAudio,
+    this.searchedNicobarese = false, // default: English search
+    this.showSpeaker = false,
+    this.onSpeakerTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
+    // Decide what goes on top & bottom
+    final String topText = searchedNicobarese ? english : nicobarese;
+
+    final String bottomLabel = searchedNicobarese ? 'Nicobarese' : 'English';
+
+    final String bottomText = searchedNicobarese ? nicobarese : english;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: screenSize.width * 0.85,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(2, 2)),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Column(
+          // 🔊 + Top word
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                nicobarese,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  topText,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: isError ? Colors.redAccent : Colors.black,
+                  ),
                 ),
               ),
-              Text(
-                "English: $english",
-                style: const TextStyle(color: Colors.black54),
-              ),
+
+              if (showSpeaker && !isError)
+                IconButton(
+                  icon: const Icon(Icons.volume_up_rounded),
+                  onPressed: onSpeakerTap,
+                ),
             ],
           ),
-          if (onPlayAudio != null)
-            IconButton(
-              icon: const Icon(Icons.volume_up),
-              onPressed: onPlayAudio,
+
+          if (!isError) ...[
+            const SizedBox(height: 8),
+            Text(
+              "$bottomLabel: $bottomText",
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
             ),
+          ],
         ],
       ),
     );

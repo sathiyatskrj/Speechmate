@@ -1,0 +1,30 @@
+[
+  {
+    "text": "Good Morning",
+    "audio": {
+      "category": "phrases",
+      "file": "good_morning.mp3"
+    }
+  },
+  {
+    "text": "How are you",
+    "audio": {
+      "category": "phrases",
+      "file": "how_are_you.mp3"
+    }
+  },
+  {
+    "text": "Keep silent",
+    "audio": {
+      "category": "phrases",
+      "file": "keep_silent.mp3"
+    }
+  },
+  {
+    "text": "What is your name",
+    "audio": {
+      "category": "phrases",
+      "file": "what_is_your_name.mp3"
+    }
+  }
+]
