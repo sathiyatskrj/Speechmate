@@ -322,7 +322,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
                controller: searchController,
                onSearch: performSearch,
                onClear: clearSearch,
-               onVoiceSearch: performVoiceSearch,
              ),
              const SizedBox(height: 15),
              Expanded(child: content),
@@ -332,4 +331,5 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     );
   }
 }
+
 
