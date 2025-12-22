@@ -66,7 +66,8 @@ class InfoButton extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
-          BoxShadow(colors: [Colors.black26], blurRadius: 20, offset: Offset(0, 10))
+          // FIXED: used 'color' instead of 'colors'
+          BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, 10))
         ],
       ),
       child: Column(
