@@ -4,22 +4,28 @@ class TranslationCard extends StatelessWidget {
   final String nicobarese;
   final String english;
   final bool isError;
-
-  // NEW
   final bool searchedNicobarese;
-
+  
   // Speaker
   final bool showSpeaker;
   final VoidCallback? onSpeakerTap;
+  
+  // Favorites & Report
+  final bool isFavorite;
+  final VoidCallback? onFavoriteToggle;
+  final VoidCallback? onReport;
 
   const TranslationCard({
     super.key,
     required this.nicobarese,
     required this.english,
     this.isError = false,
-    this.searchedNicobarese = false, // default: English search
+    this.searchedNicobarese = false,
     this.showSpeaker = false,
     this.onSpeakerTap,
+    this.isFavorite = false,
+    this.onFavoriteToggle,
+    this.onReport,
   });
 
   @override
@@ -29,15 +35,12 @@ class TranslationCard extends StatelessWidget {
     final isMediumScreen = screenSize.width < 400;
 
     // Responsive font sizes
-    final topFontSize = isSmallScreen ? 20.0 : (isMediumScreen ? 22.0 : 26.0);
+    final topFontSize = isSmallScreen ? 20.0 : (isMediumScreen ? 23.0 : 26.0);
     final bottomFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
     final cardPadding = isSmallScreen ? 12.0 : (isMediumScreen ? 16.0 : 20.0);
 
-    // Decide what goes on top & bottom
     final String topText = searchedNicobarese ? english : nicobarese;
-
     final String bottomLabel = searchedNicobarese ? 'Nicobarese' : 'English';
-
     final String bottomText = searchedNicobarese ? nicobarese : english;
 
     return Container(
@@ -57,7 +60,6 @@ class TranslationCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 🔊 + Top word
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -68,7 +70,6 @@ class TranslationCard extends StatelessWidget {
                     fontSize: topFontSize,
                     fontWeight: FontWeight.w600,
                     color: isError ? Colors.redAccent : Colors.black,
-                    height: 1.2,
                   ),
                   softWrap: true,
                   overflow: TextOverflow.visible,
@@ -77,13 +78,25 @@ class TranslationCard extends StatelessWidget {
 
               if (showSpeaker && !isError)
                 IconButton(
-                  icon: Icon(
-                    Icons.volume_up_rounded,
-                    size: isSmallScreen ? 20 : 24,
-                  ),
+                  icon: Icon(Icons.volume_up_rounded, size: isSmallScreen ? 22 : 24),
                   onPressed: onSpeakerTap,
                   padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
-                  constraints: const BoxConstraints(),
+                ),
+              if (onFavoriteToggle != null && !isError)
+                IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? Colors.red : null,
+                    size: isSmallScreen ? 20 : 22,
+                  ),
+                  onPressed: onFavoriteToggle,
+                  padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
+                ),
+              if (onReport != null && !isError)
+                IconButton(
+                  icon: Icon(Icons.flag_outlined, size: isSmallScreen ? 18 : 20),
+                  onPressed: onReport,
+                  padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
                 ),
             ],
           ),
@@ -95,7 +108,6 @@ class TranslationCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: bottomFontSize,
                 color: Colors.black54,
-                height: 1.3,
               ),
               softWrap: true,
               overflow: TextOverflow.visible,
