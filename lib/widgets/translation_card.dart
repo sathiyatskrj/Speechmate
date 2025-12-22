@@ -4,38 +4,48 @@ class TranslationCard extends StatelessWidget {
   final String nicobarese;
   final String english;
   final bool isError;
+
+  // NEW
   final bool searchedNicobarese;
+
+  // Speaker
   final bool showSpeaker;
   final VoidCallback? onSpeakerTap;
-  final bool isFavorite;
-  final VoidCallback? onFavoriteToggle;
-  final VoidCallback? onReport;
 
   const TranslationCard({
     super.key,
     required this.nicobarese,
     required this.english,
     this.isError = false,
-    this.searchedNicobarese = false,
+    this.searchedNicobarese = false, // default: English search
     this.showSpeaker = false,
     this.onSpeakerTap,
-    this.isFavorite = false,
-    this.onFavoriteToggle,
-    this.onReport,
   });
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 360;
+    final isMediumScreen = screenSize.width < 400;
+
+    // Responsive font sizes
+    final topFontSize = isSmallScreen ? 20.0 : (isMediumScreen ? 22.0 : 26.0);
+    final bottomFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+    final cardPadding = isSmallScreen ? 12.0 : (isMediumScreen ? 16.0 : 20.0);
+
+    // Decide what goes on top & bottom
     final String topText = searchedNicobarese ? english : nicobarese;
+
     final String bottomLabel = searchedNicobarese ? 'Nicobarese' : 'English';
+
     final String bottomText = searchedNicobarese ? nicobarese : english;
 
     return Container(
-      width: screenWidth * 0.9,
-      padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+      width: double.infinity,
+      constraints: BoxConstraints(
+        maxWidth: screenSize.width * 0.95,
+      ),
+      padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -47,6 +57,7 @@ class TranslationCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // 🔊 + Top word
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -54,72 +65,40 @@ class TranslationCard extends StatelessWidget {
                 child: Text(
                   topText,
                   style: TextStyle(
-                    fontSize: isSmallScreen ? 22 : 26,
+                    fontSize: topFontSize,
                     fontWeight: FontWeight.w600,
                     color: isError ? Colors.redAccent : Colors.black,
+                    height: 1.2,
                   ),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
                 ),
               ),
 
               if (showSpeaker && !isError)
                 IconButton(
-                  icon: const Icon(Icons.volume_up_rounded),
-                  onPressed: onSpeakerTap,
-                  iconSize: isSmallScreen ? 20 : 24,
-                ),
-
-              if (!isError && onFavoriteToggle != null)
-                IconButton(
                   icon: Icon(
-                    isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
-                    color: isFavorite ? Colors.amber : Colors.grey,
-                    size: isSmallScreen ? 24 : 28,
+                    Icons.volume_up_rounded,
+                    size: isSmallScreen ? 20 : 24,
                   ),
-                  onPressed: onFavoriteToggle,
+                  onPressed: onSpeakerTap,
+                  padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
+                  constraints: const BoxConstraints(),
                 ),
             ],
           ),
 
           if (!isError) ...[
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    "$bottomLabel: $bottomText",
-                    style: TextStyle(
-                      fontSize: isSmallScreen ? 14 : 16,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ),
-                
-                if (onReport != null)
-                  InkWell(
-                    onTap: onReport,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.flag_outlined,
-                            size: isSmallScreen ? 14 : 16,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "Report",
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: isSmallScreen ? 10 : 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
+            SizedBox(height: isSmallScreen ? 6 : 8),
+            Text(
+              "$bottomLabel: $bottomText",
+              style: TextStyle(
+                fontSize: bottomFontSize,
+                color: Colors.black54,
+                height: 1.3,
+              ),
+              softWrap: true,
+              overflow: TextOverflow.visible,
             ),
           ],
         ],
