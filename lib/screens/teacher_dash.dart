@@ -6,7 +6,6 @@ import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
 import '../services/tts_service.dart';
-import '../services/voice_service.dart';
 import '../widgets/audio_phrase_card.dart';
 import 'quiz_screen.dart';
 import 'chat_translate_screen.dart';
@@ -25,7 +24,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
   final FavoritesService favoritesService = FavoritesService();
   final HistoryService historyService = HistoryService();
   final ProgressService progressService = ProgressService();
-  final VoiceService voiceService = VoiceService();
   final TtsService ttsService = TtsService();
   final AudioPlayer _player = AudioPlayer();
 
@@ -34,7 +32,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
   bool isLoading = false;
   bool searchedNicobarese = false;
   bool isFavorite = false;
-  bool isListening = false;
 
   Map<String, dynamic>? dailyWord;
   List<String> history = [];
@@ -112,19 +109,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
         isFavorite = fav;
         isLoading = false;
       });
-    }
-  }
-
-  void performVoiceSearch() async {
-    setState(() => isListening = true);
-    
-    final text = await voiceService.listen();
-    
-    setState(() => isListening = false);
-    
-    if (text != null && text.isNotEmpty) {
-      searchController.text = text;
-      performSearch();
     }
   }
 
@@ -348,3 +332,4 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     );
   }
 }
+
