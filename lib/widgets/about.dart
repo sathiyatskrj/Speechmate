@@ -6,10 +6,9 @@ class InfoButton extends StatelessWidget {
   // Constant information for all screens
   static const String _imagePath = 'assets/icons/branding.png';
   static const String _aboutText =
-      'This application helps you learn and practice multiple languages. '
+      'This application helps you learn and practice multiple Tribal languages. '
       'Select your preferred language to get started with your learning journey.';
-  static const String _createdBy = 'T Sathiya Moorthy';
-  static const String _developedBy = 'Pratik Bairagi';
+  static const String _developedBy = 'T Sathiya Moorthy and Pratik Bairagi';
 
   @override
   Widget build(BuildContext context) {
@@ -103,10 +102,6 @@ class InfoButton extends StatelessWidget {
                         style: TextStyle(fontSize: 18, color: Colors.white70),
                       ),
                       SizedBox(height: 12),
-                      Text(
-                        'Created by....$_createdBy',
-                        style: TextStyle(fontSize: 18, color: Colors.white70),
-                      ),
                       Text(
                         'Developed by....$_developedBy',
                         style: TextStyle(fontSize: 18, color: Colors.white70),
