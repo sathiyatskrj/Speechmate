@@ -17,14 +17,15 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
   @override
   void initState() {
     super.initState();
-    dictionaryService.load();
+    // Load dictionary on init
+    dictionaryService.loadDictionary(DictionaryType.words);
   }
 
-  void translateText() {
+  void translateText() async {
     final input = controller.text.trim();
     if (input.isEmpty) return;
 
-    final result = dictionaryService.search(input);
+    final result = await dictionaryService.searchWord(input);
 
     setState(() {
       // user message
@@ -53,18 +54,17 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
     
     // Responsive values
     final messageFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final messageMaxWidth = screenSize.width * 0.75; // 75% of screen width
+    final messageMaxWidth = screenSize.width * 0.75;
     final messagePadding = isSmallScreen ? 10.0 : 12.0;
     final chatPadding = isSmallScreen ? 8.0 : 12.0;
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Text Translator"),
+        title: const Text("Chat Translator"),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            /// CHAT AREA
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.all(chatPadding),
@@ -74,21 +74,13 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
                   final isUser = msg['type'] == 'user';
 
                   return Align(
-                    alignment:
-                        isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
-                      margin: EdgeInsets.symmetric(
-                        vertical: isSmallScreen ? 4 : 6,
-                      ),
+                      margin: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 6),
                       padding: EdgeInsets.all(messagePadding),
-                      constraints: BoxConstraints(
-                        maxWidth: messageMaxWidth,
-                        minWidth: 60,
-                      ),
+                      constraints: BoxConstraints(maxWidth: messageMaxWidth, minWidth: 60),
                       decoration: BoxDecoration(
-                        color: isUser
-                            ? Colors.teal.shade600
-                            : Colors.grey.shade200,
+                        color: isUser ? Colors.teal.shade600 : Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -106,7 +98,6 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
               ),
             ),
 
-            /// INPUT BAR
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: isSmallScreen ? 8 : 12,
@@ -114,12 +105,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
               ),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 6,
-                  )
-                ],
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
               ),
               child: Row(
                 children: [
@@ -128,25 +114,19 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
                       controller: controller,
                       decoration: InputDecoration(
                         hintText: "Type text to translate...",
-                        hintStyle: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
-                        ),
+                        hintStyle: TextStyle(fontSize: isSmallScreen ? 14 : 16),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: isSmallScreen ? 8 : 12,
                           vertical: 8,
                         ),
                       ),
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 14 : 16,
-                      ),
+                      style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+                      onSubmitted: (_) => translateText(),
                     ),
                   ),
                   IconButton(
-                    icon: Icon(
-                      Icons.send,
-                      size: isSmallScreen ? 20 : 24,
-                    ),
+                    icon: Icon(Icons.send, size: isSmallScreen ? 20 : 24),
                     color: Colors.teal,
                     onPressed: translateText,
                     padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
