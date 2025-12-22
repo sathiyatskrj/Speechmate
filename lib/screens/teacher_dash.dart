@@ -6,6 +6,9 @@ import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
 import '../services/tts_service.dart';
+import '../services/favorites_service.dart';
+import '../services/history_service.dart';
+import '../services/progress_service.dart';
 import '../widgets/audio_phrase_card.dart';
 import 'quiz_screen.dart';
 import 'chat_translate_screen.dart';
@@ -44,7 +47,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ttsService.init(); // Initialize TTS
+    ttsService.init();
     
     _magicController = AnimationController(
       vsync: this,
@@ -77,7 +80,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
 
     await _loadDictionaries();
 
-    final loadedPhrases = await dictionaryService.getDictionary(DictionaryType.phrases);
+    final loadedPhrases = dictionaryService.getDictionary(DictionaryType.phrases);
     final h = await historyService.getHistory();
     final dWord = await dictionaryService.getDailyWord();
 
@@ -209,7 +212,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
     final isSmallScreen = screenSize.width < 360;
     final isMediumScreen = screenSize.width < 400;
 
-    // Responsive values
     final titleFontSize = isSmallScreen ? 16.0 : (isMediumScreen ? 17.0 : 18.0);
     final titleSpacing = isSmallScreen ? 15.0 : (isMediumScreen ? 20.0 : 30.0);
     final sectionFontSize = isSmallScreen ? 16.0 : 18.0;
@@ -241,9 +243,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
 
             if (result != null && result!['_type'] == 'words')
               Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isSmallScreen ? 4 : 0,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 4 : 0),
                 child: TranslationCard(
                   nicobarese: result!['nicobarese'],
                   english: result!['english'],
@@ -263,9 +263,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
               )
             else if (result == null)
               Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: isSmallScreen ? 4 : 0,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 4 : 0),
                 child: const TranslationCard(
                   nicobarese: "Word not found",
                   english: "",
@@ -284,22 +282,11 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "📅 Daily Word",
-                    style: TextStyle(
-                      fontSize: sectionFontSize,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
+                  Text("📅 Daily Word", style: TextStyle(fontSize: sectionFontSize, fontWeight: FontWeight.bold, color: Colors.black87)),
                   IconButton(
                     icon: Icon(Icons.share, color: Colors.blue, size: iconSize),
                     onPressed: () {
-                      Share.share(
-                        '📚 Today\'s Nicobarese Word:\n\n'
-                        '${dailyWord!['nicobarese']} = ${dailyWord!['english']}\n\n'
-                        'Learn with Speechmate!',
-                      );
+                      Share.share('📚 Today\'s Nicobarese Word:\n\n${dailyWord!['nicobarese']} = ${dailyWord!['english']}\n\nLearn with Speechmate!');
                     },
                   ),
                 ],
@@ -312,14 +299,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
               SizedBox(height: isSmallScreen ? 15 : 20),
             ],
             if (history.isNotEmpty) ...[
-              Text(
-                "🕒 Recent Searches",
-                style: TextStyle(
-                  fontSize: sectionFontSize,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
+              Text("🕒 Recent Searches", style: TextStyle(fontSize: sectionFontSize, fontWeight: FontWeight.bold, color: Colors.black87)),
               SizedBox(height: isSmallScreen ? 8 : 10),
               Expanded(
                 child: ListView.builder(
@@ -328,10 +308,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
                     return Card(
                       child: ListTile(
                         leading: Icon(Icons.history, size: isSmallScreen ? 18 : 20),
-                        title: Text(
-                          history[index],
-                          style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                        ),
+                        title: Text(history[index], style: TextStyle(fontSize: isSmallScreen ? 14 : 16)),
                         onTap: () {
                           searchController.text = history[index];
                           performSearch();
@@ -344,13 +321,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
             ] else
               Expanded(
                 child: Center(
-                  child: Text(
-                    "Start searching to learn!",
-                    style: TextStyle(
-                      color: Colors.black45,
-                      fontSize: isSmallScreen ? 14 : 16,
-                    ),
-                  ),
+                  child: Text("Start searching to learn!", style: TextStyle(color: Colors.black45, fontSize: isSmallScreen ? 14 : 16)),
                 ),
               ),
           ],
@@ -373,11 +344,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
                       Expanded(
                         child: Text(
                           searchedNicobarese ? "Nicobarese → English" : "English → Nicobarese",
-                          style: TextStyle(
-                            fontSize: titleFontSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
+                          style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.w600, color: Colors.black87),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -407,17 +374,12 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
                     ],
                   ),
                   SizedBox(height: titleSpacing),
-                  Search(
-                    controller: searchController,
-                    onSearch: performSearch,
-                    onClear: clearSearch,
-                  ),
+                  Search(controller: searchController, onSearch: performSearch, onClear: clearSearch),
                   SizedBox(height: isSmallScreen ? 10 : 15),
                   content,
                 ],
               ),
             ),
-            // Hidden Easter Egg
             if (_showMagic)
               IgnorePointer(
                 child: AnimatedBuilder(
@@ -435,13 +397,9 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
                               margin: EdgeInsets.all(isSmallScreen ? 30 : 40),
                               padding: EdgeInsets.all(isSmallScreen ? 20 : 30),
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.purple.shade400, Colors.blue.shade400, Colors.pink.shade400],
-                                ),
+                                gradient: LinearGradient(colors: [Colors.purple.shade400, Colors.blue.shade400, Colors.pink.shade400]),
                                 borderRadius: BorderRadius.circular(25),
-                                boxShadow: [
-                                  BoxShadow(color: Colors.purple.withOpacity(0.6), blurRadius: 30, spreadRadius: 10),
-                                ],
+                                boxShadow: [BoxShadow(color: Colors.purple.withOpacity(0.6), blurRadius: 30, spreadRadius: 10)],
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
