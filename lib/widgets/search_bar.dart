@@ -4,12 +4,14 @@ class Search extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSearch;
   final VoidCallback onClear;
+  final VoidCallback? onVoiceSearch; // NEW
 
   const Search({
     super.key,
     required this.controller,
     required this.onSearch,
     required this.onClear,
+    this.onVoiceSearch, // NEW
   });
 
   @override
@@ -32,14 +34,21 @@ class Search extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Search words",
-                hintStyle: const TextStyle(color: Colors.black45),
+                hintStyle: TextStyle(color: Colors.black45),
                 border: InputBorder.none,
               ),
               onChanged: (_) {},
             ),
           ),
+          // Microphone button (NEW)
+          if (onVoiceSearch != null)
+            IconButton(
+              icon: const Icon(Icons.mic, color: Colors.redAccent),
+              onPressed: onVoiceSearch,
+              tooltip: 'Voice Search',
+            ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: onSearch,
