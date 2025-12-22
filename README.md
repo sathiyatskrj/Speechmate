@@ -118,4 +118,5 @@ The goal of SpeechMate is to make bilingual word lookup fast, accessible, and ea
 - More Nicobarese dialect support
 
 ## Contributers
-- [Pratik](https://github.com/Lyco0) (Main Developer)
+
+- [Pratik](https://github.com/Lyco0) (Developer)
