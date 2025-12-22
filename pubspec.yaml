@@ -12,7 +12,7 @@ dependencies:
   flutter_tts: ^4.2.3
   audioplayers: ^6.5.1
   shared_preferences: ^2.2.2
-  speech_to_text: ^6.6.0
+  # speech_to_text: ^6.6.0
   share_plus: ^7.2.1
 
 dev_dependencies:
@@ -55,3 +55,4 @@ flutter:
     - assets/images/
     - assets/data/dictionary_phrases.json
     - assets/icons/branding.png
+
