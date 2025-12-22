@@ -14,7 +14,7 @@ class TeacherDash extends StatefulWidget {
   State<TeacherDash> createState() => _TeacherDashState();
 }
 
-class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
+class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, TickerProviderStateMixin {
   final TextEditingController searchController = TextEditingController();
   final DictionaryService dictionaryService = DictionaryService();
   final TtsService ttsService = TtsService();
@@ -25,30 +25,37 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
   bool isLoading = false;
   bool searchedNicobarese = false;
 
+  // Hidden Easter egg
+  bool _showMagic = false;
+  late AnimationController _magicController;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ttsService.init(); // Initialize TTS
+    ttsService.init();
+    
+    // Animation for hidden feature
+    _magicController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+    );
+    
     _loadDictionaries();
   }
 
-  // Monitor app lifecycle
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Free memory when app goes to background or is paused
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       dictionaryService.unloadAll();
     }
 
-    // Reload when app comes back to foreground
     if (state == AppLifecycleState.resumed) {
       _loadDictionaries();
     }
   }
 
-  // Load both words and phrases dictionaries
   Future<void> _loadDictionaries() async {
     if (mounted) {
       setState(() {
@@ -56,13 +63,11 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
       });
     }
 
-    // Load both dictionaries needed for this screen
     await dictionaryService.loadMultiple([
       DictionaryType.words,
       DictionaryType.phrases,
     ]);
 
-    // Get the phrases data
     final loadedPhrases = await dictionaryService.getDictionary(
       DictionaryType.phrases,
     );
@@ -75,9 +80,26 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     }
   }
 
-  // Perform search in both words and phrases
   Future<void> performSearch() async {
     FocusScope.of(context).unfocus();
+
+    // Hidden Easter egg - Try searching these words!
+    final searchText = searchController.text.toLowerCase().trim();
+    if (searchText == 'speechmate' || 
+        searchText == 'nicobar' || 
+        searchText == 'magic' ||
+        searchText == 'treasure') {
+      setState(() => _showMagic = true);
+      _magicController.forward(from: 0);
+      
+      Future.delayed(const Duration(milliseconds: 2500), () {
+        if (mounted) {
+          setState(() => _showMagic = false);
+          _magicController.reset();
+        }
+      });
+      return;
+    }
 
     if (mounted) {
       setState(() {
@@ -85,7 +107,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
       });
     }
 
-    // Search in both dictionaries
     final searchResult = await dictionaryService.searchEverywhere(
       searchController.text,
     );
@@ -93,9 +114,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     if (mounted) {
       setState(() {
         result = searchResult;
-
         searchedNicobarese = searchResult?['_searchedNicobarese'] == true;
-
         isLoading = false;
       });
     }
@@ -108,14 +127,12 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     });
   }
 
-  // Play audio from assets
   void playAudio(String category, String fileName) async {
     try {
       final path = 'audio/$category/$fileName';
       await _player.play(AssetSource(path));
       debugPrint('Trying to play: audio/$category/$fileName');
     } catch (e) {
-      // Handle audio playback error
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -126,16 +143,11 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    // Remove lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
-
-    // Dispose resources
     _player.dispose();
     searchController.dispose();
-
-    // Free memory when leaving this screen
+    _magicController.dispose();
     dictionaryService.unloadAll();
-
     super.dispose();
   }
 
@@ -145,125 +157,196 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     final isSmallScreen = screenSize.width < 360;
     final isMediumScreen = screenSize.width < 400;
     
-    // Responsive font sizes
     final titleFontSize = isSmallScreen ? 18.0 : (isMediumScreen ? 20.0 : 22.0);
     final titleSpacing = isSmallScreen ? 15.0 : (isMediumScreen ? 20.0 : 30.0);
     
     return Scaffold(
       body: SafeArea(
-        child: Background(
-          colors: const [Color(0xFF38BDF8), Color(0xFF94FFF8)],
-          child:
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Title
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isSmallScreen ? 8.0 : 0.0,
-                        ),
-                        child: Text(
-                          searchedNicobarese
-                              ? "Nicobarese → English"
-                              : "English → Nicobarese",
-                          style: TextStyle(
-                            fontSize: titleFontSize,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-
-                      SizedBox(height: titleSpacing),
-
-                      // SEARCH BAR
-                      Search(
-                        controller: searchController,
-                        onSearch: performSearch,
-                        onClear: clearSearch,
-                      ),
-
-                      const SizedBox(height: 5),
-
-                      // Phrases list with audio and search results
-                      Expanded(
-                        child: ListView(
-                          padding: EdgeInsets.only(
-                            bottom: 20,
-                            left: isSmallScreen ? 4 : 0,
-                            right: isSmallScreen ? 4 : 0,
-                          ),
-                          children: [
-                            // Audio phrase cards - ALWAYS VISIBLE
-                            if (phrases.isNotEmpty)
-                              ...phrases.map((item) {
-                                return AudioPhraseCard(
-                                  text: item['text'] ?? 'Unknown phrase',
-                                  onPlay: () {
-                                    if (item['audio'] != null) {
-                                      playAudio(
-                                        item['audio']['category'] ?? '',
-                                        item['audio']['file'] ?? '',
-                                      );
-                                    }
-                                  },
-                                );
-                              }),
-
-                            // Spacing between phrases and search results
-                            if (phrases.isNotEmpty && searchController.text.isNotEmpty)
-                              const SizedBox(height: 16),
-
-                            // Translation result (AFTER audio cards)
-                            if (searchController.text.isNotEmpty &&
-                                result != null &&
-                                result!['_type'] == 'words')
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: isSmallScreen ? 4 : 0,
-                                  right: isSmallScreen ? 4 : 0,
-                                ),
-                                child: TranslationCard(
-                                  nicobarese: result!['nicobarese'],
-                                  english: result!['english'],
-                                  isError: false,
-                                  searchedNicobarese: searchedNicobarese,
-                                  showSpeaker: true,
-                                  onSpeakerTap: () {
-                                    // 🔊 Speak only the searched language
-                                    if (searchedNicobarese) {
-                                      ttsService.speakEnglish(
-                                        result!['english'],
-                                      );
-                                    } else {
-                                      ttsService.speakNicobarese(
-                                        result!['nicobarese'],
-                                      );
-                                    }
-                                  },
-                                ),
-                              )
-                            else if (searchController.text.isNotEmpty &&
-                                result == null)
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: isSmallScreen ? 4 : 0,
-                                  right: isSmallScreen ? 4 : 0,
-                                ),
-                                child: const TranslationCard(
-                                  nicobarese: "Word not found",
-                                  english: "",
-                                  isError: true,
-                                ),
+        child: Stack(
+          children: [
+            Background(
+              colors: const [Color(0xFF38BDF8), Color(0xFF94FFF8)],
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isSmallScreen ? 8.0 : 0.0,
+                            ),
+                            child: Text(
+                              searchedNicobarese
+                                  ? "Nicobarese → English"
+                                  : "English → Nicobarese",
+                              style: TextStyle(
+                                fontSize: titleFontSize,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
                               ),
-                          ],
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+
+                          SizedBox(height: titleSpacing),
+
+                          Search(
+                            controller: searchController,
+                            onSearch: performSearch,
+                            onClear: clearSearch,
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          Expanded(
+                            child: ListView(
+                              padding: EdgeInsets.only(
+                                bottom: 20,
+                                left: isSmallScreen ? 4 : 0,
+                                right: isSmallScreen ? 4 : 0,
+                              ),
+                              children: [
+                                if (phrases.isNotEmpty)
+                                  ...phrases.map((item) {
+                                    return AudioPhraseCard(
+                                      text: item['text'] ?? 'Unknown phrase',
+                                      onPlay: () {
+                                        if (item['audio'] != null) {
+                                          playAudio(
+                                            item['audio']['category'] ?? '',
+                                            item['audio']['file'] ?? '',
+                                          );
+                                        }
+                                      },
+                                    );
+                                  }),
+
+                                if (phrases.isNotEmpty && searchController.text.isNotEmpty)
+                                  const SizedBox(height: 16),
+
+                                if (searchController.text.isNotEmpty &&
+                                    result != null &&
+                                    result!['_type'] == 'words')
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: isSmallScreen ? 4 : 0,
+                                      right: isSmallScreen ? 4 : 0,
+                                    ),
+                                    child: TranslationCard(
+                                      nicobarese: result!['nicobarese'],
+                                      english: result!['english'],
+                                      isError: false,
+                                      searchedNicobarese: searchedNicobarese,
+                                      showSpeaker: true,
+                                      onSpeakerTap: () {
+                                        if (searchedNicobarese) {
+                                          ttsService.speakEnglish(
+                                            result!['english'],
+                                          );
+                                        } else {
+                                          ttsService.speakNicobarese(
+                                            result!['nicobarese'],
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  )
+                                else if (searchController.text.isNotEmpty &&
+                                    result == null)
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: isSmallScreen ? 4 : 0,
+                                      right: isSmallScreen ? 4 : 0,
+                                    ),
+                                    child: const TranslationCard(
+                                      nicobarese: "Word not found",
+                                      english: "",
+                                      isError: true,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+            ),
+            
+            // Hidden Easter Egg Animation
+            if (_showMagic)
+              IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: _magicController,
+                  builder: (context, child) {
+                    final progress = _magicController.value;
+                    return Container(
+                      color: Colors.black.withOpacity(0.7 * (1 - progress)),
+                      child: Center(
+                        child: Transform.scale(
+                          scale: 0.3 + (progress * 0.7),
+                          child: Opacity(
+                            opacity: progress < 0.8 ? 1.0 : (1.0 - ((progress - 0.8) / 0.2)),
+                            child: Container(
+                              margin: EdgeInsets.all(isSmallScreen ? 30 : 40),
+                              padding: EdgeInsets.all(isSmallScreen ? 20 : 30),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.purple.shade400,
+                                    Colors.blue.shade400,
+                                    Colors.pink.shade400,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.purple.withOpacity(0.6),
+                                    blurRadius: 30,
+                                    spreadRadius: 10,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '✨🎉✨',
+                                    style: TextStyle(
+                                      fontSize: (isSmallScreen ? 50 : 70) * (0.5 + progress * 0.5),
+                                    ),
+                                  ),
+                                  SizedBox(height: isSmallScreen ? 15 : 20),
+                                  Text(
+                                    'You Found It!',
+                                    style: TextStyle(
+                                      fontSize: isSmallScreen ? 22 : 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(height: isSmallScreen ? 8 : 10),
+                                  Text(
+                                    '🌴 Hidden Treasure Unlocked! 🌴',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: isSmallScreen ? 14 : 16,
+                                      color: Colors.white.withOpacity(0.95),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
+                ),
+              ),
+          ],
         ),
       ),
     );
