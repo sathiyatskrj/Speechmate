@@ -6,8 +6,8 @@ plugins {
 
 android {
     namespace = "com.speechmate.speechmate"
-    compileSdk = 34  // Updated to latest stable
-    ndkVersion = "27.0.12077973"  // Fixed NDK version
+    compileSdk = 35  // Changed to 35 (required by plugins)
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -20,8 +20,8 @@ android {
 
     defaultConfig {
         applicationId = "com.speechmate.speechmate"
-        minSdk = 21  // Android 5.0 (Lollipop) - supports old devices
-        targetSdk = 34  // Latest stable Android
+        minSdk = 21  // Android 5.0 (Lollipop)
+        targetSdk = 34  // Latest stable
         versionCode = 1
         versionName = "1.2.0"
     }
