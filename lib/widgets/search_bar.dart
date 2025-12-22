@@ -49,13 +49,6 @@ class Search extends StatelessWidget {
               onChanged: (_) {},
             ),
           ),
-          if (onVoiceSearch != null)
-            IconButton(
-              icon: const Icon(Icons.mic, color: Colors.redAccent),
-              onPressed: onVoiceSearch,
-              tooltip: 'Voice Search',
-              iconSize: isSmallScreen ? 20 : 24,
-            ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: onSearch,
@@ -72,3 +65,4 @@ class Search extends StatelessWidget {
     );
   }
 }
+
