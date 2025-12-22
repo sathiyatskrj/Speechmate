@@ -1,0 +1,195 @@
+import 'package:flutter/material.dart';
+import '../services/dictionary_service.dart';
+import '../widgets/background.dart';
+
+class QuizScreen extends StatefulWidget {
+  const QuizScreen({super.key});
+
+  @override
+  State<QuizScreen> createState() => _QuizScreenState();
+}
+
+class _QuizScreenState extends State<QuizScreen> {
+  final DictionaryService dictionaryService = DictionaryService();
+  
+  List<Map<String, dynamic>> questions = [];
+  int currentIndex = 0;
+  int score = 0;
+  bool isLoading = true;
+  bool answered = false;
+  int? selectedOption;
+  
+  List<String> options = [];
+  int correctOptionIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadQuiz();
+  }
+
+  Future<void> _loadQuiz() async {
+    setState(() => isLoading = true);
+    
+    final randomWords = await dictionaryService.getRandomWords(5);
+    
+    setState(() {
+      questions = randomWords;
+      currentIndex = 0;
+      score = 0;
+      isLoading = false;
+    });
+    
+    _generateOptions();
+  }
+
+  void _generateOptions() async {
+    if (currentIndex >= questions.length) return;
+
+    final correctWord = questions[currentIndex];
+    final wrong = await dictionaryService.getRandomWords(3);
+    
+    List<String> opts = [
+      correctWord['english'] ?? '',
+      ...wrong.map((e) => e['english'].toString())
+    ];
+    
+    opts.shuffle();
+    
+    setState(() {
+      options = opts;
+      correctOptionIndex = opts.indexOf(correctWord['english']);
+      answered = false;
+      selectedOption = null;
+    });
+  }
+
+  void _submitAnswer(int optionIndex) {
+    if (answered) return;
+
+    setState(() {
+      answered = true;
+      selectedOption = optionIndex;
+      if (optionIndex == correctOptionIndex) score++;
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (currentIndex < questions.length - 1) {
+        setState(() => currentIndex++);
+        _generateOptions();
+      } else {
+        _showScoreDialog();
+      }
+    });
+  }
+
+  void _showScoreDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("Quiz Completed!"),
+        content: Text("You scored $score / ${questions.length}"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text("Exit"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _loadQuiz();
+            },
+            child: const Text("Play Again"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text("Quiz Mode", style: TextStyle(color: Colors.black)),
+        centerTitle: true,
+        leading: const BackButton(color: Colors.black),
+      ),
+      body: Background(
+        colors: const [Color(0xFF845EC2), Color(0xFFD65DB1)],
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
+        child: isLoading 
+            ? const Center(child: CircularProgressIndicator(color: Colors.white))
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                   Text(
+                     "Question ${currentIndex + 1} / ${questions.length}",
+                     textAlign: TextAlign.center,
+                     style: const TextStyle(color: Colors.white70, fontSize: 16),
+                   ),
+                   const SizedBox(height: 20),
+                   
+                   Container(
+                     padding: const EdgeInsets.all(30),
+                     decoration: BoxDecoration(
+                       color: Colors.white,
+                       borderRadius: BorderRadius.circular(20),
+                       boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black26)]
+                     ),
+                     child: Column(
+                       children: [
+                         const Text("Translate this:", style: TextStyle(color: Colors.grey)),
+                         const SizedBox(height: 10),
+                         Text(
+                           questions[currentIndex]['nicobarese'] ?? '',
+                           style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black87),
+                           textAlign: TextAlign.center,
+                         ),
+                       ],
+                     ),
+                   ),
+                   
+                   const SizedBox(height: 40),
+                   
+                   ...List.generate(4, (index) {
+                     Color color = Colors.white;
+                     if (answered) {
+                       if (index == correctOptionIndex) {
+                         color = Colors.greenAccent;
+                       } else if (index == selectedOption) {
+                         color = Colors.redAccent;
+                       }
+                     }
+                     
+                     return Padding(
+                       padding: const EdgeInsets.only(bottom: 12),
+                       child: ElevatedButton(
+                         style: ElevatedButton.styleFrom(
+                           backgroundColor: color,
+                           padding: const EdgeInsets.symmetric(vertical: 16),
+                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                         ),
+                         onPressed: () => _submitAnswer(index),
+                         child: Text(
+                           options.length > index ? options[index] : '',
+                           style: TextStyle(
+                             fontSize: 18, 
+                             color: answered ? Colors.white : Colors.black87
+                           ),
+                         ),
+                       ),
+                     );
+                   }),
+                ],
+              ),
+      ),
+    );
+  }
+}
