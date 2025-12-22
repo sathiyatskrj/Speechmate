@@ -1,15 +1,11 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import '../widgets/background.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
 import '../services/tts_service.dart';
 import '../widgets/audio_phrase_card.dart';
-import 'quiz_screen.dart';
-import 'chat_translate_screen.dart';
-import 'progress_screen.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -21,9 +17,6 @@ class TeacherDash extends StatefulWidget {
 class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
   final TextEditingController searchController = TextEditingController();
   final DictionaryService dictionaryService = DictionaryService();
-  final FavoritesService favoritesService = FavoritesService();
-  final HistoryService historyService = HistoryService();
-  final ProgressService progressService = ProgressService();
   final TtsService ttsService = TtsService();
   final AudioPlayer _player = AudioPlayer();
 
@@ -31,122 +24,81 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
   List<Map<String, dynamic>> phrases = [];
   bool isLoading = false;
   bool searchedNicobarese = false;
-  bool isFavorite = false;
-
-  Map<String, dynamic>? dailyWord;
-  List<String> history = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadAllData();
+    ttsService.init(); // Initialize TTS
+    _loadDictionaries();
   }
 
+  // Monitor app lifecycle
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Free memory when app goes to background or is paused
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       dictionaryService.unloadAll();
     }
+
+    // Reload when app comes back to foreground
     if (state == AppLifecycleState.resumed) {
       _loadDictionaries();
     }
   }
 
+  // Load both words and phrases dictionaries
   Future<void> _loadDictionaries() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+
+    // Load both dictionaries needed for this screen
     await dictionaryService.loadMultiple([
       DictionaryType.words,
       DictionaryType.phrases,
     ]);
-  }
 
-  Future<void> _loadAllData() async {
-    if (mounted) setState(() => isLoading = true);
-
-    await _loadDictionaries();
-
-    final loadedPhrases = await dictionaryService.getDictionary(DictionaryType.phrases);
-    final h = await historyService.getHistory();
-    final dWord = await dictionaryService.getDailyWord();
+    // Get the phrases data
+    final loadedPhrases = await dictionaryService.getDictionary(
+      DictionaryType.phrases,
+    );
 
     if (mounted) {
       setState(() {
         phrases = loadedPhrases;
-        history = h;
-        dailyWord = dWord;
         isLoading = false;
       });
     }
   }
 
+  // Perform search in both words and phrases
   Future<void> performSearch() async {
     FocusScope.of(context).unfocus();
-    if (searchController.text.isEmpty) return;
 
-    if (mounted) setState(() => isLoading = true);
-
-    await progressService.incrementSearchCount();
-    await progressService.updateStreak();
-
-    final searchResult = await dictionaryService.searchEverywhere(searchController.text);
-
-    if (searchResult != null) {
-      await historyService.addToHistory(searchController.text);
-      final newHistory = await historyService.getHistory();
-      if (mounted) setState(() => history = newHistory);
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
     }
 
-    bool fav = false;
-    if (searchResult != null && searchResult['_type'] == 'words') {
-      fav = await favoritesService.isFavorite(searchResult['english'] ?? '');
-    }
+    // Search in both dictionaries
+    final searchResult = await dictionaryService.searchEverywhere(
+      searchController.text,
+    );
 
     if (mounted) {
       setState(() {
         result = searchResult;
+
         searchedNicobarese = searchResult?['_searchedNicobarese'] == true;
-        isFavorite = fav;
+
         isLoading = false;
       });
     }
-  }
-
-  void toggleFavorite() async {
-    if (result == null || result!['_type'] != 'words') return;
-    final word = result!['english'] ?? '';
-    if (isFavorite) {
-      await favoritesService.removeFavorite(word);
-    } else {
-      await favoritesService.addFavorite(word);
-    }
-    setState(() => isFavorite = !isFavorite);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(isFavorite ? 'Added to Favorites' : 'Removed from Favorites'), duration: const Duration(seconds: 1)),
-    );
-  }
-
-  void showReportDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Report Issue"),
-        content: const TextField(
-          decoration: InputDecoration(hintText: "What is wrong?"),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Thanks for your feedback!")));
-            },
-            child: const Text("Submit"),
-          ),
-        ],
-      ),
-    );
   }
 
   void clearSearch() {
@@ -156,180 +108,164 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
     });
   }
 
+  // Play audio from assets
   void playAudio(String category, String fileName) async {
     try {
-      await _player.play(AssetSource('audio/$category/$fileName'));
+      final path = 'audio/$category/$fileName';
+      await _player.play(AssetSource(path));
+      debugPrint('Trying to play: audio/$category/$fileName');
     } catch (e) {
-      // ignore
+      // Handle audio playback error
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Could not play audio: $e')));
+      }
     }
   }
 
   @override
   void dispose() {
+    // Remove lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
+
+    // Dispose resources
     _player.dispose();
     searchController.dispose();
+
+    // Free memory when leaving this screen
     dictionaryService.unloadAll();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget content;
-
-    if (isLoading) {
-      content = const Center(child: CircularProgressIndicator());
-    } else if (searchController.text.isNotEmpty) {
-      content = Column(
-        children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 20),
-              children: [
-                 ...phrases.map((item) => AudioPhraseCard(
-                      text: item['text'] ?? '',
-                      onPlay: () {
-                         if (item['audio'] != null) playAudio(item['audio']['category'], item['audio']['file']);
-                      },
-                 )),
-
-                 if (result != null && result!['_type'] == 'words')
-                   Padding(
-                     padding: const EdgeInsets.only(top: 16),
-                     child: TranslationCard(
-                       nicobarese: result!['nicobarese'],
-                       english: result!['english'],
-                       searchedNicobarese: searchedNicobarese,
-                       showSpeaker: true,
-                       onSpeakerTap: () {
-                         if (searchedNicobarese) {
-                           ttsService.speakEnglish(result!['english']);
-                         } else {
-                           ttsService.speakNicobarese(result!['nicobarese']);
-                         }
-                       },
-                       isFavorite: isFavorite,
-                       onFavoriteToggle: toggleFavorite,
-                       onReport: showReportDialog,
-                     ),
-                   )
-                 else if (result == null)
-                   const Padding(
-                     padding: EdgeInsets.only(top: 16),
-                     child: TranslationCard(
-                       nicobarese: "Word not found",
-                       english: "",
-                       isError: true,
-                     ),
-                   ),
-              ],
-            ),
-          )
-        ],
-      );
-    } else {
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-           if (dailyWord != null) ...[
-             Row(
-               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-               children: [
-                 const Text("📅 Daily Word", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-                 IconButton(
-                   icon: const Icon(Icons.share, color: Colors.blue),
-                   onPressed: () {
-                     Share.share(
-                       '📚 Today\'s Nicobarese Word:\n\n'
-                       '${dailyWord!['nicobarese']} = ${dailyWord!['english']}\n\n'
-                       'Learn with Speechmate!',
-                     );
-                   },
-                 ),
-               ],
-             ),
-             const SizedBox(height: 10),
-             TranslationCard(
-               nicobarese: dailyWord!['nicobarese'],
-               english: dailyWord!['english'],
-             ),
-             const SizedBox(height: 20),
-           ],
-
-           if (history.isNotEmpty) ...[
-             const Text("🕒 Recent Searches", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-             const SizedBox(height: 10),
-             Expanded(
-               child: ListView.builder(
-                 itemCount: history.length,
-                 itemBuilder: (context, index) {
-                   return Card(
-                     child: ListTile(
-                       leading: const Icon(Icons.history, size: 20),
-                       title: Text(history[index]),
-                       onTap: () {
-                         searchController.text = history[index];
-                         performSearch();
-                       },
-                     ),
-                   );
-                 },
-               ),
-             )
-           ] else 
-             const Expanded(child: Center(child: Text("Start searching to learn!", style: TextStyle(color: Colors.black45)))),
-        ],
-      );
-    }
-
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 360;
+    final isMediumScreen = screenSize.width < 400;
+    
+    // Responsive font sizes
+    final titleFontSize = isSmallScreen ? 18.0 : (isMediumScreen ? 20.0 : 22.0);
+    final titleSpacing = isSmallScreen ? 15.0 : (isMediumScreen ? 20.0 : 30.0);
+    
     return Scaffold(
-      body: Background(
-        colors: const [Color(0xFF38BDF8), Color(0xFF94FFF8)],
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-        child: Column(
-          children: [
-             Row(
-               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-               children: [
-                 const SizedBox(width: 40),
-                 Text(
-                   searchedNicobarese ? "Nicobarese → English" : "English → Nicobarese",
-                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
-                 ),
-                 Row(
-                   children: [
-                     IconButton(
-                       icon: const Icon(Icons.quiz_outlined, color: Colors.deepPurple),
-                       tooltip: 'Quiz Mode',
-                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
-                     ),
-                     IconButton(
-                       icon: const Icon(Icons.chat_bubble_outline, color: Colors.blueAccent),
-                       tooltip: 'Chat Translator',
-                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
-                     ),
-                     IconButton(
-                       icon: const Icon(Icons.bar_chart, color: Colors.green),
-                       tooltip: 'Progress',
-                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
-                     ),
-                   ],
-                 )
-               ],
-             ),
-             const SizedBox(height: 30),
-             Search(
-               controller: searchController,
-               onSearch: performSearch,
-               onClear: clearSearch,
-             ),
-             const SizedBox(height: 15),
-             Expanded(child: content),
-          ],
+      body: SafeArea(
+        child: Background(
+          colors: const [Color(0xFF38BDF8), Color(0xFF94FFF8)],
+          child:
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Title
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 8.0 : 0.0,
+                        ),
+                        child: Text(
+                          searchedNicobarese
+                              ? "Nicobarese → English"
+                              : "English → Nicobarese",
+                          style: TextStyle(
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+
+                      SizedBox(height: titleSpacing),
+
+                      // SEARCH BAR
+                      Search(
+                        controller: searchController,
+                        onSearch: performSearch,
+                        onClear: clearSearch,
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      // Phrases list with audio and search results
+                      Expanded(
+                        child: ListView(
+                          padding: EdgeInsets.only(
+                            bottom: 20,
+                            left: isSmallScreen ? 4 : 0,
+                            right: isSmallScreen ? 4 : 0,
+                          ),
+                          children: [
+                            // Audio phrase cards - ALWAYS VISIBLE
+                            if (phrases.isNotEmpty)
+                              ...phrases.map((item) {
+                                return AudioPhraseCard(
+                                  text: item['text'] ?? 'Unknown phrase',
+                                  onPlay: () {
+                                    if (item['audio'] != null) {
+                                      playAudio(
+                                        item['audio']['category'] ?? '',
+                                        item['audio']['file'] ?? '',
+                                      );
+                                    }
+                                  },
+                                );
+                              }),
+
+                            // Spacing between phrases and search results
+                            if (phrases.isNotEmpty && searchController.text.isNotEmpty)
+                              const SizedBox(height: 16),
+
+                            // Translation result (AFTER audio cards)
+                            if (searchController.text.isNotEmpty &&
+                                result != null &&
+                                result!['_type'] == 'words')
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  left: isSmallScreen ? 4 : 0,
+                                  right: isSmallScreen ? 4 : 0,
+                                ),
+                                child: TranslationCard(
+                                  nicobarese: result!['nicobarese'],
+                                  english: result!['english'],
+                                  isError: false,
+                                  searchedNicobarese: searchedNicobarese,
+                                  showSpeaker: true,
+                                  onSpeakerTap: () {
+                                    // 🔊 Speak only the searched language
+                                    if (searchedNicobarese) {
+                                      ttsService.speakEnglish(
+                                        result!['english'],
+                                      );
+                                    } else {
+                                      ttsService.speakNicobarese(
+                                        result!['nicobarese'],
+                                      );
+                                    }
+                                  },
+                                ),
+                              )
+                            else if (searchController.text.isNotEmpty &&
+                                result == null)
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  left: isSmallScreen ? 4 : 0,
+                                  right: isSmallScreen ? 4 : 0,
+                                ),
+                                child: const TranslationCard(
+                                  nicobarese: "Word not found",
+                                  english: "",
+                                  isError: true,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );
   }
 }
-
-
