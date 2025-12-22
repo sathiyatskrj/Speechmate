@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/screens/feelings_page.dart';
 import 'package:speechmate/screens/mybody_part.dart';
 import 'package:speechmate/screens/nature_page.dart';
+// [NEW] Import the Games Hub
+import 'games/games_hub_screen.dart';
+
 import '../widgets/background.dart';
 import '../widgets/learning_tiles.dart';
 import '../widgets/search_bar.dart';
@@ -40,6 +43,12 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       "word": "Body Parts",
       "colors": [Color(0xFFB084FF), Color(0xFF7AA6FF)],
       "navigateTo": BodyPartsScreen(),
+    },
+    // [NEW] Added Games Tile
+    {
+      "word": "Games",
+      "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+      "navigateTo": const GamesHubScreen(),
     },
   ];
 
