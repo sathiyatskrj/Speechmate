@@ -9,137 +9,153 @@ class ChatTranslateScreen extends StatefulWidget {
 }
 
 class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
-  final TextEditingController _controller = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  final DictionaryService _dictionaryService = DictionaryService();
-  
-  List<Map<String, String>> messages = [
-    {"role": "bot", "text": "Hello! Type a word in English or Nicobarese, and I will translate it for you."}
-  ];
+  final DictionaryService dictionaryService = DictionaryService();
+  final TextEditingController controller = TextEditingController();
+
+  final List<Map<String, String>> messages = [];
 
   @override
   void initState() {
     super.initState();
-    _dictionaryService.loadAll();
+    dictionaryService.load();
   }
 
-  void _sendMessage() async {
-    if (_controller.text.trim().isEmpty) return;
+  void translateText() {
+    final input = controller.text.trim();
+    if (input.isEmpty) return;
 
-    final userText = _controller.text.trim();
-    
-    setState(() {
-      messages.add({"role": "user", "text": userText});
-      _controller.clear();
-    });
-    
-    _scrollToBottom();
-
-    await Future.delayed(const Duration(milliseconds: 600));
-
-    final result = await _dictionaryService.searchEverywhere(userText);
-    String botReply = "Sorry, I don't know that word yet.";
-    
-    if (result != null) {
-      if (result['_type'] == 'words') {
-        bool searchedNicobarese = result['_searchedNicobarese'] == true;
-        if (searchedNicobarese) {
-          botReply = "English: ${result['english']}";
-        } else {
-          botReply = "Nicobarese: ${result['nicobarese']}";
-        }
-      } else {
-        botReply = "Phrase: ${result['text']}\nTranslation found in list.";
-      }
-    }
+    final result = dictionaryService.search(input);
 
     setState(() {
-      messages.add({"role": "bot", "text": botReply});
-    });
-    _scrollToBottom();
-  }
-  
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+      // user message
+      messages.add({
+        "text": input,
+        "type": "user",
+      });
+
+      // translated message
+      messages.add({
+        "text": result != null
+            ? "${result['english']} ↔ ${result['nicobarese']}"
+            : "Translation not found",
+        "type": "bot",
+      });
+
+      controller.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 360;
+    final isMediumScreen = screenSize.width < 400;
+    
+    // Responsive values
+    final messageFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+    final messageMaxWidth = screenSize.width * 0.75; // 75% of screen width
+    final messagePadding = isSmallScreen ? 10.0 : 12.0;
+    final chatPadding = isSmallScreen ? 8.0 : 12.0;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chat Translator"),
-        backgroundColor: const Color(0xFF38BDF8),
-        elevation: 0,
+        title: const Text("Text Translator"),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final msg = messages[index];
-                final isUser = msg['role'] == 'user';
-                return Align(
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: isUser ? const Color(0xFF38BDF8) : Colors.grey[200],
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(16),
-                        topRight: const Radius.circular(16),
-                        bottomLeft: isUser ? const Radius.circular(16) : Radius.zero,
-                        bottomRight: isUser ? Radius.zero : const Radius.circular(16),
+      body: SafeArea(
+        child: Column(
+          children: [
+            /// CHAT AREA
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(chatPadding),
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final msg = messages[index];
+                  final isUser = msg['type'] == 'user';
+
+                  return Align(
+                    alignment:
+                        isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(
+                        vertical: isSmallScreen ? 4 : 6,
+                      ),
+                      padding: EdgeInsets.all(messagePadding),
+                      constraints: BoxConstraints(
+                        maxWidth: messageMaxWidth,
+                        minWidth: 60,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isUser
+                            ? Colors.teal.shade600
+                            : Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        msg['text']!,
+                        style: TextStyle(
+                          color: isUser ? Colors.white : Colors.black87,
+                          fontSize: messageFontSize,
+                          height: 1.3,
+                        ),
+                        softWrap: true,
                       ),
                     ),
-                    child: Text(
-                      msg['text']!,
-                      style: TextStyle(color: isUser ? Colors.white : Colors.black87),
+                  );
+                },
+              ),
+            ),
+
+            /// INPUT BAR
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isSmallScreen ? 8 : 12,
+                vertical: isSmallScreen ? 6 : 8,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 6,
+                  )
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      decoration: InputDecoration(
+                        hintText: "Type text to translate...",
+                        hintStyle: TextStyle(
+                          fontSize: isSmallScreen ? 14 : 16,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 8 : 12,
+                          vertical: 8,
+                        ),
+                      ),
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 14 : 16,
+                      ),
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          
-          Container(
-            padding: const EdgeInsets.all(10),
-            color: Colors.white,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: "Type a word...",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                  IconButton(
+                    icon: Icon(
+                      Icons.send,
+                      size: isSmallScreen ? 20 : 24,
                     ),
-                    onSubmitted: (_) => _sendMessage(),
+                    color: Colors.teal,
+                    onPressed: translateText,
+                    padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
                   ),
-                ),
-                const SizedBox(width: 8),
-                FloatingActionButton(
-                  mini: true,
-                  backgroundColor: const Color(0xFF38BDF8),
-                  onPressed: _sendMessage,
-                  child: const Icon(Icons.send),
-                ),
-              ],
+                ],
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
