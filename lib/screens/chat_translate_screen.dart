@@ -17,15 +17,14 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
   @override
   void initState() {
     super.initState();
-    // Load dictionary on init
-    dictionaryService.loadDictionary(DictionaryType.words);
+    dictionaryService.load();
   }
 
-  void translateText() async {
+  void translateText() {
     final input = controller.text.trim();
     if (input.isEmpty) return;
 
-    final result = await dictionaryService.searchWord(input);
+    final result = dictionaryService.search(input);
 
     setState(() {
       // user message
@@ -48,94 +47,79 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isSmallScreen = screenSize.width < 360;
-    final isMediumScreen = screenSize.width < 400;
-    
-    // Responsive values
-    final messageFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final messageMaxWidth = screenSize.width * 0.75;
-    final messagePadding = isSmallScreen ? 10.0 : 12.0;
-    final chatPadding = isSmallScreen ? 8.0 : 12.0;
-    
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chat Translator"),
+        title: const Text("Text Translator"),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(chatPadding),
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  final msg = messages[index];
-                  final isUser = msg['type'] == 'user';
+      body: Column(
+        children: [
+          /// CHAT AREA
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final msg = messages[index];
+                final isUser = msg['type'] == 'user';
 
-                  return Align(
-                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 6),
-                      padding: EdgeInsets.all(messagePadding),
-                      constraints: BoxConstraints(maxWidth: messageMaxWidth, minWidth: 60),
-                      decoration: BoxDecoration(
-                        color: isUser ? Colors.teal.shade600 : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        msg['text']!,
-                        style: TextStyle(
-                          color: isUser ? Colors.white : Colors.black87,
-                          fontSize: messageFontSize,
-                          height: 1.3,
-                        ),
-                        softWrap: true,
+                return Align(
+                  alignment:
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    padding: const EdgeInsets.all(12),
+                    constraints: const BoxConstraints(maxWidth: 280),
+                    decoration: BoxDecoration(
+                      color: isUser
+                          ? Colors.teal.shade600
+                          : Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      msg['text']!,
+                      style: TextStyle(
+                        color: isUser ? Colors.white : Colors.black87,
+                        fontSize: 16,
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
+          ),
 
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: isSmallScreen ? 8 : 12,
-                vertical: isSmallScreen ? 6 : 8,
-              ),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                        hintText: "Type text to translate...",
-                        hintStyle: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: isSmallScreen ? 8 : 12,
-                          vertical: 8,
-                        ),
-                      ),
-                      style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                      onSubmitted: (_) => translateText(),
+          /// INPUT BAR
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                )
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    decoration: const InputDecoration(
+                      hintText: "Type text to translate...",
+                      border: InputBorder.none,
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.send, size: isSmallScreen ? 20 : 24),
-                    color: Colors.teal,
-                    onPressed: translateText,
-                    padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  color: Colors.teal,
+                  onPressed: translateText,
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
