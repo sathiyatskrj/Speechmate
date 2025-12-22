@@ -4,20 +4,23 @@ class Search extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSearch;
   final VoidCallback onClear;
-  final VoidCallback? onVoiceSearch; // NEW
+  final VoidCallback? onVoiceSearch;
 
   const Search({
     super.key,
     required this.controller,
     required this.onSearch,
     required this.onClear,
-    this.onVoiceSearch, // NEW
+    this.onVoiceSearch,
   });
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+    
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
@@ -34,29 +37,35 @@ class Search extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "Search words",
-                hintStyle: TextStyle(color: Colors.black45),
+                hintStyle: TextStyle(
+                  color: Colors.black45,
+                  fontSize: isSmallScreen ? 14 : 16,
+                ),
                 border: InputBorder.none,
               ),
+              style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
               onChanged: (_) {},
             ),
           ),
-          // Microphone button (NEW)
           if (onVoiceSearch != null)
             IconButton(
               icon: const Icon(Icons.mic, color: Colors.redAccent),
               onPressed: onVoiceSearch,
               tooltip: 'Voice Search',
+              iconSize: isSmallScreen ? 20 : 24,
             ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: onSearch,
+            iconSize: isSmallScreen ? 20 : 24,
           ),
           if (controller.text.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: onClear,
+              iconSize: isSmallScreen ? 20 : 24,
             ),
         ],
       ),
