@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class Background extends StatelessWidget {
-  final Widget child;
   final List<Color> colors;
-  final EdgeInsetsGeometry padding;
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
 
   const Background({
     super.key,
+    required this.colors,
     required this.child,
-      this.colors = const [],
-    this.padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+    this.padding,
   });
 
   @override
@@ -17,7 +17,6 @@ class Background extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      padding: padding,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: colors,
@@ -25,7 +24,12 @@ class Background extends StatelessWidget {
           end: Alignment.bottomCenter,
         ),
       ),
-      child: child,
+      child: SafeArea(
+        child: Padding(
+          padding: padding ?? EdgeInsets.zero,
+          child: child,
+        ),
+      ),
     );
   }
 }
