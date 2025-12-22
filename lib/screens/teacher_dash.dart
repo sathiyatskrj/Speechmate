@@ -6,9 +6,6 @@ import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
 import '../services/tts_service.dart';
-import '../services/favorites_service.dart';
-import '../services/history_service.dart';
-import '../services/progress_service.dart';
 import '../widgets/audio_phrase_card.dart';
 import 'quiz_screen.dart';
 import 'chat_translate_screen.dart';
@@ -425,3 +422,4 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
     );
   }
 }
+
