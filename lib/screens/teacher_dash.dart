@@ -268,7 +268,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
              TranslationCard(
                nicobarese: dailyWord!['nicobarese'],
                english: dailyWord!['english'],
-               isFavorite: false,
              ),
              const SizedBox(height: 20),
            ],
@@ -319,3 +318,33 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver {
                        icon: const Icon(Icons.quiz_outlined, color: Colors.deepPurple),
                        tooltip: 'Quiz Mode',
                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
+                     ),
+                     IconButton(
+                       icon: const Icon(Icons.chat_bubble_outline, color: Colors.blueAccent),
+                       tooltip: 'Chat Translator',
+                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
+                     ),
+                     IconButton(
+                       icon: const Icon(Icons.bar_chart, color: Colors.green),
+                       tooltip: 'Progress',
+                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
+                     ),
+                   ],
+                 )
+               ],
+             ),
+             const SizedBox(height: 30),
+             Search(
+               controller: searchController,
+               onSearch: performSearch,
+               onClear: clearSearch,
+               onVoiceSearch: performVoiceSearch,
+             ),
+             const SizedBox(height: 15),
+             Expanded(child: content),
+          ],
+        ),
+      ),
+    );
+  }
+}
