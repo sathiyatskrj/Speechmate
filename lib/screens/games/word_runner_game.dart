@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../services/dictionary_service.dart';
@@ -14,72 +15,107 @@ class WordRunnerGame extends StatefulWidget {
 enum GameState { menu, playing, gameOver, victory }
 enum ItemType { obstacle, word, surprise }
 
-class GameObject {
+// --- DATA CLASSES ---
+
+class GameItem {
   double x;
   double y;
   double width;
   double height;
   ItemType type;
-  String? value; // For words
+  String? value;
   Color color;
   bool collected;
+  double rotation; // For visual flair
 
-  GameObject({
+  GameItem({
     required this.x,
     required this.y,
     required this.type,
-    this.width = 50,
-    this.height = 50,
+    this.width = 60,
+    this.height = 60,
     this.value,
     this.color = Colors.red,
     this.collected = false,
+    this.rotation = 0,
   });
 }
 
+class Particle {
+  double x;
+  double y;
+  double vx;
+  double vy;
+  double life; // 1.0 to 0.0
+  Color color;
+  double size;
+
+  Particle({
+    required this.x, 
+    required this.y, 
+    required this.vx, 
+    required this.vy, 
+    required this.color,
+    this.life = 1.0,
+    this.size = 5.0,
+  });
+}
+
+// --- MAIN GAME WIDGET ---
+
 class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStateMixin {
-  // Game Configuration
-  static const double gravity = 0.8;
-  static const double jumpForce = -20.0;
+  // Game Config
+  static const double gravity = 0.6;
+  static const double jumpForce = -16.0;
   static const double groundHeight = 100.0;
   
-  // Services
+  // Services & Controllers
   final DictionaryService _dictionaryService = DictionaryService();
-  
-  // Game Loop
-  Timer? _gameLoop;
+  late AnimationController _gameTicker; // High performance game loop
   
   // Game State
   GameState _gameState = GameState.menu;
   int _score = 0;
   int _level = 1;
-  final int _maxLevels = 10;
+  int _combo = 0; // Combo counter
+  double _screenShake = 0.0; // Screen shake magnitude
+  
+  // Data
   List<String> _targetWords = [];
   List<String> _foundWords = [];
+  final List<GameItem> _items = [];
+  final List<Particle> _particles = [];
   
-  // Player State
+  // Player
   double _playerY = 0;
-  double _playerVelocityY = 0;
+  double _playerVy = 0;
   bool _isGrounded = true;
-  final double _playerX = 50; // Fixed horizontal position
+  final double _playerX = 80;
+  bool _isGoldMode = false;
   
-  // World State
-  double _scrollSpeed = 5.0;
-  double _distanceTraveled = 0;
-  final List<GameObject> _objects = [];
+  // World
+  double _scrollSpeed = 6.0;
+  double _distance = 0;
+  double _time = 0; // For sine waves
   
   // Visuals
-  Color _skyColor = const Color(0xFF87CEEB);
-  final Random _random = Random();
-  
+  final Random _rnd = Random();
+  Color _skyTop = const Color(0xFF1a2a6c);
+  Color _skyMid = const Color(0xFFb21f1f);
+  Color _skyBot = const Color(0xFFfdbb2d);
+
   @override
   void initState() {
     super.initState();
     _loadDictionary();
+    
+    // 60 FPS Ticker
+    _gameTicker = AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _gameTicker.addListener(_gameLoop);
+    _gameTicker.repeat();
   }
 
   Future<void> _loadDictionary() async {
-    // Only load words if not already loaded or reload if needed
-    // Since DictionaryService manages cache, we can just call it
     await _dictionaryService.loadDictionary(DictionaryType.words);
     _setupGame();
   }
@@ -87,536 +123,545 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   void _setupGame() {
     final allWords = _dictionaryService.getDictionary(DictionaryType.words);
     if (allWords.isEmpty) {
-      // Fallback if dictionary empty
-      _targetWords = ["APPLE", "BANANA", "CAT", "DOG", "EGG", "FISH", "GOAT", "HAT", "ICE", "JUMP"];
+      _targetWords = ["CODE", "DEUS", "HACK", "WIN", "FAST", "EPIC", "COOL", "JAVA", "DART", "WEB"];
     } else {
-      // Pick 10 random words
-      // Only picking English words for simplicity of display
       final shuffled = List<Map<String, dynamic>>.from(allWords)..shuffle();
       _targetWords = shuffled.take(10).map((e) => e['english'].toString().toUpperCase()).toList();
     }
     
-    // Reset State
-    _score = 0;
-    _level = 1;
-    _foundWords = [];
-    _objects.clear();
-    _playerY = 0;
-    _playerVelocityY = 0;
-    _scrollSpeed = 5.0;
-    _distanceTraveled = 0;
-    
-    if (mounted) {
-      setState(() {
-        _gameState = GameState.menu;
-      });
-    }
+    _resetState();
+  }
+
+  void _resetState() {
+    if (!mounted) return;
+    setState(() {
+      _score = 0;
+      _level = 1;
+      _combo = 0;
+      _foundWords.clear();
+      _items.clear();
+      _particles.clear();
+      
+      _playerY = 0;
+      _playerVy = 0;
+      _isGrounded = true;
+      _distance = 0;
+      _scrollSpeed = 7.0;
+      
+      _skyTop = const Color(0xFF1a2a6c);
+      _skyMid = const Color(0xFFb21f1f);
+      _skyBot = const Color(0xFFfdbb2d);
+    });
   }
 
   void _startGame() {
-    setState(() {
-      _gameState = GameState.playing;
-    });
-    _gameLoop?.cancel();
-    _gameLoop = Timer.periodic(const Duration(milliseconds: 16), _update);
+    setState(() => _gameState = GameState.playing);
   }
 
-  void _jump() {
+  // --- GAME LOOP ---
+  void _gameLoop() {
     if (_gameState != GameState.playing) return;
     
-    // Allow double jump? For now just single jump from ground
-    if (_isGrounded) {
-      setState(() {
-        _playerVelocityY = jumpForce;
-        _isGrounded = false;
-      });
-    }
-  }
-
-  void _update(Timer timer) {
-    if (_gameState != GameState.playing) return;
-
     setState(() {
-      // 1. Physics
-      _playerVelocityY += gravity;
-      _playerY += _playerVelocityY;
+      _time += 0.05;
+      _distance += _scrollSpeed;
+      
+      // 1. Difficulty Ramp
+      double speedMultiplier = 1.0 + (_level * 0.1) + (_combo * 0.05);
+      double currentSpeed = _scrollSpeed * speedMultiplier;
+      if (_isGoldMode) currentSpeed += 3.0;
 
+      // 2. Physics
+      _playerVy += gravity;
+      _playerY += _playerVy;
+      
       // Ground Collision
-      if (_playerY >= 0) { // Assuming 0 is ground level relative to bottom
+      if (_playerY >= 0) {
         _playerY = 0;
-        _playerVelocityY = 0;
+        _playerVy = 0;
         _isGrounded = true;
       }
 
-      // 2. World Movement
-      _scrollSpeed = 6.0 + (_level * 0.5); // Increase speed with level
-      _distanceTraveled += _scrollSpeed;
+      // 3. Spawning
+      _handleSpawning();
 
-      // 3. Spawning Objects
-      _spawnObjects();
-
-      // 4. Update Objects & Collision
-      for (int i = _objects.length - 1; i >= 0; i--) {
-        GameObject obj = _objects[i];
-        obj.x -= _scrollSpeed;
-
-        // Collision Check
-        bool collision = !obj.collected && _checkCollision(
-          // Player Rect
-          Rect.fromLTWH(
-             _playerX, 
-             _playerY + 10, // Slight hitbox adjustment
-             40, 
-             40
-          ),
-          // Object Rect
-          Rect.fromLTWH(
-             obj.x, 
-             obj.y, // relative to ground
-             obj.width, 
-             obj.height
-          )
-        );
-
-        if (collision) {
-          _handleCollision(obj);
+      // 4. Update Items
+      for (int i = _items.length - 1; i >= 0; i--) {
+        GameItem item = _items[i];
+        item.x -= currentSpeed;
+        item.rotation += 0.05; // Spin effect
+        
+        // Floating effect for words
+        if (item.type == ItemType.word) {
+          item.y += sin(_time + item.x * 0.01) * 0.5;
         }
 
-        // Remove off-screen
-        if (obj.x < -100) {
-          _objects.removeAt(i);
+        // Collision
+        if (!item.collected && _checkCollision(item)) {
+          _handleCollision(item);
         }
+
+        // Cleanup
+        if (item.x < -200) _items.removeAt(i);
       }
-
-      // 5. Level & Win Condition
-      if (_foundWords.length >= _maxLevels) {
-        _winGame();
+      
+      // 5. Particles
+      for (int i = _particles.length - 1; i >= 0; i--) {
+        Particle p = _particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2; // Gravity for particles
+        p.life -= 0.02;
+        if (p.life <= 0) _particles.removeAt(i);
+      }
+      
+      // 6. Screen Shake Decay
+      if (_screenShake > 0) _screenShake = max(0, _screenShake - 1);
+      
+      // 7. Win Check
+      if (_foundWords.length >= 10 && _gameState != GameState.victory) {
+        _gameState = GameState.victory;
+        _createExplosion(_playerX, _playerY - 100, Colors.amber);
       }
     });
   }
 
-  bool _checkCollision(Rect player, Rect obj) {
-    return player.overlaps(obj);
+  bool _checkCollision(GameItem item) {
+    double pCenterX = _playerX + 25;
+    double pCenterY = _playerY + 25; // Relative to ground, same as logic
+    
+    double iCenterX = item.x + item.width / 2;
+    double iCenterY = item.y + item.height / 2; 
+
+    double dx = pCenterX - iCenterX;
+    double dy = pCenterY - iCenterY;
+    double dist = sqrt(dx*dx + dy*dy);
+    
+    return dist < (30 + item.width / 3); // Hitbox radius
   }
 
-  void _handleCollision(GameObject obj) {
-    if (obj.type == ItemType.obstacle) {
-      // Game Over
-      _gameOver();
-    } else if (obj.type == ItemType.word) {
-      if (_foundWords.length < _targetWords.length && obj.value == _targetWords[_foundWords.length]) {
-        // Correct Word!
-        obj.collected = true;
-        _foundWords.add(obj.value!);
-        _score += 100;
-        _level++;
-        _triggerSuprise(); // Visual feedback
-      } else {
-        // Simple penalty for wrong word
-        if (_targetWords.contains(obj.value) && !_foundWords.contains(obj.value)) {
-           obj.collected = true;
-           _foundWords.add(obj.value!);
-           _score += 100;
-           _level = min(_maxLevels, _level + 1);
-           
-           if (_foundWords.length >= 10) _winGame();
-        } else {
-           if (!obj.collected) {
-             _score = max(0, _score - 50);
-             obj.collected = true;
-           }
-        }
-      }
-    } else if (obj.type == ItemType.surprise) {
-      if (!obj.collected) {
-        obj.collected = true;
-        _triggerSuprise();
+  void _handleCollision(GameItem item) {
+    item.collected = true;
+    
+    if (item.type == ItemType.obstacle) {
+      if (_isGoldMode) {
         _score += 500;
+        _createExplosion(item.x, item.y, Colors.red);
+        _screenShake = 5.0;
+      } else {
+        _gameState = GameState.gameOver;
+        _screenShake = 20.0;
+        _createExplosion(_playerX, _playerY, Colors.red);
+      }
+    } 
+    else if (item.type == ItemType.word) {
+      String target = _targetWords[_foundWords.length];
+      
+      if (item.value == target) {
+        // CORRECT
+        _foundWords.add(item.value!);
+        _combo++;
+        int bonus = 100 * (1 + _combo);
+        _score += bonus;
+        _level++;
+        _createExplosion(item.x, item.y, Colors.greenAccent);
+      } 
+      else if (_targetWords.contains(item.value) && !_foundWords.contains(item.value)) {
+        // GOOD BUT OUT OF ORDER
+        _foundWords.add(item.value!);
+        _score += 100;
+        _combo = 0; // Break combo
+        _createExplosion(item.x, item.y, Colors.cyan);
+      } 
+      else {
+        // WRONG
+        _score = max(0, _score - 50);
+        _combo = 0;
+        _screenShake = 5.0;
+        _createExplosion(item.x, item.y, Colors.grey);
+      }
+    } 
+    else if (item.type == ItemType.surprise) {
+      _activateGoldMode();
+      _createExplosion(item.x, item.y, Colors.yellow);
+    }
+  }
+
+  void _createExplosion(double x, double y, Color color) {
+    for (int i = 0; i < 20; i++) {
+      double angle = _rnd.nextDouble() * 2 * pi;
+      double speed = _rnd.nextDouble() * 10 + 2;
+      _particles.add(Particle(
+        x: x, y: y,
+        vx: cos(angle) * speed,
+        vy: sin(angle) * speed,
+        color: color.withOpacity(0.8),
+        size: _rnd.nextDouble() * 8 + 2
+      ));
+    }
+  }
+
+  void _handleSpawning() {
+    if (_rnd.nextInt(100) < 3) { // 3% chance per frame
+      double roll = _rnd.nextDouble();
+      double spawnX = MediaQuery.of(context).size.width + 100;
+      
+      if (roll < 0.4) {
+        // Obstacle
+        _items.add(GameItem(
+          x: spawnX,
+          y: 0, // Ground
+          type: ItemType.obstacle,
+          width: 50, height: 50
+        ));
+      } else if (roll < 0.8) {
+        // Word
+        String word;
+        List<String> needed = _targetWords.where((w) => !_foundWords.contains(w)).toList();
+        if (needed.isNotEmpty && _rnd.nextDouble() < 0.6) {
+           word = needed.first; // High chance for NEXT needed word
+        } else if (needed.isNotEmpty) {
+           word = needed[_rnd.nextInt(needed.length)];
+        } else {
+           word = "WIN";
+        }
+        
+        _items.add(GameItem(
+          x: spawnX,
+          y: 60.0 + _rnd.nextDouble() * 150, // Air
+          type: ItemType.word,
+          value: word,
+          width: 100, height: 40,
+          color: Colors.blue
+        ));
+      } else {
+        // Surprise
+        _items.add(GameItem(
+          x: spawnX,
+          y: 200,
+          type: ItemType.surprise,
+          width: 40, height: 40
+        ));
       }
     }
   }
 
-  void _triggerSuprise() {
-     setState(() {
-        _skyColor = Colors.primaries[_random.nextInt(Colors.primaries.length)].shade200;
-     });
-     
-     Future.delayed(const Duration(milliseconds: 500), () {
-       if (mounted) setState(() => _skyColor = const Color(0xFF87CEEB));
-     });
+  void _activateGoldMode() {
+    setState(() {
+      _isGoldMode = true;
+      _skyTop = Colors.purple;
+      _skyMid = Colors.orange;
+      _skyBot = Colors.yellow;
+    });
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          _isGoldMode = false;
+          _skyTop = const Color(0xFF1a2a6c);
+          _skyMid = const Color(0xFFb21f1f);
+          _skyBot = const Color(0xFFfdbb2d);
+        });
+      }
+    });
   }
 
-  void _spawnObjects() {
-    if (_random.nextInt(100) < 2) { 
-       double typeRoll = _random.nextDouble();
-       
-       if (typeRoll < 0.4) {
-         // Obstacle
-         _objects.add(GameObject(
-           x: MediaQuery.of(context).size.width,
-           y: 0,
-           type: ItemType.obstacle,
-           width: 40,
-           height: 40,
-           color: Colors.red.shade900,
-         ));
-       } else if (typeRoll < 0.7) {
-         // Word
-         String wordToSpawn;
-         final remaining = _targetWords.where((w) => !_foundWords.contains(w)).toList();
-         
-         if (remaining.isNotEmpty && _random.nextDouble() < 0.6) {
-            wordToSpawn = remaining[_random.nextInt(remaining.length)];
-         } else {
-            wordToSpawn = _targetWords[_random.nextInt(_targetWords.length)];
-         }
-
-         _objects.add(GameObject(
-           x: MediaQuery.of(context).size.width,
-           y: 50.0 + _random.nextInt(150),
-           type: ItemType.word,
-           value: wordToSpawn,
-           width: 100,
-           height: 40,
-           color: Colors.blueAccent,
-         ));
-       } else if (typeRoll < 0.75) {
-         // Surprise
-         _objects.add(GameObject(
-           x: MediaQuery.of(context).size.width,
-           y: 150,
-           type: ItemType.surprise,
-           width: 40,
-           height: 40,
-           color: Colors.purpleAccent,
-         ));
-       }
+  void _jump() {
+    if (_isGrounded) {
+      _playerVy = jumpForce;
+      _isGrounded = false;
+      
+      // Jump Particles
+      for(int i=0; i<5; i++) {
+        _particles.add(Particle(
+          x: _playerX + 25, y: 5, 
+          vx: (_rnd.nextDouble() - 0.5) * 5, 
+          vy: 0, 
+          color: Colors.white.withOpacity(0.5)
+        ));
+      }
     }
-  }
-
-  void _gameOver() {
-    _gameLoop?.cancel();
-    setState(() {
-      _gameState = GameState.gameOver;
-    });
-  }
-
-  void _winGame() {
-    _gameLoop?.cancel();
-    setState(() {
-      _gameState = GameState.victory;
-    });
   }
 
   @override
   void dispose() {
-    _gameLoop?.cancel();
+    _gameTicker.dispose();
     super.dispose();
   }
 
+  // --- RENDERING ---
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        onTapUp: (_) => _jump(),
-        onTapDown: (_) => _jump(),
-        child: Container(
-          color: _skyColor,
-          child: Stack(
-            children: [
-              // Background
-              Positioned(
-                top: 50,
-                right: (_distanceTraveled * 0.1) % (MediaQuery.of(context).size.width + 200) - 100,
-                child: const Icon(Icons.cloud, size: 80, color: Colors.white54),
-              ),
-              Positioned(
-                top: 100,
-                right: ((_distanceTraveled * 0.05) + 200) % (MediaQuery.of(context).size.width + 200) - 100,
-                child: const Icon(Icons.cloud, size: 60, color: Colors.white38),
-              ),
+    // Screen Shake Transform
+    double shakeX = (_rnd.nextDouble() - 0.5) * _screenShake;
+    double shakeY = (_rnd.nextDouble() - 0.5) * _screenShake;
 
-              // Ground
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: groundHeight,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.brown,
-                    border: Border(top: BorderSide(color: Colors.green.shade800, width: 10)),
-                  ),
-                  child: const Center(child: Text("TAP TO JUMP", style: TextStyle(color: Colors.white30))),
-                ),
-              ),
-
-              // Objects
-              ..._objects.map((obj) => Positioned(
-                left: obj.x,
-                bottom: groundHeight + obj.y,
-                child: _buildObject(obj),
-              )),
-
-              // Player
-              Positioned(
-                left: _playerX,
-                bottom: groundHeight + _playerY,
-                child: Transform.rotate(
-                   angle: _gameState == GameState.playing ? (_playerY / 100) * 0.5 : 0,
-                   child: Container(
-                    width: 50,
-                    height: 50,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.directions_run,
-                      size: 50,
-                      color: Colors.white,
-                      shadows: [Shadow(color: Colors.black, blurRadius: 10)],
+    return Transform.translate(
+      offset: Offset(shakeX, shakeY),
+      child: Scaffold(
+        body: GestureDetector(
+          onTapDown: (_) => _jump(),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [_skyTop, _skyMid, _skyBot],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              )
+            ),
+            child: Stack(
+              children: [
+                // 1. Parallax Layers
+                _buildParallaxLayer(speed: 0.2, color: Colors.white.withOpacity(0.2), icon: Icons.cloud, size: 100, y: 100),
+                _buildParallaxLayer(speed: 0.5, color: Colors.white.withOpacity(0.1), icon: Icons.cloud, size: 60, y: 200),
+                _buildParallaxLayer(speed: 0.8, color: Colors.black12, icon: Icons.landscape, size: 200, y: MediaQuery.of(context).size.height - 150),
+                
+                // 2. Game View (Custom Painter for performance with particles)
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: GamePainter(
+                      playerX: _playerX,
+                      playerY: _playerY,
+                      items: _items,
+                      particles: _particles,
+                      groundHeight: groundHeight,
+                      isGoldMode: _isGoldMode,
                     ),
                   ),
                 ),
-              ),
-              
-              // HUD
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildHudChip("Level", "$_level"),
-                          _buildHudChip("Score", "$_score"),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                        decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(15)),
-                        child: Text(
-                          "Objective: Find 10 Words (${_foundWords.length}/10)", 
-                          style: const TextStyle(color: Colors.white)
+
+                // 3. UI Layer
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // HUD Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildHUD("SCORE", "$_score", Colors.amber),
+                            if (_combo > 1) 
+                              _buildHUD("COMBO", "${_combo}x", Colors.redAccent),
+                            _buildHUD("GOAL", "${_foundWords.length}/${_targetWords.length}", Colors.cyan),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 5),
-                      LinearProgressIndicator(
-                        value: _foundWords.length / _maxLevels,
-                        backgroundColor: Colors.white30,
-                        color: Colors.greenAccent,
-                        minHeight: 8,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ],
+                        // Target Bar
+                        const SizedBox(height: 20),
+                        if (_gameState == GameState.playing)
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.black45,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white24)
+                          ),
+                          child: Text(
+                            _foundWords.length < _targetWords.length 
+                             ? "FIND: ${_targetWords[_foundWords.length]}" 
+                             : "RUSH TO FINISH!",
+                            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-
-              // Overlays
-              if (_gameState == GameState.menu) _buildMenuOverlay(),
-              if (_gameState == GameState.gameOver) _buildGameOverOverlay(),
-              if (_gameState == GameState.victory) _buildVictoryOverlay(),
-              
-              // Back Button
-              if (_gameState != GameState.playing)
-                Positioned(
-                  top: 40,
-                  left: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                )
-            ],
+                
+                // 4. Overlays
+                if (_gameState == GameState.menu) _buildMenu(),
+                if (_gameState == GameState.gameOver) _buildGameOver(),
+                if (_gameState == GameState.victory) _buildVictory(),
+                
+                // Back Button
+                if (_gameState != GameState.playing)
+                  Positioned(top: 40, left: 10, child: BackButton(color: Colors.white)),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
-  Widget _buildObject(GameObject obj) {
-    if (obj.type == ItemType.word) {
-       bool isNeeded = _targetWords.contains(obj.value) && !_foundWords.contains(obj.value);
-       Color cardColor = isNeeded ? Colors.orange : Colors.grey;
-       
-       return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: const [BoxShadow(color: Colors.black45, offset: Offset(2,2), blurRadius: 4)],
-          ),
-          child: Text(
-            obj.value ?? "",
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-       );
-    } else if (obj.type == ItemType.surprise) {
-       return Container(
-         width: obj.width,
-         height: obj.height,
-         decoration: const BoxDecoration(
-           shape: BoxShape.circle,
-           color: Colors.purple,
-           boxShadow: [BoxShadow(color: Colors.purpleAccent, blurRadius: 10, spreadRadius: 2)],
-         ),
-         child: const Icon(Icons.card_giftcard, color: Colors.white, size: 24),
-       );
-    } else {
-       return Container(
-         width: obj.width,
-         height: obj.height,
-         decoration: BoxDecoration(
-           color: obj.color,
-           borderRadius: BorderRadius.circular(8),
-           border: Border.all(color: Colors.redAccent, width: 2),
-         ),
-         child: const Icon(Icons.warning_amber_rounded, color: Colors.white),
-       );
-    }
-  }
-
-  Widget _buildHudChip(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.black54,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24),
-      ),
+  
+  Widget _buildParallaxLayer({required double speed, required Color color, required IconData icon, required double size, required double y}) {
+    double pos = (_distance * speed) % (MediaQuery.of(context).size.width + size);
+    return Positioned(
+      left: -pos,
+      top: y,
       child: Row(
         children: [
-          Text("$label: ", style: const TextStyle(color: Colors.white70)),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+          Icon(icon, size: size, color: color),
+          SizedBox(width: MediaQuery.of(context).size.width),
+          Icon(icon, size: size, color: color),
         ],
       ),
     );
   }
 
-  Widget _buildMenuOverlay() {
+  Widget _buildHUD(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+        Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.w900, shadows: [Shadow(color: color.withOpacity(0.5), blurRadius: 10)])),
+      ],
+    );
+  }
+
+  Widget _buildMenu() {
     return Center(
-      child: Container(
-        padding: const EdgeInsets.all(32),
-        margin: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 20)],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.directions_run_outlined, size: 60, color: Colors.blue),
-            const SizedBox(height: 10),
-            const Text("WORD RUNNER", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue)),
-            const SizedBox(height: 20),
-            const Text("1. Tap to Jump\n2. Collect target English words\n3. Avoid Red Obstacles", textAlign: TextAlign.center, style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _startGame,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                textStyle: const TextStyle(fontSize: 20),
-              ),
-              child: const Text("START RUN"),
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text("WORD\nRUNNER", textAlign: TextAlign.center, style: TextStyle(fontSize: 60, height: 0.9, fontWeight: FontWeight.w900, color: Colors.white, shadows: [Shadow(color: Colors.purple, offset: Offset(4,4))])),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _startGame,
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20)),
+            child: const Text("START RUN", style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold)),
+          )
+        ],
       ),
     );
   }
 
-  Widget _buildGameOverOverlay() {
+  Widget _buildGameOver() {
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(32),
-        margin: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 20)],
-        ),
+        padding: const EdgeInsets.all(30),
+        decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.red)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cancel, size: 60, color: Colors.red),
-            const SizedBox(height: 10),
-            const Text("GAME OVER", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.red)),
+            const Text("CRASHED!", style: TextStyle(color: Colors.red, fontSize: 40, fontWeight: FontWeight.bold)),
+            Text("Score: $_score", style: const TextStyle(color: Colors.white, fontSize: 20)),
             const SizedBox(height: 20),
-            Text("Score: $_score", style: const TextStyle(fontSize: 24)),
-            Text("Words: ${_foundWords.length}/10", style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _foundWords.map((w) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Chip(label: Text(w)),
-                )).toList(),
-              ),
-            ),
-            const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _setupGame,
-                  child: const Text("RETRY"),
-                ),
-                const SizedBox(width: 20),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text("EXIT"),
-                ),
-              ],
-            ),
+            ElevatedButton(onPressed: _setupGame, child: const Text("RETRY"))
           ],
         ),
       ),
     );
+  }
+  
+  Widget _buildVictory() {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(30),
+        decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.amber)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("LEGEND!", style: TextStyle(color: Colors.amber, fontSize: 40, fontWeight: FontWeight.bold)),
+            const Text("All Words Found", style: TextStyle(color: Colors.white70)),
+            Text("Final Score: $_score", style: const TextStyle(color: Colors.white, fontSize: 20)),
+            const SizedBox(height: 20),
+            ElevatedButton(onPressed: _setupGame, child: const Text("PLAY AGAIN"))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- CUSTOM PAINTER (Visual Engine) ---
+
+class GamePainter extends CustomPainter {
+  final double playerX;
+  final double playerY;
+  final List<GameItem> items;
+  final List<Particle> particles;
+  final double groundHeight;
+  final bool isGoldMode;
+
+  GamePainter({
+    required this.playerX, 
+    required this.playerY, 
+    required this.items, 
+    required this.particles,
+    required this.groundHeight,
+    required this.isGoldMode,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 1. Draw Player
+    final Paint playerPaint = Paint()
+      ..color = isGoldMode ? Colors.yellow : Colors.white
+      ..style = PaintingStyle.fill
+      ..shader = isGoldMode ? ui.Gradient.linear(
+          Offset(playerX, size.height - groundHeight - playerY), 
+          Offset(playerX, size.height - groundHeight - playerY + 50), 
+          [Colors.yellow, Colors.orange]) : null;
+
+    // Draw Player shadow
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(playerX + 25, size.height - groundHeight + 10), width: 40, height: 10),
+      Paint()..color = Colors.black26
+    );
+
+    // Draw Player Body (Simple rounded rect for modern look)
+    double drawY = size.height - groundHeight - playerY - 50;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Rect.fromLTWH(playerX, drawY, 50, 50), const Radius.circular(15)), 
+      playerPaint
+    );
+    // Player Eye
+    canvas.drawCircle(Offset(playerX + 35, drawY + 15), 5, Paint()..color = Colors.black);
+
+    // 2. Draw Items
+    for (var item in items) {
+      double itemY = size.height - groundHeight - item.y - item.height;
+      
+      // Save canvas for rotations
+      canvas.save();
+      canvas.translate(item.x + item.width / 2, itemY + item.height / 2);
+      canvas.rotate(item.rotation);
+      canvas.translate(-(item.x + item.width / 2), -(itemY + item.height / 2));
+      
+      if (item.type == ItemType.obstacle) {
+        // Draw Spikes
+        final Path path = Path();
+        path.moveTo(item.x, itemY + item.height);
+        path.lineTo(item.x + item.width / 2, itemY);
+        path.lineTo(item.x + item.width, itemY + item.height);
+        path.close();
+        canvas.drawPath(path, Paint()..color = Colors.redAccent);
+      } else if (item.type == ItemType.word) {
+        // Draw Word Bubble
+        final Paint bubblePaint = Paint()
+          ..color = item.color
+          ..style = PaintingStyle.fill
+          ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 2);
+          
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(Rect.fromLTWH(item.x, itemY, item.width, item.height), const Radius.circular(10)), 
+          bubblePaint
+        );
+        // Draw Text manually
+        TextSpan span = TextSpan(style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), text: item.value);
+        TextPainter tp = TextPainter(text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
+        tp.layout(minWidth: item.width);
+        tp.paint(canvas, Offset(item.x, itemY + 10)); // Approximate center
+      } else {
+        // Draw Star
+        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 15, Paint()..color = Colors.yellowAccent ..maskFilter = MaskFilter.blur(BlurStyle.normal, 5));
+        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 8, Paint()..color = Colors.white);
+      }
+      
+      canvas.restore();
+    }
+
+    // 3. Draw Particles (High Performance)
+    final Paint particlePaint = Paint();
+    for (var p in particles) {
+      double pY = size.height - groundHeight - p.y;
+      particlePaint.color = p.color;
+      if (p.life < 0.3) particlePaint.color = p.color.withOpacity(p.life * 3);
+      
+      canvas.drawCircle(Offset(p.x, pY), p.size, particlePaint);
+    }
   }
 
-  Widget _buildVictoryOverlay() {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 20)],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.emoji_events, size: 80, color: Colors.amber),
-            const SizedBox(height: 10),
-            const Text("VICTORY!", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.amber)),
-            const SizedBox(height: 20),
-            const Text("You completed all 10 levels!", textAlign: TextAlign.center),
-            const SizedBox(height: 10),
-            Text("Final Score: $_score", style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _setupGame,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber, 
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15)
-              ),
-              child: const Text("PLAY AGAIN", style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-             const SizedBox(height: 20),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("EXIT"),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true; // Always repaint for games
 }
