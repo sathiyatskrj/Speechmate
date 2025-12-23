@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/dictionary_service.dart';
+import '../../services/dictionary_service.dart';
 
 class WordRunnerGame extends StatefulWidget {
   const WordRunnerGame({super.key});
