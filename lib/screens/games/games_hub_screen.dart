@@ -3,6 +3,7 @@ import 'dart:math';
 import 'word_match_game.dart';
 import 'flash_card_game.dart';
 import 'scramble_game.dart';
+import 'word_runner_game.dart'; // [NEW] Added Import
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -73,6 +74,15 @@ class _GamesHubScreenState extends State<GamesHubScreen> {
                     Icons.spellcheck,
                     [const Color(0xFF84fab0), const Color(0xFF8fd3f4)],
                     const ScrambleGame(),
+                  ),
+                  // [NEW] Word Runner Game
+                  _buildGameCard(
+                    context,
+                    "Word Runner",
+                    "Run, Jump & Collect Words!",
+                    Icons.directions_run,
+                    [const Color(0xFFff9966), const Color(0xFFff5e62)],
+                    const WordRunnerGame(),
                   ),
                 ],
               ),
