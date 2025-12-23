@@ -66,7 +66,7 @@ class Particle {
 class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStateMixin {
   // Game Config
   static const double gravity = 0.6;
-  static const double jumpForce = -16.0;
+  static const double jumpForce = 16.0;
   static const double groundHeight = 100.0;
   
   // Services & Controllers
