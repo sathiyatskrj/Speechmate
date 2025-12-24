@@ -227,17 +227,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
             right: isSmallScreen ? 4 : 0,
           ),
           children: [
-            if (phrases.isNotEmpty)
-              ...phrases.map((item) => AudioPhraseCard(
-                    text: item['text'] ?? '',
-                    onPlay: () {
-                      if (item['audio'] != null) playAudio(item['audio']['category'], item['audio']['file']);
-                    },
-                  )),
-
-            if (phrases.isNotEmpty && result != null)
-              const SizedBox(height: 16),
-
             if (result != null && result!['_type'] == 'words')
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 4 : 0),
@@ -275,6 +264,55 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Common Phrases Section
+            if (phrases.isNotEmpty) ...[
+              Text("💬 Common Phrases", style: TextStyle(fontSize: sectionFontSize, fontWeight: FontWeight.bold, color: Colors.black87)),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 80, // Height for horizontal scrolling cards
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: phrases.length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 10),
+                  itemBuilder: (context, index) {
+                    final item = phrases[index];
+                    return GestureDetector(
+                      onTap: () {
+                         if (item['audio'] != null) playAudio(item['audio']['category'], item['audio']['file']);
+                      },
+                      child: Container(
+                         width: 160,
+                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                         decoration: BoxDecoration(
+                           color: Colors.white, 
+                           borderRadius: BorderRadius.circular(15),
+                           boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+                           border: Border.all(color: Colors.blue.withOpacity(0.3))
+                         ),
+                         alignment: Alignment.center,
+                         child: Row(
+                           mainAxisSize: MainAxisSize.min,
+                           children: [
+                             const Icon(Icons.volume_up, size: 20, color: Colors.blue),
+                             const SizedBox(width: 8),
+                             Expanded(
+                               child: Text(
+                                 item['text'] ?? '', 
+                                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), 
+                                 maxLines: 2, 
+                                 overflow: TextOverflow.ellipsis
+                               ),
+                             ),
+                           ],
+                         ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+
             if (dailyWord != null) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -422,4 +460,3 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
     );
   }
 }
-
