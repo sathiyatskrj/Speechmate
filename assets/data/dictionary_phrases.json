@@ -26,5 +26,40 @@
       "category": "phrases",
       "file": "what_is_your_name.mp3"
     }
+  },
+  {
+    "text": "Sit down",
+    "audio": {
+      "category": "phrases",
+      "file": "sit_down.mp3"
+    }
+  },
+  {
+    "text": "Stand up",
+    "audio": {
+      "category": "phrases",
+      "file": "stand_up.mp3"
+    }
+  },
+  {
+    "text": "Open your book",
+    "audio": {
+      "category": "phrases",
+      "file": "open_book.mp3"
+    }
+  },
+  {
+    "text": "Close your book",
+    "audio": {
+      "category": "phrases",
+      "file": "close_book.mp3"
+    }
+  },
+  {
+    "text": "good afternoon",
+    "audio": {
+      "category": "phrases",
+      "file": "good_afternoon.mp3"
+    }
   }
 ]
