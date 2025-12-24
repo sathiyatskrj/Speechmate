@@ -45,14 +45,14 @@
     "text": "Open your book",
     "audio": {
       "category": "phrases",
-      "file": "open_book.mp3"
+      "file": "open_your_book.mp3"
     }
   },
   {
     "text": "Close your book",
     "audio": {
       "category": "phrases",
-      "file": "close_book.mp3"
+      "file": "close_your_book.mp3"
     }
   },
   {
@@ -63,4 +63,5 @@
     }
   }
 ]
+
 
