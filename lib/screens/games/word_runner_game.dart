@@ -65,8 +65,8 @@ class Particle {
 
 class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStateMixin {
   // Game Config
-  static const double gravity = 0.6;
-  static const double jumpForce = 16.0;
+  static const double gravity = -0.8; // Gravity pulls DOWN (negative)
+  static const double jumpForce = 22.0; // Jump pushes UP (positive)
   static const double groundHeight = 100.0;
   
   // Services & Controllers
@@ -135,6 +135,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   void _resetState() {
     if (!mounted) return;
     setState(() {
+      _gameState = GameState.menu; // Return to menu
       _score = 0;
       _level = 1;
       _combo = 0;
@@ -176,7 +177,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
       _playerY += _playerVy;
       
       // Ground Collision
-      if (_playerY >= 0) {
+      if (_playerY <= 0) { // Clamp when falling below ground
         _playerY = 0;
         _playerVy = 0;
         _isGrounded = true;
