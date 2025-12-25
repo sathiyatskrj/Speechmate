@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum DictionaryType { words, phrases, nature, numbers }
+enum DictionaryType { words, phrases, nature, numbers, animals, magic }
 
 class ProgressService {
   static const String _searchCountKey = 'search_count';
@@ -141,18 +141,26 @@ class DictionaryService {
   final Map<DictionaryType, String> _paths = {
     DictionaryType.words: 'assets/data/dictionary.json',
     DictionaryType.phrases: 'assets/data/dictionary_phrases.json',
+    DictionaryType.animals: 'assets/data/dictionary_animals.json', // Added
+    DictionaryType.magic: 'assets/data/dictionary_magic.json', // Added
   };
 
   Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
     if (_cache.containsKey(type)) {
       return _cache[type]!;
     }
+    
+    if (!_paths.containsKey(type)) return [];
 
     final String path = _paths[type]!;
-    final List<Map<String, dynamic>> data = await _loadJson(path);
-
-    _cache[type] = data;
-    return data;
+    try {
+      final List<Map<String, dynamic>> data = await _loadJson(path);
+      _cache[type] = data;
+      return data;
+    } catch (e) {
+      print("Warning: Could not load $type from $path: $e");
+      return [];
+    }
   }
 
   Future<void> loadMultiple(List<DictionaryType> types) async {
@@ -164,9 +172,13 @@ class DictionaryService {
   }
 
   Future<List<Map<String, dynamic>>> _loadJson(String path) async {
-    final String response = await rootBundle.loadString(path);
-    final List<dynamic> data = json.decode(response);
-    return data.map((e) => Map<String, dynamic>.from(e)).toList();
+    try {
+      final String response = await rootBundle.loadString(path);
+      final List<dynamic> data = json.decode(response);
+      return data.map((e) => Map<String, dynamic>.from(e)).toList();
+    } catch (e) {
+      return [];
+    }
   }
 
   bool isLoaded(DictionaryType type) {
@@ -218,6 +230,16 @@ class DictionaryService {
   Future<List<Map<String, dynamic>>> getNumberItems() async {
     return await loadDictionary(DictionaryType.numbers);
   }
+  
+  // Added getter for Animals
+  Future<List<Map<String, dynamic>>> getAnimalsItems() async {
+    return await loadDictionary(DictionaryType.animals);
+  }
+
+  // Added getter for Magic Words
+  Future<List<Map<String, dynamic>>> getMagicWordsItems() async {
+    return await loadDictionary(DictionaryType.magic);
+  }
 
   Future<Map<String, dynamic>?> searchEverywhere(String query) async {
     final q = query.trim().toLowerCase();
@@ -242,6 +264,19 @@ class DictionaryService {
         '_searchedNicobarese': false,
       };
     }
+    
+    // Also search in Animals for completeness
+    try {
+      final animals = await getAnimalsItems();
+      final animal = animals.firstWhere((e) => e['text'].toString().toLowerCase() == q);
+      return {
+        ...animal,
+        '_type': 'animals',
+        'english': animal['text'],
+        'nicobarese': animal['nicobarese'],
+        '_searchedNicobarese': false,
+      };
+    } catch (_) {}
 
     return null;
   }
