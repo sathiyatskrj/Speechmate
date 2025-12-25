@@ -1,0 +1,44 @@
+[
+  {
+    "text": "Father",
+    "nicobarese": "Kikònyö Yöng",
+    "audio": "family/father.mp3",
+    "image": "assets/images/father.png"
+  },
+  {
+    "text": "Mother",
+    "nicobarese": "Kikanö Yöng Nyiö",
+    "audio": "family/mother.mp3",
+    "image": "assets/images/mother.png"
+  },
+  {
+    "text": "Brother",
+    "nicobarese": "Kanònyö-Mem",
+    "audio": "family/brother.mp3",
+    "image": "assets/images/brother.png"
+  },
+  {
+    "text": "Sister",
+    "nicobarese": "Kānanö",
+    "audio": "family/sister.mp3",
+    "image": "assets/images/sister.png"
+  },
+  {
+    "text": "Grandfather",
+    "nicobarese": "Kikònyö Grand",
+    "audio": "family/grandfather.mp3",
+    "image": "assets/images/grandfather.png"
+  },
+  {
+    "text": "Grandmother",
+    "nicobarese": "Kikanö Grand",
+    "audio": "family/grandmother.mp3",
+    "image": "assets/images/grandmother.png"
+  },
+  {
+    "text": "Friend",
+    "nicobarese": "Hòl",
+    "audio": "family/friend.mp3",
+    "image": "assets/images/friend.png"
+  }
+]
