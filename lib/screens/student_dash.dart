@@ -7,6 +7,7 @@ import 'number_page.dart';
 import 'games/games_hub_screen.dart';
 import 'animals_page.dart';
 import 'magic_words_page.dart';
+import 'community_screen.dart';
 import '../services/tts_service.dart';
 
 import '../widgets/background.dart';
@@ -63,6 +64,11 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       "word": "Magic Words",
       "colors": [Color(0xFFfc00ff), Color(0xFF00dbde)], // Pink/Cyan for Magic
       "navigateTo": const MagicWordsPage(),
+    },
+    {
+      "word": "Community",
+      "colors": [Color(0xFF4FACFE), Color(0xFF00F2FE)], // Blue/Cyan for Community
+      "navigateTo": const CommunityScreen(),
     },
   ];
 
