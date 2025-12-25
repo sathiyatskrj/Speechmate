@@ -11,6 +11,7 @@ import 'quiz_screen.dart';
 import 'chat_translate_screen.dart';
 import 'progress_screen.dart';
 import 'teacher_levels_screen.dart';
+import 'community_screen.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -348,6 +349,48 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
                   ),
                 ),
               ),
+              
+              const SizedBox(height: 20),
+              
+              // Community Hub Mockup Link
+              GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(color: Colors.purple.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))
+                    ],
+                    border: Border.all(color: Colors.purple.withOpacity(0.1)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.purple.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.people_rounded, color: Colors.purple, size: 30),
+                      ),
+                      const SizedBox(width: 15),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Community Hub 🌏", style: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text("See what others are sharing", style: TextStyle(color: Colors.black54, fontSize: 12)),
+                        ],
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black26, size: 20),
+                    ],
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 20),
             ],
 
