@@ -1,0 +1,47 @@
+[
+  {
+    "text": "Hello",
+    "nicobarese": "Öt-yi",
+    "audio": { "category": "magic", "file": "hello.mp3" }
+  },
+  {
+    "text": "Goodbye",
+    "nicobarese": "Hò-ö",
+    "audio": { "category": "magic", "file": "goodbye.mp3" }
+  },
+  {
+    "text": "Please",
+    "nicobarese": "Tö-kūlö",
+    "audio": { "category": "magic", "file": "please.mp3" }
+  },
+  {
+    "text": "Thank you",
+    "nicobarese": "Kūlö",
+    "audio": { "category": "magic", "file": "thank_you.mp3" }
+  },
+  {
+    "text": "Sorry",
+    "nicobarese": "Inrēlen",
+    "audio": { "category": "magic", "file": "sorry.mp3" }
+  },
+  {
+    "text": "Excuse me",
+    "nicobarese": "Hā-töh",
+    "audio": { "category": "magic", "file": "excuse_me.mp3" }
+  },
+  {
+    "text": "You're welcome",
+    "nicobarese": "Hēn-kūlö",
+    "audio": { "category": "magic", "file": "welcome.mp3" }
+  },
+  {
+    "text": "May I?",
+    "nicobarese": "Yö-ö?",
+    "audio": { "category": "magic", "file": "may_i.mp3" }
+  },
+  {
+    "text": "Pardon me",
+    "nicobarese": "Inrēlen",
+    "audio": { "category": "magic", "file": "pardon.mp3" }
+  }
+]
