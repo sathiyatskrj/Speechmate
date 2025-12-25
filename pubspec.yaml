@@ -2,7 +2,6 @@ name: speechmate
 description: "A bilingual Dictionary for Nicobarian translation"
 publish_to: 'none'
 version: 1.2.0+1
-
 environment:
   sdk: ">=3.2.0 <4.0.0"
 dependencies:
@@ -13,14 +12,12 @@ dependencies:
   audioplayers: ^6.5.1
   shared_preferences: ^2.2.2
   share_plus: ^7.2.1
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.6
-
 flutter_launcher_icons:
   android: true
   ios: true
@@ -28,7 +25,6 @@ flutter_launcher_icons:
   adaptive_icon_background: "assets/icons/background.png"
   adaptive_icon_foreground: "assets/icons/foreground.png"
   min_sdk_android: 21
-
 flutter_native_splash:
   image: assets/icons/logo_main.png
   branding: assets/icons/branding.png
@@ -40,7 +36,6 @@ flutter_native_splash:
     image: assets/icons/logo_main.png
     branding: assets/icons/branding.png
   web: false
-
 flutter:
   uses-material-design: true
   assets:
@@ -53,7 +48,8 @@ flutter:
     - assets/audio/feelings/
     - assets/images/
     - assets/data/dictionary_phrases.json
+    - assets/data/dictionary_animals.json
+    - assets/data/dictionary_magic.json
+    - assets/audio/magic/
+    - assets/audio/animals/
     - assets/icons/branding.png
-
-
-
