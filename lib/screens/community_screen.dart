@@ -24,7 +24,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isVerified": true,
     },
     {
-      "author": "Sathiya.",
+      "author": "Gladys.",
       "role": "Student",
       "avatar": "R",
       "color": Colors.orange,
@@ -71,16 +71,30 @@ class _CommunityScreenState extends State<CommunityScreen> {
     });
   }
 
+  bool _isAdminMode = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Community Hub 🌏"),
-        backgroundColor: Colors.transparent,
+        title: Text(_isAdminMode ? "Admin Panel 🛡️" : "Community Hub 🌏"),
+        backgroundColor: _isAdminMode ? Colors.redAccent.withOpacity(0.8) : Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: Icon(_isAdminMode ? Icons.admin_panel_settings : Icons.admin_panel_settings_outlined),
+            tooltip: "Toggle Admin Mode (Demo)",
+            onPressed: () {
+              setState(() {
+                _isAdminMode = !_isAdminMode;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(_isAdminMode ? "Admin Mode Activated 🛡️" : "Regular User Mode 👤")),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.cloud_sync_outlined),
             tooltip: "Syncing when online",
@@ -98,12 +112,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
             const SnackBar(content: Text("Post saved! Will upload when online. 🌐")),
           );
         },
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: _isAdminMode ? Colors.redAccent : Colors.deepPurple,
         icon: const Icon(Icons.edit),
         label: const Text("New Post"),
       ),
       body: Background(
-        colors: const [Color(0xFF89f7fe), Color(0xFF66a6ff)], // Fresh Blue Gradient
+        colors: _isAdminMode 
+            ? [const Color(0xFF434343), const Color(0xFF000000)] // Dark mode for Admin
+            : [const Color(0xFF89f7fe), const Color(0xFF66a6ff)], // Fresh Blue Post
         child: Column(
           children: [
             // "Offline First" Banner
@@ -194,6 +210,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             offset: const Offset(0, 4),
           ),
         ],
+        border: _isAdminMode ? Border.all(color: Colors.redAccent, width: 2) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,9 +263,34 @@ class _CommunityScreenState extends State<CommunityScreen> {
               IconButton(
                 icon: const Icon(Icons.share_outlined, color: Colors.grey),
                 onPressed: () {},
-              ),
+              )
             ],
           ),
+          
+          if (_isAdminMode) ...[
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                    ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.check, size: 18),
+                        label: const Text("Approve"),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+                    ),
+                    ElevatedButton.icon(
+                        onPressed: () {
+                             setState(() {
+                                 _posts.removeAt(index);
+                             });
+                        },
+                        icon: const Icon(Icons.close, size: 18),
+                        label: const Text("Reject"),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                    ),
+                ],
+              )
+          ]
         ],
       ),
     );
