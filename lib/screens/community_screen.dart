@@ -12,7 +12,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Mock Data
   final List<Map<String, dynamic>> _posts = [
     {
-      "author": "Sarah M.",
+      "author": "Sneha Gosh.",
       "role": "Teacher Level 5",
       "avatar": "S",
       "color": Colors.purple,
@@ -23,7 +23,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isLiked": false,
     },
     {
-      "author": "Rahul K.",
+      "author": "Gladys.",
       "role": "Student",
       "avatar": "R",
       "color": Colors.orange,
@@ -45,7 +45,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isLiked": true,
     },
     {
-      "author": "Priya S.",
+      "author": "Kunal Patel.",
       "role": "Teacher Level 2",
       "avatar": "P",
       "color": Colors.pink,
