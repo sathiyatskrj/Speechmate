@@ -1,0 +1,50 @@
+[
+  {
+    "text": "Dog",
+    "nicobarese": "Am",
+    "audio": { "category": "animals", "file": "dog.mp3" },
+    "image": "assets/images/dog.png"
+  },
+  {
+    "text": "Pig",
+    "nicobarese": "Ha-ūn",
+    "audio": { "category": "animals", "file": "pig.mp3" },
+    "image": "assets/images/pig.png"
+  },
+  {
+    "text": "Chicken",
+    "nicobarese": "Kam-ò",
+    "audio": { "category": "animals", "file": "chicken.mp3" },
+    "image": "assets/images/chicken.png"
+  },
+  {
+    "text": "Goat",
+    "nicobarese": "Me-e",
+    "audio": { "category": "animals", "file": "goat.mp3" },
+    "image": "assets/images/goat.png"
+  },
+  {
+    "text": "Lizard",
+    "nicobarese": "Kal-ok",
+    "audio": { "category": "animals", "file": "lizard.mp3" },
+    "image": "assets/images/lizard.png"
+  },
+  {
+    "text": "Monkey",
+    "nicobarese": "Kew",
+    "audio": { "category": "animals", "file": "monkey.mp3" },
+    "image": "assets/images/monkey.png"
+  },
+  {
+    "text": "Crab",
+    "nicobarese": "Kānang",
+    "audio": { "category": "animals", "file": "crab.mp3" },
+    "image": "assets/images/crab.png"
+  },
+  {
+    "text": "Fish",
+    "nicobarese": "Kāk",
+    "audio": { "category": "animals", "file": "fish.mp3" },
+    "image": "assets/images/fish.png"
+  }
+]
