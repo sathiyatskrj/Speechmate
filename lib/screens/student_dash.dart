@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/screens/feelings_page.dart';
 import 'package:speechmate/screens/mybody_part.dart';
 import 'package:speechmate/screens/nature_page.dart';
-// [NEW] Import the Games Hub
+import 'number_page.dart';
+// Updated Imports
 import 'games/games_hub_screen.dart';
+import 'animals_page.dart';
+import 'magic_words_page.dart';
+import '../services/tts_service.dart';
 
 import '../widgets/background.dart';
 import '../widgets/learning_tiles.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
-import 'number_page.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -22,6 +25,7 @@ class StudentDash extends StatefulWidget {
 class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   final TextEditingController searchController = TextEditingController();
   final DictionaryService dictionaryService = DictionaryService();
+  final TtsService ttsService = TtsService();
 
   final List<Map<String, dynamic>> learningTiles = [
     {
@@ -44,22 +48,36 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       "colors": [Color(0xFFB084FF), Color(0xFF7AA6FF)],
       "navigateTo": BodyPartsScreen(),
     },
-    // [NEW] Added Games Tile
     {
       "word": "Games",
-      "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+      "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], // Purple for Games
       "navigateTo": const GamesHubScreen(),
+    },
+    // New Sections
+    {
+      "word": "Animals",
+      "colors": [Color(0xFF11998e), Color(0xFF38ef7d)], // Green Gradient for Animals
+      "navigateTo": const AnimalsPage(),
+    },
+    {
+      "word": "Magic Words",
+      "colors": [Color(0xFFfc00ff), Color(0xFF00dbde)], // Pink/Cyan for Magic
+      "navigateTo": const MagicWordsPage(),
     },
   ];
 
   Map<String, dynamic>? result;
   bool isLoading = false;
   bool searchedNicobarese = false;
+  
+  // Hidden Feature Counter
+  int _secretTapCount = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    ttsService.init(); // Initialize TTS
     _loadDictionary();
   }
 
@@ -87,7 +105,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     });
   }
 
-  /// Perform search
   Future<void> performSearch() async {
     FocusScope.of(context).unfocus();
 
@@ -95,7 +112,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       isLoading = true;
     });
 
-    final searchResult = await dictionaryService.searchWord(
+    final searchResult = await dictionaryService.searchEverywhere(
       searchController.text,
     );
 
@@ -103,9 +120,14 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       result = searchResult;
 
       if (searchResult != null) {
-        final query = searchController.text.trim().toLowerCase();
-        searchedNicobarese =
-            searchResult['nicobarese'].toString().toLowerCase() == query;
+        // Safe check for search direction
+        if (searchResult.containsKey('_searchedNicobarese')) {
+            searchedNicobarese = searchResult['_searchedNicobarese'];
+        } else {
+            final query = searchController.text.trim().toLowerCase();
+            searchedNicobarese =
+                searchResult['nicobarese'].toString().toLowerCase() == query;
+        }
       } else {
         searchedNicobarese = false;
       }
@@ -126,57 +148,86 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        colors: const [Color(0xFF94FFF8), Color(0xFF38BDF8)],
+        // Enhanced visuals with a gradient
+        colors: const [Color(0xFFE0C3FC), Color(0xFF8EC5FC)], 
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              searchedNicobarese
-                  ? "Nicobarese → English"
-                  : "English → Nicobarese",
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+            // Hidden Feature: Tap Title 5 times
+            GestureDetector(
+                onTap: () {
+                    setState(() {
+                        _secretTapCount++;
+                        if (_secretTapCount >= 5) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("🎉 Secret Party Mode Activated! 🎉"),
+                                    backgroundColor: Colors.purpleAccent,
+                                )
+                            );
+                            _secretTapCount = 0;
+                            // You can add more fun effects here later!
+                        }
+                    });
+                },
+                child: Text(
+                  searchedNicobarese
+                      ? "Nicobarese → English"
+                      : "English → Nicobarese",
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [Shadow(color: Colors.black26, offset: Offset(1,1), blurRadius: 2)]
+                  ),
+                ),
             ),
-
             const SizedBox(height: 30),
-
             Search(
               controller: searchController,
               onSearch: performSearch,
               onClear: clearSearch,
             ),
-
             const SizedBox(height: 30),
-
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children:
-                  learningTiles.map((item) {
-                    return LearningTiles(
-                      word: item["word"],
-                      gradient: List<Color>.from(item["colors"]),
-                      navigateTo: item["navigateTo"],
-                    );
-                  }).toList(),
-            ),
-
-            const SizedBox(height: 30),
-
             if (isLoading)
               const CircularProgressIndicator()
             else if (searchController.text.isNotEmpty)
               TranslationCard(
                 nicobarese:
                     result != null ? result!['nicobarese'] : "Word not found",
-                english: result != null ? result!['english'] : "",
+                english: result != null ? (result!['english'] ?? result!['text'] ?? "") : "",
                 isError: result == null,
                 searchedNicobarese: searchedNicobarese,
-              ),
+                showSpeaker: result != null, // Show speaker if found
+                onSpeakerTap: () {
+                    if (result == null) return;
+                    // Fix TTS
+                    if (searchedNicobarese) {
+                        ttsService.speakEnglish(result!['english'] ?? result!['text'] ?? "");
+                    } else {
+                        ttsService.speakNicobarese(result!['nicobarese']);
+                    }
+                },
+              )
+            else
+             Expanded(
+               child: SingleChildScrollView(
+                 child: Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  alignment: WrapAlignment.center,
+                  children:
+                      learningTiles.map((item) {
+                        return LearningTiles(
+                          word: item["word"],
+                          gradient: List<Color>.from(item["colors"]),
+                          navigateTo: item["navigateTo"],
+                        );
+                      }).toList(),
+                 ),
+               ),
+             ),
           ],
         ),
       ),
