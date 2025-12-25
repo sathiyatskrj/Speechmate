@@ -8,6 +8,7 @@ import 'games/games_hub_screen.dart';
 import 'animals_page.dart';
 import 'magic_words_page.dart';
 import 'community_screen.dart';
+import 'family_page.dart';
 import '../services/tts_service.dart';
 
 import '../widgets/background.dart';
@@ -69,6 +70,12 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       "word": "Community",
       "colors": [Color(0xFF4FACFE), Color(0xFF00F2FE)], // Blue/Cyan for Community
       "navigateTo": const CommunityScreen(),
+      "isSecret": true,
+    },
+    {
+      "word": "Family",
+      "colors": [Color(0xFFff9a9e), Color(0xFFfecfef)], // Pink/Peach for Family
+      "navigateTo": const FamilyPage(),
     },
   ];
 
@@ -246,5 +253,46 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     searchController.dispose();
     dictionaryService.unload(DictionaryType.words);
     super.dispose();
+  }
+
+  void _showSecretAccessDialog(BuildContext context, Widget targetScreen) {
+    final TextEditingController _controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Senior Student Access 🔒"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Solve this to enter:\n\n12 + 15 = ?"),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(hintText: "Enter answer"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (_controller.text == "27") {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => targetScreen));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Incorrect. Access Denied 🚫")),
+                );
+              }
+            },
+            child: const Text("Enter"),
+          ),
+        ],
+      ),
+    );
   }
 }
