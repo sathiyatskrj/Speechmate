@@ -12,7 +12,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Mock Data
   final List<Map<String, dynamic>> _posts = [
     {
-      "author": "Sneha Gosh.",
+      "author": "Sarah M.",
       "role": "Teacher Level 5",
       "avatar": "S",
       "color": Colors.purple,
@@ -23,7 +23,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isLiked": false,
     },
     {
-      "author": "Gladys.",
+      "author": "Rahul K.",
       "role": "Student",
       "avatar": "R",
       "color": Colors.orange,
@@ -45,7 +45,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isLiked": true,
     },
     {
-      "author": "Kunal Patel.",
+      "author": "Priya S.",
       "role": "Teacher Level 2",
       "avatar": "P",
       "color": Colors.pink,
@@ -80,15 +80,20 @@ class _CommunityScreenState extends State<CommunityScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none),
-            onPressed: () {},
+            icon: const Icon(Icons.cloud_sync_outlined),
+            tooltip: "Syncing when online",
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Syncing with community server... (Simulated)")),
+              );
+            },
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Post creation coming soon!")),
+            const SnackBar(content: Text("Post saved! Will upload when online. 🌐")),
           );
         },
         backgroundColor: Colors.deepPurple,
@@ -97,16 +102,36 @@ class _CommunityScreenState extends State<CommunityScreen> {
       ),
       body: Background(
         colors: const [Color(0xFF89f7fe), Color(0xFF66a6ff)], // Fresh Blue Gradient
-        child: ListView.builder(
-          padding: const EdgeInsets.fromLTRB(16, 100, 16, 80),
-          itemCount: _posts.length + 1, // +1 for Trending header
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return _buildTrendingSection();
-            }
-            final post = _posts[index - 1];
-            return _buildPostCard(post, index - 1);
-          },
+        child: Column(
+          children: [
+            // "Offline First" Banner
+            Container(
+              width: double.infinity,
+              color: Colors.orange.withOpacity(0.9),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   Icon(Icons.wifi_off_rounded, size: 14, color: Colors.white),
+                   SizedBox(width: 8),
+                   Text("Offline Mode: Posts will sync later", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                itemCount: _posts.length + 1, // +1 for Trending header
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return _buildTrendingSection();
+                  }
+                  final post = _posts[index - 1];
+                  return _buildPostCard(post, index - 1);
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
