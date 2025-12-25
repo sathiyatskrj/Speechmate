@@ -11,6 +11,20 @@ class ProgressService {
   static const String _streakKey = 'current_streak';
   static const String _lastActiveKey = 'last_active_date';
   static const String _wordsLearnedKey = 'words_learned';
+  static const String _teacherLevelKey = 'teacher_level';
+
+  Future<int> getTeacherLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_teacherLevelKey) ?? 1;
+  }
+
+  Future<void> unlockNextLevel(int completedLevel) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentLevel = prefs.getInt(_teacherLevelKey) ?? 1;
+    if (completedLevel >= currentLevel) {
+      await prefs.setInt(_teacherLevelKey, currentLevel + 1);
+    }
+  }
 
   Future<void> incrementSearchCount() async {
     final prefs = await SharedPreferences.getInstance();
@@ -297,6 +311,30 @@ class DictionaryService {
     var seed = now.year * 10000 + now.month * 100 + now.day;
     var index = seed % words.length;
     
+  Future<Map<String, dynamic>?> getDailyWord() async {
+    final words = await loadDictionary(DictionaryType.words);
+    if (words.isEmpty) return null;
+    
+    var now = DateTime.now();
+    var seed = now.year * 10000 + now.month * 100 + now.day;
+    var index = seed % words.length;
+    
     return words[index];
+  }
+
+  Future<List<Map<String, dynamic>>> getWordsForLevel(int level) async {
+    final words = await loadDictionary(DictionaryType.words);
+    if (words.isEmpty) return [];
+
+    int wordsPerLevel = 10;
+    int startIndex = (level - 1) * wordsPerLevel;
+    
+    // Ensure we don't go out of bounds
+    if (startIndex >= words.length) return [];
+    
+    int endIndex = startIndex + wordsPerLevel;
+    if (endIndex > words.length) endIndex = words.length;
+
+    return words.sublist(startIndex, endIndex);
   }
 }
