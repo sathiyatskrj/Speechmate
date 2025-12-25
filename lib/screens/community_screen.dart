@@ -12,7 +12,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Mock Data
   final List<Map<String, dynamic>> _posts = [
     {
-      "author": "Sarah M.",
+      "author": "Sneha Gosh.",
       "role": "Teacher Level 5",
       "avatar": "S",
       "color": Colors.purple,
@@ -21,9 +21,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "comments": 5,
       "time": "2 hrs ago",
       "isLiked": false,
+      "isVerified": true,
     },
     {
-      "author": "Rahul K.",
+      "author": "Sathiya.",
       "role": "Student",
       "avatar": "R",
       "color": Colors.orange,
@@ -32,6 +33,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "comments": 8,
       "time": "4 hrs ago",
       "isLiked": false,
+      "isVerified": false,
     },
      {
       "author": "Speechmate Team",
@@ -45,7 +47,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isLiked": true,
     },
     {
-      "author": "Priya S.",
+      "author": "Kunal Patel.",
       "role": "Teacher Level 2",
       "avatar": "P",
       "color": Colors.pink,
@@ -206,7 +208,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(post['author'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Row(
+                    children: [
+                      Text(post['author'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      if (post['isVerified'] == true) ...[
+                        const SizedBox(width: 4),
+                        const Icon(Icons.verified, color: Colors.blue, size: 16),
+                      ],
+                    ],
+                  ),
                   Text(post['role'], style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                 ],
               ),
