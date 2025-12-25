@@ -36,7 +36,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isVerified": false,
     },
      {
-      "author": "Speechmate Team",
+      "author": "SpeechMate Connect",
       "role": "Admin",
       "avatar": "A",
       "color": Colors.blue,
@@ -72,6 +72,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   }
 
   bool _isAdminMode = false;
+  bool _isOnline = false; // "Simulated" online status
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +84,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
         elevation: 0,
         foregroundColor: Colors.white,
         actions: [
+          if (_isAdminMode)
+            IconButton(
+              icon: Icon(_isOnline ? Icons.wifi : Icons.wifi_off),
+              tooltip: "Toggle Online Sim",
+              onPressed: () {
+                setState(() => _isOnline = !_isOnline);
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(_isOnline ? "Simulating ONLINE 🟢" : "Simulating OFFLINE 🔴")));
+              },
+            ),
           IconButton(
             icon: Icon(_isAdminMode ? Icons.admin_panel_settings : Icons.admin_panel_settings_outlined),
             tooltip: "Toggle Admin Mode (Demo)",
@@ -96,20 +107,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.cloud_sync_outlined),
-            tooltip: "Syncing when online",
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Syncing with community server... (Simulated)")),
-              );
-            },
+            icon: Icon(_isOnline ? Icons.cloud_done : Icons.cloud_off),
+            tooltip: _isOnline ? "Synced" : "Offline",
+            onPressed: () {},
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Post saved! Will upload when online. 🌐")),
+             SnackBar(content: Text(_isOnline ? "Posted successfully! ✅" : "Post saved! Will upload when online. 🌐")),
           );
         },
         backgroundColor: _isAdminMode ? Colors.redAccent : Colors.deepPurple,
@@ -122,20 +129,36 @@ class _CommunityScreenState extends State<CommunityScreen> {
             : [const Color(0xFF89f7fe), const Color(0xFF66a6ff)], // Fresh Blue Post
         child: Column(
           children: [
-            // "Offline First" Banner
-            Container(
-              width: double.infinity,
-              color: Colors.orange.withOpacity(0.9),
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                   Icon(Icons.wifi_off_rounded, size: 14, color: Colors.white),
-                   SizedBox(width: 8),
-                   Text("Offline Mode: Posts will sync later", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                ],
+            // "Offline First" Banner - Only show if OFFLINE
+            if (!_isOnline)
+              Container(
+                width: double.infinity,
+                color: Colors.orange.withOpacity(0.9),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Icon(Icons.wifi_off_rounded, size: 14, color: Colors.white),
+                     SizedBox(width: 8),
+                     Text("Offline Mode: Posts will sync later", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  ],
+                ),
               ),
-            ),
+            // "Online" Banner - Optional, good for demo
+            if (_isOnline)
+              Container(
+                width: double.infinity,
+                color: Colors.green.withOpacity(0.9),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Icon(Icons.wifi, size: 14, color: Colors.white),
+                     SizedBox(width: 8),
+                     Text("Online: Synced with Nicobar Server 🟢", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
