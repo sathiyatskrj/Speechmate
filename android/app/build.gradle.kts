@@ -23,7 +23,7 @@ android {
         minSdk = 21  // Android 5.0 (Lollipop)
         targetSdk = 34  // Latest stable
         versionCode = 1
-        versionName = "1.2.0"
+        versionName = "1.3.4"
     }
 
     buildTypes {
@@ -36,3 +36,4 @@ android {
 flutter {
     source = "../.."
 }
+
