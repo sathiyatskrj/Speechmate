@@ -13,6 +13,7 @@ dependencies:
   audioplayers: ^6.5.1
   shared_preferences: ^2.2.2
   share_plus: ^7.2.1
+  rive: ^0.13.0 
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +58,10 @@ flutter:
     - assets/data/dictionary_magic.json
     - assets/audio/magic/
     - assets/audio/animals/
+    - assets/audio/family/ 
+    - assets/data/dictionary_family.json 
     - assets/icons/branding.png
-
+    - assets/icons/branding.png
+    - assets/anim/ 
 
 
