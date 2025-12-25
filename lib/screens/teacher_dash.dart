@@ -10,6 +10,7 @@ import '../widgets/audio_phrase_card.dart';
 import 'quiz_screen.dart';
 import 'chat_translate_screen.dart';
 import 'progress_screen.dart';
+import 'teacher_levels_screen.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -308,6 +309,43 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
                       ),
                     );
                   },
+                ),
+              ),
+              const SizedBox(height: 20),
+              const SizedBox(height: 20),
+              
+              // New Teacher Certification section
+              GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [Color(0xFF2E3192), Color(0xFF1BFFFF)]),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                        child: const Icon(Icons.school, color: Colors.white, size: 30),
+                      ),
+                      const SizedBox(width: 15),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Teacher Certification", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text("Master 10 Levels & Get Certified!", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        ],
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70, size: 20),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
