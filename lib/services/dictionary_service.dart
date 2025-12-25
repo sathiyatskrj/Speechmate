@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum DictionaryType { words, phrases, nature, numbers, animals, magic }
+enum DictionaryType { words, phrases, nature, numbers, animals, magic, family }
 
 class ProgressService {
   static const String _searchCountKey = 'search_count';
@@ -157,6 +157,7 @@ class DictionaryService {
     DictionaryType.phrases: 'assets/data/dictionary_phrases.json',
     DictionaryType.animals: 'assets/data/dictionary_animals.json', // Added
     DictionaryType.magic: 'assets/data/dictionary_magic.json', // Added
+    DictionaryType.family: 'assets/data/dictionary_family.json', // Added
   };
 
   Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
@@ -301,6 +302,11 @@ class DictionaryService {
 
     final List<Map<String, dynamic>> shuffled = List.from(words)..shuffle(Random());
     return shuffled.take(count).toList();
+  }
+
+  // Method for Family Items (Added for Hackathon)
+  Future<List<Map<String, dynamic>>> getFamilyItems() async {
+    return await loadDictionary(DictionaryType.family);
   }
 
   Future<Map<String, dynamic>?> getDailyWord() async {
