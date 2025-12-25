@@ -311,14 +311,6 @@ class DictionaryService {
     var seed = now.year * 10000 + now.month * 100 + now.day;
     var index = seed % words.length;
     
-  Future<Map<String, dynamic>?> getDailyWord() async {
-    final words = await loadDictionary(DictionaryType.words);
-    if (words.isEmpty) return null;
-    
-    var now = DateTime.now();
-    var seed = now.year * 10000 + now.month * 100 + now.day;
-    var index = seed % words.length;
-    
     return words[index];
   }
 
