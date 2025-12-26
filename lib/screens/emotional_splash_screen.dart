@@ -45,7 +45,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
       CurvedAnimation(parent: _mainController, curve: const Interval(0.2, 0.3, curve: Curves.easeIn)),
     );
     _wordsPosition = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.25, 0.6, curve: Curves.easeInOutSlowMiddle)),
+      CurvedAnimation(parent: _mainController, curve: const Interval(0.25, 0.6, curve: Curves.easeInOut)),
     );
 
     // 3. Student Enlightened (3.5s - 4.5s)
