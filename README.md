@@ -7,7 +7,7 @@
 </h1>
 
 <p align="center">
-  <em>"Preserving Heritage, One Word at a Time."</em>
+  <em>"Where Language Barrier Ends."</em>
 </p>
 
 <p align="center">
@@ -127,4 +127,5 @@ Built with ❤️ by **The SpeechMate Team**
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
+
 
