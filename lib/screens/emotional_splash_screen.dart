@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
+import 'package:flutter/services.dart';
 import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/languages.dart';
 
@@ -14,253 +16,375 @@ class EmotionalSplashScreen extends StatefulWidget {
 
 class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with TickerProviderStateMixin {
   late AnimationController _mainController;
+  late AnimationController _pulseController;
   
-  // Staggered Animations
-  late Animation<double> _teacherOpacity;
-  late Animation<double> _studentOpacity;
-  late Animation<double> _wordsPosition;
-  late Animation<double> _wordsOpacity;
-  late Animation<double> _studentGlow;
-  late Animation<double> _finalFadeOut;
-  late Animation<double> _logoFadeIn;
+  // SEQUENCING
+  late Animation<double> _constellationOpacity;
+  late Animation<double> _logoScale;
+  late Animation<double> _logoRotate;
+  late Animation<double> _textSlide;
+  late Animation<double> _textOpacity;
+  
+  // PARTICLE SYSTEM
+  final int particleCount = 65; // increased density
+  final List<Particle> particles = [];
+  final math.Random random = math.Random();
+  Offset _touchPosition = Offset.zero;
 
   @override
   void initState() {
     super.initState();
+    
+    // Initialize Particles with Physics properties
+    for (int i = 0; i < particleCount; i++) {
+      particles.add(Particle(random));
+    }
+
+    _pulseController = AnimationController(
+       vsync: this, 
+       duration: const Duration(seconds: 4)
+    )..repeat(reverse: true);
+
     _mainController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 6),
+      duration: const Duration(milliseconds: 6500),
     );
 
-    // 1. Scene Entering (0-1s)
-    _teacherOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.0, 0.15, curve: Curves.easeOut)),
-    );
-    _studentOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.1, 0.25, curve: Curves.easeOut)),
+    // 1. Constellation Fade In (0 - 2s)
+    _constellationOpacity = CurvedAnimation(
+      parent: _mainController,
+      curve: const Interval(0.0, 0.3, curve: Curves.easeIn),
     );
 
-    // 2. Words Floating (1s - 3.5s)
-    _wordsOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.2, 0.3, curve: Curves.easeIn)),
+    // 2. Logo Explosion (2s - 3s)
+    _logoScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _mainController, curve: const Interval(0.3, 0.5, curve: Curves.elasticOut)),
     );
-    _wordsPosition = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.25, 0.6, curve: Curves.easeInOut)),
-    );
-
-    // 3. Student Enlightened (3.5s - 4.5s)
-    _studentGlow = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.6, 0.75, curve: Curves.easeOut)),
+     _logoRotate = Tween<double>(begin: -0.5, end: 0.0).animate(
+      CurvedAnimation(parent: _mainController, curve: const Interval(0.3, 0.6, curve: Curves.easeOutBack)),
     );
 
-    // 4. Transition to Logo (4.5s - 5.0s)
-    _finalFadeOut = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.75, 0.85, curve: Curves.easeIn)),
+    // 3. 3D Text Reveal (3s - 5s)
+    _textSlide = Tween<double>(begin: 100, end: 0).animate(
+      CurvedAnimation(parent: _mainController, curve: const Interval(0.5, 0.7, curve: Curves.easeOutExpo)),
     );
-
-    // 5. Logo Reveal (5.0s - 6.0s)
-    _logoFadeIn = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _mainController, curve: const Interval(0.85, 1.0, curve: Curves.easeOut)),
+    _textOpacity = CurvedAnimation(
+      parent: _mainController,
+      curve: const Interval(0.55, 0.7, curve: Curves.easeIn),
     );
 
     _mainController.forward();
 
     _mainController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        // Navigate to next screen
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => widget.nextScreen,
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(seconds: 1),
-          ),
-        );
+        // Haptic Feedback for impact
+        HapticFeedback.mediumImpact();
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => widget.nextScreen,
+              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+              transitionDuration: const Duration(milliseconds: 1000),
+            ),
+          );
+        });
       }
+    });
+
+    // Ambient loop for particles
+    _pulseController.addListener(() {
+      final size = MediaQuery.of(context).size;
+      setState(() {
+         for (var p in particles) {
+           p.update(_touchPosition, size);
+         }
+      });
     });
   }
 
   @override
   void dispose() {
     _mainController.dispose();
+    _pulseController.dispose();
     super.dispose();
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    setState(() {
+      _touchPosition = details.globalPosition;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFBF7), // Creamy background
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // MAIN SCENE
-          AnimatedBuilder(
-            animation: _mainController,
-            builder: (context, child) {
-              // If we are in the final fade out stage
-              if (_finalFadeOut.value > 0.0 && _logoFadeIn.value == 0.0) {
-                 return Opacity(
-                   opacity: 1.0 - _finalFadeOut.value,
-                   child: _buildClassroomScene(),
-                 );
-              }
-              // If we are showing logo
-              if (_logoFadeIn.value > 0.0) {
-                return Opacity(opacity: _logoFadeIn.value, child: _buildLogoScene());
-              }
-              // Normal scene
-              return _buildClassroomScene();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClassroomScene() {
-    return Stack(
-      children: [
-        // Teacher (Left)
-        Positioned(
-          left: 40,
-          bottom: 200,
-          child: FadeTransition(
-            opacity: _teacherOpacity,
-            child: Column(
-              children: [
-                const Icon(Icons.face_3_rounded, size: 80, color: Color(0xFF8D6E63)), // Warm brown text
-                const SizedBox(height: 10),
-                Text("Teacher", style: TextStyle(color: Colors.brown.shade300, fontSize: 14)),
-              ],
-            ),
-          ),
-        ),
-
-        // Student (Right)
-        Positioned(
-          right: 40,
-          bottom: 200,
-          child: FadeTransition(
-            opacity: _studentOpacity,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Glow Effect
-                Transform.scale(
-                  scale: 1.0 + (_studentGlow.value * 0.5),
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.amber.withOpacity(_studentGlow.value * 0.4),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.amber,
-                          blurRadius: 40 * _studentGlow.value,
-                          spreadRadius: 10 * _studentGlow.value,
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                Column(
-                  children: [
-                    Icon(
-                      Icons.face_6_rounded, 
-                      size: 80, 
-                      color: Color.lerp(const Color(0xFF8D6E63), Colors.amber.shade800, _studentGlow.value)
-                    ),
-                    const SizedBox(height: 10),
-                    Text("Student", style: TextStyle(color: Colors.brown.shade300, fontSize: 14)),
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onPanUpdate: _onPanUpdate,
+        onPanEnd: (_) => _touchPosition = Offset.zero,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // DEEP SPACE GRADIENT
+            Container(
+              decoration: const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.bottomCenter,
+                  radius: 1.5, // Expanded depth
+                  colors: [  
+                    Color(0xFF4A00E0), // Vibrant Violet
+                    Color(0xFF8E2DE2), // Rich Purple 
+                    Color(0xFF0F0C29), // Deep Space
+                    Colors.black
                   ],
+                  stops: [0.0, 0.3, 0.7, 1.0],
                 ),
-              ],
-            ),
-          ),
-        ),
-
-        // Floating Words (Middle)
-        Positioned(
-          left: 120 + (MediaQuery.of(context).size.width - 240) * _wordsPosition.value,
-          bottom: 240, // Aligned with heads
-          child: FadeTransition(
-            opacity: _wordsOpacity,
-            child: Opacity(
-              opacity: 1.0 - _studentGlow.value, // Hide words when they reach/absorb
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildFloatingSymbol("अ", Colors.orange),
-                  const SizedBox(width: 5),
-                  _buildFloatingSymbol("A", Colors.blue),
-                  const SizedBox(width: 5),
-                  _buildFloatingSymbol("Ka", Colors.green),
-                ],
               ),
             ),
-          ),
+
+            // INTERACTIVE CONSTELLATION MESH
+            AnimatedBuilder(
+              animation: _mainController,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _constellationOpacity.value,
+                  child: CustomPaint(
+                    painter: ConstellationPainter(
+                      particles: particles, 
+                      pulse: _pulseController.value,
+                      touchPos: _touchPosition
+                    ),
+                    size: Size.infinite,
+                  ),
+                );
+              },
+            ),
+
+            // CENTER CONTENT
+            Center(
+              child: AnimatedBuilder(
+                animation: _mainController,
+                builder: (context, child) {
+                  return Column(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       // 3D LOGO CONTAINER
+                       Transform(
+                         transform: Matrix4.identity()
+                           ..setEntry(3, 2, 0.001) // Perspective
+                           ..rotateX(0.1 * math.sin(_pulseController.value * math.pi))
+                           ..rotateY(0.1 * math.cos(_pulseController.value * math.pi))
+                           ..scale(_logoScale.value),
+                         alignment: Alignment.center,
+                         child: Transform.rotate(
+                           angle: _logoRotate.value,
+                           child: Container(
+                             width: 140,
+                             height: 140,
+                             decoration: BoxDecoration(
+                               shape: BoxShape.circle,
+                               gradient: const LinearGradient(
+                                 begin: Alignment.topLeft,
+                                 end: Alignment.bottomRight,
+                                 colors: [Colors.cyanAccent, Colors.purpleAccent],
+                               ),
+                               boxShadow: [
+                                 BoxShadow(
+                                   color: Colors.cyanAccent.withOpacity(0.5),
+                                   blurRadius: 60 * _logoScale.value,
+                                   spreadRadius: 10,
+                                 )
+                               ]
+                             ),
+                             padding: const EdgeInsets.all(3),
+                             child: Container(
+                               decoration: const BoxDecoration(
+                                 shape: BoxShape.circle,
+                                 color: Colors.black,
+                               ),
+                               child: ClipOval(
+                                 child: Image.asset(
+                                   'assets/icons/logo_main.png', 
+                                   fit: BoxFit.cover,
+                                   errorBuilder: (c,o,s) => const Icon(Icons.mic, color: Colors.white, size: 60)
+                                 ),
+                               ),
+                             ),
+                           ),
+                         ),
+                       ),
+
+                       const SizedBox(height: 50),
+
+                       // 3D TEXT REVEAL
+                       Transform.translate(
+                         offset: Offset(0, _textSlide.value),
+                         child: Opacity(
+                            opacity: _textOpacity.value,
+                            child: Column(
+                              children: [
+                                ShaderMask(
+                                  shaderCallback: (bounds) => const LinearGradient(
+                                    colors: [Colors.white, Color(0xFFB0C4DE)],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter
+                                  ).createShader(bounds),
+                                  child: Text(
+                                    "SPEECHMATE",
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto', // Default but clean
+                                      fontSize: 42,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      letterSpacing: 8.0,
+                                      height: 1.0,
+                                      shadows: [
+                                        Shadow(color: Colors.cyan.withOpacity(0.5), blurRadius: 30, offset: const Offset(0,10))
+                                      ]
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // GLIMMERING SUBTITLE
+                                AnimatedBuilder(
+                                  animation: _pulseController,
+                                  builder: (context, child) {
+                                    return Text(
+                                      "ANCESTRAL VOICES. FUTURE TECH.",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.6 + (0.4 * _pulseController.value)),
+                                        letterSpacing: 2.0,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                         ),
+                       ),
+                     ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 🌌 TRIBAL PHYSICS ENGINE
+// ---------------------------------------------------------------------------
+
+class Particle {
+  double x;
+  double y;
+  double vx;
+  double vy;
+  double radius;
+  String char;
+  Color color;
+  
+  Particle(math.Random r)
+     : x = r.nextDouble(),
+       y = r.nextDouble(),
+       vx = (r.nextDouble() - 0.5) * 0.0015,
+       vy = (r.nextDouble() - 0.5) * 0.0015,
+       radius = r.nextDouble() * 10 + 10, // Size for text
+       char = _getRandomChar(r),
+       color = Colors.white.withOpacity(0.3 + r.nextDouble() * 0.4);
+
+  static String _getRandomChar(math.Random r) {
+    // User Provided Tribal Scripts
+    final List<String> nicobarese = ['A', 'Ā', 'B', 'D', 'K', 'L', 'M', 'N', 'O', 'Ò'];
+    final List<String> greatAndamanese = ['a', 'e', 'i', 'o', 'u', 'ph', 'th', 'kh'];
+    final List<String> onge = ['A', 'Ŋ', 'G', 'K', 'T', 'E', 'Y', 'W'];
+    
+    final all = [...nicobarese, ...greatAndamanese, ...onge];
+    return all[r.nextInt(all.length)];
   }
 
-  Widget _buildFloatingSymbol(String char, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        shape: BoxShape.circle,
-        border: Border.all(color: color.withOpacity(0.5)),
-      ),
-      child: Text(
-        char, 
-        style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 16)
-      ),
-    );
+  void update(Offset touchPos, Size size) {
+    x += vx;
+    y += vy;
+
+    // Bounce off walls
+    if (x < 0 || x > 1) vx *= -1;
+    if (y < 0 || y > 1) vy *= -1;
+    
+    // Interactive Repulsion from Touch
+    if (touchPos != Offset.zero) {
+       // Normalize touch to 0-1
+       double tx = touchPos.dx / size.width;
+       double ty = touchPos.dy / size.height;
+       
+       double dx = x - tx;
+       double dy = y - ty;
+       double dist = math.sqrt(dx*dx + dy*dy);
+       
+       if (dist < 0.2) { // Repel if close
+         vx += dx * 0.001;
+         vy += dy * 0.001;
+       }
+    }
+  }
+}
+
+class ConstellationPainter extends CustomPainter {
+  final List<Particle> particles;
+  final double pulse;
+  final Offset touchPos;
+
+  ConstellationPainter({required this.particles, required this.pulse, required this.touchPos});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..strokeCap = StrokeCap.round;
+    
+    for (int i = 0; i < particles.length; i++) {
+       final p1 = particles[i];
+       final pos1 = Offset(p1.x * size.width, p1.y * size.height);
+
+       // Draw Text Character
+       final textSpan = TextSpan(
+         text: p1.char,
+         style: TextStyle(
+           color: p1.color.withOpacity(0.5 + (0.3 * math.sin(pulse * math.pi))),
+           fontSize: p1.radius,
+           fontWeight: FontWeight.bold,
+           shadows: [Shadow(color: Colors.cyanAccent.withOpacity(0.5), blurRadius: 4)]
+         ),
+       );
+       final textPainter = TextPainter(
+         text: textSpan,
+         textDirection: TextDirection.ltr,
+       );
+       textPainter.layout();
+       textPainter.paint(canvas, pos1 - Offset(textPainter.width / 2, textPainter.height / 2));
+
+       // Connect to neighbors (Neural Mesh)
+       for (int j = i + 1; j < particles.length; j++) {
+         final p2 = particles[j];
+         final pos2 = Offset(p2.x * size.width, p2.y * size.height);
+         
+         final dist = (pos1 - pos2).distance;
+         
+         if (dist < 90) { // Connection threshold
+            final double opacity = (1.0 - (dist / 90)) * 0.4;
+            paint.color = Colors.cyan.withOpacity(opacity);
+            paint.strokeWidth = 1.0;
+            canvas.drawLine(pos1, pos2, paint);
+         }
+       }
+    }
   }
 
-  Widget _buildLogoScene() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-           Container(
-             padding: const EdgeInsets.all(20),
-             decoration: BoxDecoration(
-               color: Colors.white,
-               shape: BoxShape.circle,
-               boxShadow: [
-                 BoxShadow(color: Colors.orange.withOpacity(0.2), blurRadius: 30, spreadRadius: 10)
-               ]
-             ),
-             child: Image.asset('assets/icons/logo_main.png', width: 100, height: 100),
-           ),
-           const SizedBox(height: 30),
-           const Text(
-             "SpeechMate",
-             style: TextStyle(
-               fontFamily: 'Arial', // Or your custom font
-               fontSize: 32,
-               fontWeight: FontWeight.bold,
-               color: Color(0xFFFF6F61),
-               letterSpacing: 1.2,
-             ),
-           ),
-           const SizedBox(height: 16),
-           const Text(
-             "Preserving ancestral voices\nthrough technology.",
-             textAlign: TextAlign.center,
-             style: TextStyle(
-               fontSize: 16,
-               color: Colors.grey,
-               fontStyle: FontStyle.italic,
-               height: 1.5,
-             ),
-           ),
-        ],
-      ),
-    );
-  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
