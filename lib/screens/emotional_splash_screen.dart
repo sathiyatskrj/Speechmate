@@ -252,7 +252,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                                   animation: _pulseController,
                                   builder: (context, child) {
                                     return Text(
-                                      "ANCESTRAL VOICES. FUTURE TECH.",
+                                      "WHERE LANGUAGE BARRIERS END.",
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
