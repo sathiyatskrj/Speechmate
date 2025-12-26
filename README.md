@@ -33,8 +33,7 @@
 
 **SpeechMate** was born from a desire to stop this silence. While we started with **Nicobarese**—the heartbeat of the Nicobar Islands—our vision is far greater. We are building a digital ark for **all endangered tribal languages**. 
 
-This isn't just an app. It's a bridge between generations. It empowers a grandmother to teach her grandson the words of their ancestors, using the technology of today.
-
+This isn't just an app. It's a bridge between generations. It helps teachers pass the language of our ancestors to students—so it is never lost.
 ---
 
 ## 🚀 Key Features
@@ -128,3 +127,4 @@ Built with ❤️ by **The SpeechMate Team**
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
+
