@@ -80,12 +80,20 @@ class _FamilyPageState extends State<FamilyPage> {
                       leading: Container(
                         height: 60,
                         width: 60,
+                        clipBehavior: Clip.antiAlias,
                         decoration: BoxDecoration(
                           color: Colors.orange.shade100,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.person, size: 30, color: Colors.orange),
-                        // We would use Image.asset(member['image']) here if images existed
+                        child: (member['image'] != null && member['image'].toString().isNotEmpty)
+                            ? Image.asset(
+                                member['image'],
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(Icons.person, size: 30, color: Colors.orange);
+                                },
+                              )
+                            : const Icon(Icons.person, size: 30, color: Colors.orange),
                       ),
                       title: Text(
                         member['text'],
