@@ -67,15 +67,15 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       "navigateTo": const MagicWordsPage(),
     },
     {
+      "word": "Family",
+      "colors": [Color(0xFFff9a9e), Color(0xFFfecfef)], // Pink/Peach for Family
+      "navigateTo": const FamilyPage(),
+    },
+    {
       "word": "Community",
       "colors": [Color(0xFF4FACFE), Color(0xFF00F2FE)], // Blue/Cyan for Community
       "navigateTo": const CommunityScreen(),
       "isSecret": true,
-    },
-    {
-      "word": "Family",
-      "colors": [Color(0xFFff9a9e), Color(0xFFfecfef)], // Pink/Peach for Family
-      "navigateTo": const FamilyPage(),
     },
   ];
 
