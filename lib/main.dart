@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/languages.dart';
 import 'package:flutter/services.dart';
+import 'package:speechmate/screens/emotional_splash_screen.dart';
 import 'package:speechmate/widgets/instant_popup_transition.dart';
 
 void main() async {
@@ -29,10 +30,11 @@ class MyApp extends StatelessWidget {
           builders: {TargetPlatform.android: NoTransition()},
         ),
       ),
-      home:
-          languageSelected
-              ? const Languages()
-              : const LanguageSelectionScreen(),
+      home: EmotionalSplashScreen(
+        nextScreen: languageSelected
+            ? const Languages()
+            : const LanguageSelectionScreen(),
+      ),
     );
   }
 }
