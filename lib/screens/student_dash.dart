@@ -230,12 +230,15 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                   spacing: 16,
                   runSpacing: 16,
                   alignment: WrapAlignment.center,
-                  children:
+                      children:
                       learningTiles.map((item) {
                         return LearningTiles(
                           word: item["word"],
                           gradient: List<Color>.from(item["colors"]),
                           navigateTo: item["navigateTo"],
+                          onTap: item.containsKey('isSecret') && item['isSecret'] == true
+                              ? () => _showSecretAccessDialog(context, item['navigateTo'])
+                              : null,
                         );
                       }).toList(),
                  ),
