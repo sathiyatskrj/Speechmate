@@ -263,8 +263,11 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
       );
     } else {
       content = Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
+          padding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 12 : 20, 
+            vertical: 10
+          ),
           children: [
             // Common Phrases Section
             if (phrases.isNotEmpty) ...[
@@ -273,6 +276,7 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
               SizedBox(
                 height: 80, // Height for horizontal scrolling cards
                 child: ListView.separated(
+                  physics: const BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   itemCount: phrases.length,
                   separatorBuilder: (context, index) => const SizedBox(width: 10),
@@ -312,7 +316,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
                   },
                 ),
               ),
-              const SizedBox(height: 20),
               const SizedBox(height: 20),
               
               // New Teacher Certification section
@@ -414,30 +417,43 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
               ),
               SizedBox(height: isSmallScreen ? 15 : 20),
             ],
+            
             if (history.isNotEmpty) ...[
               Text("🕒 Recent Searches", style: TextStyle(fontSize: sectionFontSize, fontWeight: FontWeight.bold, color: Colors.black87)),
               SizedBox(height: isSmallScreen ? 8 : 10),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: history.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: ListTile(
-                        leading: Icon(Icons.history, size: isSmallScreen ? 18 : 20),
-                        title: Text(history[index], style: TextStyle(fontSize: isSmallScreen ? 14 : 16)),
-                        onTap: () {
-                          searchController.text = history[index];
-                          performSearch();
-                        },
-                      ),
-                    );
-                  },
-                ),
-              )
+              // Flattened History List
+              ...history.map((term) {
+                return Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(color: Colors.orange.shade50, shape: BoxShape.circle),
+                      child: Icon(Icons.history, size: isSmallScreen ? 18 : 20, color: Colors.orange),
+                    ),
+                    title: Text(term, style: TextStyle(fontSize: isSmallScreen ? 14 : 16, fontWeight: FontWeight.w500)),
+                    trailing: const Icon(Icons.north_west, size: 16, color: Colors.grey),
+                    onTap: () {
+                      searchController.text = term;
+                      performSearch();
+                    },
+                  ),
+                );
+              }),
+              const SizedBox(height: 20),
             ] else
-              Expanded(
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
                 child: Center(
-                  child: Text("Start searching to learn!", style: TextStyle(color: Colors.black45, fontSize: isSmallScreen ? 14 : 16)),
+                  child: Column(
+                    children: [
+                      Icon(Icons.search_off_rounded, size: 50, color: Colors.black12),
+                      const SizedBox(height: 10),
+                      Text("Start searching to learn!", style: TextStyle(color: Colors.black45, fontSize: isSmallScreen ? 14 : 16)),
+                    ],
+                  ),
                 ),
               ),
           ],
