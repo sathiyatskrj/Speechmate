@@ -4,6 +4,7 @@ import 'tap_scale.dart';
 class LearningTiles extends StatelessWidget {
   final String word;
   final List<Color> gradient;
+  final Widget? navigateTo;
   final VoidCallback? onTap;
 
   const LearningTiles({
