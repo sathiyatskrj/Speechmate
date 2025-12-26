@@ -4,13 +4,14 @@ import 'tap_scale.dart';
 class LearningTiles extends StatelessWidget {
   final String word;
   final List<Color> gradient;
-  final Widget? navigateTo;
+  final VoidCallback? onTap;
 
   const LearningTiles({
     super.key,
     required this.word,
     required this.gradient,
     this.navigateTo,
+    this.onTap,
   });
 
   @override
@@ -18,7 +19,7 @@ class LearningTiles extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return TapScale(
-      onTap: () {
+      onTap: onTap ?? () {
         if (navigateTo != null) {
           Navigator.push(
             context,
