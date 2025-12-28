@@ -15,7 +15,6 @@ dependencies:
   share_plus: ^7.2.1
   rive: ^0.13.0 # For animations
   speech_to_text: ^6.6.0 # For Real AI Speech Pipeline
-  record: ^4.4.4 # For Language Preservation Engine
 
 dev_dependencies:
   flutter_test:
