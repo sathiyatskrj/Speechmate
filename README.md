@@ -143,18 +143,9 @@ SpeechMate is the prototype engine. Our roadmap includes:
 3.  **AI Integration:** Using machine learning to translate full sentences from local dialects to English.
 
 ---
-
-## 🤝 Contributors
-
-Built with ❤️ by **The SpeechMate Team**
-
-*   **[T Sathiya Moorthy](https://github.com/sathiyatskrj)** - Developer & Visionary
-*   **[Pratik](https://github.com/Lyco0)** - Developer & Visionary
-
----
-
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
+
 
 
