@@ -5,13 +5,20 @@ import 'package:speechmate/screens/nature_page.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/features/preservation/voice_archive.dart';
 import 'number_page.dart';
+import 'package:record/record.dart'; // Added
+import 'package:path_provider/path_provider.dart'; // Added
+import 'dart:io'; // Added
+import 'package:flutter/services.dart'; // Added for rootBundle
+import '../services/whisper_service.dart'; // Added
 // Updated Imports
 import 'games/games_hub_screen.dart';
 import 'animals_page.dart';
 import 'magic_words_page.dart';
 import 'community_screen.dart';
 import 'family_page.dart';
+import 'family_page.dart';
 import '../services/tts_service.dart';
+import '../widgets/gamification_header.dart'; // Added Import
 
 import '../widgets/background.dart';
 import '../widgets/learning_tiles.dart';
@@ -120,6 +127,110 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     });
   }
 
+  // --- WHISPER LOGIC START ---
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  bool _isRecording = false;
+
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final Directory appDocDir = await getApplicationDocumentsDirectory();
+        final String filePath = '${appDocDir.path}/temp_recording.wav';
+        
+        await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000), path: filePath);
+        
+        setState(() {
+          _isRecording = true;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text("🎙️ Listening... Tap again to stop."), duration: Duration(seconds: 10), backgroundColor: Colors.redAccent)
+        );
+      }
+    } catch (e) {
+      print("Error starting record: $e");
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+        isLoading = true; // Show loading while transcribing
+      });
+
+      if (path != null) {
+        // --- TRANSCRIBE ---
+        // We need a model path. For Hackathon, we assume raw asset path or user placed it.
+        // Android assets are not directly accessible by simple path string for File I/O usually, 
+        // unless we copy them to cache.
+        // For this hackathon step, let's assume we copy model from asset to cache if needed, 
+        // OR just pass the asset name if our C++ code handled assets (it doesn't, it handles paths).
+        
+        // Quick Fix: Copy model from assets to temp dir first time.
+        final modelPath = await _getModelPath();
+        
+        final text = await WhisperService().transcribe(modelPath, path);
+        print("Transcribed: $text");
+        
+        if (text.startsWith("Error")) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+        } else {
+           // Cleanup text (remove [BLANK_AUDIO] etc if any)
+           final cleanText = text.replaceAll("[BLANK_AUDIO]", "").trim();
+           if (cleanText.isEmpty) {
+               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❓ Could not hear anything.")));
+           } else {
+               searchController.text = cleanText;
+               performSearch();
+           }
+        }
+      }
+      
+      setState(() {
+          isLoading = false;
+      });
+      
+    } catch (e) {
+      print("Error stopping record: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<String> _getModelPath() async {
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String modelPath = '${appDocDir.path}/ggml-tiny.en.bin';
+    final File modelFile = File(modelPath);
+
+    if (!await modelFile.exists()) {
+       // Mock copy for hackathon if file not found in assets, 
+       // but ideally we load from assets. 
+       // For now, return a placeholder or try to load from known location.
+       // The user instructions said: "Place this later in: android/app/src/main/assets/models/"
+       // We need to copy it out to be readable by C++ fopen.
+       try {
+          final ByteData data = await rootBundle.load('assets/models/ggml-tiny.en.bin');
+          final List<int> bytes = data.buffer.asUint8List();
+          await modelFile.writeAsBytes(bytes, flush: true);
+       } catch (e) {
+          print("Error copying model: $e");
+          // If fail, maybe return empty string or handle error
+          return ""; 
+       }
+    }
+    return modelPath;
+  }
+
+  void _onMicTap() {
+      if (_isRecording) {
+          _stopRecording();
+      } else {
+          _startRecording();
+      }
+  }
+  // --- WHISPER LOGIC END ---
+
   Future<void> performSearch() async {
     FocusScope.of(context).unfocus();
 
@@ -150,6 +261,110 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       isLoading = false;
     });
   }
+
+  // --- WHISPER LOGIC START ---
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  bool _isRecording = false;
+
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final Directory appDocDir = await getApplicationDocumentsDirectory();
+        final String filePath = '${appDocDir.path}/temp_recording.wav';
+        
+        await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000), path: filePath);
+        
+        setState(() {
+          _isRecording = true;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text("🎙️ Listening... Tap again to stop."), duration: Duration(seconds: 10), backgroundColor: Colors.redAccent)
+        );
+      }
+    } catch (e) {
+      print("Error starting record: $e");
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+        isLoading = true; // Show loading while transcribing
+      });
+
+      if (path != null) {
+        // --- TRANSCRIBE ---
+        // We need a model path. For Hackathon, we assume raw asset path or user placed it.
+        // Android assets are not directly accessible by simple path string for File I/O usually, 
+        // unless we copy them to cache.
+        // For this hackathon step, let's assume we copy model from asset to cache if needed, 
+        // OR just pass the asset name if our C++ code handled assets (it doesn't, it handles paths).
+        
+        // Quick Fix: Copy model from assets to temp dir first time.
+        final modelPath = await _getModelPath();
+        
+        final text = await WhisperService().transcribe(modelPath, path);
+        print("Transcribed: $text");
+        
+        if (text.startsWith("Error")) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+        } else {
+           // Cleanup text (remove [BLANK_AUDIO] etc if any)
+           final cleanText = text.replaceAll("[BLANK_AUDIO]", "").trim();
+           if (cleanText.isEmpty) {
+               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❓ Could not hear anything.")));
+           } else {
+               searchController.text = cleanText;
+               performSearch();
+           }
+        }
+      }
+      
+      setState(() {
+          isLoading = false;
+      });
+      
+    } catch (e) {
+      print("Error stopping record: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<String> _getModelPath() async {
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String modelPath = '${appDocDir.path}/ggml-tiny.en.bin';
+    final File modelFile = File(modelPath);
+
+    if (!await modelFile.exists()) {
+       // Mock copy for hackathon if file not found in assets, 
+       // but ideally we load from assets. 
+       // For now, return a placeholder or try to load from known location.
+       // The user instructions said: "Place this later in: android/app/src/main/assets/models/"
+       // We need to copy it out to be readable by C++ fopen.
+       try {
+          final ByteData data = await rootBundle.load('assets/models/ggml-tiny.en.bin');
+          final List<int> bytes = data.buffer.asUint8List();
+          await modelFile.writeAsBytes(bytes, flush: true);
+       } catch (e) {
+          print("Error copying model: $e");
+          // If fail, maybe return empty string or handle error
+          return ""; 
+       }
+    }
+    return modelPath;
+  }
+
+  void _onMicTap() {
+      if (_isRecording) {
+          _stopRecording();
+      } else {
+          _startRecording();
+      }
+  }
+  // --- WHISPER LOGIC END ---
 
   void clearSearch() {
     setState(() {
@@ -203,6 +418,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
               controller: searchController,
               onSearch: performSearch,
               onClear: clearSearch,
+              onMicTap: _onMicTap, // Pass Callback
             ),
             const SizedBox(height: 30),
             
@@ -233,50 +449,8 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                  child: Column(
                     children: [
                       // GAMIFICATION HEADER
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 15),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [Colors.indigo.shade900, Colors.purple.shade800]),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundColor: Colors.amber,
-                              child: Text("${GamificationService.currentLevel}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(GamificationService.getLevelTitle(GamificationService.currentLevel), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                                  const SizedBox(height: 5),
-                                  LinearProgressIndicator(
-                                    value: GamificationService.xp / GamificationService.nextLevelXp,
-                                    backgroundColor: Colors.white24,
-                                    color: Colors.greenAccent,
-                                    minHeight: 6,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text("${GamificationService.xp} / ${GamificationService.nextLevelXp} XP", style: const TextStyle(color: Colors.white70, fontSize: 10)),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              children: [
-                                const Icon(Icons.local_fire_department, color: Colors.orange, size: 28),
-                                Text("${GamificationService.currentStreak} Day", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
+                      const GamificationHeader(),
+                      const SizedBox(height: 15),
                       
                       // TILES GRID
                       Expanded(
