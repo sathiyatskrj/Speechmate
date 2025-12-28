@@ -178,6 +178,103 @@ static inline void ggml_bitset_clear(ggml_bitset_t *bitset, size_t i) {
 #define GGML_HASHSET_FULL ((size_t)-1)
 #define GGML_HASHSET_ALREADY_EXISTS ((size_t)-2)
 
+struct ggml_hash_set {
+  size_t size;
+  ggml_bitset_t *used;
+  struct ggml_tensor **keys;
+};
+
+struct ggml_hash_set ggml_hash_set_new(size_t size);
+void ggml_hash_set_free(struct ggml_hash_set *hash_set);
+size_t ggml_hash_size(size_t min_sz);
+void ggml_hash_set_reset(struct ggml_hash_set *hash_set);
+static bool ggml_hash_contains(const struct ggml_hash_set *hash_set,
+                               struct ggml_tensor *key);
+static size_t ggml_hash_find(const struct ggml_hash_set *hash_set,
+                             const struct ggml_tensor *key);
+static size_t ggml_hash_insert(struct ggml_hash_set *hash_set,
+                               struct ggml_tensor *key);
+static size_t ggml_hash_find_or_insert(struct ggml_hash_set *hash_set,
+                                       struct ggml_tensor *key);
+
+static inline size_t ggml_hash(const struct ggml_tensor *p) {
+  return (size_t)(uintptr_t)p >> 4;
+}
+
+static size_t ggml_hash_find(const struct ggml_hash_set *hash_set,
+                             const struct ggml_tensor *key) {
+  size_t h = ggml_hash(key) % hash_set->size;
+  size_t i = h;
+  while (ggml_bitset_get(hash_set->used, i) && hash_set->keys[i] != key) {
+    i = (i + 1) % hash_set->size;
+    if (i == h) {
+      return GGML_HASHSET_FULL;
+    }
+  }
+  return i;
+}
+
+static bool ggml_hash_contains(const struct ggml_hash_set *hash_set,
+                               struct ggml_tensor *key) {
+  size_t i = ggml_hash_find(hash_set, key);
+  return i != GGML_HASHSET_FULL && ggml_bitset_get(hash_set->used, i);
+}
+
+static size_t ggml_hash_insert(struct ggml_hash_set *hash_set,
+                               struct ggml_tensor *key) {
+  size_t h = ggml_hash(key) % hash_set->size;
+  size_t i = h;
+  do {
+    if (!ggml_bitset_get(hash_set->used, i)) {
+      ggml_bitset_set(hash_set->used, i);
+      hash_set->keys[i] = key;
+      return i;
+    }
+    if (hash_set->keys[i] == key) {
+      return GGML_HASHSET_ALREADY_EXISTS;
+    }
+    i = (i + 1) % hash_set->size;
+  } while (i != h);
+  GGML_ABORT("fatal error");
+}
+
+static size_t ggml_hash_find_or_insert(struct ggml_hash_set *hash_set,
+                                       struct ggml_tensor *key) {
+  size_t h = ggml_hash(key) % hash_set->size;
+  size_t i = h;
+  do {
+    if (!ggml_bitset_get(hash_set->used, i)) {
+      ggml_bitset_set(hash_set->used, i);
+      hash_set->keys[i] = key;
+      return i;
+    }
+    if (hash_set->keys[i] == key) {
+      return i;
+    }
+    i = (i + 1) % hash_set->size;
+  } while (i != h);
+  GGML_ABORT("fatal error");
+}
+
+enum ggml_cgraph_eval_order {
+  GGML_CGRAPH_EVAL_ORDER_LEFT_TO_RIGHT = 0,
+  GGML_CGRAPH_EVAL_ORDER_RIGHT_TO_LEFT,
+  GGML_CGRAPH_EVAL_ORDER_COUNT
+};
+
+struct ggml_cgraph {
+  int size;
+  int n_nodes;
+  int n_leafs;
+  struct ggml_tensor **nodes;
+  struct ggml_tensor **grads;
+  struct ggml_tensor **grad_accs;
+  struct ggml_tensor **leafs;
+  int32_t *use_counts;
+  struct ggml_hash_set visited_hash_set;
+  enum ggml_cgraph_eval_order order;
+};
+
 #ifdef __cplusplus
 }
 #endif
