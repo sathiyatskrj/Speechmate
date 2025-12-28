@@ -5,6 +5,44 @@
   bool _showAiOverlay = false;
   String _aiText = ""; 
 
+  Future<void> performSearch() async {
+    FocusScope.of(context).unfocus();
+    if (searchController.text.isEmpty) return;
+
+    setState(() => isLoading = true);
+
+    // 1. Direct Search
+    var searchResult = await dictionaryService.searchEverywhere(
+      searchController.text,
+    );
+    
+    // 2. NLP Translation Fallback
+    if (searchResult == null) {
+        searchResult = await dictionaryService.translateSentence(searchController.text);
+    }
+
+    if (mounted) {
+      setState(() {
+        result = searchResult;
+        
+        if (searchResult != null) {
+          if (searchResult!.containsKey('_searchedNicobarese')) {
+              searchedNicobarese = searchResult!['_searchedNicobarese'];
+          } else if (searchResult!.containsKey('_isGenerated')) {
+             searchedNicobarese = false; 
+          } else {
+              final query = searchController.text.trim().toLowerCase();
+              searchedNicobarese =
+                  searchResult!['nicobarese'].toString().toLowerCase() == query;
+          }
+        } else {
+          searchedNicobarese = false;
+        }
+        isLoading = false;
+      });
+    }
+  } 
+
   // ... update _startRecording to show overlay
   Future<void> _startRecording() async {
     try {

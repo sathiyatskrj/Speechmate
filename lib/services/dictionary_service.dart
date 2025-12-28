@@ -260,4 +260,65 @@ class DictionaryService {
 
     return words.sublist(startIndex, endIndex);
   }
+  Future<Map<String, dynamic>?> translateSentence(String input) async {
+    if (input.trim().isEmpty) return null;
+    
+    // 1. Load Data if needed
+    if (_dictionaries[DictionaryType.words] == null) {
+        await loadDictionary(DictionaryType.words);
+    }
+    if (_dictionaries[DictionaryType.phrases] == null) { 
+        await loadDictionary(DictionaryType.phrases);
+    }
+
+    final String query = input.trim().toLowerCase();
+    
+    // 2. CHECK EXACT PHRASE MATCH FIRST 
+    final phrases = _dictionaries[DictionaryType.phrases] ?? [];
+    for (var phrase in phrases) {
+       final eng = (phrase['text'] ?? phrase['english'] ?? '').toString().toLowerCase();
+       if (eng == query) {
+           return {
+               'english': phrase['text'] ?? phrase['english'],
+               'nicobarese': phrase['nicobarese'],
+               '_type': 'phrase',
+               '_isExact': true
+           };
+       }
+    }
+
+    // 3. WORD-BY-WORD TRANSLATION
+    final List<String> tokens = input.split(' ');
+    List<String> translatedTokens = [];
+    bool foundAtLeastOne = false;
+
+    final words = _dictionaries[DictionaryType.words] ?? [];
+    final Map<String, String> wordMap = {};
+    for (var w in words) {
+        wordMap[(w['english'] ?? '').toString().toLowerCase()] = w['nicobarese'];
+    }
+
+    for (String token in tokens) {
+        String cleanToken = token.replaceAll(RegExp(r'[^\w\s]'), '').toLowerCase();
+        String punctuation = token.replaceAll(RegExp(r'[\w\s]'), '');
+        
+        if (wordMap.containsKey(cleanToken)) {
+            translatedTokens.add(wordMap[cleanToken]! + punctuation);
+            foundAtLeastOne = true;
+        } else {
+            translatedTokens.add(token); 
+        }
+    }
+
+    if (foundAtLeastOne) {
+        return {
+            'english': input,
+            'nicobarese': translatedTokens.join(' '),
+            '_type': 'sentence',
+            '_isGenerated': true
+        };
+    }
+
+    return null;
+  }
 }
