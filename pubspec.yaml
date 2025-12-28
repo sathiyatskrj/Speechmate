@@ -15,7 +15,7 @@ dependencies:
   share_plus: ^7.2.1
   rive: ^0.13.0 # For animations
   speech_to_text: ^6.6.0 # For Real AI Speech Pipeline
-  record: ^5.1.0 # For Language Preservation Engine
+  record: ^4.4.4 # For Language Preservation Engine
 
 dev_dependencies:
   flutter_test:
@@ -60,11 +60,11 @@ flutter:
     - assets/data/dictionary_magic.json
     - assets/audio/magic/
     - assets/audio/animals/
-    - assets/audio/family/ 
-    - assets/data/dictionary_family.json 
+    - assets/audio/family/ # Added for Family section
+    - assets/data/dictionary_family.json # Added for Family data
     - assets/icons/branding.png
     - assets/icons/branding.png
-    - assets/anim/ 
+    - assets/anim/ # For Rive animations
 
 
 
