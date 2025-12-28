@@ -6,22 +6,22 @@ plugins {
 
 android {
     namespace = "com.speechmate.speechmate"
-    compileSdk = 35  // Changed to 35 (required by plugins)
+    compileSdk = 33
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
         applicationId = "com.speechmate.speechmate"
-        minSdk = 21  // Android 5.0 (Lollipop)
-        targetSdk = 34  // Latest stable
+        minSdk = 21
+        targetSdk = 33
         versionCode = 1
         versionName = "1.4.0"
     }
@@ -36,5 +36,3 @@ android {
 flutter {
     source = "../.."
 }
-
-
