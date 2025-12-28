@@ -1,7 +1,7 @@
 name: speechmate
 description: "A bilingual Dictionary for Nicobarian translation"
 publish_to: 'none'
-version: 1.2.0+1
+version: 1.2.0+2
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
@@ -13,7 +13,9 @@ dependencies:
   audioplayers: ^6.5.1
   shared_preferences: ^2.2.2
   share_plus: ^7.2.1
-  rive: ^0.13.0 
+  rive: ^0.13.0 # For animations
+  speech_to_text: ^6.6.0 # For Real AI Speech Pipeline
+  record: ^5.1.0 # For Language Preservation Engine
 
 dev_dependencies:
   flutter_test:
