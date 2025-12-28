@@ -41,47 +41,56 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   final List<Map<String, dynamic>> learningTiles = [
     {
       "word": "Numbers",
+      "emoji": "🔢",
       "colors": [Color(0xFFFF7E79), Color(0xFFFFB677)],
       "navigateTo": NumberPage(),
     },
     {
       "word": "Nature",
+      "emoji": "🌿",
       "colors": [Color(0xFF5ED87D), Color(0xFF92FF70)],
       "navigateTo": NaturePage(),
     },
     {
       "word": "Feelings",
+      "emoji": "😊",
       "colors": [Color(0xFF66CCFF), Color(0xFF0099FF)],
       "navigateTo": FeelingsPage(),
     },
     {
       "word": "Body Parts",
+      "emoji": "💪",
       "colors": [Color(0xFFB084FF), Color(0xFF7AA6FF)],
       "navigateTo": BodyPartsScreen(),
     },
     {
       "word": "Games",
+      "emoji": "🎮",
       "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], // Purple for Games
       "navigateTo": const GamesHubScreen(),
     },
     // New Sections
     {
       "word": "Animals",
+      "emoji": "🐘",
       "colors": [Color(0xFF11998e), Color(0xFF38ef7d)], // Green Gradient for Animals
       "navigateTo": const AnimalsPage(),
     },
     {
       "word": "Magic Words",
+      "emoji": "✨",
       "colors": [Color(0xFFfc00ff), Color(0xFF00dbde)], // Pink/Cyan for Magic
       "navigateTo": const MagicWordsPage(),
     },
     {
       "word": "Family",
+      "emoji": "👨‍👩‍👧‍👦",
       "colors": [Color(0xFFff9a9e), Color(0xFFfecfef)], // Pink/Peach for Family
       "navigateTo": const FamilyPage(),
     },
     {
       "word": "Community",
+      "emoji": "🤝",
       "colors": [Color(0xFF4FACFE), Color(0xFF00F2FE)], // Blue/Cyan for Community
       "navigateTo": const CommunityScreen(),
       "isSecret": true,
@@ -127,8 +136,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     });
   }
 
-
-
   Future<void> performSearch() async {
     FocusScope.of(context).unfocus();
 
@@ -159,9 +166,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       isLoading = false;
     });
   }
-
-
-
 
   // --- WHISPER LOGIC START ---
   final AudioRecorder _audioRecorder = AudioRecorder();
@@ -262,130 +266,178 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       body: Background(
         // Enhanced visuals with a gradient
         colors: const [Color(0xFFE0C3FC), Color(0xFF8EC5FC)], 
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Hidden Feature: Tap Title 5 times
-            GestureDetector(
-                onTap: () {
-                    setState(() {
-                        _secretTapCount++;
-                        if (_secretTapCount >= 5) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("🎉 Secret Party Mode Activated! 🎉"),
-                                    backgroundColor: Colors.purpleAccent,
-                                )
-                            );
-                            _secretTapCount = 0;
-                            // You can add more fun effects here later!
-                        }
-                    });
-                },
-                child: Text(
-                  searchedNicobarese
-                      ? "Nicobarese → English"
-                      : "English → Nicobarese",
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [Shadow(color: Colors.black26, offset: Offset(1,1), blurRadius: 2)]
-                  ),
-                ),
-            ),
-            const SizedBox(height: 30),
-            Search(
-              controller: searchController,
-              onSearch: performSearch,
-              onClear: clearSearch,
-              onMicTap: _onMicTap, // Pass Callback
-            ),
-            const SizedBox(height: 30),
-            
-            // MAIN CONTENT AREA
-            if (isLoading)
-              const CircularProgressIndicator()
-            else if (searchController.text.isNotEmpty)
-              TranslationCard(
-                nicobarese:
-                    result != null ? result!['nicobarese'] : "Word not found",
-                english: result != null ? (result!['english'] ?? result!['text'] ?? "") : "",
-                isError: result == null,
-                searchedNicobarese: searchedNicobarese,
-                showSpeaker: result != null, // Show speaker if found
-                onSpeakerTap: () {
-                    if (result == null) return;
-                    // Fix TTS
-                    if (searchedNicobarese) {
-                        ttsService.speakEnglish(result!['english'] ?? result!['text'] ?? "");
-                    } else {
-                        ttsService.speakNicobarese(result!['nicobarese']);
-                    }
-                },
-              )
-            else
-               // DASHBOARD CONTENT
-               Expanded(
+        padding: EdgeInsets.zero, // Remove default padding for full flexibility
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+               // --- HERO HEADER START ---
+               Container(
+                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                 decoration: BoxDecoration(
+                   color: Colors.white.withOpacity(0.3),
+                   borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(40), bottomRight: Radius.circular(40)),
+                   border: Border.all(color: Colors.white.withOpacity(0.2)),
+                 ),
                  child: Column(
-                    children: [
-                      // GAMIFICATION HEADER
-                      const GamificationHeader(),
-                      const SizedBox(height: 15),
-                      
-                      // TILES GRID
-                      Expanded(
-                        child: GridView.builder(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          itemCount: learningTiles.length + 1, // +1 for Voice Archive
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 1.1,
+                   children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Hello, Explorer! 🚀",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  shadows: [Shadow(color: Colors.black.withOpacity(0.1), offset: const Offset(1,1), blurRadius: 4)]
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Ready to learn something new?",
+                                style: TextStyle(fontSize: 14, color: Colors.indigo.shade900),
+                              ),
+                            ],
                           ),
-                          itemBuilder: (context, index) {
-                            // Voice Archive Tile (Special Highlighting)
-                            if (index == learningTiles.length) { 
-                               return GestureDetector(
-                                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceArchiveScreen())),
-                                 child: Container(
-                                   decoration: BoxDecoration(
-                                     gradient: const LinearGradient(colors: [Color(0xFF1E1E2C), Color(0xFF232526)]),
-                                     borderRadius: BorderRadius.circular(24),
-                                     border: Border.all(color: Colors.cyanAccent.withOpacity(0.3), width: 1),
-                                     boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: const Offset(0, 4))],
-                                   ),
-                                   child: const Column(
-                                     mainAxisAlignment: MainAxisAlignment.center,
-                                     children: [
-                                       Icon(Icons.record_voice_over, size: 40, color: Colors.cyanAccent),
-                                       SizedBox(height: 10),
-                                       Text("Voice Archive", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                                       Text("Be Infinite", style: TextStyle(color: Colors.white54, fontSize: 10)),
-                                     ],
-                                   ),
-                                 ),
-                               );
-                            }
-
-                            final tile = learningTiles[index];
-                            return LearningTiles(
-                              word: tile["word"],
-                              gradient: List<Color>.from(tile["colors"]),
-                              navigateTo: tile["navigateTo"],
-                              onTap: tile.containsKey('isSecret') && tile['isSecret'] == true
-                                  ? () => _showSecretAccessDialog(context, tile['navigateTo'])
-                                  : null,
-                            );
-                          },
-                        ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _secretTapCount++;
+                                if (_secretTapCount >= 5) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("🎉 Secret Party Mode Activated! 🎉"), backgroundColor: Colors.purpleAccent)
+                                  );
+                                  _secretTapCount = 0;
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                              child: const Text("🦄", style: TextStyle(fontSize: 28)),
+                            ),
+                          )
+                        ],
                       ),
-                    ],
+                      const SizedBox(height: 20),
+                      Search(
+                        controller: searchController,
+                        onSearch: performSearch,
+                        onClear: clearSearch,
+                        onMicTap: _onMicTap,
+                      ),
+                   ],
                  ),
                ),
-          ],
+               // --- HERO HEADER END ---
+
+              const SizedBox(height: 10),
+              
+              // MAIN CONTENT AREA
+              if (isLoading)
+                const Expanded(child: Center(child: CircularProgressIndicator()))
+              else if (searchController.text.isNotEmpty)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: TranslationCard(
+                      nicobarese: result != null ? result!['nicobarese'] : "Word not found",
+                      english: result != null ? (result!['english'] ?? result!['text'] ?? "") : "",
+                      isError: result == null,
+                      searchedNicobarese: searchedNicobarese,
+                      showSpeaker: result != null, 
+                      onSpeakerTap: () {
+                          if (result == null) return;
+                          if (searchedNicobarese) {
+                              ttsService.speakEnglish(result!['english'] ?? result!['text'] ?? "");
+                          } else {
+                              ttsService.speakNicobarese(result!['nicobarese']);
+                          }
+                      },
+                    ),
+                  ),
+                )
+              else
+                 // DASHBOARD CONTENT
+                 Expanded(
+                   child: SingleChildScrollView( // Changed to ScrollView for potential overflow
+                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                     physics: const BouncingScrollPhysics(),
+                     child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Your Journey",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+                          // GAMIFICATION HEADER (Now more compact if needed, or keeping it as is)
+                          const GamificationHeader(),
+                          const SizedBox(height: 20),
+                          
+                          const Text(
+                            "Discover",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          const SizedBox(height: 10),
+
+                          GridView.builder(
+                            shrinkWrap: true, // Improved for Nested Scroll
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: learningTiles.length + 1, 
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 1.0, // More square-ish for premium tiles
+                            ),
+                            itemBuilder: (context, index) {
+                              if (index == learningTiles.length) { 
+                                 return GestureDetector(
+                                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceArchiveScreen())),
+                                   child: Container(
+                                     decoration: BoxDecoration(
+                                       gradient: const LinearGradient(colors: [Color(0xFF1E1E2C), Color(0xFF232526)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                                       borderRadius: BorderRadius.circular(24),
+                                       border: Border.all(color: Colors.cyanAccent.withOpacity(0.3), width: 1),
+                                       boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 8, offset: const Offset(4, 4))],
+                                     ),
+                                     child: const Column(
+                                       mainAxisAlignment: MainAxisAlignment.center,
+                                       children: [
+                                         Icon(Icons.mic_external_on, size: 40, color: Colors.cyanAccent),
+                                         SizedBox(height: 10),
+                                         Text("Voice Archive", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                                         Text("Record & Save", style: TextStyle(color: Colors.white54, fontSize: 10)),
+                                       ],
+                                     ),
+                                   ),
+                                 );
+                              }
+                      
+                              final tile = learningTiles[index];
+                              return LearningTiles(
+                                word: tile["word"],
+                                emoji: tile["emoji"], // Pass new emoji
+                                gradient: List<Color>.from(tile["colors"]),
+                                navigateTo: tile["navigateTo"],
+                                onTap: tile.containsKey('isSecret') && tile['isSecret'] == true
+                                    ? () => _showSecretAccessDialog(context, tile['navigateTo'])
+                                    : null,
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 80), // Bottom padding
+                        ],
+                     ),
+                   ),
+                 ),
+            ],
+          ),
         ),
       ),
     );

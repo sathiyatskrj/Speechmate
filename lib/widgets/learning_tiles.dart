@@ -3,6 +3,7 @@ import 'tap_scale.dart';
 
 class LearningTiles extends StatelessWidget {
   final String word;
+  final String? emoji;
   final List<Color> gradient;
   final Widget? navigateTo;
   final VoidCallback? onTap;
@@ -10,6 +11,7 @@ class LearningTiles extends StatelessWidget {
   const LearningTiles({
     super.key,
     required this.word,
+    this.emoji,
     required this.gradient,
     this.navigateTo,
     this.onTap,
@@ -17,8 +19,6 @@ class LearningTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return TapScale(
       onTap: onTap ?? () {
         if (navigateTo != null) {
@@ -29,28 +29,74 @@ class LearningTiles extends StatelessWidget {
         }
       },
       child: Container(
-        width: size.width * 0.40,
-        height: size.height * 0.12,
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: gradient),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
+          gradient: LinearGradient(
+            colors: gradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
             BoxShadow(
-              color: Colors.black26,
-              blurRadius: 5,
-              offset: Offset(2, 2),
+              color: gradient.last.withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(4, 8),
+            ),
+            const BoxShadow(
+              color: Colors.white24,
+              blurRadius: 2,
+              offset: Offset(-2, -2),
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            word,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
+        child: Stack(
+          children: [
+            // Decorative circle in background
+            Positioned(
+              right: -20,
+              top: -20,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
-          ),
+            
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (emoji != null) ...[
+                  Text(
+                    emoji!,
+                    style: const TextStyle(fontSize: 40),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                Center(
+                  child: Text(
+                    word,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.5,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black26,
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
