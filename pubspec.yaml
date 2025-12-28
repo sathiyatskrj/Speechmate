@@ -13,8 +13,8 @@ dependencies:
   audioplayers: ^6.5.1
   shared_preferences: ^2.2.2
   share_plus: ^7.2.1
-  rive: ^0.13.0 # For animations
-  speech_to_text: ^6.3.0 # <--- THIS MUST BE 6.3.0
+  rive: ^0.13.0
+  speech_to_text: 5.6.3
 
 dev_dependencies:
   flutter_test:
