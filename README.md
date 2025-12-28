@@ -31,7 +31,36 @@
 
 **Every 14 days, a language dies.** When a language disappears, we don't just lose words; we lose centuries of wisdom, culture, and identity.
 
-**SpeechMate** was born from a desire to stop this silence. While we started with **Nicobarese**—the heartbeat of the Nicobar Islands—our vision is far greater. We are building a digital ark for **all endangered tribal languages**. 
+## 🏗️ Architecture
+
+<p align="center">
+  <img src="https://mermaid.ink/img/pako:eNptkMFuwjAMhl8l8gV64z1w2jFp4jS0N0gIdYmbWBIlKnOaOqR99xUoDA5tciT_-39sxz2JUhIkfF5Pry_GCdu_u-2WbV_fvuw22z0-Nq_vj_eP79vXw9tH_7Z9_Xo97A_73fF4fD4dDx_vH_u_4c_w7_B3-Ef4J_wV/hX--R9JqZRUklKppFSCUolKJSqVqFSiUolKJSpBKUGpBKVSpEqRKkWqFKlSpEqRKkWqFKlSpEqRSiUqlahUolKJSiUqlahUolKJSiUqlahUolKJSiUqlahUolKJSiUqlahUolKJ6l_0C8y5c4E" alt="Clean Architecture Diagram" />
+</p>
+
+# Architecture - Clean & Offline First
+
+```mermaid
+graph TD
+    User([User]) --> UI[Flutter UI Layer]
+    UI --> Logic[Business Logic / ViewModels]
+    Logic --> Repo[Repository Layer]
+    
+    subgraph Data Layer
+        Repo --> LocalDB[(SQLite / SharedPrefs)]
+        Repo --> Assets[JSON Assets]
+        Repo --> Whisper[Offline AI / C++]
+    end
+    
+    subgraph Offline AI
+        Whisper --> JNI[JNI Bridge]
+        JNI --> CPP[Whisper.cpp Engine]
+        CPP --> Model[GGML Model .bin]
+    end
+    
+    Assets -- "Fast Read" --> Repo
+    LocalDB -- "Persist Progress" --> Repo
+```
+While we started with **Nicobarese**—the heartbeat of the Nicobar Islands—our vision is far greater. We are building a digital ark for **all endangered tribal languages**. 
 
 This isn't just an app. It's a bridge between generations. It helps teachers pass the language of our ancestors to students—so it is never lost.
 ---
