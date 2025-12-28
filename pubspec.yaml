@@ -65,3 +65,6 @@ flutter:
     - assets/audio/family/ 
     - assets/data/dictionary_family.json 
     - assets/icons/branding.png
+
+dependency_overrides:
+  record_linux: ^1.2.0
