@@ -15,8 +15,6 @@ class WordManagementScreen extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Background(
-         // Basic gradient background usage if constructor differs, check Background widget definition? 
-         // Assuming Background accepts child.
         child: const Center(
           child: Text(
             "Word Management Feature\n(Coming Soon)", 

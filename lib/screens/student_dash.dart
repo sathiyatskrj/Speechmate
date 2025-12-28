@@ -109,19 +109,10 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   }
 
   Future<String> _getModelPath() async {
-     // Check if model exists in app docs, else fallback or error
-     // For this fix, assuming model is already managed by WhisperService or placed in assets
-     // But WhisperService.transcribe usually needs a path.
-     // Let's assume a default path or asset copy logic exists elsewhere or 
-     // we just pass a placeholder if the service handles it.
-     // Actually, looking at previous code, user had _getModelPath logic.
-     // I need to copy the model from assets if not exists.
-     
      final Directory appDocDir = await getApplicationDocumentsDirectory();
      final String modelPath = '${appDocDir.path}/ggml-tiny.bin';
      
      if (!File(modelPath).existsSync()) {
-       // Load from assets and write
        try {
          final ByteData data = await DefaultAssetBundle.of(context).load('assets/models/ggml-tiny.bin');
          final List<int> bytes = data.buffer.asUint8List();
@@ -174,7 +165,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
            });
            
            if (cleanText.isNotEmpty) {
-               // Wait a moment so user reads text, then close and search
                await Future.delayed(const Duration(seconds: 2));
                if (mounted) {
                    setState(() => _showAiOverlay = false);
@@ -270,7 +260,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                     decoration: BoxDecoration(color: Colors.cyanAccent.withOpacity(0.2), shape: BoxShape.circle),
                     child: IconButton(
                         icon: const Icon(Icons.mic_none_outlined, color: Colors.cyanAccent),
-                        onPressed: _onMicTap, // Quick AI Access
+                        onPressed: _onMicTap, 
                     ),
                   )
                 ],
