@@ -30,8 +30,6 @@
 
 ---
 
-## 🌏 The Mission: A Voice for the Voiceless
-
 **"When a language dies, a world disappears."**
 
 Every 14 days, an elder passes away, and with them, a library of wisdom burns to the ground. We are losing the songs of the forest, the names of the medicinal herbs, and the stories of our ancestors. The silence is growing.
@@ -44,7 +42,7 @@ We are fighting against time to ensure that no culture is ever forgotten. **We a
 
 ---
 
-## 🚀 Key Features (Hackathon Edition)
+## 🚀 Key Features
 
 We combined deep cultural preservation with cutting-edge Edge AI:
 
@@ -149,7 +147,7 @@ Want to run this locally? Follow these steps:
 
 We are just getting started. SpeechMate is the scalable engine for a revolution:
 
-1.  **Pan-India Expansion:** We will adapt this engine for **Onges, Great Andamanese, Jarawa, and Sentinelese**.
+1.  **Pan-India Expansion:** We will adapt this engine for **Onges, Great Andamanese etc**.
 2.  **Voice of the Elders:** A feature for elders to record folklore and songs directly, creating a **Living Archive**.
 3.  **Global Heritage Network:** Connecting tribal communities worldwide to share their preservation stories.
 
@@ -159,4 +157,5 @@ We are just getting started. SpeechMate is the scalable engine for a revolution:
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
+
 
