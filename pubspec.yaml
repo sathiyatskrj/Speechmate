@@ -14,7 +14,7 @@ dependencies:
   shared_preferences: ^2.2.2
   share_plus: ^7.2.1
   rive: ^0.13.0
-  speech_to_text: 5.6.3
+  speech_to_text: ^7.3.0
 
 dev_dependencies:
   flutter_test:
