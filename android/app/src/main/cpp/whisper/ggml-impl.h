@@ -3,7 +3,6 @@
 // GGML internal header
 
 #include "ggml.h"
-#include "gguf.h"
 
 #include <assert.h>
 #include <math.h>
@@ -11,7 +10,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 #ifdef __ARM_FEATURE_SVE
 #include <arm_sve.h>
