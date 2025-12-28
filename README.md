@@ -149,7 +149,11 @@ Want to run this locally? Follow these steps:
 
 We are just getting started. SpeechMate is the scalable engine for a revolution:
 
+<<<<<<< HEAD
 1.  **Pan-India Expansion:** We will adapt this engine for **Onges, Great Andamanese, Jarawa, and Sentinelese**.
+=======
+1.  **Pan-India Expansion:** We will adapt this engine for **Onges, Great Andamanese etc**.
+>>>>>>> 1d32a1bb99f183e275bc7f3352b63939ee7d7d86
 2.  **Voice of the Elders:** A feature for elders to record folklore and songs directly, creating a **Living Archive**.
 3.  **Global Heritage Network:** Connecting tribal communities worldwide to share their preservation stories.
 
@@ -159,3 +163,4 @@ We are just getting started. SpeechMate is the scalable engine for a revolution:
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
+
