@@ -2,9 +2,69 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/screens/word_management_screen.dart';
 import 'package:speechmate/screens/about_screen.dart';
 import '../widgets/background.dart';
+import '../widgets/search_bar.dart';
+import '../widgets/translation_card.dart';
+import '../services/dictionary_service.dart';
 
-class TeacherDash extends StatelessWidget {
+class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
+
+  @override
+  State<TeacherDash> createState() => _TeacherDashState();
+}
+
+class _TeacherDashState extends State<TeacherDash> {
+  final TextEditingController _searchController = TextEditingController();
+  final DictionaryService _dictionaryService = DictionaryService();
+  
+  bool _isLoading = false;
+  Map<String, dynamic>? _result;
+  bool _searchedNicobarese = false;
+
+  Future<void> _performSearch() async {
+    FocusScope.of(context).unfocus();
+    if (_searchController.text.isEmpty) return;
+
+    setState(() => _isLoading = true);
+
+    // 1. Direct Search
+    var searchResult = await _dictionaryService.searchEverywhere(
+      _searchController.text,
+    );
+    
+    // 2. NLP Translation Fallback
+    if (searchResult == null) {
+        searchResult = await _dictionaryService.translateSentence(_searchController.text);
+    }
+
+    if (mounted) {
+      setState(() {
+        _result = searchResult;
+        
+        if (searchResult != null) {
+          if (searchResult!.containsKey('_searchedNicobarese')) {
+              _searchedNicobarese = searchResult!['_searchedNicobarese'];
+          } else if (searchResult!.containsKey('_isGenerated')) {
+             _searchedNicobarese = false; 
+          } else {
+              final query = _searchController.text.trim().toLowerCase();
+              _searchedNicobarese =
+                  searchResult!['nicobarese'].toString().toLowerCase() == query;
+          }
+        } else {
+          _searchedNicobarese = false;
+        }
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchController.clear();
+      _result = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +132,56 @@ class TeacherDash extends StatelessWidget {
                   ),
                 ),
                 
+                const SizedBox(height: 35),
+
+                // TRANSLATION TOOL (HACKATHON FEATURE)
+                const Text(
+                  "QUICK TRANSLATE",
+                  style: TextStyle(
+                    color: Colors.cyanAccent, 
+                    fontWeight: FontWeight.w700, 
+                    letterSpacing: 1.2
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Container(
+                   padding: const EdgeInsets.all(16),
+                   decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
+                   ),
+                   child: Column(
+                     children: [
+                        Search(
+                          controller: _searchController, 
+                          onSearch: _performSearch, 
+                          onClear: _clearSearch, 
+                          onMicTap: () {}, // No mic needed for teacher maybe? Or implement slightly different?
+                          // Assuming Search widget handles mic tap optionality? 
+                          // If Search widget REQUIRES mic tap, I'll provide empty function or one that shows 'Not for Teacher'
+                          // Let's implement basic mic if needed, but for now empty is safe.
+                        ),
+                        if (_isLoading)
+                           const Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: Colors.cyanAccent)),
+                        
+                        if (_result != null)
+                           Padding(
+                             padding: const EdgeInsets.only(top: 15),
+                             child: TranslationCard(
+                                nicobarese: _result!['nicobarese'],
+                                english: _result!['english'] ?? _result!['text'] ?? "",
+                                searchedNicobarese: _searchedNicobarese,
+                                isError: false,
+                                showSpeaker: false, // Keep it simple for teacher dash
+                             ),
+                           )
+                        else if (_searchController.text.isNotEmpty && !_isLoading && _result == null)
+                            const Padding(padding: EdgeInsets.all(10), child: Text("No result found.", style: TextStyle(color: Colors.white54))),
+                     ],
+                   ),
+                ),
+
                 const SizedBox(height: 35),
 
                 // Management Section
