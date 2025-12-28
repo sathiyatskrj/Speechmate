@@ -173,7 +173,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
         final Directory appDocDir = await getApplicationDocumentsDirectory();
         final String filePath = '${appDocDir.path}/temp_recording.wav';
         
-        await _audioRecorder.start(path: filePath, encoder: AudioEncoder.wav, samplingRate: 16000);
+        await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000), path: filePath);
         
         setState(() {
           _isRecording = true;
