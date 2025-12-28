@@ -14,7 +14,7 @@ dependencies:
   shared_preferences: ^2.2.2
   share_plus: ^7.2.1
   rive: ^0.13.0 # For animations
-  speech_to_text: ^6.3.0 # For Real AI Speech Pipeline (Stable Build)
+  speech_to_text: ^6.3.0 # <--- THIS MUST BE 6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +59,6 @@ flutter:
     - assets/data/dictionary_magic.json
     - assets/audio/magic/
     - assets/audio/animals/
-    - assets/audio/family/ # Added for Family section
-    - assets/data/dictionary_family.json # Added for Family data
+    - assets/audio/family/ 
+    - assets/data/dictionary_family.json 
     - assets/icons/branding.png
