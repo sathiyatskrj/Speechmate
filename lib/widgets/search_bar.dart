@@ -10,7 +10,10 @@ class Search extends StatelessWidget {
     required this.controller,
     required this.onSearch,
     required this.onClear,
+    this.onMicTap, // New Callback
   });
+
+  final VoidCallback? onMicTap;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +43,13 @@ class Search extends StatelessWidget {
               onSubmitted: (_) => onSearch(), // Enable Enter key search
               textInputAction: TextInputAction.search,
             ),
+            ),
           ),
+          if (onMicTap != null)
+            IconButton(
+              icon: const Icon(Icons.mic, color: Colors.blueAccent),
+              onPressed: onMicTap,
+            ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: onSearch,
