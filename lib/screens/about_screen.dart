@@ -52,8 +52,18 @@ class AboutScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                    // EMOTIONAL INTRO
-                   _buildSectionTitle("Why Speechmate?", Icons.favorite, Colors.redAccent),
-                   const SizedBox(height: 10),
+                   _buildSectionTitle("Speechmate", Icons.favorite, Colors.redAccent),
+                   const SizedBox(height: 5),
+                   const Text(
+                     "Where the language barriers end.",
+                     style: TextStyle(
+                       color: Colors.cyanAccent,
+                       fontSize: 16,
+                       fontWeight: FontWeight.bold,
+                       fontStyle: FontStyle.italic,
+                     ),
+                   ),
+                   const SizedBox(height: 15),
                    _buildGlassCard(
                      child: const Text(
                        "Language is the soul of a culture. When a language fades, a unique way of seeing the world vanishes with it.\n\n"
