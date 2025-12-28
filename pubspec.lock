@@ -424,6 +424,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.3"
+  rive:
+    dependency: "direct main"
+    description:
+      name: rive
+      sha256: "1146f0aa8f7e6c6c9f6e41c838f5c7b60b64c5f91feae7ba3b7a361a76c7b0c8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.13.0"
+  rive_common:
+    dependency: transitive
+    description:
+      name: rive_common
+      sha256: b0881b9873e887e31b4783e16ef9a88a0e5c8d30d98d26f9c6093b4e1988ab23
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.11"
+  share_plus:
+    dependency: "direct main"
+    description:
+      name: share_plus
+      sha256: "6cec740fa0943a826951223e76218df002804adb588235a8910dc3d6b0654e11"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.2.2"
+  share_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: share_plus_platform_interface
+      sha256: "251eb156a8b5fa9ce033747d73535bf53911071f8d3b6f9e8b0f6oder2634dbe"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -493,6 +525,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.1"
+  speech_to_text:
+    dependency: "direct main"
+    description:
+      name: speech_to_text
+      sha256: "52d7537c1c55831e7f946af8c5a7c5d5d78b83082e18d403f1c1445a174d6ba3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.0"
+  speech_to_text_macos:
+    dependency: transitive
+    description:
+      name: speech_to_text_macos
+      sha256: "6b5bb0431c2e2f4cce163c3e253e193767d14fd02565008cd924aa28a84fbd88"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
+  speech_to_text_platform_interface:
+    dependency: transitive
+    description:
+      name: speech_to_text_platform_interface
+      sha256: "13d90215a7554c9e3fef1188a23d4ecb70950e955dadc2d9e09422b5c675c867"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   stack_trace:
     dependency: transitive
     description:
