@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.speechmate.speechmate"
-    compileSdk = 35
+    compileSdk = 34
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -22,13 +22,13 @@ android {
         applicationId = "com.speechmate.speechmate"
         minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.4.0"
+        versionCode = 2 // Updated to match pubspec (1.2.0+2)
+        versionName = "1.2.0" // Updated to match pubspec
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            // signingConfig = signingConfigs.getByName("debug") // Removed dangerous config
             minifyEnabled false
             shrinkResources false
         }

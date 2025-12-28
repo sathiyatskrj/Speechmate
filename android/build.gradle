@@ -10,7 +10,7 @@ subprojects {
     project.buildDir = file("${rootProject.buildDir}/${project.name}")
 }
 subprojects {
-    project.evaluationDependsOn(":app")
+    // project.evaluationDependsOn(":app") // Deprecated content removed
 }
 
 tasks.register("clean", Delete) {

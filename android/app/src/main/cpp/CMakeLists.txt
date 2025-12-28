@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.1)
+cmake_minimum_required(VERSION 3.22.1)
 
 project(speechmate_whisper)
 
@@ -6,9 +6,6 @@ add_library(whisper-lib SHARED
     native-lib.cpp
     whisper/whisper.cpp
     whisper/ggml.c
-    whisper/ggml-alloc.c
-    whisper/ggml-backend.c
-    whisper/ggml-quants.c
 )
 
 find_library(log-lib log)
