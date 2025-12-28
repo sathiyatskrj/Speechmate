@@ -150,7 +150,7 @@ class HistoryService {
 }
 
 class DictionaryService {
-  final Map<DictionaryType, List<Map<String, dynamic>>> _cache = {};
+  final Map<DictionaryType, List<Map<String, dynamic>>> _dictionaries = {};
 
   final Map<DictionaryType, String> _paths = {
     DictionaryType.words: 'assets/data/dictionary.json',
@@ -158,22 +158,74 @@ class DictionaryService {
     DictionaryType.animals: 'assets/data/dictionary_animals.json',
     DictionaryType.magic: 'assets/data/dictionary_magic.json',
     DictionaryType.family: 'assets/data/dictionary_family.json',
-    DictionaryType.nature: 'assets/data/dictionary.json', // Assuming nature data is here or needs a placeholder. Using dictionary.json as fallback if specific file missing, or maybe user has it but forgot to list. For now, let's point to words or create empty. Wait, analysis said nature items will return empty. Let's assume they are meant to be in separate files like others. 
-    // ACTUALLY, checking the code usage, getNatureItems loads DictionaryType.nature. If no file, it loads nothing. 
-    // Let's look at the file list from "list_dir assets/data". 
-    // Found: dictionary.json, dictionary_animals.json, dictionary_family.json, dictionary_magic.json, dictionary_phrases.json.
-    // NO nature.json or numbers.json.
-    // This means we probably need to create them or map them to existing ones if they are subsets.
-    // For now, let's map them to dictionary.json to avoid crash/empty, OR better, create empty files so they don't error? 
-    // Actually the code just returns empty list if no path. The issue is they are in the Enum but not here.
-    // Let's add them pointing to potentially existing files or just empty ones if not found.
-    // Given the task is "Fix", I should probably make them at least not crash.
-    // I will map them to specific filenames that OUGHT to exist.
-    DictionaryType.nature: 'assets/data/dictionary_nature.json',
-    DictionaryType.numbers: 'assets/data/dictionary_numbers.json',
+    DictionaryType.nature: 'assets/data/dictionary.json', // Reuse main dict
+    DictionaryType.numbers: 'assets/data/dictionary.json', // Reuse main dict
   };
 
-  // ... [keep existing code] ...
+  Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
+    if (_dictionaries.containsKey(type)) {
+      return _dictionaries[type]!;
+    }
+
+    try {
+      final path = _paths[type];
+      if (path == null) return [];
+
+      final String jsonString = await rootBundle.loadString(path);
+      final List<dynamic> jsonList = json.decode(jsonString);
+      final List<Map<String, dynamic>> items = List<Map<String, dynamic>>.from(jsonList);
+      
+      _dictionaries[type] = items;
+      return items;
+    } catch (e) {
+      print("Error loading dictionary $type: $e");
+      return [];
+    }
+  }
+
+  Future<void> unload(DictionaryType type) async {
+    _dictionaries.remove(type);
+  }
+
+  Future<Map<String, dynamic>?> searchWord(String query) async {
+    final words = await loadDictionary(DictionaryType.words);
+    final q = query.trim().toLowerCase();
+    
+    try {
+      return words.firstWhere((w) {
+         return (w['english']?.toString().toLowerCase() == q) ||
+                (w['nicobarese']?.toString().toLowerCase() == q);
+      });
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> searchPhrase(String query) async {
+    final phrases = await loadDictionary(DictionaryType.phrases);
+    final q = query.trim().toLowerCase();
+
+    try {
+      return phrases.firstWhere((p) {
+         return (p['text']?.toString().toLowerCase() == q) || 
+                (p['english']?.toString().toLowerCase() == q);
+      });
+    } catch (e) {
+      return null; 
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAnimalsItems() async {
+    return loadDictionary(DictionaryType.animals);
+  }
+  
+  Future<List<Map<String, dynamic>>> getMagicItems() async {
+     return loadDictionary(DictionaryType.magic);
+  }
+  
+  Future<List<Map<String, dynamic>>> getFamilyItems() async {
+      return loadDictionary(DictionaryType.family);
+  }
 
   Future<Map<String, dynamic>?> searchEverywhere(String query) async {
     final q = query.trim().toLowerCase();
@@ -203,7 +255,7 @@ class DictionaryService {
     try {
       final animals = await getAnimalsItems();
       final animal = animals.firstWhere(
-        (e) => e['text'].toString().toLowerCase() == q,
+        (e) => (e['text'] ?? e['english']).toString().toLowerCase() == q,
         orElse: () => {}, 
       );
       
@@ -211,7 +263,7 @@ class DictionaryService {
           return {
             ...animal,
             '_type': 'animals',
-            'english': animal['text'] ?? '',
+            'english': animal['text'] ?? animal['english'] ?? '',
             'nicobarese': animal['nicobarese'] ?? '',
             '_searchedNicobarese': false,
           };
@@ -227,11 +279,6 @@ class DictionaryService {
 
     final List<Map<String, dynamic>> shuffled = List.from(words)..shuffle(Random());
     return shuffled.take(count).toList();
-  }
-
-  // Method for Family Items (Added for Hackathon)
-  Future<List<Map<String, dynamic>>> getFamilyItems() async {
-    return await loadDictionary(DictionaryType.family);
   }
 
   Future<Map<String, dynamic>?> getDailyWord() async {
@@ -260,14 +307,15 @@ class DictionaryService {
 
     return words.sublist(startIndex, endIndex);
   }
+
   Future<Map<String, dynamic>?> translateSentence(String input) async {
     if (input.trim().isEmpty) return null;
     
     // 1. Load Data if needed
-    if (_dictionaries[DictionaryType.words] == null) {
+    if (!_dictionaries.containsKey(DictionaryType.words)) {
         await loadDictionary(DictionaryType.words);
     }
-    if (_dictionaries[DictionaryType.phrases] == null) { 
+    if (!_dictionaries.containsKey(DictionaryType.phrases)) { 
         await loadDictionary(DictionaryType.phrases);
     }
 

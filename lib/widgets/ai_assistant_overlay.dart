@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rive/rive.dart';
 import 'dart:math' as math;
 
 class AiAssistantOverlay extends StatefulWidget {

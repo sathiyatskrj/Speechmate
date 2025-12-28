@@ -76,9 +76,9 @@ class AboutScreen extends StatelessWidget {
                 _buildCard(
                   child: Column(
                     children: [
-                       _buildMemberRow("Sathiya", "Lead Developer", Icons.code),
+                       _buildMemberRow("Hackathon Team", "Development", Icons.code),
                        const Divider(),
-                       _buildMemberRow("Team SpeechMate", "Research & Design", Icons.brush),
+                       _buildMemberRow("Research Team", "Design & Content", Icons.brush),
                     ],
                   ),
                 ),

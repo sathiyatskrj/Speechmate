@@ -30,11 +30,17 @@
 
 ---
 
-## 🌏 The Mission: Hack for Social Cause
+## 🌏 The Mission: A Voice for the Voiceless
 
-**Every 14 days, a language dies.** When a language disappears, we don't just lose words; we lose centuries of wisdom, culture, and identity.
+**"When a language dies, a world disappears."**
 
-**SpeechMate** is a digital ark built for the **Nicobarese** tribal community. It bridges the gap between elders and the new generation using advanced **Offline AI**, ensuring their heritage survives even without internet access.
+Every 14 days, an elder passes away, and with them, a library of wisdom burns to the ground. We are losing the songs of the forest, the names of the medicinal herbs, and the stories of our ancestors. The silence is growing.
+
+**SpeechMate is not just an app. It is a Digital Ark.**
+
+While we begin our journey with **Nicobarese**—giving a voice to the indigenous people of the Nicobar Islands—our vision is boundless. We are building the infrastructure to save **every endangered tribal language** in India and beyond.
+
+We are fighting against time to ensure that no culture is ever forgotten. **We are coding for heritage.**
 
 ---
 
@@ -141,11 +147,13 @@ Want to run this locally? Follow these steps:
 
 ## 🔮 The Future: "Project Tribal-Link"
 
-SpeechMate is the prototype engine. Our roadmap includes:
+We are just getting started. SpeechMate is the scalable engine for a revolution:
 
-1.  **Multi-Dialect Support:** Expanding to **Onges, Great Andamanese etc**.
-2.  **Voice Contribution:** Allowing elders to record pronunciations directly into the app to build a "Voice Archive".
-3.  **Cross-Platform AI:** Porting the C++ bridge to iOS/Swift.
+1.  **Pan-India Expansion:** We will adapt this engine for **Onges, Great Andamanese, Jarawa, and Sentinelese**.
+2.  **Voice of the Elders:** A feature for elders to record folklore and songs directly, creating a **Living Archive**.
+3.  **Global Heritage Network:** Connecting tribal communities worldwide to share their preservation stories.
+
+*This is a movement. Join us in preserving the diversity of humanity.*
 
 ---
 <p align="center">
