@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/screens/feelings_page.dart';
 import 'package:speechmate/screens/mybody_part.dart';
 import 'package:speechmate/screens/nature_page.dart';
+import 'package:speechmate/features/gamification/gamification_service.dart';
+import 'package:speechmate/features/preservation/voice_archive.dart';
 import 'number_page.dart';
 // Updated Imports
 import 'games/games_hub_screen.dart';
@@ -224,20 +226,97 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                 },
               )
             else
-             Expanded(
-               child: SingleChildScrollView(
-                 child: Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  alignment: WrapAlignment.center,
-                      children:
-                      learningTiles.map((item) {
+           Column(
+          children: [
+            // GAMIFICATION HEADER
+            Container(
+              margin: const EdgeInsets.only(bottom: 15),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.indigo.shade900, Colors.purple.shade800]),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.amber,
+                    child: Text("${GamificationService.currentLevel}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(GamificationService.getLevelTitle(GamificationService.currentLevel), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        const SizedBox(height: 5),
+                        LinearProgressIndicator(
+                          value: GamificationService.xp / GamificationService.nextLevelXp,
+                          backgroundColor: Colors.white24,
+                          color: Colors.greenAccent,
+                          minHeight: 6,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        const SizedBox(height: 5),
+                        Text("${GamificationService.xp} / ${GamificationService.nextLevelXp} XP", style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    children: [
+                      const Icon(Icons.local_fire_department, color: Colors.orange, size: 28),
+                      Text("${GamificationService.currentStreak} Day", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            
+            // GRID TILES
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.only(bottom: 20),
+                itemCount: learningTiles.length + 1, // +1 for Voice Archive
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  childAspectRatio: 1.1,
+                ),
+                itemBuilder: (context, index) {
+                  // Voice Archive Tile (Special Highlighting)
+                  if (index == learningTiles.length) { 
+                     return GestureDetector(
+                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceArchiveScreen())),
+                       child: Container(
+                         decoration: BoxDecoration(
+                           gradient: const LinearGradient(colors: [Color(0xFF1E1E2C), Color(0xFF232526)]),
+                           borderRadius: BorderRadius.circular(24),
+                           border: Border.all(color: Colors.cyanAccent.withOpacity(0.3), width: 1),
+                           boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: const Offset(0, 4))],
+                         ),
+                         child: const Column(
+                           mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                             Icon(Icons.record_voice_over, size: 40, color: Colors.cyanAccent),
+                             SizedBox(height: 10),
+                             Text("Voice Archive", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                             Text("Be Infinite", style: TextStyle(color: Colors.white54, fontSize: 10)),
+                           ],
+                         ),
+                       ),
+                     );
+                  }
+
+                  final tile = learningTiles[index];
                         return LearningTiles(
-                          word: item["word"],
-                          gradient: List<Color>.from(item["colors"]),
-                          navigateTo: item["navigateTo"],
-                          onTap: item.containsKey('isSecret') && item['isSecret'] == true
-                              ? () => _showSecretAccessDialog(context, item['navigateTo'])
+                          word: tile["word"],
+                          gradient: List<Color>.from(tile["colors"]),
+                          navigateTo: tile["navigateTo"],
+                          onTap: tile.containsKey('isSecret') && tile['isSecret'] == true
+                              ? () => _showSecretAccessDialog(context, tile['navigateTo'])
                               : null,
                         );
                       }).toList(),
