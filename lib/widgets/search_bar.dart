@@ -43,7 +43,6 @@ class Search extends StatelessWidget {
               onSubmitted: (_) => onSearch(), // Enable Enter key search
               textInputAction: TextInputAction.search,
             ),
-            ),
           ),
           if (onMicTap != null)
             IconButton(

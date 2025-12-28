@@ -162,6 +162,92 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
 
 
+
+  // --- WHISPER LOGIC START ---
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  bool _isRecording = false;
+
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final Directory appDocDir = await getApplicationDocumentsDirectory();
+        final String filePath = '${appDocDir.path}/temp_recording.wav';
+        
+        await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000), path: filePath);
+        
+        setState(() {
+          _isRecording = true;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text("🎙️ Listening... Tap again to stop."), duration: Duration(seconds: 10), backgroundColor: Colors.redAccent)
+        );
+      }
+    } catch (e) {
+      print("Error starting record: $e");
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+        isLoading = true; // Show loading while transcribing
+      });
+
+      if (path != null) {
+        // --- TRANSCRIBE ---
+        final modelPath = await _getModelPath();
+        final text = await WhisperService().transcribe(modelPath, path);
+        print("Transcribed: $text");
+        
+        if (text.startsWith("Error")) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+        } else {
+           final cleanText = text.replaceAll("[BLANK_AUDIO]", "").trim();
+           if (cleanText.isEmpty) {
+               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("❓ Could not hear anything.")));
+           } else {
+               searchController.text = cleanText;
+               performSearch();
+           }
+        }
+      }
+      setState(() { isLoading = false; });
+    } catch (e) {
+      print("Error stopping record: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<String> _getModelPath() async {
+    final Directory appDocDir = await getApplicationDocumentsDirectory();
+    final String modelPath = '${appDocDir.path}/ggml-tiny.en.bin';
+    final File modelFile = File(modelPath);
+
+    if (!await modelFile.exists()) {
+       try {
+          final ByteData data = await rootBundle.load('assets/models/ggml-tiny.en.bin');
+          final List<int> bytes = data.buffer.asUint8List();
+          await modelFile.writeAsBytes(bytes, flush: true);
+       } catch (e) {
+          print("Error copying model: $e");
+          return ""; 
+       }
+    }
+    return modelPath;
+  }
+
+  void _onMicTap() {
+      if (_isRecording) {
+          _stopRecording();
+      } else {
+          _startRecording();
+      }
+  }
+  // --- WHISPER LOGIC END ---
+
   void clearSearch() {
     setState(() {
       searchController.clear();
