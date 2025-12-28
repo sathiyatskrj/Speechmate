@@ -146,7 +146,6 @@ class _TeacherDashState extends State<TeacherDash> with WidgetsBindingObserver, 
         isLoading = false;
       });
     }
-    }
   }
 
   // --- WHISPER LOGIC START ---
