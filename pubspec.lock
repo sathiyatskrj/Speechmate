@@ -452,7 +452,7 @@ packages:
     dependency: transitive
     description:
       name: share_plus_platform_interface
-      sha256: "251eb156a8b5fa9ce033747d73535bf53911071f8d3b6f9e8b0f6oder2634dbe"
+            sha256: "251eb156a8b5fa9ce033747d73535bf53911071f8d3b6f9e8b0f6cde72634dbe"
       url: "https://pub.dev"
     source: hosted
     version: "3.4.0"
