@@ -14,7 +14,8 @@ Java_com_speechmate_speechmate_MainActivity_transcribe(
     const char *model = env->GetStringUTFChars(modelPath, 0);
     const char *audio = env->GetStringUTFChars(audioPath, 0);
 
-    struct whisper_context *ctx = whisper_init_from_file(model);
+    struct whisper_context_params cparams = whisper_context_default_params();
+    struct whisper_context *ctx = whisper_init_from_file_with_params(model, cparams);
 
     if (ctx == nullptr) {
         return env->NewStringUTF("Error: Failed to initialize whisper context");
