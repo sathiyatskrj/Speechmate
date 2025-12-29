@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 class WhisperService {
   static const _channel = MethodChannel('speechmate/whisper');
