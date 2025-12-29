@@ -111,11 +111,11 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
   Future<String> _getModelPath() async {
      final Directory appDocDir = await getApplicationDocumentsDirectory();
-     final String modelPath = '${appDocDir.path}/ggml-tiny.bin';
+     final String modelPath = '${appDocDir.path}/ggml-tiny.en.bin';
      
      if (!File(modelPath).existsSync()) {
        try {
-         final ByteData data = await DefaultAssetBundle.of(context).load('assets/models/ggml-tiny.bin');
+         final ByteData data = await DefaultAssetBundle.of(context).load('assets/models/ggml-tiny.en.bin');
          final List<int> bytes = data.buffer.asUint8List();
          await File(modelPath).writeAsBytes(bytes);
        } catch (e) {

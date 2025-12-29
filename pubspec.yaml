@@ -65,6 +65,7 @@ flutter:
     - assets/audio/family/ 
     - assets/data/dictionary_family.json 
     - assets/icons/branding.png
+    - assets/models/ggml-tiny.en.bin
 
 dependency_overrides:
   record_linux: ^1.2.0
