@@ -135,7 +135,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
         
         await _audioRecorder.start(
           const RecordConfig(
-            encoder: AudioEncoder.pcm16bit,
+            encoder: AudioEncoder.wav,
             sampleRate: 16000,
             numChannels: 1,
           ), 
