@@ -164,6 +164,8 @@ class DictionaryService {
     return words.sublist(startIndex, endIndex);
   }
 
+  Future<List<Map<String, dynamic>>> getDictionary(DictionaryType type) => loadDictionary(type);
+
   Future<Map<String, dynamic>?> translateSentence(String input) async {
     if (input.trim().isEmpty) return null;
     
