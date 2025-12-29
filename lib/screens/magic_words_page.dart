@@ -24,7 +24,7 @@ class _MagicWordsPageState extends State<MagicWordsPage> {
 
   Future<void> _loadData() async {
     await _dictionaryService.loadDictionary(DictionaryType.magic);
-    final items = _dictionaryService.getDictionary(DictionaryType.magic);
+    final items = await _dictionaryService.getDictionary(DictionaryType.magic);
     if (mounted) {
       setState(() {
         _words = items;
