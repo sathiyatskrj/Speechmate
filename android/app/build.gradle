@@ -28,7 +28,7 @@ android {
 
     buildTypes {
         release {
-            // signingConfig = signingConfigs.getByName("debug") // Removed dangerous config
+            signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
         }
