@@ -120,8 +120,8 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
     _setupGame();
   }
 
-  void _setupGame() {
-    final allWords = _dictionaryService.getDictionary(DictionaryType.words);
+  Future<void> _setupGame() async {
+    final allWords = await _dictionaryService.getDictionary(DictionaryType.words);
     if (allWords.isEmpty) {
       _targetWords = ["CODE", "DEUS", "HACK", "WIN", "FAST", "EPIC", "COOL", "JAVA", "DART", "WEB"];
     } else {
