@@ -22,6 +22,7 @@ import 'package:speechmate/screens/animals_page.dart';
 import 'package:speechmate/screens/magic_words_page.dart';
 import 'package:speechmate/screens/family_page.dart';
 import 'package:speechmate/screens/community_screen.dart';
+import 'package:speechmate/screens/student_progress_screen.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -287,17 +288,21 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       return Padding(
         padding: const EdgeInsets.all(20),
         child: TranslationCard(
-          nicobarese: result != null ? result!['nicobarese'] : "No match found",
-          english: result != null ? (result!['english'] ?? result!['text'] ?? "") : "",
+          nicobarese: result != null ? (result!['nicobarese'] ?? "Translation not available") : "No match found",
+          english: result != null ? (result!['english'] ?? result!['text'] ?? "No translation") : "",
           isError: result == null,
           searchedNicobarese: searchedNicobarese,
           showSpeaker: result != null, 
           onSpeak: () {
               if (result == null) return;
+              final textToSpeak = searchedNicobarese 
+                  ? (result!['english'] ?? result!['text'] ?? "")
+                  : (result!['nicobarese'] ?? "");
+              if (textToSpeak.isEmpty) return;
               if (searchedNicobarese) {
-                  ttsService.speakEnglish(result!['english'] ?? result!['text'] ?? "");
+                  ttsService.speakEnglish(textToSpeak);
               } else {
-                  ttsService.speakNicobarese(result!['nicobarese']);
+                  ttsService.speakNicobarese(textToSpeak);
               }
           },
         ),
