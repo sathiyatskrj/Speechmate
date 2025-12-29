@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../widgets/background.dart';
 import '../services/dictionary_service.dart';
-import '../services/tts_service.dart';
 
 class CommonPhrasesScreen extends StatefulWidget {
   const CommonPhrasesScreen({super.key});
@@ -12,14 +12,13 @@ class CommonPhrasesScreen extends StatefulWidget {
 
 class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
   final DictionaryService _dictionaryService = DictionaryService();
-  final TtsService _ttsService = TtsService();
+  final AudioPlayer _audioPlayer = AudioPlayer();
   List<Map<String, dynamic>> _phrases = [];
 
   @override
   void initState() {
     super.initState();
     _loadPhrases();
-    _ttsService.init();
   }
 
   Future<void> _loadPhrases() async {
@@ -27,6 +26,33 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
     setState(() {
       _phrases = data;
     });
+  }
+
+  Future<void> _playAudio(Map<String, dynamic> phrase) async {
+    try {
+      final audio = phrase['audio'];
+      if (audio != null && audio is Map) {
+        final category = audio['category'] ?? 'phrases';
+        final file = audio['file'];
+        if (file != null) {
+          final audioPath = 'audio/$category/$file';
+          await _audioPlayer.stop();
+          await _audioPlayer.play(AssetSource(audioPath));
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Audio not available: $e')),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,13 +79,22 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
-                      title: Text(item['text'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                      subtitle: Text(item['nicobarese'] ?? '', style: const TextStyle(color: Colors.teal, fontSize: 16, fontStyle: FontStyle.italic)),
+                      title: Text(
+                        item['text'] ?? '', 
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
+                      ),
+                      subtitle: item['nicobarese'] != null 
+                        ? Text(
+                            item['nicobarese'] ?? '', 
+                            style: const TextStyle(color: Colors.teal, fontSize: 16, fontStyle: FontStyle.italic)
+                          )
+                        : const Text(
+                            'Tap to hear pronunciation',
+                            style: TextStyle(color: Colors.grey, fontSize: 14, fontStyle: FontStyle.italic)
+                          ),
                       trailing: IconButton(
                         icon: const Icon(Icons.volume_up, color: Colors.blueAccent),
-                        onPressed: () {
-                           _ttsService.speakNicobarese(item['nicobarese'] ?? '');
-                        },
+                        onPressed: () => _playAudio(item),
                       ),
                     ),
                   );
