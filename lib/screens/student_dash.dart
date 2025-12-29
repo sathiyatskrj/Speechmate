@@ -133,7 +133,14 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
         final Directory appDocDir = await getApplicationDocumentsDirectory();
         final String filePath = '${appDocDir.path}/temp_recording.wav';
         
-        await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000), path: filePath);
+        await _audioRecorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.pcm16bit,
+            sampleRate: 16000,
+            numChannels: 1,
+          ), 
+          path: filePath
+        );
         
         setState(() {
           _isRecording = true;
@@ -152,6 +159,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   Future<void> _stopRecording() async {
     try {
       final path = await _audioRecorder.stop();
+      await Future.delayed(const Duration(milliseconds: 300)); // Flush buffer
       setState(() {
         _isRecording = false;
         _aiText = "Thinking..."; 
