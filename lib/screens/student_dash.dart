@@ -52,6 +52,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     // Preload dictionaries
     dictionaryService.loadDictionary(DictionaryType.words);
     dictionaryService.loadDictionary(DictionaryType.phrases);
+    ttsService.init();
   }
 
   @override
@@ -211,7 +212,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       body: Stack(
         children: [
           Background(
-            colors: const [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)], // Premium Dark Theme
+            colors: const [Color(0xFFFFDEE9), Color(0xFFB5FFFC)], // Fairyland Gradient (Pink -> Cyan)
             padding: EdgeInsets.zero,
             child: SafeArea(
               child: Column(
@@ -257,8 +258,8 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("SpeechMate", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 1.5)),
-                      Text("Learn. Preserve. Connect.", style: TextStyle(color: Colors.cyanAccent, fontSize: 12, letterSpacing: 2)),
+                      Text("SpeechMate", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.purple, letterSpacing: 1.5)),
+                      Text("Where language barriers end.", style: TextStyle(color: Colors.purpleAccent, fontSize: 14, fontStyle: FontStyle.italic)),
                     ],
                   ),
                   Container(

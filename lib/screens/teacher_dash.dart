@@ -10,6 +10,9 @@ import '../widgets/background.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
+import '../services/tts_service.dart';
+import 'package:speechmate/screens/common_phrases_screen.dart'; // Placeholder for new screen
+import 'package:speechmate/screens/voice_vault_screen.dart'; // Placeholder for Record feature
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -21,6 +24,7 @@ class TeacherDash extends StatefulWidget {
 class _TeacherDashState extends State<TeacherDash> {
   final TextEditingController _searchController = TextEditingController();
   final DictionaryService _dictionaryService = DictionaryService();
+  final TtsService _ttsService = TtsService();
   
   bool _isLoading = false;
   Map<String, dynamic>? _result;
@@ -30,6 +34,7 @@ class _TeacherDashState extends State<TeacherDash> {
   @override
   void initState() {
     super.initState();
+    _ttsService.init();
     _loadData();
   }
 
@@ -121,8 +126,8 @@ class _TeacherDashState extends State<TeacherDash> {
                           ),
                         ),
                         Text(
-                          "Classroom Tools",
-                          style: TextStyle(color: Colors.cyanAccent, fontSize: 14),
+                          "Where language barriers end.",
+                          style: TextStyle(color: Colors.cyanAccent, fontSize: 14, fontStyle: FontStyle.italic),
                         ),
                       ],
                     ),
@@ -173,7 +178,15 @@ class _TeacherDashState extends State<TeacherDash> {
                                 english: _result!['english'] ?? _result!['text'] ?? "",
                                 searchedNicobarese: _searchedNicobarese,
                                 isError: false,
-                                showSpeaker: false, 
+                                showSpeaker: true, 
+                                onSpeak: () {
+                                    if (_result == null) return;
+                                    if (_searchedNicobarese) {
+                                        _ttsService.speakEnglish(_result!['english'] ?? _result!['text'] ?? "");
+                                    } else {
+                                        _ttsService.speakNicobarese(_result!['nicobarese']);
+                                    }
+                                },
                              ),
                            )
                      ],
@@ -226,17 +239,17 @@ class _TeacherDashState extends State<TeacherDash> {
                     ),
                     _buildFeatureCard(
                       context,
-                      title: "Manage Words",
-                      icon: Icons.edit_note,
+                      title: "Common Phrases",
+                      icon: Icons.chat_bubble_outline,
                       color: Colors.pinkAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WordManagementScreen())),
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
                     ),
                     _buildFeatureCard(
                       context,
-                      title: "About App",
-                      icon: Icons.info_outline,
-                      color: Colors.tealAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
+                      title: "Voice Vault",
+                      icon: Icons.mic,
+                      color: Colors.redAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
                     ),
                   ],
                 ),
