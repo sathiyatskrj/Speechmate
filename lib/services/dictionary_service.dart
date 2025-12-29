@@ -34,7 +34,22 @@ class DictionaryService {
       _dictionaries[type] = items;
       return items;
     } catch (e) {
-      print("Error loading dictionary $type: $e");
+      print("ERROR loading dictionary $type: $e");
+      
+      // Fallback for Words if asset loading fails (Critical for demo)
+      if (type == DictionaryType.words) {
+         print("Using Fallback Dictionary for Words");
+         final fallback = [
+           {"english": "Teacher", "nicobarese": "Mö-hakööpöti"},
+           {"english": "Student", "nicobarese": "Möhakööp"},
+           {"english": "Water", "nicobarese": "Mak"},
+           {"english": "School", "nicobarese": "Iskul"},
+           {"english": "Good Morning", "nicobarese": "Lööh arōö"},
+           {"english": "Thank You", "nicobarese": "Kīnőng"}
+         ];
+         _dictionaries[type] = fallback;
+         return fallback;
+      }
       return [];
     }
   }
