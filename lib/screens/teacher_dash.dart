@@ -37,6 +37,7 @@ class _TeacherDashState extends State<TeacherDash> {
   bool _isLoading = false;
   Map<String, dynamic>? _result;
   bool _searchedNicobarese = false;
+  bool _hasSearched = false;
   Map<String, dynamic>? _dailyWord;
   
   // AI Mic State
@@ -85,6 +86,7 @@ class _TeacherDashState extends State<TeacherDash> {
     if (mounted) {
       setState(() {
         _result = searchResult;
+        _hasSearched = true;
         if (searchResult != null) {
           if (searchResult!.containsKey('_searchedNicobarese')) {
               _searchedNicobarese = searchResult!['_searchedNicobarese'];
@@ -107,6 +109,7 @@ class _TeacherDashState extends State<TeacherDash> {
     setState(() {
       _searchController.clear();
       _result = null;
+      _hasSearched = false;
     });
   }
 
@@ -283,15 +286,15 @@ class _TeacherDashState extends State<TeacherDash> {
                         if (_isLoading)
                            const Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: Colors.cyanAccent)),
                         
-                        if (_result != null)
+                        if (!_isLoading && _hasSearched)
                            Padding(
                              padding: const EdgeInsets.only(top: 15),
                              child: TranslationCard(
-                                nicobarese: _result!['nicobarese'],
-                                english: _result!['english'] ?? _result!['text'] ?? "",
+                                nicobarese: _result != null ? _result!['nicobarese'] : "No match found",
+                                english: _result != null ? (_result!['english'] ?? _result!['text'] ?? "") : "",
                                 searchedNicobarese: _searchedNicobarese,
-                                isError: false,
-                                showSpeaker: true, 
+                                isError: _result == null,
+                                showSpeaker: _result != null, 
                                 onSpeak: () {
                                     if (_result == null) return;
                                     if (_searchedNicobarese) {
@@ -408,7 +411,7 @@ class _TeacherDashState extends State<TeacherDash> {
             ],
           ),
           const SizedBox(height: 10),
-          Text(word['text'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(word['english'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
           Text(word['nicobarese'] ?? '', style: const TextStyle(color: Colors.cyanAccent, fontSize: 18, fontStyle: FontStyle.italic)),
         ],
       ),
