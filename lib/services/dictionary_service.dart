@@ -227,4 +227,13 @@ class DictionaryService {
 
     return null;
   }
+
+  // Get random words for quiz
+  Future<List<Map<String, dynamic>>> getRandomWords(int count) async {
+    final words = await loadDictionary(DictionaryType.words);
+    if (words.isEmpty) return [];
+    
+    final shuffled = List<Map<String, dynamic>>.from(words)..shuffle();
+    return shuffled.take(count).toList();
+  }
 }
