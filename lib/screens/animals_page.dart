@@ -24,7 +24,7 @@ class _AnimalsPageState extends State<AnimalsPage> {
 
   Future<void> _loadData() async {
     await _dictionaryService.loadDictionary(DictionaryType.animals);
-    final items = _dictionaryService.getDictionary(DictionaryType.animals);
+    final items = await _dictionaryService.getDictionary(DictionaryType.animals);
     if (mounted) {
       setState(() {
         _animals = items;
