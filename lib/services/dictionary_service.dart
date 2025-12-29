@@ -45,14 +45,21 @@ class DictionaryService {
 
   Future<Map<String, dynamic>?> searchWord(String query) async {
     final words = await loadDictionary(DictionaryType.words);
+    print("DEBUG: searchWord - loaded ${words.length} words");
     final q = query.trim().toLowerCase();
+    print("DEBUG: searching for: '$q'");
     
     try {
-      return words.firstWhere((w) {
-         return (w['english']?.toString().toLowerCase() == q) ||
-                (w['nicobarese']?.toString().toLowerCase() == q);
+      final result = words.firstWhere((w) {
+         final eng = w['english']?.toString().toLowerCase();
+         final nic = w['nicobarese']?.toString().toLowerCase();
+         print("DEBUG: comparing '$eng' || '$nic' with '$q'");
+         return (eng == q) || (nic == q);
       });
+      print("DEBUG: found result: $result");
+      return result;
     } catch (e) {
+      print("DEBUG: searchWord error: $e");
       return null;
     }
   }
