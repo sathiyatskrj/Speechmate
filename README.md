@@ -144,11 +144,32 @@ SpeechMate is designed to be language-agnostic. Adding **Great Andamanese** or *
 // Example: Scalable JSON Structure
 {
   "eng": "Water",
-  "trans": "Dak",
+  "trans": "mak",
   "lang_code": "nic_car", 
   "audio": "water_car.wav"
 }
 ```
+
+---
+
+## 🔮 Future Roadmap (What's Next?)
+
+While SpeechMate v1.0 is a robust tool, we have an ambitious roadmap to further bridge the gap:
+
+### 🚦 Current Limitations (v1.0)
+*   **One-Way Voice Input**: Currently supports English Voice → Text. Nicobarese voice input is not yet trained.
+*   **Approximated Pronunciation**: Uses standard TTS engines which may not perfectly capture the tonal nuances of Nicobarese.
+*   **Static Learning**: Courses are pre-defined and hardcoded in JSON.
+
+### 🌟 Planned Features (v2.0+)
+1.  **Bi-Directional Voice Translation**: 
+    *   Training a custom **Wav2Vec 2.0** model on Nicobarese audio data collected via the "Voice Vault" feature to allow Nicobarese → English speech recognition.
+2.  **AR "Point & Learn"**:
+    *   Using **Google ML Kit Object Detection** to allow students to point their camera at objects (e.g., a Coconut) and instantly see the Nicobarese word ("Kūk") and hear it.
+3.  **Collaborative Classroom (Mesh Networking)**:
+    *   Enabling peer-to-peer multiplayer word games between teacher and student devices using **Wifi Direct**, requiring NO internet router.
+4.  **Generative Cultural Stories**:
+    *   Fine-tuning a small LLM (like Llama-3-8B-Quantized) to generate new, context-aware folklore stories in English and Nicobarese to keep children engaged.
 
 ---
 
@@ -182,5 +203,3 @@ SpeechMate is designed to be language-agnostic. Adding **Great Andamanese** or *
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
-
-
