@@ -180,6 +180,7 @@ SpeechMate is designed to be language-agnostic. Adding **Great Andamanese** or *
 ---
 
 <p align="center">
-  Built with ❤️ for the <strong>All India Hackathon</strong>.<br>
+  Built with ❤️ for the <strong>Hack For Social Cause</strong>.<br>
   <em>Preserving Heritage, One Line of Code at a Time.</em>
 </p>
+
