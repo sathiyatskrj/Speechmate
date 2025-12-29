@@ -364,8 +364,6 @@ class _TeacherDashState extends State<TeacherDash> {
           ),
           ),
           _buildAiOverlay(),
-      ),
-          ),
         ],
       ),
     );
@@ -379,7 +377,6 @@ class _TeacherDashState extends State<TeacherDash> {
           onMicPressed: _onMicTap,
           onClose: () => setState(() => _showAiOverlay = false),
       );
-  }
   }
 
   Widget _buildDailyWordCard(Map<String, dynamic> word) {

@@ -200,6 +200,7 @@ class DictionaryService {
 
     final words = _dictionaries[DictionaryType.words] ?? [];
     final Map<String, String> wordMap = {};
+    for (var w in words) {
         wordMap[(w['english'] ?? '').toString().toLowerCase()] = w['nicobarese'] ?? '';
     }
 

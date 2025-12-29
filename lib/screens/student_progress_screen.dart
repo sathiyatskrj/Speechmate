@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/services/dictionary_service.dart';
+import 'package:speechmate/services/progress_service.dart';
 import '../widgets/background.dart';
 
 class StudentProgressScreen extends StatefulWidget {
