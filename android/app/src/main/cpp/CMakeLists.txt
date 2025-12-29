@@ -6,6 +6,9 @@ add_library(whisper-lib SHARED
     native-lib.cpp
     whisper/whisper.cpp
     whisper/ggml.c
+    whisper/ggml-alloc.c
+    whisper/ggml-backend.c
+    whisper/ggml-quants.c
 )
 
 find_library(log-lib log)
