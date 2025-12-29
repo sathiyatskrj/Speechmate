@@ -141,6 +141,9 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       }
     } catch (e) {
       debugPrint("Error starting record: $e");
+      if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to start recording: $e")));
+      }
     }
   }
 
@@ -177,6 +180,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       }
     } catch (e) {
        setState(() => _aiText = "Error: $e");
+       debugPrint("Recording Error: $e");
     }
   }
   

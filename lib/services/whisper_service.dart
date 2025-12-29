@@ -11,6 +11,13 @@ class WhisperService {
       return "";
     }
 
+    if (!await File(modelPath).exists()) {
+        return "Error: Model file not found at $modelPath";
+    }
+    if (!await File(audioPath).exists()) {
+        return "Error: Audio file not found at $audioPath";
+    }
+
     _isProcessing = true;
     try {
       final String text = await _channel.invokeMethod('transcribe', {

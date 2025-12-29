@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/screens/word_management_screen.dart';
 import 'package:speechmate/screens/about_screen.dart';
+import 'package:speechmate/screens/community_screen.dart';
+import 'package:speechmate/screens/quiz_screen.dart';
+import 'package:speechmate/screens/progress_screen.dart';
+import 'package:speechmate/screens/chat_translate_screen.dart';
+import 'package:speechmate/screens/teacher_levels_screen.dart'; // Assuming this exists or using generic
 import '../widgets/background.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
@@ -20,6 +25,28 @@ class _TeacherDashState extends State<TeacherDash> {
   bool _isLoading = false;
   Map<String, dynamic>? _result;
   bool _searchedNicobarese = false;
+  Map<String, dynamic>? _dailyWord;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    // CRITICAL: Load dictionaries to prevent crashes
+    await _dictionaryService.loadDictionary(DictionaryType.words);
+    await _dictionaryService.loadDictionary(DictionaryType.phrases);
+    
+    // Load Daily Word
+    final daily = await _dictionaryService.getDailyWord();
+    
+    if (mounted) {
+      setState(() {
+        _dailyWord = daily;
+      });
+    }
+  }
 
   Future<void> _performSearch() async {
     FocusScope.of(context).unfocus();
@@ -40,7 +67,6 @@ class _TeacherDashState extends State<TeacherDash> {
     if (mounted) {
       setState(() {
         _result = searchResult;
-        
         if (searchResult != null) {
           if (searchResult!.containsKey('_searchedNicobarese')) {
               _searchedNicobarese = searchResult!['_searchedNicobarese'];
@@ -74,6 +100,7 @@ class _TeacherDashState extends State<TeacherDash> {
         padding: EdgeInsets.zero,
         child: SafeArea(
           child: SingleChildScrollView(
+             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,10 +113,6 @@ class _TeacherDashState extends State<TeacherDash> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Welcome Back,",
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
-                        ),
-                        Text(
                           "Teacher Panel",
                           style: TextStyle(
                             color: Colors.white,
@@ -97,53 +120,33 @@ class _TeacherDashState extends State<TeacherDash> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        Text(
+                          "Classroom Tools",
+                          style: TextStyle(color: Colors.cyanAccent, fontSize: 14),
+                        ),
                       ],
                     ),
-                    const CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.cyanAccent,
-                      child: Icon(Icons.person, color: Colors.black),
+                    IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.white70),
+                      onPressed: () => Navigator.pop(context),
                     )
                   ],
                 ),
                 
-                const SizedBox(height: 30),
-                
-                // Analytics Cards
-                const Text(
-                  "OVERVIEW",
-                  style: TextStyle(
-                    color: Colors.cyanAccent, 
-                    fontWeight: FontWeight.w700, 
-                    letterSpacing: 1.2
-                  ),
-                ),
-                const SizedBox(height: 15),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildStatCard("Students", "125", Icons.group, Colors.blue),
-                      const SizedBox(width: 15),
-                      _buildStatCard("Words Learned", "8,234", Icons.auto_stories, Colors.purple),
-                      const SizedBox(width: 15),
-                      _buildStatCard("Avg. Time", "45m", Icons.timer, Colors.orange),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 35),
+                const SizedBox(height: 25),
 
-                // TRANSLATION TOOL (HACKATHON FEATURE)
+                // DAILY WORD
+                if (_dailyWord != null)
+                  _buildDailyWordCard(_dailyWord!),
+                
+                const SizedBox(height: 25),
+
+                // TRANSLATION TOOL
                 const Text(
                   "QUICK TRANSLATE",
-                  style: TextStyle(
-                    color: Colors.cyanAccent, 
-                    fontWeight: FontWeight.w700, 
-                    letterSpacing: 1.2
-                  ),
+                  style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 10),
                 Container(
                    padding: const EdgeInsets.all(16),
                    decoration: BoxDecoration(
@@ -157,10 +160,7 @@ class _TeacherDashState extends State<TeacherDash> {
                           controller: _searchController, 
                           onSearch: _performSearch, 
                           onClear: _clearSearch, 
-                          onMicTap: () {}, // No mic needed for teacher maybe? Or implement slightly different?
-                          // Assuming Search widget handles mic tap optionality? 
-                          // If Search widget REQUIRES mic tap, I'll provide empty function or one that shows 'Not for Teacher'
-                          // Let's implement basic mic if needed, but for now empty is safe.
+                          onMicTap: () {}, 
                         ),
                         if (_isLoading)
                            const Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: Colors.cyanAccent)),
@@ -173,71 +173,74 @@ class _TeacherDashState extends State<TeacherDash> {
                                 english: _result!['english'] ?? _result!['text'] ?? "",
                                 searchedNicobarese: _searchedNicobarese,
                                 isError: false,
-                                showSpeaker: false, // Keep it simple for teacher dash
+                                showSpeaker: false, 
                              ),
                            )
-                        else if (_searchController.text.isNotEmpty && !_isLoading && _result == null)
-                            const Padding(padding: EdgeInsets.all(10), child: Text("No result found.", style: TextStyle(color: Colors.white54))),
                      ],
                    ),
                 ),
 
-                const SizedBox(height: 35),
+                const SizedBox(height: 25),
 
-                // Management Section
+                // FEATURES GRID
                 const Text(
-                  "MANAGEMENT",
-                  style: TextStyle(
-                    color: Colors.cyanAccent, 
-                    fontWeight: FontWeight.w700, 
-                    letterSpacing: 1.2
-                  ),
+                  "TOOLS & RESOURCES",
+                  style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
                 ),
                 const SizedBox(height: 15),
-                
-                _buildActionTile(
-                  context,
-                  title: "Manage Dictionary",
-                  subtitle: "Add, edit or remove words",
-                  icon: Icons.book,
-                  color: Colors.pinkAccent,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WordManagementScreen())),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 15,
+                  mainAxisSpacing: 15,
+                  childAspectRatio: 1.3,
+                  children: [
+                    _buildFeatureCard(
+                      context,
+                      title: "Community",
+                      icon: Icons.public,
+                      color: Colors.blueAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      title: "Quiz Mode",
+                      icon: Icons.quiz,
+                      color: Colors.purpleAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      title: "Progress",
+                      icon: Icons.bar_chart,
+                      color: Colors.greenAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      title: "Translator",
+                      icon: Icons.translate,
+                      color: Colors.orangeAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      title: "Manage Words",
+                      icon: Icons.edit_note,
+                      color: Colors.pinkAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WordManagementScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      title: "About App",
+                      icon: Icons.info_outline,
+                      color: Colors.tealAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
+                    ),
+                  ],
                 ),
-                _buildActionTile(
-                  context,
-                  title: "Student Progress",
-                  subtitle: "View individual reports",
-                  icon: Icons.bar_chart,
-                  color: Colors.greenAccent,
-                  onTap: () {
-                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Feature Enabled for Demo")));
-                  },
-                ),
-                _buildActionTile(
-                  context,
-                  title: "Class Settings",
-                  subtitle: "Permissions and access",
-                  icon: Icons.settings,
-                  color: Colors.blueAccent,
-                  onTap: () {},
-                ),
-                 _buildActionTile(
-                  context,
-                  title: "About App",
-                  subtitle: "Version & Mission",
-                  icon: Icons.info_outline,
-                  color: Colors.white70,
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
-                ),
-
-                const SizedBox(height: 30),
-                Center(
-                  child: TextButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.logout, color: Colors.redAccent),
-                    label: const Text("Log Out", style: TextStyle(color: Colors.redAccent)),
-                  ),
-                )
+                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -246,75 +249,57 @@ class _TeacherDashState extends State<TeacherDash> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildDailyWordCard(Map<String, dynamic> word) {
     return Container(
-      width: 150,
+      width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        gradient: LinearGradient(colors: [Colors.indigo.shade900, Colors.blue.shade900]),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 24),
+          const Row(
+            children: [
+              Icon(Icons.calendar_today, color: Colors.white70, size: 16),
+              SizedBox(width: 8),
+              Text("DAILY WORD", style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            ],
           ),
-          const SizedBox(height: 15),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 12,
-            ),
-          ),
+          const SizedBox(height: 10),
+          Text(word['text'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(word['nicobarese'] ?? '', style: const TextStyle(color: Colors.cyanAccent, fontSize: 18, fontStyle: FontStyle.italic)),
         ],
       ),
     );
   }
 
-  Widget _buildActionTile(BuildContext context, {required String title, required String subtitle, required IconData icon, required Color color, required VoidCallback onTap}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        onTap: onTap,
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 24),
+  Widget _buildFeatureCard(BuildContext context, {required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
-        title: Text(
-          title,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 28),
+            ),
+            const SizedBox(height: 10),
+            Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ],
         ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(color: Colors.white.withOpacity(0.5)),
-        ),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.3), size: 16),
       ),
     );
   }
