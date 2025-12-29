@@ -11,6 +11,13 @@ import '../widgets/search_bar.dart';
 import '../widgets/translation_card.dart';
 import '../services/dictionary_service.dart';
 import '../services/tts_service.dart';
+import '../services/tts_service.dart';
+import '../services/whisper_service.dart'; // Mic Support
+import 'package:record/record.dart'; // Mic Support
+import 'package:path_provider/path_provider.dart'; // Mic Support
+import 'dart:io'; // Mic Support
+import 'dart:typed_data'; // Mic Support
+import '../widgets/ai_assistant_overlay.dart'; // Mic Support
 import 'package:speechmate/screens/common_phrases_screen.dart'; // Placeholder for new screen
 import 'package:speechmate/screens/voice_vault_screen.dart'; // Placeholder for Record feature
 
@@ -25,11 +32,17 @@ class _TeacherDashState extends State<TeacherDash> {
   final TextEditingController _searchController = TextEditingController();
   final DictionaryService _dictionaryService = DictionaryService();
   final TtsService _ttsService = TtsService();
+  final AudioRecorder _audioRecorder = AudioRecorder();
   
   bool _isLoading = false;
   Map<String, dynamic>? _result;
   bool _searchedNicobarese = false;
   Map<String, dynamic>? _dailyWord;
+  
+  // AI Mic State
+  bool _isRecording = false;
+  bool _showAiOverlay = false;
+  String _aiText = "";
 
   @override
   void initState() {
@@ -98,18 +111,110 @@ class _TeacherDashState extends State<TeacherDash> {
   }
 
   @override
+  void dispose() {
+    _audioRecorder.dispose();
+    super.dispose();
+  }
+
+  // --- MIC & WHISPER LOGIC ---
+  Future<String> _getModelPath() async {
+     final Directory appDocDir = await getApplicationDocumentsDirectory();
+     final String modelPath = '${appDocDir.path}/ggml-tiny.en.bin';
+     
+     if (!File(modelPath).existsSync()) {
+       try {
+         final ByteData data = await DefaultAssetBundle.of(context).load('assets/models/ggml-tiny.en.bin');
+         final List<int> bytes = data.buffer.asUint8List();
+         await File(modelPath).writeAsBytes(bytes);
+       } catch (e) {
+         print("Error copying model: $e");
+       }
+     }
+     return modelPath;
+  }
+
+  Future<void> _startRecording() async {
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final Directory appDocDir = await getApplicationDocumentsDirectory();
+        final String filePath = '${appDocDir.path}/temp_recording_teacher.wav';
+        
+        await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000), path: filePath);
+        
+        setState(() {
+          _isRecording = true;
+          _showAiOverlay = true; 
+          _aiText = "Listening...";
+        });
+      }
+    } catch (e) {
+      debugPrint("Error starting record: $e");
+      if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to start recording: $e")));
+      }
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      final path = await _audioRecorder.stop();
+      setState(() {
+        _isRecording = false;
+        _aiText = "Thinking..."; 
+      });
+
+      if (path != null) {
+        final modelPath = await _getModelPath();
+        final text = await WhisperService().transcribe(modelPath, path);
+        
+        if (text.startsWith("Error")) {
+           setState(() => _aiText = "Oops! I didn't catch that.");
+        } else {
+           final cleanText = text.replaceAll("[BLANK_AUDIO]", "").trim();
+           setState(() {
+               _aiText = cleanText.isEmpty ? "I heard silence..." : cleanText;
+               _searchController.text = cleanText; 
+           });
+           
+           if (cleanText.isNotEmpty) {
+               await Future.delayed(const Duration(seconds: 2));
+               if (mounted) {
+                   setState(() => _showAiOverlay = false);
+                   _performSearch();
+               }
+               return; 
+           }
+        }
+      }
+    } catch (e) {
+       setState(() => _aiText = "Error: $e");
+       debugPrint("Recording Error: $e");
+    }
+  }
+  
+  void _onMicTap() {
+      if (_isRecording) {
+          _stopRecording();
+      } else {
+          _startRecording();
+      }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Background(
-        colors: const [Color(0xFF141E30), Color(0xFF243B55)], // Professional Dark Navy
-        padding: EdgeInsets.zero,
-        child: SafeArea(
-          child: SingleChildScrollView(
-             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      body: Stack(
+        children: [
+          Background(
+            colors: const [Color(0xFF141E30), Color(0xFF243B55)], // Professional Dark Navy
+            padding: EdgeInsets.zero,
+            child: SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,7 +270,7 @@ class _TeacherDashState extends State<TeacherDash> {
                           controller: _searchController, 
                           onSearch: _performSearch, 
                           onClear: _clearSearch, 
-                          onMicTap: () {}, 
+                          onMicTap: _onMicTap, 
                         ),
                         if (_isLoading)
                            const Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: Colors.cyanAccent)),
@@ -257,9 +362,24 @@ class _TeacherDashState extends State<TeacherDash> {
               ],
             ),
           ),
-        ),
+          ),
+          _buildAiOverlay(),
+      ),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildAiOverlay() {
+      if (!_showAiOverlay) return const SizedBox.shrink();
+      return AiAssistantOverlay(
+          isListening: _isRecording,
+          currentText: _aiText,
+          onMicPressed: _onMicTap,
+          onClose: () => setState(() => _showAiOverlay = false),
+      );
+  }
   }
 
   Widget _buildDailyWordCard(Map<String, dynamic> word) {
