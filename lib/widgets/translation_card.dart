@@ -8,7 +8,7 @@ class TranslationCard extends StatelessWidget {
   
   // Speaker
   final bool showSpeaker;
-  final VoidCallback? onSpeakerTap;
+  final VoidCallback? onSpeak; // Renamed from onSpeakerTap
   
   // Favorites & Report
   final bool isFavorite;
@@ -22,7 +22,7 @@ class TranslationCard extends StatelessWidget {
     this.isError = false,
     this.searchedNicobarese = false,
     this.showSpeaker = false,
-    this.onSpeakerTap,
+    this.onSpeak,
     this.isFavorite = false,
     this.onFavoriteToggle,
     this.onReport,
@@ -79,7 +79,7 @@ class TranslationCard extends StatelessWidget {
               if (showSpeaker && !isError)
                 IconButton(
                   icon: Icon(Icons.volume_up_rounded, size: isSmallScreen ? 22 : 24),
-                  onPressed: onSpeakerTap,
+                  onPressed: onSpeak,
                   padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
                 ),
               if (onFavoriteToggle != null && !isError)
