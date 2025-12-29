@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/progress_service.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/dictionary_service.dart';
 import '../widgets/background.dart';

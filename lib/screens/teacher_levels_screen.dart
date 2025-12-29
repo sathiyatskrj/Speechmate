@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/dictionary_service.dart';
+import '../services/progress_service.dart';
 import 'level_learning_screen.dart';
 import '../widgets/background.dart';
 
