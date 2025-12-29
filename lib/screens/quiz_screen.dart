@@ -28,40 +28,82 @@ class _QuizScreenState extends State<QuizScreen> {
     _loadQuiz();
   }
 
+
   Future<void> _loadQuiz() async {
     setState(() => isLoading = true);
     
-    final randomWords = await dictionaryService.getRandomWords(5);
-    
-    setState(() {
-      questions = randomWords;
-      currentIndex = 0;
-      score = 0;
-      isLoading = false;
-    });
-    
-    _generateOptions();
+    try {
+      final randomWords = await dictionaryService.getRandomWords(5);
+      
+      if (randomWords.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to load quiz words. Please try again.')),
+          );
+          Navigator.pop(context);
+        }
+        return;
+      }
+      
+      setState(() {
+        questions = randomWords;
+        currentIndex = 0;
+        score = 0;
+        isLoading = false;
+      });
+      
+      _generateOptions();
+    } catch (e) {
+      print('ERROR loading quiz: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Quiz error: $e')),
+        );
+        Navigator.pop(context);
+      }
+    }
   }
 
   void _generateOptions() async {
-    if (currentIndex >= questions.length) return;
+    if (currentIndex >= questions.length || questions.isEmpty) return;
 
-    final correctWord = questions[currentIndex];
-    final wrong = await dictionaryService.getRandomWords(3);
-    
-    List<String> opts = [
-      correctWord['english'] ?? '',
-      ...wrong.map((e) => e['english'].toString())
-    ];
-    
-    opts.shuffle();
-    
-    setState(() {
-      options = opts;
-      correctOptionIndex = opts.indexOf(correctWord['english']);
-      answered = false;
-      selectedOption = null;
-    });
+    try {
+      final correctWord = questions[currentIndex];
+      // Safely get wrong options, handling potential empty returns
+      var wrong = await dictionaryService.getRandomWords(3);
+      
+      // Fallback if we can't get random words (shouldn't happen if dictionary loaded)
+      if (wrong.isEmpty) {
+         print("Warning: Could not get random words for wrong options");
+         wrong = []; 
+      }
+
+      List<String> opts = [
+        correctWord['english'] ?? 'Unknown',
+        ...wrong.map((e) => e['english']?.toString() ?? 'Unknown')
+      ];
+      
+      // Ensure we have unique options if possible, though strict uniqueness isn't critical for MVP
+      opts.shuffle(); // Randomize position
+      
+      if (mounted) {
+        setState(() {
+          options = opts;
+          correctOptionIndex = opts.indexOf(correctWord['english']);
+          // Safety check: if shuffle messed up index finding (unlikely but safe)
+          if (correctOptionIndex == -1) correctOptionIndex = 0; 
+          
+          answered = false;
+          selectedOption = null;
+        });
+      }
+    } catch (e) {
+      print("Error generating options: $e");
+      // Recovery: try to move to next or just show what we have
+      if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error preparing question: $e")));
+      }
+    }
   }
 
   void _submitAnswer(int optionIndex) {
