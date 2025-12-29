@@ -62,4 +62,17 @@ class ProgressService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getStringList(_keyQuizScores) ?? [];
   }
+
+  // Teacher-specific methods
+  static const String _keyTeacherLevel = 'teacher_level';
+
+  Future<int> getTeacherLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyTeacherLevel) ?? 1;
+  }
+
+  Future<void> unlockNextLevel(int currentLevel) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyTeacherLevel, currentLevel + 1);
+  }
 }

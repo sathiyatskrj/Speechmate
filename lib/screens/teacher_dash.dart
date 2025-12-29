@@ -206,7 +206,7 @@ class _TeacherDashState extends State<TeacherDash> {
       body: Stack(
         children: [
           Background(
-            colors: const [Color(0xFF141E30), Color(0xFF243B55)], // Professional Dark Navy
+            colors: const [Color(0xFF141E30), Color(0xFF243B55)],
             padding: EdgeInsets.zero,
             child: SafeArea(
               child: SingleChildScrollView(
