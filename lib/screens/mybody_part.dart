@@ -21,7 +21,7 @@ class BodyPartsScreen extends StatelessWidget {
     BodyPartItem(
       name: 'Ear',
       image: 'assets/images/ear.png',
-      audio: 'audio/ear.mp3',
+      audio: 'audio/body_parts/ear.mp3',
     ),
     BodyPartItem(
       name: 'Eye',
