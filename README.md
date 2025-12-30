@@ -44,11 +44,11 @@
 
 **Facts:**
 *   Every **14 days**, an indigenous language dies.
-*   The **Nicobarese** language (Austroasiatic) is fading as younger generations shift to Hindi/English.
+*   Languages like **Nicobarese** (Austroasiatic) and **Great Andamanese** are fading as younger generations shift to Hindi/English.
 *   **70% of tribal students** face learning gaps due to language barriers in government schools.
 
 **The Solution:**
-**SpeechMate** is not just a dictionary. It is an **Education & Preservation Platform** that works **100% Offline** in remote islands, using advanced Edge AI to teach, translate, and preserve the language.
+**SpeechMate** is not just a dictionary. It is a **Universal Education & Preservation Platform** designed to support **any tribal language**. It works **100% Offline** in remote islands, using advanced Edge AI to teach, translate, and preserve these languages, starting with **Nicobarese**.
 
 ---
 

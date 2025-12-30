@@ -228,12 +228,21 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                 children: [
                    _buildHeroHeader(context),
                    const SizedBox(height: 10),
-                   if (isLoading)
-                     const Expanded(child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)))
-                   else if (searchController.text.isNotEmpty)
-                     Expanded(child: _buildSearchResults())
-                   else
-                     Expanded(child: _buildDashboardContent()),
+                   Expanded(
+                     child: SingleChildScrollView(
+                       physics: const BouncingScrollPhysics(),
+                       child: Column(
+                         children: [
+                             if (isLoading)
+                               const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)))
+                             else if (searchController.text.isNotEmpty)
+                               _buildSearchResults(),
+                             
+                             _buildDashboardContent(),
+                         ],
+                       ),
+                     ),
+                   ),
                 ],
               ),
             ),
@@ -318,8 +327,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   }
 
   Widget _buildDashboardContent() {
-      return SingleChildScrollView(
-         physics: const BouncingScrollPhysics(),
+      return Padding(
          padding: const EdgeInsets.all(20),
          child: Column(
              crossAxisAlignment: CrossAxisAlignment.start,
