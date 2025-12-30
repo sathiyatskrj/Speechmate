@@ -143,7 +143,7 @@ class AboutScreen extends StatelessWidget {
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Built with ❤️ for the All India Hackathon.", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text("Built with ❤️ for Hack For Social Cause VBYLD 2026", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       SizedBox(height: 10),
                       Text("Special thanks to the tribal communities of Nicobar for their invaluable cultural knowledge and to all educators working to preserve indigenous languages.", 
                         style: TextStyle(height: 1.5, color: Colors.black87)),
