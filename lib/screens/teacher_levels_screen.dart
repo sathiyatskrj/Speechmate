@@ -63,26 +63,29 @@ class _TeacherLevelsScreenState extends State<TeacherLevelsScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView.builder(
-                padding: const EdgeInsets.fromLTRB(20, 100, 20, 20),
+                padding: const EdgeInsets.fromLTRB(20, 100, 20, 40),
                 itemCount: 10,
                 itemBuilder: (context, index) {
                   final level = index + 1;
                   final isLocked = level > _currentLevel;
                   final isCompleted = level < _currentLevel;
+                  final isCurrent = level == _currentLevel;
                   
                   return GestureDetector(
                     onTap: () => _openLevel(level),
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.only(bottom: 20),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: isLocked ? Colors.white.withOpacity(0.5) : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(25), // Softer corners
+                        border: isCurrent ? Border.all(color: Colors.amber, width: 3) : null,
                         boxShadow: [
                            if (!isLocked)
                             BoxShadow(
-                              color: Colors.blueAccent.withOpacity(0.2),
-                              blurRadius: 15,
+                              color: isCurrent ? Colors.amber.withOpacity(0.4) : Colors.blueAccent.withOpacity(0.2),
+                              blurRadius: isCurrent ? 20 : 15,
                               offset: const Offset(0, 5),
                             )
                         ],
@@ -95,21 +98,29 @@ class _TeacherLevelsScreenState extends State<TeacherLevelsScreen> {
                               shape: BoxShape.circle,
                               color: isLocked 
                                   ? Colors.grey[400] 
-                                  : (isCompleted ? Colors.green : Colors.blueAccent),
+                                  : (isCompleted ? Colors.green : Colors.amber),
                               gradient: isLocked 
                                   ? null 
                                   : LinearGradient(
                                       colors: isCompleted 
                                           ? [Colors.green, Colors.greenAccent]
-                                          : [Colors.blue, Colors.blueAccent],
+                                          : [Colors.orange, Colors.amber],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
+                              boxShadow: [
+                                  if (!isLocked)
+                                    BoxShadow(
+                                        color: (isCompleted ? Colors.green : Colors.amber).withOpacity(0.5),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4)
+                                    )
+                              ]
                             ),
                             child: Icon(
-                              isLocked ? Icons.lock : (isCompleted ? Icons.check : Icons.star),
+                              isLocked ? Icons.lock : (isCompleted ? Icons.check : Icons.play_arrow_rounded),
                               color: Colors.white,
-                              size: 30,
+                              size: 32,
                             ),
                           ),
                           const SizedBox(width: 20),
@@ -121,26 +132,35 @@ class _TeacherLevelsScreenState extends State<TeacherLevelsScreen> {
                                   "Level $level",
                                   style: TextStyle(
                                     fontSize: 22,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: isCurrent ? FontWeight.w900 : FontWeight.bold,
                                     color: isLocked ? Colors.grey[600] : Colors.black87,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
-                                Text(
-                                  isLocked ? "Locked" : (isCompleted ? "Completed" : "Start Learning"),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: isLocked ? Colors.grey[500] : Colors.grey[700],
-                                  ),
-                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                    children: [
+                                        if (isCurrent) 
+                                            const Padding(padding: EdgeInsets.only(right: 6), child: Icon(Icons.star, size: 16, color: Colors.amber)),
+                                        Text(
+                                          isLocked ? "Locked" : (isCompleted ? "Completed" : "Current Mission"),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                                            color: isLocked ? Colors.grey[500] : (isCurrent ? Colors.amber[800] : Colors.green),
+                                          ),
+                                        ),
+                                    ],
+                                )
                               ],
                             ),
                           ),
                           if (!isLocked)
                              Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: isCompleted ? Colors.green : Colors.blueAccent,
-                              size: 20,
-                            ),
+                               Icons.arrow_forward_ios_rounded,
+                               color: isCompleted ? Colors.green : Colors.amber,
+                               size: 20,
+                             ),
                         ],
                       ),
                     ),
