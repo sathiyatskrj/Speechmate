@@ -12,7 +12,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Mock Data
   final List<Map<String, dynamic>> _posts = [
     {
-      "author": "Sneha Gosh.",
+      "author": "Sneha Ghosh.",
       "role": "Teacher Level 5",
       "avatar": "S",
       "color": Colors.purple,
