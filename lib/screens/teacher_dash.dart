@@ -327,6 +327,13 @@ class _TeacherDashState extends State<TeacherDash> {
                   children: [
                     _buildFeatureCard(
                       context,
+                      title: "Certification",
+                      icon: Icons.verified,
+                      color: Colors.amberAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
                       title: "Community",
                       icon: Icons.public,
                       color: Colors.blueAccent,
