@@ -300,7 +300,10 @@ class _TeacherDashState extends State<TeacherDash> {
                                     if (_searchedNicobarese) {
                                         _ttsService.speakEnglish(_result!['english'] ?? _result!['text'] ?? "");
                                     } else {
-                                        _ttsService.speakNicobarese(_result!['nicobarese'] ?? "");
+                                        _ttsService.speakNicobarese(
+                                          _result!['nicobarese'] ?? "",
+                                          englishWord: _result!['english'] ?? _result!['text']
+                                        );
                                     }
                                 },
                              ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/dictionary_service.dart';
+import '../services/smart_quiz_service.dart';
 import '../widgets/background.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -11,6 +12,7 @@ class QuizScreen extends StatefulWidget {
 
 class _QuizScreenState extends State<QuizScreen> {
   final DictionaryService dictionaryService = DictionaryService();
+  final SmartQuizService smartQuizService = SmartQuizService();
   
   List<Map<String, dynamic>> questions = [];
   int currentIndex = 0;
@@ -33,9 +35,21 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() => isLoading = true);
     
     try {
-      final randomWords = await dictionaryService.getRandomWords(5);
+    try {
+      // ADAPTIVE LEARNING: Try to load missed words first
+      List<Map<String, dynamic>> missed = await smartQuizService.getMissedWords();
+      List<Map<String, dynamic>> fresh = await dictionaryService.getRandomWords(5);
       
-      if (randomWords.isEmpty) {
+      // Mix 2 missed words (if any) with 3 fresh words
+      List<Map<String, dynamic>> quizSet = [];
+      if (missed.isNotEmpty) {
+          missed.shuffle();
+          quizSet.addAll(missed.take(2));
+      }
+      quizSet.addAll(fresh.take(5 - quizSet.length));
+      quizSet.shuffle(); // Randomize order
+      
+      if (quizSet.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Failed to load quiz words. Please try again.')),
@@ -46,7 +60,7 @@ class _QuizScreenState extends State<QuizScreen> {
       }
       
       setState(() {
-        questions = randomWords;
+        questions = quizSet;
         currentIndex = 0;
         score = 0;
         isLoading = false;
@@ -112,7 +126,14 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       answered = true;
       selectedOption = optionIndex;
-      if (optionIndex == correctOptionIndex) score++;
+      answered = true;
+      selectedOption = optionIndex;
+      if (optionIndex == correctOptionIndex) {
+          score++;
+          smartQuizService.markCorrect(questions[currentIndex]);
+      } else {
+          smartQuizService.markMissed(questions[currentIndex]);
+      }
     });
 
     Future.delayed(const Duration(seconds: 2), () {
