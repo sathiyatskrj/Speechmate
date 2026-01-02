@@ -26,14 +26,24 @@ class _ColorsPageState extends State<ColorsPage> {
     {"name": "Black", "nicobarese": "Hatöm", "color": Color(0xFF1a1a1a), "emoji": "🌑"},
   ];
 
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
   @override
-  void initState() {
-    super.initState();
-    _ttsService.init();
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 
-  void _playAudio(String word) {
-    _ttsService.speakNicobarese(word);
+  Future<void> _playAudio(String colorName, String fallbackWord) async {
+    // Play audio from assets: assets/audio/colors/blue.mp3
+    final String assetPath = 'audio/colors/${colorName.toLowerCase()}.mp3';
+    try {
+        await _audioPlayer.play(AssetSource(assetPath));
+    } catch (e) {
+        debugPrint("Error playing audio: $e");
+        // Fallback to TTS: speak the Nicobarese word
+        _ttsService.speakNicobarese(fallbackWord); 
+    }
   }
 
   @override
@@ -68,9 +78,8 @@ class _ColorsPageState extends State<ColorsPage> {
     );
   }
 
-  Widget _buildColorCard(Map<String, dynamic> item, int index) {
     return GestureDetector(
-      onTap: () => _playAudio(item['nicobarese']),
+      onTap: () => _playAudio(item['name'], item['nicobarese']),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,

@@ -57,6 +57,8 @@ flutter:
     - assets/audio/phrases/
     - assets/audio/nature/
     - assets/audio/body_parts/
+    - assets/audio/colors/
+    - assets/audio/things/
     - assets/audio/feelings/
     - assets/images/
     - assets/data/dictionary_phrases.json

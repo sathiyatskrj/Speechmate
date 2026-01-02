@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/background.dart';
 
@@ -14,22 +15,24 @@ class _ThingsPageState extends State<ThingsPage> {
   final TtsService _ttsService = TtsService();
 
   final List<Map<String, dynamic>> _things = [
-    {"name": "Table", "nicobarese": "Mēj", "emoji": "🪑"},
-    {"name": "Chair", "nicobarese": "Kursi", "emoji": "🛋️"},
-    {"name": "Pen", "nicobarese": "Kalam", "emoji": "🖊️"},
-    {"name": "Book", "nicobarese": "Kitāp", "emoji": "📖"},
-    {"name": "Bag", "nicobarese": "Thailā", "emoji": "🎒"},
-    {"name": "Bottle", "nicobarese": "Botal", "emoji": "🍾"},
-    {"name": "Phone", "nicobarese": "Fon", "emoji": "📱"},
-    {"name": "Light", "nicobarese": "Batti", "emoji": "💡"},
-    {"name": "Fan", "nicobarese": "Pankha", "emoji": "🌬️"},
-    {"name": "Door", "nicobarese": "Kiwār", "emoji": "🚪"},
+    {"name": "Table", "nicobarese": "Mish", "emoji": "🪑"},
+    {"name": "Chair", "nicobarese": "Anūchö", "emoji": "🛋️"},
+    {"name": "Pen", "nicobarese": "Kanūich", "emoji": "🖊️"},
+    {"name": "Book", "nicobarese": "Mat Lipööre", "emoji": "📖"}, // Shortened for UI
+    {"name": "Bag", "nicobarese": "Bag", "emoji": "🎒"},
+    {"name": "Bottle", "nicobarese": "Pilūn", "emoji": "🍾"},
+    {"name": "Clock", "nicobarese": "Kāriyāl", "emoji": "⏰"}, // Replaced Phone
+    {"name": "Light", "nicobarese": "Eānvö", "emoji": "💡"},
+    {"name": "Fan", "nicobarese": "Fan", "emoji": "🌬️"},
+    {"name": "Door", "nicobarese": "Inkūp", "emoji": "🚪"},
     {"name": "Window", "nicobarese": "Khirki", "emoji": "🪟"},
-    {"name": "Bed", "nicobarese": "Bistar", "emoji": "🛏️"},
-    {"name": "Plate", "nicobarese": "Thāli", "emoji": "🍽️"},
-    {"name": "Spoon", "nicobarese": "Chammach", "emoji": "🥄"},
-    {"name": "Cup", "nicobarese": "Pyāla", "emoji": "☕"},
+    {"name": "Bed", "nicobarese": "Tahāklöö", "emoji": "🛏️"},
+    {"name": "Plate", "nicobarese": "Pingāl", "emoji": "🍽️"},
+    {"name": "Spoon", "nicobarese": "Chāmāch", "emoji": "🥄"},
+    {"name": "Cup", "nicobarese": "Kööp", "emoji": "☕"},
   ];
+
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -37,8 +40,22 @@ class _ThingsPageState extends State<ThingsPage> {
     _ttsService.init();
   }
 
-  void _playAudio(String word) {
-    _ttsService.speakNicobarese(word);
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playAudio(String thingName, String fallbackWord) async {
+    // Play audio from assets: assets/audio/things/table.mp3
+    final String assetPath = 'audio/things/${thingName.toLowerCase()}.mp3';
+    try {
+        await _audioPlayer.play(AssetSource(assetPath));
+    } catch (e) {
+        debugPrint("Error playing audio: $e");
+        // Fallback to TTS: speak the Nicobarese word
+        _ttsService.speakNicobarese(fallbackWord); 
+    }
   }
 
   @override
@@ -75,7 +92,7 @@ class _ThingsPageState extends State<ThingsPage> {
 
   Widget _buildThingCard(Map<String, dynamic> item, int index) {
     return GestureDetector(
-      onTap: () => _playAudio(item['nicobarese']),
+      onTap: () => _playAudio(item['name'], item['nicobarese']),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
