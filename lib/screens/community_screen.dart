@@ -63,7 +63,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isVerified": false,
     },
     {
-      "author": "Rohan (Elder)",
+      "author": "Joseph (Elder)",
       "role": "Native Speaker",
       "avatar": "Ro",
       "color": 0xFF009688, // Colors.teal.value
@@ -75,7 +75,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isVerified": true,
     },
     {
-      "author": "Anjali",
+      "author": "Daniel",
       "role": "Student",
       "avatar": "An",
       "color": 0xFF795548, // Colors.brown.value
