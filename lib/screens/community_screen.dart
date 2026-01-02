@@ -27,7 +27,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       "isVerified": true,
     },
     {
-      "author": "Sneha Gosh",
+      "author": "Sneha Ghosh.",
       "role": "Teacher Level 5",
       "avatar": "S",
       "color": 0xFF9C27B0, // Colors.purple.value
