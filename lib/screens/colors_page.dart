@@ -14,16 +14,16 @@ class _ColorsPageState extends State<ColorsPage> {
   final TtsService _ttsService = TtsService();
 
   final List<Map<String, dynamic>> _colors = [
-    {"name": "Sea Blue", "nicobarese": "Makalö", "color": Color(0xFF006994), "emoji": "🌊"},
-    {"name": "Coconut Green", "nicobarese": "Maha", "color": Color(0xFF90C242), "emoji": "🥥"},
-    {"name": "Sunset Orange", "nicobarese": "Föl", "color": Color(0xFFFF5E3A), "emoji": "🌅"},
-    {"name": "Sand White", "nicobarese": "Pöch", "color": Color(0xFFF6EAD1), "emoji": "🏖️"},
-    {"name": "Coral Pink", "nicobarese": "Hëw", "color": Color(0xFFFF6F61), "emoji": "🪸"},
-    {"name": "Earth Brown", "nicobarese": "Tanëh", "color": Color(0xFF8B4513), "emoji": "🏾"},
-    {"name": "Berry Red", "nicobarese": "Apël", "color": Color(0xFFDC143C), "emoji": "🍒"},
-    {"name": "Deep Ocean", "nicobarese": "Kamat", "color": Color(0xFF000080), "emoji": "🦈"},
-    {"name": "Sunshine Yellow", "nicobarese": "Univät", "color": Color(0xFFFFD700), "emoji": "☀️"},
-    {"name": "Night Black", "nicobarese": "Hatöm", "color": Color(0xFF1a1a1a), "emoji": "🌑"},
+    {"name": "Blue", "nicobarese": "Makalö", "color": Color(0xFF006994), "emoji": "🌊"},
+    {"name": "Green", "nicobarese": "Maha", "color": Color(0xFF90C242), "emoji": "🥥"},
+    {"name": "Orange", "nicobarese": "Föl", "color": Color(0xFFFF5E3A), "emoji": "🌅"},
+    {"name": "White", "nicobarese": "Pöch", "color": Color(0xFFF6EAD1), "emoji": "🏖️"},
+    {"name": "Pink", "nicobarese": "Hëw", "color": Color(0xFFFF6F61), "emoji": "🪸"},
+    {"name": "Brown", "nicobarese": "Tanëh", "color": Color(0xFF8B4513), "emoji": "🏾"},
+    {"name": "Red", "nicobarese": "Apël", "color": Color(0xFFDC143C), "emoji": "🍒"},
+    {"name": "Dark Blue", "nicobarese": "Kamat", "color": Color(0xFF000080), "emoji": "🦈"},
+    {"name": "Yellow", "nicobarese": "Univät", "color": Color(0xFFFFD700), "emoji": "☀️"},
+    {"name": "Black", "nicobarese": "Hatöm", "color": Color(0xFF1a1a1a), "emoji": "🌑"},
   ];
 
   @override
