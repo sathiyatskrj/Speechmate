@@ -23,6 +23,8 @@ import 'package:speechmate/screens/magic_words_page.dart';
 import 'package:speechmate/screens/family_page.dart';
 import 'package:speechmate/screens/community_screen.dart';
 import 'package:speechmate/screens/student_progress_screen.dart';
+import 'package:speechmate/screens/colors_page.dart';
+import 'package:speechmate/screens/things_page.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -206,6 +208,8 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     {"word": "Numbers", "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": NumberPage(), "icon": Icons.format_list_numbered_rounded},
     {"word": "Nature", "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": NaturePage(), "icon": Icons.eco_rounded},
     {"word": "Feelings", "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": FeelingsPage(), "icon": Icons.emoji_emotions_rounded},
+    {"word": "Colors", "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const ColorsPage(), "icon": Icons.palette_rounded},
+    {"word": "Things", "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const ThingsPage(), "icon": Icons.chair_rounded},
     {"word": "Body Parts", "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": BodyPartsScreen(), "icon": Icons.accessibility_new_rounded},
     {"word": "Games", "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
     {"word": "Animals", "emoji": "🦁", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const AnimalsPage(), "icon": Icons.pets_rounded},
