@@ -35,7 +35,6 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() => isLoading = true);
     
     try {
-    try {
       // ADAPTIVE LEARNING: Try to load missed words first
       List<Map<String, dynamic>> missed = await smartQuizService.getMissedWords();
       List<Map<String, dynamic>> fresh = await dictionaryService.getRandomWords(5);

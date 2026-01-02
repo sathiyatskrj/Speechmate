@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:audioplayers/audioplayers.dart'; // [FIX] Added import
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/background.dart';
 
@@ -78,6 +79,7 @@ class _ColorsPageState extends State<ColorsPage> {
     );
   }
 
+  Widget _buildColorCard(Map<String, dynamic> item, int index) {
     return GestureDetector(
       onTap: () => _playAudio(item['name'], item['nicobarese']),
       child: Container(
