@@ -20,6 +20,8 @@ import 'dart:typed_data'; // Mic Support
 import '../widgets/ai_assistant_overlay.dart'; // Mic Support
 import 'package:speechmate/screens/common_phrases_screen.dart'; // Placeholder for new screen
 import 'package:speechmate/screens/voice_vault_screen.dart'; // Placeholder for Record feature
+import 'package:speechmate/screens/culture_screen.dart'; // [NEW] Link
+
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -376,6 +378,13 @@ class _TeacherDashState extends State<TeacherDash> {
                       icon: Icons.mic,
                       color: Colors.redAccent,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      title: "Culture",
+                      icon: Icons.account_balance,
+                      color: Colors.tealAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
                     ),
                   ],
                 ),

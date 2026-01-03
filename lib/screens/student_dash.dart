@@ -217,7 +217,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     {"word": "Animals", "emoji": "🦁", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const AnimalsPage(), "icon": Icons.pets_rounded},
     {"word": "Magic Words", "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const MagicWordsPage(), "icon": Icons.auto_fix_high_rounded},
     {"word": "Family", "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const FamilyPage(), "icon": Icons.family_restroom_rounded},
-    {"word": "Culture", "emoji": "🌴", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CultureScreen(), "icon": Icons.account_balance_rounded}, // [NEW]
+
     {"word": "Voice Vault", "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded}, // [NEW]
     {"word": "Community", "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
   ];
