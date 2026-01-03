@@ -1,0 +1,1125 @@
+﻿# Dictionary Duplicate Analysis Report
+
+## Summary
+- **Total Entries:** 617
+- **Duplicate English Words:** 71
+- **Duplicate Nicobarese Words:** 28
+
+## Duplicate English Words
+
+### 'sand' (appears 3 times)
+
+**Entry 1:**
+- English: Sand
+- Nicobarese: Kūyàyö
+
+**Entry 2:**
+- English: Sand
+- Nicobarese: koyâˑya
+
+**Entry 3:**
+- English: Sand
+- Nicobarese: -
+
+
+### 'wind' (appears 3 times)
+
+**Entry 1:**
+- English: Wind
+- Nicobarese: Kūföt
+
+**Entry 2:**
+- English: Wind
+- Nicobarese: sūng
+
+**Entry 3:**
+- English: Wind
+- Nicobarese: kofat
+
+
+### 'thirsty' (appears 2 times)
+
+**Entry 1:**
+- English: Thirsty
+- Nicobarese: Hāre-nòmö
+
+**Entry 2:**
+- English: Thirsty
+- Nicobarese: yâl
+
+
+### 'leg' (appears 2 times)
+
+**Entry 1:**
+- English: Leg
+- Nicobarese: Kālröön
+
+**Entry 2:**
+- English: Leg
+- Nicobarese: kal-drān
+
+
+### 'face' (appears 2 times)
+
+**Entry 1:**
+- English: Face
+- Nicobarese: AreKuö
+
+**Entry 2:**
+- English: Face
+- Nicobarese: kūˑa
+
+
+### 'two' (appears 2 times)
+
+**Entry 1:**
+- English: Two
+- Nicobarese: Nët
+
+**Entry 2:**
+- English: two
+- Nicobarese: neät
+
+
+### 'give' (appears 2 times)
+
+**Entry 1:**
+- English: Give
+- Nicobarese: Ta-ih kēktën-eh
+
+**Entry 2:**
+- English: Give
+- Nicobarese: kēˑângâ
+
+
+### 'girl' (appears 2 times)
+
+**Entry 1:**
+- English: Girl
+- Nicobarese: Kikanö
+
+**Entry 2:**
+- English: Girl
+- Nicobarese: nīˑa-kikana
+
+
+### 'back' (appears 2 times)
+
+**Entry 1:**
+- English: Back
+- Nicobarese: Ùk
+
+**Entry 2:**
+- English: Back
+- Nicobarese: ok
+
+
+### 'small' (appears 2 times)
+
+**Entry 1:**
+- English: Small
+- Nicobarese: Tökuöno
+
+**Entry 2:**
+- English: Small
+- Nicobarese: kūˑana
+
+
+### 'night' (appears 2 times)
+
+**Entry 1:**
+- English: Night
+- Nicobarese: Hātööm
+
+**Entry 2:**
+- English: Night
+- Nicobarese: hâtāˑm
+
+
+### 'sun' (appears 2 times)
+
+**Entry 1:**
+- English: Sun
+- Nicobarese: Tavūi
+
+**Entry 2:**
+- English: Sun
+- Nicobarese: tâwūˑe
+
+
+### 'bad' (appears 2 times)
+
+**Entry 1:**
+- English: Bad
+- Nicobarese: Töchöich
+
+**Entry 2:**
+- English: Bad
+- Nicobarese: at-lāk; at-kôlô
+
+
+### 'many' (appears 2 times)
+
+**Entry 1:**
+- English: Many
+- Nicobarese: Pòiyen
+
+**Entry 2:**
+- English: Many
+- Nicobarese: mârôˑnga
+
+
+### 'rain' (appears 2 times)
+
+**Entry 1:**
+- English: Rain
+- Nicobarese: Kūmrah
+
+**Entry 2:**
+- English: Rain
+- Nicobarese: kòmrâˑh
+
+
+### 'ear' (appears 2 times)
+
+**Entry 1:**
+- English: Ear
+- Nicobarese: Elnāk
+
+**Entry 2:**
+- English: Ear
+- Nicobarese: nâng
+
+
+### 'book' (appears 2 times)
+
+**Entry 1:**
+- English: Book
+- Nicobarese: Tö hakööpö Mat Lipööre
+
+**Entry 2:**
+- English: Book
+- Nicobarese: līˑbar
+
+
+### 'stone' (appears 2 times)
+
+**Entry 1:**
+- English: Stone
+- Nicobarese: Ihōng
+
+**Entry 2:**
+- English: Stone
+- Nicobarese: ēˑhong
+
+
+### 'cloth' (appears 2 times)
+
+**Entry 1:**
+- English: Cloth
+- Nicobarese: Inyūt
+
+**Entry 2:**
+- English: Cloth
+- Nicobarese: hillâ
+
+
+### 'head' (appears 2 times)
+
+**Entry 1:**
+- English: Head
+- Nicobarese: Kūi
+
+**Entry 2:**
+- English: Head
+- Nicobarese: kūˑi
+
+
+### 'one' (appears 2 times)
+
+**Entry 1:**
+- English: One
+- Nicobarese: Kahōk
+
+**Entry 2:**
+- English: one
+- Nicobarese: kahōk; heng
+
+
+### 'four' (appears 2 times)
+
+**Entry 1:**
+- English: Four
+- Nicobarese: Fën
+
+**Entry 2:**
+- English: four
+- Nicobarese: fän
+
+
+### 'father' (appears 2 times)
+
+**Entry 1:**
+- English: Father
+- Nicobarese: Kikònyö Yöng
+
+**Entry 2:**
+- English: Father
+- Nicobarese: yang-kikôˑña
+
+
+### 'angry' (appears 2 times)
+
+**Entry 1:**
+- English: Angry
+- Nicobarese: Tāiny
+
+**Entry 2:**
+- English: Angry
+- Nicobarese: līn
+
+
+### 'bird' (appears 2 times)
+
+**Entry 1:**
+- English: Bird
+- Nicobarese: Chehechōn
+
+**Entry 2:**
+- English: Bird
+- Nicobarese: che-chōn
+
+
+### 'dance' (appears 2 times)
+
+**Entry 1:**
+- English: Dance
+- Nicobarese: Kiriöm
+
+**Entry 2:**
+- English: Dance
+- Nicobarese: kēvryˑam
+
+
+### 'walk' (appears 2 times)
+
+**Entry 1:**
+- English: Walk
+- Nicobarese: Kiröön
+
+**Entry 2:**
+- English: Walk
+- Nicobarese: wâˑng-ngare
+
+
+### 'boat' (appears 2 times)
+
+**Entry 1:**
+- English: Boat
+- Nicobarese: Chōng
+
+**Entry 2:**
+- English: Boat
+- Nicobarese: kopòk
+
+
+### 'hungry' (appears 2 times)
+
+**Entry 1:**
+- English: Hungry
+- Nicobarese: Hāhëūk
+
+**Entry 2:**
+- English: Hungry
+- Nicobarese: kâpa-hâre
+
+
+### 'mouth' (appears 2 times)
+
+**Entry 1:**
+- English: Mouth
+- Nicobarese: Elvāng
+
+**Entry 2:**
+- English: Mouth
+- Nicobarese: el-wâ
+
+
+### 'forget' (appears 2 times)
+
+**Entry 1:**
+- English: Forget
+- Nicobarese: Vāichngö
+
+**Entry 2:**
+- English: Forget
+- Nicobarese: waitˑnga
+
+
+### 'hand' (appears 2 times)
+
+**Entry 1:**
+- English: Hand
+- Nicobarese: Kël
+
+**Entry 2:**
+- English: Hand
+- Nicobarese: el-tī
+
+
+### 'blood' (appears 2 times)
+
+**Entry 1:**
+- English: Blood
+- Nicobarese: Māhām
+
+**Entry 2:**
+- English: Blood
+- Nicobarese: mân
+
+
+### 'sky' (appears 2 times)
+
+**Entry 1:**
+- English: Sky
+- Nicobarese: Hāliöngö
+
+**Entry 2:**
+- English: Sky
+- Nicobarese: el-hâlīˑang
+
+
+### 'moon' (appears 2 times)
+
+**Entry 1:**
+- English: Moon
+- Nicobarese: Chinget
+
+**Entry 2:**
+- English: Moon
+- Nicobarese: chingeät
+
+
+### 'mother' (appears 2 times)
+
+**Entry 1:**
+- English: Mother
+- Nicobarese: Kikanö Yöng Nyiö
+
+**Entry 2:**
+- English: Mother
+- Nicobarese: yang-kikâˑna
+
+
+### 'white' (appears 2 times)
+
+**Entry 1:**
+- English: White
+- Nicobarese: Isōh
+
+**Entry 2:**
+- English: White
+- Nicobarese: tisˑsoh
+
+
+### 'nose' (appears 2 times)
+
+**Entry 1:**
+- English: Nose
+- Nicobarese: Elmëh
+
+**Entry 2:**
+- English: Nose
+- Nicobarese: el-meṅh
+
+
+### 'my' (appears 2 times)
+
+**Entry 1:**
+- English: My
+- Nicobarese: Chu
+
+**Entry 2:**
+- English: My
+- Nicobarese: chyūˑa
+
+
+### 'sister' (appears 2 times)
+
+**Entry 1:**
+- English: Sister
+- Nicobarese: Kānanö
+
+**Entry 2:**
+- English: Sister
+- Nicobarese: kâna.na
+
+
+### 'laugh' (appears 2 times)
+
+**Entry 1:**
+- English: Laugh
+- Nicobarese: Hayiöla
+
+**Entry 2:**
+- English: Laugh
+- Nicobarese: haiyīˑl-kūˑa
+
+
+### 'star' (appears 2 times)
+
+**Entry 1:**
+- English: Star
+- Nicobarese: Taneūsömat
+
+**Entry 2:**
+- English: Star
+- Nicobarese: tânūˑsamat
+
+
+### 'fire' (appears 2 times)
+
+**Entry 1:**
+- English: Fire
+- Nicobarese: Tāmeūyö
+
+**Entry 2:**
+- English: Fire
+- Nicobarese: tâmöˑya
+
+
+### 'fish' (appears 2 times)
+
+**Entry 1:**
+- English: Fish
+- Nicobarese: Kāk
+
+**Entry 2:**
+- English: Fish
+- Nicobarese: kâa
+
+
+### 'foot' (appears 2 times)
+
+**Entry 1:**
+- English: Foot
+- Nicobarese: Kūlòich Röön
+
+**Entry 2:**
+- English: Foot
+- Nicobarese: drāin
+
+
+### 'road' (appears 2 times)
+
+**Entry 1:**
+- English: Road
+- Nicobarese: Tālöktū
+
+**Entry 2:**
+- English: Road
+- Nicobarese: tâ-löˑka
+
+
+### 'count' (appears 2 times)
+
+**Entry 1:**
+- English: Count
+- Nicobarese: Kaheūk
+
+**Entry 2:**
+- English: Count
+- Nicobarese: kâ-hök
+
+
+### 'stomach' (appears 2 times)
+
+**Entry 1:**
+- English: Stomach
+- Nicobarese: Ellön
+
+**Entry 2:**
+- English: Stomach
+- Nicobarese: el-lōˑan
+
+
+### 'afraid' (appears 2 times)
+
+**Entry 1:**
+- English: Afraid
+- Nicobarese: Tō-vö
+
+**Entry 2:**
+- English: Afraid
+- Nicobarese: paia-kūˑa
+
+
+### 'sit' (appears 2 times)
+
+**Entry 1:**
+- English: Sit
+- Nicobarese: Ūichngöre
+
+**Entry 2:**
+- English: Sit
+- Nicobarese: ūˑchâˑkâ
+
+
+### 'three' (appears 2 times)
+
+**Entry 1:**
+- English: Three
+- Nicobarese: Lūöi
+
+**Entry 2:**
+- English: three
+- Nicobarese: lūe
+
+
+### 'black' (appears 2 times)
+
+**Entry 1:**
+- English: Black
+- Nicobarese: Sāh
+
+**Entry 2:**
+- English: Black
+- Nicobarese: turing
+
+
+### 'child' (appears 2 times)
+
+**Entry 1:**
+- English: Child
+- Nicobarese: Nyiö/Kūn Nyiö
+
+**Entry 2:**
+- English: Child
+- Nicobarese: nīˑa
+
+
+### 'evening' (appears 2 times)
+
+**Entry 1:**
+- English: Evening
+- Nicobarese: Hāraap
+
+**Entry 2:**
+- English: Evening
+- Nicobarese: lâˑrap
+
+
+### 'song' (appears 2 times)
+
+**Entry 1:**
+- English: Song
+- Nicobarese: Tinköökö
+
+**Entry 2:**
+- English: Song
+- Nicobarese: ten-kāˑka
+
+
+### 'i' (appears 2 times)
+
+**Entry 1:**
+- English: I
+- Nicobarese: Chu-ö
+
+**Entry 2:**
+- English: I
+- Nicobarese: chyūˑa; chian
+
+
+### 'rope' (appears 2 times)
+
+**Entry 1:**
+- English: Rope
+- Nicobarese: Rehën
+
+**Entry 2:**
+- English: Rope
+- Nicobarese: pisˑsik
+
+
+### 'eye' (appears 2 times)
+
+**Entry 1:**
+- English: Eye
+- Nicobarese: Māk
+
+**Entry 2:**
+- English: Eye
+- Nicobarese: mat
+
+
+### 'turtle' (appears 2 times)
+
+**Entry 1:**
+- English: Turtle
+- Nicobarese: Kāp
+
+**Entry 2:**
+- English: Turtle
+- Nicobarese: kâp
+
+
+### 'village' (appears 2 times)
+
+**Entry 1:**
+- English: Village
+- Nicobarese: Tūhet
+
+**Entry 2:**
+- English: Village
+- Nicobarese: pânòm
+
+
+### 'rice' (appears 2 times)
+
+**Entry 1:**
+- English: Rice
+- Nicobarese: Sāiny
+
+**Entry 2:**
+- English: Rice
+- Nicobarese: saiṙ
+
+
+### 'brother' (appears 2 times)
+
+**Entry 1:**
+- English: Brother
+- Nicobarese: Kanònyö-Mem/Kahem
+
+**Entry 2:**
+- English: Brother
+- Nicobarese: hâ-nankisâˑna
+
+
+### 'bring' (appears 2 times)
+
+**Entry 1:**
+- English: Bring
+- Nicobarese: Kūmöti/Tā-ih
+
+**Entry 2:**
+- English: Bring
+- Nicobarese: kē-te
+
+
+### 'spoon' (appears 2 times)
+
+**Entry 1:**
+- English: Spoon
+- Nicobarese: chāmāch
+
+**Entry 2:**
+- English: Spoon
+- Nicobarese: sanel
+
+
+### 'boy' (appears 2 times)
+
+**Entry 1:**
+- English: Boy
+- Nicobarese: Kikònyö
+
+**Entry 2:**
+- English: Boy
+- Nicobarese: nīa (from 2 to 13 years); kom-saˑlare (when about 14)
+
+
+### 'friend' (appears 2 times)
+
+**Entry 1:**
+- English: Friend
+- Nicobarese: Hòl
+
+**Entry 2:**
+- English: Friend
+- Nicobarese: hôˑldre
+
+
+### 'river' (appears 2 times)
+
+**Entry 1:**
+- English: River
+- Nicobarese: Māk
+
+**Entry 2:**
+- English: River
+- Nicobarese: tâ-helˑel
+
+
+### 'cold' (appears 2 times)
+
+**Entry 1:**
+- English: Cold
+- Nicobarese: Töchām
+
+**Entry 2:**
+- English: Cold
+- Nicobarese: lūˑich
+
+
+### 'finger' (appears 2 times)
+
+**Entry 1:**
+- English: Finger
+- Nicobarese: Kūnti
+
+**Entry 2:**
+- English: Finger
+- Nicobarese: kuntī
+
+
+### 'five' (appears 2 times)
+
+**Entry 1:**
+- English: Five
+- Nicobarese: Taneui
+
+**Entry 2:**
+- English: five
+- Nicobarese: tanī
+
+
+### 'good' (appears 2 times)
+
+**Entry 1:**
+- English: Good
+- Nicobarese: Vāi
+
+**Entry 2:**
+- English: Good
+- Nicobarese: lāk; kôlô
+
+
+## Duplicate Nicobarese Words
+
+
+### 'pânòm' (appears 3 times)
+
+**Entry 1:**
+- English: Country(region)
+- Nicobarese: pânòm
+
+**Entry 2:**
+- English: Place(village,town)
+- Nicobarese: pânòm
+
+**Entry 3:**
+- English: Village
+- Nicobarese: pânòm
+
+
+### 'chōn' (appears 3 times)
+
+**Entry 1:**
+- English: Tree
+- Nicobarese: Chōn
+
+**Entry 2:**
+- English: Plant
+- Nicobarese: Chōn
+
+**Entry 3:**
+- English: Wood
+- Nicobarese: chōn
+
+
+### 'māk' (appears 3 times)
+
+**Entry 1:**
+- English: River
+- Nicobarese: Māk
+
+**Entry 2:**
+- English: Eye
+- Nicobarese: Māk
+
+**Entry 3:**
+- English: See
+- Nicobarese: māk
+
+
+### '-' (appears 3 times)
+
+**Entry 1:**
+- English: Eat(any kind of food)
+- Nicobarese: -
+
+**Entry 2:**
+- English: How many?
+- Nicobarese: -
+
+**Entry 3:**
+- English: Sand
+- Nicobarese: -
+
+
+### 'koyâˑya' (appears 2 times)
+
+**Entry 1:**
+- English: Sand
+- Nicobarese: koyâˑya
+
+**Entry 2:**
+- English: Sandy beach
+- Nicobarese: koyâˑya
+
+
+### 'chehechōn' (appears 2 times)
+
+**Entry 1:**
+- English: Bird
+- Nicobarese: Chehechōn
+
+**Entry 2:**
+- English: Butterfly
+- Nicobarese: Chehechōn
+
+
+### 'nya-ān' (appears 2 times)
+
+**Entry 1:**
+- English: Lunch
+- Nicobarese: Nya-ān
+
+**Entry 2:**
+- English: Food
+- Nicobarese: Nya-ān
+
+
+### 'kikâˑna' (appears 2 times)
+
+**Entry 1:**
+- English: Female
+- Nicobarese: kikâˑna
+
+**Entry 2:**
+- English: Woman
+- Nicobarese: kikâˑna
+
+
+### 'lin-kalˑnga' (appears 2 times)
+
+**Entry 1:**
+- English: Ankle
+- Nicobarese: lin-kalˑnga
+
+**Entry 2:**
+- English: Wrist
+- Nicobarese: lin-kalˑnga
+
+
+### 'retàk' (appears 2 times)
+
+**Entry 1:**
+- English: Time
+- Nicobarese: Retàk
+
+**Entry 2:**
+- English: Period
+- Nicobarese: Retàk
+
+
+### 'tangâˑmo' (appears 2 times)
+
+**Entry 1:**
+- English: Now
+- Nicobarese: tangâˑmo
+
+**Entry 2:**
+- English: Today
+- Nicobarese: tangâˑmo
+
+
+### 'el-tī' (appears 2 times)
+
+**Entry 1:**
+- English: Hand
+- Nicobarese: el-tī
+
+**Entry 2:**
+- English: Palm(of hand)
+- Nicobarese: el-tī
+
+
+### 'kinlāha' (appears 2 times)
+
+**Entry 1:**
+- English: Exam
+- Nicobarese: Kinlāha
+
+**Entry 2:**
+- English: Test
+- Nicobarese: Kinlāha
+
+
+### 'hārëmngēnre' (appears 2 times)
+
+**Entry 1:**
+- English: Slow
+- Nicobarese: Hārëmngēnre
+
+**Entry 2:**
+- English: Safe
+- Nicobarese: Hārëmngēnre
+
+
+### 'dēˑla; rēˑla' (appears 2 times)
+
+**Entry 1:**
+- English: Maiden
+- Nicobarese: dēˑla; rēˑla
+
+**Entry 2:**
+- English: Spinster
+- Nicobarese: dēˑla; rēˑla
+
+
+### 'kūmrah' (appears 2 times)
+
+**Entry 1:**
+- English: Rain
+- Nicobarese: Kūmrah
+
+**Entry 2:**
+- English: Rainwater
+- Nicobarese: Kūmrah
+
+
+### 'nyām' (appears 2 times)
+
+**Entry 1:**
+- English: Toy
+- Nicobarese: Nyām
+
+**Entry 2:**
+- English: Game
+- Nicobarese: Nyām
+
+
+### 'inyūt' (appears 2 times)
+
+**Entry 1:**
+- English: Uniform
+- Nicobarese: Inyūt
+
+**Entry 2:**
+- English: Cloth
+- Nicobarese: Inyūt
+
+
+### 'fè-elre' (appears 2 times)
+
+**Entry 1:**
+- English: Remember
+- Nicobarese: Fè-elre
+
+**Entry 2:**
+- English: Think
+- Nicobarese: Fè-elre
+
+
+### 'küˑya' (appears 2 times)
+
+**Entry 1:**
+- English: Hair(of head)
+- Nicobarese: küˑya
+
+**Entry 2:**
+- English: Hair(of head)t
+- Nicobarese: küˑya
+
+
+### 'chohōlre' (appears 2 times)
+
+**Entry 1:**
+- English: Stand
+- Nicobarese: Chohōlre
+
+**Entry 2:**
+- English: Wake
+- Nicobarese: Chohōlre
+
+
+### 'mai' (appears 2 times)
+
+**Entry 1:**
+- English: Sea
+- Nicobarese: Mai
+
+**Entry 2:**
+- English: Water(salt)
+- Nicobarese: mai
+
+
+### 'më-ëñ' (appears 2 times)
+
+**Entry 1:**
+- English: Your
+- Nicobarese: Më-ëñ
+
+**Entry 2:**
+- English: You
+- Nicobarese: Më-ëñ
+
+
+### 'mak' (appears 2 times)
+
+**Entry 1:**
+- English: Water
+- Nicobarese: Mak
+
+**Entry 2:**
+- English: Water(fresh)
+- Nicobarese: mak
+
+
+### 'ngòh' (appears 2 times)
+
+**Entry 1:**
+- English: His
+- Nicobarese: Ngòh
+
+**Entry 2:**
+- English: Her
+- Nicobarese: Ngòh
+
+
+### 'ngih' (appears 2 times)
+
+**Entry 1:**
+- English: This
+- Nicobarese: Ngih
+
+**Entry 2:**
+- English: Its
+- Nicobarese: Ngih
+
+
+### 'chuök möhakööp' (appears 2 times)
+
+**Entry 1:**
+- English: Class
+- Nicobarese: Chuök Möhakööp
+
+**Entry 2:**
+- English: Classroom
+- Nicobarese: Chuök Möhakööp
+
+
+### 'ok' (appears 2 times)
+
+**Entry 1:**
+- English: Back
+- Nicobarese: ok
+
+**Entry 2:**
+- English: Skin
+- Nicobarese: ok
+
+

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'logger_service.dart';
 
 enum DictionaryType { words, phrases, nature, numbers, animals, magic, family, dialects }
 
@@ -35,11 +36,11 @@ class DictionaryService {
       _dictionaries[type] = items;
       return items;
     } catch (e) {
-      print("ERROR loading dictionary $type: $e");
+      LoggerService.error('Failed to load dictionary $type', e);
       
       // Fallback for Words if asset loading fails (Critical for demo)
       if (type == DictionaryType.words) {
-         print("Using Fallback Dictionary for Words");
+         LoggerService.warning('Using fallback dictionary for words');
          final fallback = [
            {"english": "Teacher", "nicobarese": "Mö-hakööpöti"},
            {"english": "Student", "nicobarese": "Möhakööp"},
@@ -62,10 +63,10 @@ class DictionaryService {
   Future<Map<String, dynamic>?> searchWord(String query) async {
     final words = await loadDictionary(DictionaryType.words);
     final q = query.trim().toLowerCase();
-    print("DEBUG searchWord: query='$q', dictionary has ${words.length} words");
+    LoggerService.debug('searchWord query', q);
     
     if (words.isEmpty) {
-      print("ERROR: Dictionary is EMPTY! Check if assets are loading.");
+      LoggerService.error('Dictionary is EMPTY! Check if assets are loading');
       return null;
     }
     
@@ -74,10 +75,10 @@ class DictionaryService {
          return (w['english']?.toString().toLowerCase() == q) ||
                 (w['nicobarese']?.toString().toLowerCase() == q);
       });
-      print("DEBUG: Found match for '$q'");
+      LoggerService.debug('Found match for query', q);
       return result;
     } catch (e) {
-      print("DEBUG: No match found for '$q'");
+      LoggerService.debug('No match found for query', q);
       return null;
     }
   }

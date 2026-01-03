@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/dictionary_service.dart';
 import '../services/smart_quiz_service.dart';
+import '../services/logger_service.dart';
 import '../widgets/background.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -67,7 +68,7 @@ class _QuizScreenState extends State<QuizScreen> {
       
       _generateOptions();
     } catch (e) {
-      print('ERROR loading quiz: $e');
+      LoggerService.error('Failed to load quiz', e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Quiz error: $e')),
@@ -87,7 +88,7 @@ class _QuizScreenState extends State<QuizScreen> {
       
       // Fallback if we can't get random words (shouldn't happen if dictionary loaded)
       if (wrong.isEmpty) {
-         print("Warning: Could not get random words for wrong options");
+         LoggerService.warning('Could not get random words for wrong options');
          wrong = []; 
       }
 
@@ -111,7 +112,7 @@ class _QuizScreenState extends State<QuizScreen> {
         });
       }
     } catch (e) {
-      print("Error generating options: $e");
+      LoggerService.error('Error generating quiz options', e);
       // Recovery: try to move to next or just show what we have
       if (mounted) {
          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error preparing question: $e")));
@@ -120,18 +121,16 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _submitAnswer(int optionIndex) {
-    if (answered) return;
-
+    if (answered || optionIndex >= options.length) return; // Safety check
+    
     setState(() {
       answered = true;
       selectedOption = optionIndex;
-      answered = true;
-      selectedOption = optionIndex;
       if (optionIndex == correctOptionIndex) {
-          score++;
-          smartQuizService.markCorrect(questions[currentIndex]);
+        score++;
+        smartQuizService.markCorrect(questions[currentIndex]);
       } else {
-          smartQuizService.markMissed(questions[currentIndex]);
+        smartQuizService.markMissed(questions[currentIndex]);
       }
     });
 

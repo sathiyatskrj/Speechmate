@@ -75,5 +75,6 @@ class TtsService {
   /// Dispose when no longer needed
   void dispose() {
     _tts.stop();
+    _audioPlayer.dispose(); // Fix memory leak
   }
 }
