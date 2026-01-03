@@ -1,0 +1,2770 @@
+﻿[
+    {
+        "english":  "Afraid",
+        "central":  "pahôˑa",
+        "coast":  "pahöṅˑa.",
+        "teressa":  "pahô",
+        "chowra":  "pahôṅ",
+        "car":  "paia-kūˑa"
+    },
+    {
+        "english":  "Alive",
+        "central":  "hari-âṅh",
+        "coast":  "hari-âṅh",
+        "teressa":  "âṅh",
+        "chowra":  "eṅh",
+        "car":  "âṅh"
+    },
+    {
+        "english":  "All",
+        "central":  "òmtōm",
+        "coast":  "hē",
+        "teressa":  "chiöˑi",
+        "chowra":  "chiöˑi",
+        "car":  "ròk-hare"
+    },
+    {
+        "english":  "Angry",
+        "central":  "mong-hâng",
+        "coast":  "kaihtô",
+        "teressa":  "menhâng",
+        "chowra":  "kīˑhtô",
+        "car":  "līn"
+    },
+    {
+        "english":  "Ankle",
+        "central":  "ok-loaka-lâh",
+        "coast":  "-",
+        "teressa":  "ok-lâka-lâh",
+        "chowra":  "ok-lāka-läh",
+        "car":  "lin-kalˑnga"
+    },
+    {
+        "english":  "Arm",
+        "central":  "koâl",
+        "coast":  "koâl",
+        "teressa":  "kôr",
+        "chowra":  "nôˑe",
+        "car":  "kel"
+    },
+    {
+        "english":  "Asleep",
+        "central":  "iteˑak",
+        "coast":  "ko-min",
+        "teressa":  "itīˑak",
+        "chowra":  "a-mam",
+        "car":  "harrôh"
+    },
+    {
+        "english":  "Awake(v.i.)",
+        "central":  "chal-hala",
+        "coast":  "chal-hala",
+        "teressa":  "mâng-hala",
+        "chowra":  "mang-hala",
+        "car":  "â-hän"
+    },
+    {
+        "english":  "Baby",
+        "central":  "pôˑashe",
+        "coast":  "pôˑashe",
+        "teressa":  "tōˑwah",
+        "chowra":  "ke-it",
+        "car":  "tän-a"
+    },
+    {
+        "english":  "Bachelor",
+        "central":  "ilū",
+        "coast":  "ilū",
+        "teressa":  "maiyòh",
+        "chowra":  "maiâˑl",
+        "car":  "lâmaòk"
+    },
+    {
+        "english":  "Back",
+        "central":  "ok",
+        "coast":  "tomnôˑit",
+        "teressa":  "ok",
+        "chowra":  "ok",
+        "car":  "ok"
+    },
+    {
+        "english":  "Bad",
+        "central":  "hat-lapā",
+        "coast":  "ngâ-kö",
+        "teressa":  "hat-lapā",
+        "chowra":  "hat-lu",
+        "car":  "at-lāk; at-lāk; at-kôlô"
+    },
+    {
+        "english":  "bamboo",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Bamboo(B.vulgris)",
+        "central":  "hedwâ",
+        "coast":  "hoūwa",
+        "teressa":  "hâˑo",
+        "chowra":  "kame-hòṅ",
+        "car":  "hâˑo"
+    },
+    {
+        "english":  "bat",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Beads",
+        "central":  "malàu",
+        "coast":  "balū",
+        "teressa":  "hiyòh",
+        "chowra":  "hiyòh",
+        "car":  "täsēˑha"
+    },
+    {
+        "english":  "Beat",
+        "central":  "ofïṅˑo-hata",
+        "coast":  "ilīˑha",
+        "teressa":  "orī",
+        "chowra":  "o-dī",
+        "car":  "fōh"
+    },
+    {
+        "english":  "beehive",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Belly",
+        "central":  "wïˑang",
+        "coast":  "wīˑang",
+        "teressa":  "vīˑang",
+        "chowra":  "wīˑang",
+        "car":  "aich"
+    },
+    {
+        "english":  "Betelnut tree(A.catechu)",
+        "central":  "chïˑa hiyä",
+        "coast":  "(dan or) dòin-henchòm",
+        "teressa":  "at-chīˑat-hiyä",
+        "chowra":  "ontòm-heṅâng",
+        "car":  "tissâ"
+    },
+    {
+        "english":  "Bird",
+        "central":  "shichūˑa",
+        "coast":  "shichūˑa",
+        "teressa":  "shichūˑa",
+        "chowra":  "shichūˑa",
+        "car":  "che-chōn"
+    },
+    {
+        "english":  "Black",
+        "central":  "āl(-ngamat)",
+        "coast":  "om-wēt",
+        "teressa":  "āl-ngamat",
+        "chowra":  "te-chūˑmat",
+        "car":  "turing"
+    },
+    {
+        "english":  "Blind",
+        "central":  "pakïˑaṅ",
+        "coast":  "pakïˑaṅ",
+        "teressa":  "kīṅˑa-âmät",
+        "chowra":  "kīˑa-ôrmat",
+        "car":  "tät-mak"
+    },
+    {
+        "english":  "Blood",
+        "central":  "wâ",
+        "coast":  "wâ",
+        "teressa":  "vâ",
+        "chowra":  "pâheòit",
+        "car":  "mân"
+    },
+    {
+        "english":  "Boat",
+        "central":  "hifüˑa",
+        "coast":  "hifüˑa",
+        "teressa":  "pâ-tēˑa",
+        "chowra":  "pa-tel",
+        "car":  "kopòk"
+    },
+    {
+        "english":  "Book",
+        "central":  "Iëˑbare",
+        "coast":  "Iëˑbare",
+        "teressa":  "lēˑbare",
+        "chowra":  "lēˑbare",
+        "car":  "līˑbar"
+    },
+    {
+        "english":  "Bottle(ordinary black)",
+        "central":  "pentang-ning",
+        "coast":  "pentang-ning",
+        "teressa":  "chuk-ngaich",
+        "chowra":  "shi-tūn",
+        "car":  "pilan"
+    },
+    {
+        "english":  "Boy",
+        "central":  "kenyüˑm",
+        "coast":  "pinīˑeṅ",
+        "teressa":  "kenyum",
+        "chowra":  "kenyum",
+        "car":  "nīa"
+    },
+    {
+        "english":  "branch",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "bread/taro/potato",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "breadfruit",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Breast",
+        "central":  "toah",
+        "coast":  "toâh",
+        "teressa":  "tòh",
+        "chowra":  "tòh",
+        "car":  "täh"
+    },
+    {
+        "english":  "Bring",
+        "central":  "okai-hata",
+        "coast":  "koyüta-eh",
+        "teressa":  "okē",
+        "chowra":  "chēh-kete",
+        "car":  "kē-te"
+    },
+    {
+        "english":  "Brother",
+        "central":  "ta màuˑa-she",
+        "coast":  "tamàuˑha; hanòiˑfia",
+        "teressa":  "hemēòṅ-henòng",
+        "chowra":  "lâmah-henòng",
+        "car":  "hâ-nankisâˑna"
+    },
+    {
+        "english":  "Brother(elder)",
+        "central":  "chàu(-en-kòiˑña)",
+        "coast":  "hôˑshe",
+        "teressa":  "yàu-maiōh",
+        "chowra":  "yàu-mohēˑo",
+        "car":  "mäm"
+    },
+    {
+        "english":  "Brother(younger)",
+        "central":  "tàu(-en-kòiˑña)",
+        "coast":  "òmnyäˑshe",
+        "teressa":  "tàu-maioh",
+        "chowra":  "tàu-mohēˑo",
+        "car":  "kâhäm"
+    },
+    {
+        "english":  "Bury",
+        "central":  "olōˑla-she",
+        "coast":  "hâyai-hata",
+        "teressa":  "enōˑha-she",
+        "chowra":  "anōˑla",
+        "car":  "michyāˑte"
+    },
+    {
+        "english":  "butterfly",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Buy",
+        "central":  "halàu-hata",
+        "coast":  "nangˑha",
+        "teressa":  "halàu",
+        "chowra":  "ha-wâh",
+        "car":  "kē; lia-wâh"
+    },
+    {
+        "english":  "Can(able)",
+        "central":  "lēˑap",
+        "coast":  "hen-hôat",
+        "teressa":  "lˑīap",
+        "chowra":  "chöl",
+        "car":  "kôˑrn"
+    },
+    {
+        "english":  "Canoe",
+        "central":  "düˑe",
+        "coast":  "hen-hôˑat",
+        "teressa":  "rôˑe",
+        "chowra":  "düˑe",
+        "car":  "âp"
+    },
+    {
+        "english":  "cat",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "centipede",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Cheap",
+        "central":  "hat-tēt",
+        "coast":  "ngâ-tōt",
+        "teressa":  "â-hī",
+        "chowra":  "har-rūˑang",
+        "car":  "kūˑan-arai"
+    },
+    {
+        "english":  "Cheek",
+        "central":  "tapōˑa",
+        "coast":  "tapōˑa",
+        "teressa":  "â-wō",
+        "chowra":  "chiâ",
+        "car":  "âr a-kūˑa"
+    },
+    {
+        "english":  "Chest",
+        "central":  "oal-endaiˑya",
+        "coast":  "-",
+        "teressa":  "hong-endaiˑya",
+        "chowra":  "òl-en-daiˑya",
+        "car":  "kâ -el-nòṅh"
+    },
+    {
+        "english":  "Chicken",
+        "central":  "kōˑan-kamōˑe",
+        "coast":  "kōˑan-kamōˑe",
+        "teressa":  "kōˑan-kâmòih",
+        "chowra":  "kōˑan-ta-fak",
+        "car":  "kōn-haiyam"
+    },
+    {
+        "english":  "Chief",
+        "central":  "omyâˑa",
+        "coast":  "om-wī",
+        "teressa":  "en-mäˑa",
+        "chowra":  "ka-wīˑa",
+        "car":  "mâ-hūˑa"
+    },
+    {
+        "english":  "Child",
+        "central":  "kenyūm",
+        "coast":  "pinīˑeṅ",
+        "teressa":  "kenyūm",
+        "chowra":  "kenyūm",
+        "car":  "nīˑa"
+    },
+    {
+        "english":  "Chin",
+        "central":  "en-kòiñ",
+        "coast":  "en-kòiñ",
+        "teressa":  "shaˑma",
+        "chowra":  "shaˑmâ",
+        "car":  "sâmâ"
+    },
+    {
+        "english":  "chin",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Cloth",
+        "central":  "lôˑe",
+        "coast":  "lôˑe",
+        "teressa":  "henyòng",
+        "chowra":  "heuyòng",
+        "car":  "hillâ"
+    },
+    {
+        "english":  "Coat",
+        "central":  "kanyūt",
+        "coast":  "kanyūt",
+        "teressa":  "ken-lō",
+        "chowra":  "hanyūt",
+        "car":  "enyūt"
+    },
+    {
+        "english":  "cockroach",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Coconut(the fruit)",
+        "central":  "ngoât; yūˑang-oyàu",
+        "coast":  "o-ag-gàu",
+        "teressa":  "äng-ovēˑau",
+        "chowra":  "ėˑang-ovēˑau",
+        "car":  "kok; rong-taôˑka"
+    },
+    {
+        "english":  "Cold",
+        "central":  "kēe",
+        "coast":  "kaē",
+        "teressa":  "ka-hī",
+        "chowra":  "kôˑhe",
+        "car":  "lūˑich"
+    },
+    {
+        "english":  "Come here!",
+        "central":  "kaiˑtare",
+        "coast":  "kôˑta",
+        "teressa":  "hâṅˑe",
+        "chowra":  "chīˑah",
+        "car":  "yīˑhtar ihīh"
+    },
+    {
+        "english":  "Cough",
+        "central":  "oōˑah",
+        "coast":  "hoōˑaṅh",
+        "teressa":  "kâ-heṅ",
+        "chowra":  "chòk-hoōˑah",
+        "car":  "äˑha"
+    },
+    {
+        "english":  "Count",
+        "central":  "harō-hanga",
+        "coast":  "harō",
+        "teressa":  "hârō",
+        "chowra":  "kâ-hök",
+        "car":  "kâ-hök"
+    },
+    {
+        "english":  "Country(region)",
+        "central":  "mattai",
+        "coast":  "pattai",
+        "teressa":  "mattai",
+        "chowra":  "pânam",
+        "car":  "pânòm"
+    },
+    {
+        "english":  "crab",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Crocodile",
+        "central":  "yēo",
+        "coast":  "yēo",
+        "teressa":  "ēˑo",
+        "chowra":  "ēˑo",
+        "car":  "rēˑu"
+    },
+    {
+        "english":  "Cry(v.)",
+        "central":  "chīm-hata",
+        "coast":  "chīm-hata",
+        "teressa":  "chīˑam",
+        "chowra":  "â-hēˑat",
+        "car":  "puin"
+    },
+    {
+        "english":  "Current(sea or river)",
+        "central":  "wuâ",
+        "coast":  "heät",
+        "teressa":  "kahīˑa",
+        "chowra":  "kâtōk",
+        "car":  "tâhāt-mai"
+    },
+    {
+        "english":  "Damsel",
+        "central":  "holīˑan",
+        "coast":  "penhōn",
+        "teressa":  "lâmòk",
+        "chowra":  "lâmòk",
+        "car":  "dēˑla"
+    },
+    {
+        "english":  "Dance",
+        "central":  "katôˑka",
+        "coast":  "katôˑka",
+        "teressa":  "en-hòn",
+        "chowra":  "ke-rīˑam",
+        "car":  "kēvryˑam"
+    },
+    {
+        "english":  "Daughter",
+        "central":  "kōˑan-enkâna",
+        "coast":  "kōˑan-oyüˑha",
+        "teressa":  "kö-an enkēˑäna",
+        "chowra":  "kö-an enkâˑna",
+        "car":  "kūˑan kikâˑna"
+    },
+    {
+        "english":  "Day(sunrise to sunset)",
+        "central":  "heng",
+        "coast":  "hēg",
+        "teressa":  "ong-aish",
+        "chowra":  "ong-aish",
+        "car":  "sâkàm"
+    },
+    {
+        "english":  "Dead",
+        "central":  "leät-kâpâ-h",
+        "coast":  "leät-kâpâ-h",
+        "teressa":  "leät-kâ-päh",
+        "chowra":  "o-mīh",
+        "car":  "kâpâh-hâku"
+    },
+    {
+        "english":  "Dear(costly)",
+        "central":  "tōt",
+        "coast":  "tōt",
+        "teressa":  "mat-tō-ta",
+        "chowra":  "rūˑang",
+        "car":  "tu-pōˑe-rai"
+    },
+    {
+        "english":  "Dew",
+        "central":  "dâk-shūˑang",
+        "coast":  "dâk-shūˑang",
+        "teressa":  "râk-shūˑang",
+        "chowra":  "dâk-sūˑang",
+        "car":  "tai-chòm"
+    },
+    {
+        "english":  "Dig",
+        "central":  "kaichūˑat-she",
+        "coast":  "kaichūˑat-she",
+        "teressa":  "en-ō-hala",
+        "chowra":  "ahēaie",
+        "car":  "ūl-mak"
+    },
+    {
+        "english":  "Dive",
+        "central":  "tenhòp-shire",
+        "coast":  "tenhòp-shire",
+        "teressa":  "kinhòp",
+        "chowra":  "tenhòp-shire",
+        "car":  "hâmat"
+    },
+    {
+        "english":  "Dog",
+        "central":  "âm",
+        "coast":  "âm",
+        "teressa":  "òm",
+        "chowra":  "òm",
+        "car":  "am"
+    },
+    {
+        "english":  "Dream(s.)",
+        "central":  "enfūˑa",
+        "coast":  "enfūˑa",
+        "teressa":  "enfô",
+        "chowra":  "om-fē",
+        "car":  "hāˑu"
+    },
+    {
+        "english":  "Drink(v.)",
+        "central":  "tōp-hata",
+        "coast":  "onyūˑshe",
+        "teressa":  "nyū-hata",
+        "chowra":  "kahôk-hata",
+        "car":  "kâ-öt"
+    },
+    {
+        "english":  "Drunk",
+        "central":  "huyòiˑe",
+        "coast":  "kâlö",
+        "teressa":  "hōēˑòie",
+        "chowra":  "mashōta; padüˑa",
+        "car":  "hīyòiˑe"
+    },
+    {
+        "english":  "eagle",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Ear",
+        "central":  "nâng",
+        "coast":  "nâng",
+        "teressa":  "a-nang",
+        "chowra":  "nâng",
+        "car":  "nâng"
+    },
+    {
+        "english":  "Ear-stick",
+        "central":  "ichē",
+        "coast":  "ichē",
+        "teressa":  "iyòi",
+        "chowra":  "kenfīˑa",
+        "car":  "harâ-nang"
+    },
+    {
+        "english":  "East",
+        "central":  "ta-ngâˑhae",
+        "coast":  "ta-ngâˑhae",
+        "teressa":  "kata-ngâˑa",
+        "chowra":  "kata-ngâˑa",
+        "car":  "lâ-chūˑhat"
+    },
+    {
+        "english":  "East wind",
+        "central":  "fūl",
+        "coast":  "komdüˑan",
+        "teressa":  "fül",
+        "chowra":  "fül",
+        "car":  "chūˑhat"
+    },
+    {
+        "english":  "Eat(any kind of food)",
+        "central":  "ok-ngôk",
+        "coast":  "kôˑha",
+        "teressa":  "kahai(d)",
+        "chowra":  "nanôka",
+        "car":  "-"
+    },
+    {
+        "english":  "Eat(meat only)",
+        "central":  "pūˑah-lare",
+        "coast":  "hâm-lare",
+        "teressa":  "tenkaint",
+        "chowra":  "tenkaint",
+        "car":  "kâ"
+    },
+    {
+        "english":  "Eat(vegetables,rice,\u0026c.,only)",
+        "central":  "shâ-lare",
+        "coast":  "âb-lare",
+        "teressa":  "ña",
+        "chowra":  "ña",
+        "car":  "ngâ"
+    },
+    {
+        "english":  "Egg",
+        "central":  "huyä",
+        "coast":  "huyä",
+        "teressa":  "pēˑu",
+        "chowra":  "pēˑu",
+        "car":  "o-ha"
+    },
+    {
+        "english":  "Elbow",
+        "central":  "det-ong-kēˑang",
+        "coast":  "gut-ong-kēˑang",
+        "teressa":  "det-ong-kēˑang",
+        "chowra":  "det-ong-kēˑang",
+        "car":  "sē-kòng"
+    },
+    {
+        "english":  "Evening",
+        "central":  "ladīˑyaya",
+        "coast":  "ladīˑyaya",
+        "teressa":  "rīˑaiya",
+        "chowra":  "lâdˑīaya",
+        "car":  "lâˑrap"
+    },
+    {
+        "english":  "Eye",
+        "central":  "oal-mât",
+        "coast":  "oal-mât",
+        "teressa":  "âmēˑät",
+        "chowra":  "òl-mēt",
+        "car":  "mat"
+    },
+    {
+        "english":  "Face",
+        "central":  "ngôˑa-chakâ",
+        "coast":  "ngôˑa-chīˑa",
+        "teressa":  "âwˑō",
+        "chowra":  "chyà",
+        "car":  "kūˑa"
+    },
+    {
+        "english":  "Father",
+        "central":  "chīˑa-enkòi.ña",
+        "coast":  "dòin",
+        "teressa":  "yīa-maiōh",
+        "chowra":  "yang-mohēˑo",
+        "car":  "yang-kikôˑña"
+    },
+    {
+        "english":  "Female",
+        "central":  "en-kânˑa",
+        "coast":  "oyüˑha",
+        "teressa":  "enkēäna",
+        "chowra":  "en-kâˑna",
+        "car":  "kikâˑna"
+    },
+    {
+        "english":  "Fever",
+        "central":  "pom kaiˑya",
+        "coast":  "òiṅha",
+        "teressa":  "tū",
+        "chowra":  "a-lòit",
+        "car":  "wūˑe"
+    },
+    {
+        "english":  "Finger",
+        "central":  "kanetai",
+        "coast":  "ke-wēt",
+        "teressa":  "môh-tī",
+        "chowra":  "kenūsh-nòi",
+        "car":  "kuntī"
+    },
+    {
+        "english":  "Fire",
+        "central":  "heōˑe",
+        "coast":  "hentônˑha",
+        "teressa":  "heōˑe",
+        "chowra":  "palô",
+        "car":  "tâmöˑya"
+    },
+    {
+        "english":  "Fish",
+        "central":  "kâa",
+        "coast":  "kâa",
+        "teressa":  "kâa",
+        "chowra":  "kâa",
+        "car":  "kâa"
+    },
+    {
+        "english":  "five",
+        "central":  "tanai",
+        "coast":  "tanī",
+        "teressa":  "tanī",
+        "chowra":  "tanī",
+        "car":  "tanī"
+    },
+    {
+        "english":  "Foot",
+        "central":  "lâh",
+        "coast":  "lâh",
+        "teressa":  "läh",
+        "chowra":  "läh ; läˑh",
+        "car":  "drāin"
+    },
+    {
+        "english":  "forehead",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Foreigner",
+        "central":  "(paiyūh-)kaling",
+        "coast":  "(paiyūh-)kaling",
+        "teressa":  "(pai-) kaling",
+        "chowra":  "(pâeh-) kaling",
+        "car":  "tâòiṅ (or tâhäng) pūl nga"
+    },
+    {
+        "english":  "Forget",
+        "central":  "pait-ngatô",
+        "coast":  "ōaṅ-ngâruk",
+        "teressa":  "päˑngaiô",
+        "chowra":  "lânga-tô",
+        "car":  "waitˑnga"
+    },
+    {
+        "english":  "four",
+        "central":  "fēan",
+        "coast":  "fôat",
+        "teressa":  "foòn",
+        "chowra":  "foòn",
+        "car":  "fän"
+    },
+    {
+        "english":  "Fowl",
+        "central":  "kamōˑe",
+        "coast":  "kamōˑe",
+        "teressa":  "kâ-mòih",
+        "chowra":  "ta-fak",
+        "car":  "haiˑyam"
+    },
+    {
+        "english":  "Friend",
+        "central":  "homenòl",
+        "coast":  "hòiˑchya",
+        "teressa":  "-",
+        "chowra":  "ho-lōˑang",
+        "car":  "hôˑldre"
+    },
+    {
+        "english":  "frog",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Get up!",
+        "central":  "shīˑaka",
+        "coast":  "shīˑaka",
+        "teressa":  "shòkˑle",
+        "chowra":  "ōˑlare",
+        "car":  "châldre"
+    },
+    {
+        "english":  "girl",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Girl",
+        "central":  "holīˑan-wīhla",
+        "coast":  "penhōn-wīhla",
+        "teressa":  "kōˑan-lâmòk",
+        "chowra":  "pa-mīˑait",
+        "car":  "nīˑa-kikana"
+    },
+    {
+        "english":  "Give",
+        "central":  "homekwòm-hata",
+        "coast":  "homekwòm-hata",
+        "teressa":  "en-rōng-hata",
+        "chowra":  "haṅˑhata",
+        "car":  "kēˑângâ"
+    },
+    {
+        "english":  "Go!",
+        "central":  "kökˑngare",
+        "coast":  "kökˑngara",
+        "teressa":  "hâ-hōˑing",
+        "chowra":  "hâ-hōˑinge",
+        "car":  "kiranˑngara"
+    },
+    {
+        "english":  "Go(return home)",
+        "central":  "yuchūh",
+        "coast":  "hodōˑo",
+        "teressa":  "shôˑnga",
+        "chowra":  "ēˑwa",
+        "car":  "chūh"
+    },
+    {
+        "english":  "Good",
+        "central":  "la-pā",
+        "coast":  "kö",
+        "teressa":  "la-pā",
+        "chowra":  "lu",
+        "car":  "lāk; kôlô"
+    },
+    {
+        "english":  "Hair(of head)",
+        "central":  "yôk",
+        "coast":  "yôk",
+        "teressa":  "hē-òk",
+        "chowra":  "hē-òk",
+        "car":  "küˑya"
+    },
+    {
+        "english":  "Hand",
+        "central":  "kanetai",
+        "coast":  "ke-wēt",
+        "teressa":  "mòh-tī",
+        "chowra":  "nòi",
+        "car":  "el-tī"
+    },
+    {
+        "english":  "He",
+        "central":  "an",
+        "coast":  "an",
+        "teressa":  "än",
+        "chowra":  "än",
+        "car":  "ngôˑa"
+    },
+    {
+        "english":  "Head",
+        "central":  "kōˑi",
+        "coast":  "kōˑi",
+        "teressa":  "kōˑi",
+        "chowra":  "kōˑi",
+        "car":  "kūˑi"
+    },
+    {
+        "english":  "Headache",
+        "central":  "chòk-kōˑi",
+        "coast":  "yâ-kōˑi",
+        "teressa":  "shakī-kōˑi",
+        "chowra":  "shakī-kōˑi",
+        "car":  "chak-el-kūˑi"
+    },
+    {
+        "english":  "Hear",
+        "central":  "yâng",
+        "coast":  "hâng",
+        "teressa":  "heäng",
+        "chowra":  "hēˑang",
+        "car":  "hang"
+    },
+    {
+        "english":  "Heel",
+        "central":  "kentöˑla-lâh",
+        "coast":  "-",
+        "teressa":  "kentöˑla-lâh",
+        "chowra":  "kentöˑla-lâh",
+        "car":  "kolòi-drān"
+    },
+    {
+        "english":  "hill",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "hoe",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Hot (as the sun)",
+        "central":  "keöyan",
+        "coast":  "sham-höˑa",
+        "teressa":  "la-nga-eṅha",
+        "chowra":  "tain-eṅnha",
+        "car":  "wōˑi-lōn"
+    },
+    {
+        "english":  "Hot(of water,metal,\u0026c.)",
+        "central":  "tain",
+        "coast":  "tait",
+        "teressa":  "tain",
+        "chowra":  "tain",
+        "car":  "raich"
+    },
+    {
+        "english":  "House(hut)",
+        "central":  "fiī",
+        "coast":  "ēn; ñī",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "House(hut)permanent,",
+        "central":  "-",
+        "coast":  "-",
+        "teressa":  "ñī",
+        "chowra":  "ñī",
+        "car":  "pâtī"
+    },
+    {
+        "english":  "House(hut)temporary",
+        "central":  "-",
+        "coast":  "-",
+        "teressa":  "âmtōm",
+        "chowra":  "âmtōm",
+        "car":  "âm"
+    },
+    {
+        "english":  "housefly",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "How many?",
+        "central":  "kâtōm; kârân",
+        "coast":  "-",
+        "teressa":  "-",
+        "chowra":  "-",
+        "car":  "-"
+    },
+    {
+        "english":  "Hungry",
+        "central":  "òint-nga",
+        "coast":  "patòn; kōak; òintnga",
+        "teressa":  "òintnga",
+        "chowra":  "lòp",
+        "car":  "kâpa-hâre"
+    },
+    {
+        "english":  "Hunt(pigs)",
+        "central":  "haiyüˑan",
+        "coast":  "hai-chu",
+        "teressa":  "hang-ngô",
+        "chowra":  "hang-ôˑa",
+        "car":  "haichī"
+    },
+    {
+        "english":  "I",
+        "central":  "chüˑa",
+        "coast":  "chīˑaha",
+        "teressa":  "chiā",
+        "chowra":  "chiā",
+        "car":  "chyūˑa; chian"
+    },
+    {
+        "english":  "Iguana",
+        "central":  "huyī",
+        "coast":  "huyī",
+        "teressa":  "hat-hēˑot",
+        "chowra":  "hu-yē",
+        "car":  "kàu"
+    },
+    {
+        "english":  "In(inside)",
+        "central":  "ta-oal",
+        "coast":  "hoâng",
+        "teressa":  "òr",
+        "chowra":  "tala-oal",
+        "car":  "el"
+    },
+    {
+        "english":  "Iron",
+        "central":  "karau",
+        "coast":  "karrū",
+        "teressa":  "ka-rau",
+        "chowra":  "ka-ràu",
+        "car":  "weät"
+    },
+    {
+        "english":  "Jungle",
+        "central":  "oal-chūˑa",
+        "coast":  "hoâng-hōp",
+        "teressa":  "â-chīˑô",
+        "chowra":  "oal-aphôˑap",
+        "car":  "el-enchōn"
+    },
+    {
+        "english":  "Kick",
+        "central":  "tan-hanga",
+        "coast":  "tòn-hanga",
+        "teressa":  "-",
+        "chowra":  "an-tan",
+        "car":  "dran-hanga"
+    },
+    {
+        "english":  "Kill(in any manner)",
+        "central":  "orī",
+        "coast":  "orī",
+        "teressa":  "orī",
+        "chowra":  "dīˑa",
+        "car":  "feēˑla"
+    },
+    {
+        "english":  "Knee",
+        "central":  "kōi-kanōˑang",
+        "coast":  "kōi-kanōˑang",
+        "teressa":  "kōˑi-kanâˑng",
+        "chowra":  "kōˑi-kanâˑng",
+        "car":  "kūˑi-kenmôˑna"
+    },
+    {
+        "english":  "Know",
+        "central":  "akâh",
+        "coast":  "mangha",
+        "teressa":  "a-kâh",
+        "chowra":  "akâ",
+        "car":  "âkàhâˑlōn"
+    },
+    {
+        "english":  "Knuckle",
+        "central":  "mat-kanetai",
+        "coast":  "lanūˑma-kanetai",
+        "teressa":  "chī-môh tī",
+        "chowra":  "chī-nòi",
+        "car":  "mòng"
+    },
+    {
+        "english":  "Lame",
+        "central":  "shiīˑam",
+        "coast":  "shiīˑam",
+        "teressa":  "shi-kōˑaṅ",
+        "chowra":  "shi-dòk",
+        "car":  "kâròk"
+    },
+    {
+        "english":  "Large",
+        "central":  "karū",
+        "coast":  "omteṅ",
+        "teressa":  "karū",
+        "chowra":  "karū",
+        "car":  "pôˑya"
+    },
+    {
+        "english":  "Laugh",
+        "central":  "itī",
+        "coast":  "itī",
+        "teressa":  "itī",
+        "chowra":  "hâˑīa",
+        "car":  "haiyīˑl-kūˑa"
+    },
+    {
+        "english":  "lead",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "leaf",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Left(not right)",
+        "central":  "la-woaka",
+        "coast":  "lâ-atai(t)",
+        "teressa":  "lâ-wôˑka",
+        "chowra":  "la-woaˑka",
+        "car":  "tâˑwē"
+    },
+    {
+        "english":  "Leg",
+        "central":  "lâh",
+        "coast":  "lâh",
+        "teressa":  "läh",
+        "chowra":  "läˑah",
+        "car":  "kal-drān"
+    },
+    {
+        "english":  "Like(adj.)",
+        "central":  "shīˑri",
+        "coast":  "shīˑri",
+        "teressa":  "she",
+        "chowra":  "shēˑra",
+        "car":  "nhâˑti"
+    },
+    {
+        "english":  "Lime(citrus)",
+        "central":  "karoait",
+        "coast":  "karoait",
+        "teressa":  "kam-mòng",
+        "chowra":  "karòit",
+        "car":  "limˑmòng"
+    },
+    {
+        "english":  "Lime(shell)",
+        "central":  "shun",
+        "coast":  "shut",
+        "teressa":  "en-vā",
+        "chowra":  "shun",
+        "car":  "namˑma"
+    },
+    {
+        "english":  "Lip",
+        "central":  "manōˑin",
+        "coast":  "pi-shūˑinha",
+        "teressa":  "manôˑin",
+        "chowra":  "manòiˑi",
+        "car":  "minòṅh"
+    },
+    {
+        "english":  "log",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Mad",
+        "central":  "aroât",
+        "coast":  "arōˑat",
+        "teressa":  "rô",
+        "chowra":  "ko-dōˑat",
+        "car":  "kolôˑva"
+    },
+    {
+        "english":  "Maiden",
+        "central":  "holīˑan-wīhla",
+        "coast":  "penhōn-wīhla",
+        "teressa":  "lâmòk",
+        "chowra":  "lâmòk",
+        "car":  "dēˑla; rēˑla"
+    },
+    {
+        "english":  "Male",
+        "central":  "en-kòiˑña",
+        "coast":  "otāˑha",
+        "teressa":  "mai-oh",
+        "chowra":  "mohēˑo",
+        "car":  "kikôˑña"
+    },
+    {
+        "english":  "Mama",
+        "central":  "amˑâ",
+        "coast":  "hēn; hēn-ôˑya",
+        "teressa":  "âmˑâ",
+        "chowra":  "âmä",
+        "car":  "po-po"
+    },
+    {
+        "english":  "man pointing with both index fingers to the sides of his head",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Man-countryman",
+        "central":  "pai-yūh(-enkòina)",
+        "coast":  "pôh(-otäˑha)",
+        "teressa":  "pai(-maōh)",
+        "chowra":  "pâeh(-mohēo)",
+        "car":  "târik(-kikôˑna)"
+    },
+    {
+        "english":  "Man-foreigner",
+        "central":  "kaling(-en-kòiˑna)",
+        "coast":  "kaling(-otäˑha)",
+        "teressa":  "kaling(-maōh)",
+        "chowra":  "kaling(-mohēo)",
+        "car":  "taoin (-kikôˑña)"
+    },
+    {
+        "english":  "Man-other Nicobars",
+        "central":  "-",
+        "coast":  "-",
+        "teressa":  "-",
+        "chowra":  "-",
+        "car":  "tâā (-kikôˑ-ña)"
+    },
+    {
+        "english":  "mango",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Many",
+        "central":  "urūˑhat-she",
+        "coast":  "pī",
+        "teressa":  "orôˑhat-she",
+        "chowra":  "hat-môˑaṅ",
+        "car":  "mârôˑnga"
+    },
+    {
+        "english":  "Mast",
+        "central":  "kanâˑma",
+        "coast":  "kanâˑma",
+        "teressa":  "kânaˑma",
+        "chowra":  "chamkaiˑya",
+        "car":  "kânaˑmâ"
+    },
+    {
+        "english":  "Meat",
+        "central":  "ânˑha",
+        "coast":  "eṅˑha",
+        "teressa":  "eṅˑho",
+        "chowra":  "eṅˑha",
+        "car":  "alâˑhah"
+    },
+    {
+        "english":  "Monkey",
+        "central":  "dūˑen",
+        "coast":  "pâyūn",
+        "teressa":  "kēn",
+        "chowra":  "kēˑin",
+        "car":  "òiṅˑche"
+    },
+    {
+        "english":  "Monsoon(N.E)",
+        "central":  "fūl",
+        "coast":  "komdüˑan",
+        "teressa":  "fūl",
+        "chowra":  "fūl",
+        "car":  "kòm-fūˑata"
+    },
+    {
+        "english":  "Monsoon(S.W)",
+        "central":  "sho-hōng",
+        "coast":  "shin-hoâˑnga; shamhàu",
+        "teressa":  "shi-hōng",
+        "chowra":  "shi-hōng",
+        "car":  "messūˑnga"
+    },
+    {
+        "english":  "Month",
+        "central":  "kama-heṅˑwa",
+        "coast":  "kama-heṅˑwa",
+        "teressa":  "kamahâˑya",
+        "chowra":  "kamaheṅˑwa",
+        "car":  "nòng"
+    },
+    {
+        "english":  "Moon",
+        "central":  "kâhē",
+        "coast":  "kâhē",
+        "teressa":  "ka-hai",
+        "chowra":  "manēˑana",
+        "car":  "chingeät"
+    },
+    {
+        "english":  "More",
+        "central":  "pait-tare",
+        "coast":  "pait-tare",
+        "teressa":  "pēˑteh",
+        "chowra":  "pe-aiṅˑtare",
+        "car":  "hek"
+    },
+    {
+        "english":  "Mosquito",
+        "central":  "mihōˑya",
+        "coast":  "",
+        "teressa":  "mihônˑya",
+        "chowra":  "mōˑaṅh",
+        "car":  "misôˑka"
+    },
+    {
+        "english":  "Mother",
+        "central":  "chīa-enkâˑna",
+        "coast":  "hēn; hēn-ôya",
+        "teressa":  "tō-enkēˑäna",
+        "chowra":  "yang-enkâˑna",
+        "car":  "yang-kikâˑna"
+    },
+    {
+        "english":  "mouse",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Mouth",
+        "central":  "oal-fâng",
+        "coast":  "-",
+        "teressa":  "a-fâng",
+        "chowra":  "oal-fâng",
+        "car":  "el-wâ"
+    },
+    {
+        "english":  "Mud",
+        "central":  "paṅ",
+        "coast":  "pa-chaṅp",
+        "teressa":  "tu-hūˑaṅ",
+        "chowra":  "ipaiˑya",
+        "car":  "tumlatˑ"
+    },
+    {
+        "english":  "My",
+        "central":  "chüˑa",
+        "coast":  "echīˑahaṅ",
+        "teressa":  "chiā",
+        "chowra":  "chiā",
+        "car":  "chyūˑa"
+    },
+    {
+        "english":  "Nail(finger/toe)",
+        "central":  "kishuâˑh",
+        "coast":  "kishuâˑh",
+        "teressa":  "ke-shòh",
+        "chowra":  "kenôˑat",
+        "car":  "kensòh"
+    },
+    {
+        "english":  "Name",
+        "central":  "lēˑang",
+        "coast":  "lē",
+        "teressa":  "lēˑang",
+        "chowra":  "lēˑang",
+        "car":  "minaiˑña"
+    },
+    {
+        "english":  "Nautilus",
+        "central":  "tamˑmah",
+        "coast":  "tamˑmah",
+        "teressa":  "hâēˑòng",
+        "chowra":  "hâēˑòng",
+        "car":  "tamˑa"
+    },
+    {
+        "english":  "Neck",
+        "central":  "ang-lôˑnga",
+        "coast":  "ngē",
+        "teressa":  "en-lôˑnga",
+        "chowra":  "ang-lôˑnga",
+        "car":  "lik-kunˑ"
+    },
+    {
+        "english":  "necklace/bracelet",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Needle",
+        "central":  "charūˑm",
+        "coast":  "charūm",
+        "teressa":  "cha-rum",
+        "chowra":  "charum",
+        "car":  "châˑrum"
+    },
+    {
+        "english":  "Night",
+        "central":  "hatòm",
+        "coast":  "hatòm",
+        "teressa":  "ha-tam",
+        "chowra":  "hatam",
+        "car":  "hâtāˑm"
+    },
+    {
+        "english":  "No",
+        "central":  "haṅˑaṅ",
+        "coast":  "haṅˑaṅ",
+        "teressa":  "haṅˑaṅ",
+        "chowra":  "haṅˑaṅ",
+        "car":  "dra; haˑa"
+    },
+    {
+        "english":  "Noon",
+        "central":  "kâm-heng",
+        "coast":  "kâm-hēg",
+        "teressa":  "kâm-heng",
+        "chowra":  "yip-heng",
+        "car":  "sâkâˑm-matal"
+    },
+    {
+        "english":  "North",
+        "central":  "ta-ngâˑle",
+        "coast":  "la-ôl",
+        "teressa":  "lâ-ō",
+        "chowra":  "lâ-ôl",
+        "car":  "lâôˑla"
+    },
+    {
+        "english":  "North wind",
+        "central":  "kapâ",
+        "coast":  "kapâ",
+        "teressa":  "kapâ",
+        "chowra":  "kapà",
+        "car":  "kapâ"
+    },
+    {
+        "english":  "Nose",
+        "central":  "moaṅh",
+        "coast":  "moaṅh",
+        "teressa":  "mòṅh",
+        "chowra":  "mòṅh",
+        "car":  "el-meṅh"
+    },
+    {
+        "english":  "Not",
+        "central":  "hat",
+        "coast":  "ngâ",
+        "teressa":  "hat",
+        "chowra":  "hat",
+        "car":  "ar; at; dran"
+    },
+    {
+        "english":  "Now",
+        "central":  "lin-heṅ",
+        "coast":  "âha-nī",
+        "teressa":  "nä-heṅ; nēˑe-heṅ",
+        "chowra":  "maka",
+        "car":  "tangâˑmo"
+    },
+    {
+        "english":  "old man",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "one",
+        "central":  "hēang",
+        "coast":  "heg",
+        "teressa":  "hēang",
+        "chowra":  "hēang",
+        "car":  "kahōk; heng"
+    },
+    {
+        "english":  "Orange",
+        "central":  "karoait-ta-shīˑang",
+        "coast":  "karoait-ta-shai(t)",
+        "teressa":  "kammong-ta-shīˑang",
+        "chowra":  "karòit-ta-shīang",
+        "car":  "piku"
+    },
+    {
+        "english":  "Orania Bentickia",
+        "central":  "hilüˑa",
+        "coast":  "hilüˑa",
+        "teressa":  "en-kô",
+        "chowra":  "ong-kôˑa",
+        "car":  "châˑmam"
+    },
+    {
+        "english":  "Orphan",
+        "central":  "hat-chīˑao",
+        "coast":  "ngâ-dòinyo-ngâ-hēno",
+        "teressa":  "hat-yīˑao",
+        "chowra":  "hat-yīˑao",
+        "car":  "kūˑan-yòich"
+    },
+    {
+        "english":  "owl",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Paddle",
+        "central":  "pōˑwah",
+        "coast":  "pâūˑah",
+        "teressa":  "kâ-hēˑa",
+        "chowra":  "kâhēˑal",
+        "car":  "paiyūˑah"
+    },
+    {
+        "english":  "Palm(of hand)",
+        "central":  "oal-tai",
+        "coast":  "hoâng-ke-wēt",
+        "teressa":  "ô-tī",
+        "chowra":  "oal-nòi",
+        "car":  "el-tī"
+    },
+    {
+        "english":  "Pandanus",
+        "central":  "larōˑm",
+        "coast":  "tafēt",
+        "teressa":  "hen-shūˑan",
+        "chowra":  "hanfòṅ",
+        "car":  "ko-wen"
+    },
+    {
+        "english":  "Papa!",
+        "central":  "chiˑa",
+        "coast":  "dòiṅ",
+        "teressa":  "yīˑä",
+        "chowra":  "yīˑang",
+        "car":  "mamâ"
+    },
+    {
+        "english":  "papaya",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "parrot",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Perspiration",
+        "central":  "hoâng",
+        "coast":  "henâng",
+        "teressa":  "hō",
+        "chowra":  "hoâˑng",
+        "car":  "waṅg"
+    },
+    {
+        "english":  "Pig(domestic)",
+        "central":  "nōt",
+        "coast":  "pa-kòit",
+        "teressa":  "nōt",
+        "chowra":  "nōt",
+        "car":  "hâˑun"
+    },
+    {
+        "english":  "Pig(wild)",
+        "central":  "sharâˑl",
+        "coast":  "chūˑam",
+        "teressa":  "eu-hā",
+        "chowra":  "milīˑah",
+        "car":  "hân-chōn"
+    },
+    {
+        "english":  "pigeon",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Place(spot,locality)",
+        "central":  "chuk",
+        "coast":  "chū",
+        "teressa":  "chuk",
+        "chowra":  "chuk",
+        "car":  "chī-uk"
+    },
+    {
+        "english":  "Place(village,town)",
+        "central":  "mattai",
+        "coast":  "pattai",
+        "teressa":  "mattai",
+        "chowra":  "pânam",
+        "car":  "pânòm"
+    },
+    {
+        "english":  "Plantain",
+        "central":  "hibbu",
+        "coast":  "ta-lūˑi",
+        "teressa":  "kulūˑama",
+        "chowra":  "kulūˑama",
+        "car":  "taiñgūˑknga"
+    },
+    {
+        "english":  "Pork",
+        "central":  "âṅˑha-nōt",
+        "coast":  "eṅga-pakòit",
+        "teressa":  "eṅga-nōt",
+        "chowra":  "eṅha-nōt",
+        "car":  "âlâˑhah-âhˑun"
+    },
+    {
+        "english":  "Porpoise",
+        "central":  "kâ-pōˑang",
+        "coast":  "kâ-pōˑang",
+        "teressa":  "kâ-pòng",
+        "chowra":  "kâ-ya-man",
+        "car":  "kâ-pēˑòng"
+    },
+    {
+        "english":  "Pot(cooking)",
+        "central":  "haṅ-shöˑi",
+        "coast":  "ka-rēt",
+        "teressa":  "shanang (or karīˑang)",
+        "chowra":  "karīˑang",
+        "car":  "tânīˑyaya"
+    },
+    {
+        "english":  "Ptychoraphis augusta",
+        "central":  "chafât",
+        "coast":  "chafât",
+        "teressa":  "chafât",
+        "chowra":  "chafât",
+        "car":  "châˑwat"
+    },
+    {
+        "english":  "Python",
+        "central":  "tulân",
+        "coast":  "tâgūˑak",
+        "teressa":  "moīˑô",
+        "chowra":  "tulân",
+        "car":  "tūˑlan"
+    },
+    {
+        "english":  "Rain",
+        "central":  "amiṅh",
+        "coast":  "enyàuˑwa",
+        "teressa":  "amiṅh",
+        "chowra":  "amiṅh",
+        "car":  "kòmrâˑh"
+    },
+    {
+        "english":  "Rainbow",
+        "central":  "kamindō",
+        "coast":  "kanhīˑa",
+        "teressa":  "kaminˑro",
+        "chowra":  "tâˑha-nūˑña",
+        "car":  "mengâˑka"
+    },
+    {
+        "english":  "red",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "red ant",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Rib",
+        "central":  "tenyuâk",
+        "coast":  "tennôˑa",
+        "teressa":  "en-hôṅˑya",
+        "chowra":  "en-hôṅˑya",
+        "car":  "drânūˑma"
+    },
+    {
+        "english":  "Rice",
+        "central":  "arōe; arōsh",
+        "coast":  "arōˑe",
+        "teressa":  "arôˑe",
+        "chowra":  "â-rôˑe",
+        "car":  "saiṙ"
+    },
+    {
+        "english":  "Right(not left)",
+        "central":  "lâ-chü-la",
+        "coast":  "lâ-akā",
+        "teressa":  "lâ-chūˑla",
+        "chowra":  "lâ-chüˑla",
+        "car":  "hâm"
+    },
+    {
+        "english":  "River",
+        "central":  "dâk-ta-karū",
+        "coast":  "dâk-ta-omteṅ",
+        "teressa":  "râk-ta-karū",
+        "chowra":  "dâk-ta-karū",
+        "car":  "tâ-helˑel"
+    },
+    {
+        "english":  "Road",
+        "central":  "kaiyī",
+        "coast":  "kaiyī",
+        "teressa":  "â-kai",
+        "chowra":  "ô-kaiˑe",
+        "car":  "tâ-löˑka"
+    },
+    {
+        "english":  "root",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Rope",
+        "central":  "tanōˑka",
+        "coast":  "het",
+        "teressa":  "tanūˑka",
+        "chowra":  "tanūˑka",
+        "car":  "pisˑsik"
+    },
+    {
+        "english":  "Sack",
+        "central":  "shâˑya",
+        "coast":  "shâˑyo",
+        "teressa":  "shâkī",
+        "chowra":  "o-koṅ",
+        "car":  "sâk"
+    },
+    {
+        "english":  "Sail",
+        "central":  "hentē-ha",
+        "coast":  "hentēˑha",
+        "teressa":  "lôˑe-rôˑe",
+        "chowra":  "an-hīˑan-sha",
+        "car":  "en-dēh"
+    },
+    {
+        "english":  "Salt",
+        "central":  "shal",
+        "coast":  "shal",
+        "teressa":  "shâl",
+        "chowra":  "shâl",
+        "car":  "sâl"
+    },
+    {
+        "english":  "Sand",
+        "central":  "yaiˑya",
+        "coast":  "hâˑya",
+        "teressa":  "hâˑya",
+        "chowra":  "taˑrü",
+        "car":  "koyâˑya"
+    },
+    {
+        "english":  "Sand",
+        "central":  "pīˑet",
+        "coast":  "pēˑat",
+        "teressa":  "pīˑat",
+        "chowra":  "pīˑat",
+        "car":  "-"
+    },
+    {
+        "english":  "Sandy beach",
+        "central":  "chakâ-yaiˑya",
+        "coast":  "chīˑa-hâ.ya",
+        "teressa":  "che-haiˑya",
+        "chowra":  "chia-ta-nâk",
+        "car":  "koyâˑya"
+    },
+    {
+        "english":  "Say/Speak",
+        "central":  "ol-yōˑla",
+        "coast":  "hâˑhal",
+        "teressa":  "en-nēˑola",
+        "chowra":  "kâ-nyūˑa",
+        "car":  "rô"
+    },
+    {
+        "english":  "scorpion",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Sea",
+        "central":  "kamalē",
+        "coast":  "ô",
+        "teressa":  "en-līˑang",
+        "chowra":  "shama-ràu",
+        "car":  "mai"
+    },
+    {
+        "english":  "See",
+        "central":  "harra",
+        "coast":  "haka",
+        "teressa":  "ha",
+        "chowra":  "harra",
+        "car":  "māk"
+    },
+    {
+        "english":  "Seed",
+        "central":  "op-ēp",
+        "coast":  "op-ēp",
+        "teressa":  "en-shūng",
+        "chowra":  "en-shūng",
+        "car":  "kōˑlal"
+    },
+    {
+        "english":  "Sell",
+        "central":  "iñīh-hata",
+        "coast":  "ingīˑh-hata",
+        "teressa":  "ingīˑh-hata",
+        "chowra":  "ingīˑh-hata",
+        "car":  "hâˑwa"
+    },
+    {
+        "english":  "Send",
+        "central":  "homekwòm-nga-lâh",
+        "coast":  "homkwòm-nga-lâh",
+        "teressa":  "en-rōng-nga-lâh",
+        "chowra":  "o-haṅnga-lâh",
+        "car":  "kēˑngam"
+    },
+    {
+        "english":  "Sew",
+        "central":  "ichīˑh-hata",
+        "coast":  "ichīˑh-hata",
+        "teressa":  "ichīh-hata",
+        "chowra":  "chīh-hata",
+        "car":  "chōk"
+    },
+    {
+        "english":  "Ship",
+        "central":  "chông",
+        "coast":  "chông",
+        "teressa":  "chiôˑng",
+        "chowra":  "chiôˑng",
+        "car":  "chông"
+    },
+    {
+        "english":  "Shore",
+        "central":  "yīˑap-chakâ",
+        "coast":  "ēˑap-chakâ",
+        "teressa":  "halā-mattai",
+        "chowra":  "ev-ven-pânam",
+        "car":  "tuhēˑt"
+    },
+    {
+        "english":  "Shoulder",
+        "central":  "kōˑi-ung-wâh",
+        "coast":  "-",
+        "teressa":  "kōˑi-ūngâh",
+        "chowra":  "kōˑi-pâk",
+        "car":  "el-tânôˑr"
+    },
+    {
+        "english":  "Sick",
+        "central":  "tū",
+        "coast":  "yâ",
+        "teressa":  "tū",
+        "chowra":  "ke-sūˑen",
+        "car":  "wâˑhau; at-lāke"
+    },
+    {
+        "english":  "Silver",
+        "central":  "chuâ",
+        "coast":  "chuâ",
+        "teressa":  "chiô",
+        "chowra":  "chiô",
+        "car":  "chēha-kūˑa"
+    },
+    {
+        "english":  "Sing",
+        "central":  "ikâˑsha",
+        "coast":  "eyū.ha",
+        "teressa":  "tīˑkak",
+        "chowra":  "tīˑkak",
+        "car":  "tīkak-rôˑre"
+    },
+    {
+        "english":  "Sister",
+        "central":  "tamàua-she-enkâˑna",
+        "coast":  "hanâˑna",
+        "teressa":  "hemēòṅ-henòng-enkēˑäna",
+        "chowra":  "lâmah-henòng-kâna",
+        "car":  "kâna.na"
+    },
+    {
+        "english":  "Sister(elder)",
+        "central":  "chàu-enkâˑna",
+        "coast":  "hanâˑna-omshöˑka",
+        "teressa":  "yàu-enkēˑäna",
+        "chowra":  "yàu-enkâ.na",
+        "car":  "mäm-kikâˑna"
+    },
+    {
+        "english":  "Sister(younger)",
+        "central":  "tàu-enkâˑna",
+        "coast":  "hanâˑna-omnyä-sha",
+        "teressa":  "tàu-enkēˑäna",
+        "chowra":  "tàu-enkâ.na",
+        "car":  "kâhäm-kikâˑna"
+    },
+    {
+        "english":  "Sit",
+        "central":  "pöˑya",
+        "coast":  "kantö",
+        "teressa":  "ūˑkāˑhe",
+        "chowra":  "at-ngòich-he",
+        "car":  "ūˑchâˑkâ"
+    },
+    {
+        "english":  "Skin",
+        "central":  "ok",
+        "coast":  "kuhāˑha",
+        "teressa":  "ok",
+        "chowra":  "ok",
+        "car":  "ok"
+    },
+    {
+        "english":  "Sky",
+        "central":  "kala-höˑiya",
+        "coast":  "kala-höˑiya",
+        "teressa":  "ôˑha-līˑanga",
+        "chowra":  "ôˑha-līˑanga",
+        "car":  "el-hâlīˑang"
+    },
+    {
+        "english":  "Sleepy",
+        "central":  "iteakla",
+        "coast":  "ong-ngāla",
+        "teressa":  "ingòiˑla",
+        "chowra":  "itīˑakla",
+        "car":  "harˑrôh-tare"
+    },
+    {
+        "english":  "Small",
+        "central":  "ompeṅˑshe",
+        "coast":  "dīnait",
+        "teressa":  "pa-meṅˑshe",
+        "chowra":  "pa-mīˑaich",
+        "car":  "kūˑana"
+    },
+    {
+        "english":  "Smoke(n.)",
+        "central":  "fūsh",
+        "coast":  "fūsh",
+        "teressa":  "ōsh-heōˑe",
+        "chowra":  "aichīˑp",
+        "car":  "lūl"
+    },
+    {
+        "english":  "Snake(venomous)",
+        "central":  "pai(d)",
+        "coast":  "-",
+        "teressa":  "paich",
+        "chowra":  "paich",
+        "car":  "pē(d)"
+    },
+    {
+        "english":  "Sneeze(n.)",
+        "central":  "ēˑai",
+        "coast":  "ēˑai",
+        "teressa":  "eˑäh",
+        "chowra":  "eˑäh",
+        "car":  "yesˑsa"
+    },
+    {
+        "english":  "Snore",
+        "central":  "hīngôˑak",
+        "coast":  "hīngôˑak",
+        "teressa":  "hīngôk",
+        "chowra":  "hīngôk",
+        "car":  "ken-ngôˑka"
+    },
+    {
+        "english":  "Son",
+        "central":  "kōˑan-en-kòiˑña",
+        "coast":  "kōˑan(-otāˑha)",
+        "teressa":  "kōˑan-maiōh",
+        "chowra":  "kōˑan-mohēˑo",
+        "car":  "kūˑan-kikôˑna"
+    },
+    {
+        "english":  "Song",
+        "central":  "kanòi-she",
+        "coast":  "yanū.ha",
+        "teressa":  "tekāk",
+        "chowra":  "tekāk",
+        "car":  "ten-kāˑka"
+    },
+    {
+        "english":  "Soth wind",
+        "central":  "hâṅsh-lòhˑnga",
+        "coast":  "hâṅsh-lòhnga",
+        "teressa":  "hâeṅ-lòhnga",
+        "chowra":  "hâeṅ-lòhnga",
+        "car":  "lôˑhnga"
+    },
+    {
+        "english":  "South",
+        "central":  "ta-ngangˑe",
+        "coast":  "lâ.òng",
+        "teressa":  "ta-ngangˑhe",
+        "chowra":  "ta-ngang-he",
+        "car":  "lâ-hīˑa"
+    },
+    {
+        "english":  "Spear(bladed)",
+        "central":  "shaneṅ",
+        "coast":  "shaneṅ",
+        "teressa":  "shaneṅ",
+        "chowra":  "kanyēh",
+        "car":  "wē"
+    },
+    {
+        "english":  "Spear(Pronged)",
+        "central":  "miàṅ",
+        "coast":  "pīlīiya",
+        "teressa":  "miäṅ",
+        "chowra":  "miän",
+        "car":  "maâṅ"
+    },
+    {
+        "english":  "spider",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Spinster",
+        "central":  "holī.aṅ",
+        "coast":  "penhōn",
+        "teressa":  "enkēˑäna",
+        "chowra":  "en-kâna",
+        "car":  "dēˑla; rēˑla"
+    },
+    {
+        "english":  "Spit(expectorate)",
+        "central":  "tapaih-hai-ñe",
+        "coast":  "tapaih-haiˑñe",
+        "teressa":  "kapōh-haiˑñe",
+        "chowra":  "pamtēh-haiˑñi",
+        "car":  "kāh"
+    },
+    {
+        "english":  "Spoon",
+        "central":  "shanē.äl",
+        "coast":  "shanēˑäl",
+        "teressa":  "shanēˑo",
+        "chowra":  "sanēˑo",
+        "car":  "sanel"
+    },
+    {
+        "english":  "sprout",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Squat(sit on one\u0027s heels)",
+        "central":  "omdūm-hare",
+        "coast":  "omdūm-hare",
+        "teressa":  "omrūm-hē",
+        "chowra":  "omrūm-hē",
+        "car":  "dròichâˑka"
+    },
+    {
+        "english":  "squirrel",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Stammer",
+        "central":  "chē-kale-tâk",
+        "coast":  "chē-kale-tâk",
+        "teressa":  "sheṅh-kali-tâk",
+        "chowra":  "sheṅ-kanīˑal",
+        "car":  "ikˑnyô"
+    },
+    {
+        "english":  "Stand up!",
+        "central":  "shīˑaka",
+        "coast":  "shīˑaka",
+        "teressa":  "shòk-le",
+        "chowra":  "ōla-re",
+        "car":  "chôˑldre; sakˑlare"
+    },
+    {
+        "english":  "Star",
+        "central":  "shòk-malēˑcha",
+        "coast":  "shòk-malēˑcha",
+        "teressa":  "kalat-pēcha",
+        "chowra":  "melūˑcha; kilit-pī-cha",
+        "car":  "tânūˑsamat"
+    },
+    {
+        "english":  "Steal",
+        "central":  "kalô-hanga",
+        "coast":  "palai(t)",
+        "teressa":  "kalô-hanga",
+        "chowra":  "malāˑnga",
+        "car":  "olâˑya"
+    },
+    {
+        "english":  "Steamer",
+        "central":  "chông-heōˑe",
+        "coast":  "chông-hentôṅˑha",
+        "teressa":  "chòng-heōˑe",
+        "chowra":  "chòng-palô",
+        "car":  "tatâm-mue"
+    },
+    {
+        "english":  "Stomach",
+        "central":  "wīˑang",
+        "coast":  "wīˑang",
+        "teressa":  "vīˑang",
+        "chowra":  "wīˑang",
+        "car":  "el-lōˑan"
+    },
+    {
+        "english":  "Stomach-ache",
+        "central":  "chôk-wīˑang",
+        "coast":  "chôk-wīˑang",
+        "teressa":  "shakī-vīˑang",
+        "chowra":  "shakī-wīˑang",
+        "car":  "chak-el-lōˑan"
+    },
+    {
+        "english":  "Stone",
+        "central":  "mangnge",
+        "coast":  "kenmwâˑma",
+        "teressa":  "patu",
+        "chowra":  "mangˑe",
+        "car":  "ēˑhong"
+    },
+    {
+        "english":  "Storm",
+        "central":  "hurâˑsha",
+        "coast":  "oriasha",
+        "teressa":  "hurâˑsha",
+        "chowra":  "fēh",
+        "car":  "ras-hat"
+    },
+    {
+        "english":  "Straight",
+        "central":  "chiam",
+        "coast":  "lē",
+        "teressa":  "lā",
+        "chowra":  "tāt",
+        "car":  "chip"
+    },
+    {
+        "english":  "Strong",
+        "central":  "koâˑng",
+        "coast":  "kôˑag",
+        "teressa":  "kale-eṅha",
+        "chowra":  "kale-eṅha",
+        "car":  "kalī-âˑlah; ngē-âˑlah"
+    },
+    {
+        "english":  "Suck",
+        "central":  "chôṅ-hata",
+        "coast":  "chūṅhuṅ",
+        "teressa":  "ñôt-hata",
+        "chowra":  "mô-hata",
+        "car":  "pô"
+    },
+    {
+        "english":  "Suckle",
+        "central":  "chôṅ-toah-chīˑare",
+        "coast":  "bōˑa-toah-henˑde",
+        "teressa":  "mòṅ-tòh",
+        "chowra":  "meṅ-tòh",
+        "car":  "hâpô-nīˑa"
+    },
+    {
+        "english":  "Sugar",
+        "central":  "shòṅk",
+        "coast":  "shòṅk",
+        "teressa":  "shōk",
+        "chowra":  "ken-sūkare",
+        "car":  "kan-sūˑkar"
+    },
+    {
+        "english":  "Sun",
+        "central":  "heng",
+        "coast":  "hēg",
+        "teressa":  "amūˑe",
+        "chowra":  "amūˑe",
+        "car":  "tâwūˑe"
+    },
+    {
+        "english":  "Surf",
+        "central":  "shâ-hong",
+        "coast":  "kârūai(d)",
+        "teressa":  "haraich",
+        "chowra":  "ēˑok",
+        "car":  "màu-wa"
+    },
+    {
+        "english":  "Sweet",
+        "central":  "shī-ang",
+        "coast":  "shai(t)",
+        "teressa":  "shīˑang",
+        "chowra":  "kuchik",
+        "car":  "kuchik"
+    },
+    {
+        "english":  "Swim",
+        "central":  "kīchal",
+        "coast":  "kīchal",
+        "teressa":  "üak",
+        "chowra":  "yâr",
+        "car":  "yā"
+    },
+    {
+        "english":  "Tabu",
+        "central":  "chi(j)",
+        "coast":  "yīi",
+        "teressa":  "yeòich",
+        "chowra":  "kāl",
+        "car":  "tâkôˑya"
+    },
+    {
+        "english":  "Tail",
+        "central":  "kinnòk-det",
+        "coast":  "enkūt",
+        "teressa":  "rēt",
+        "chowra":  "rēt",
+        "car":  "lâm-tit"
+    },
+    {
+        "english":  "Taller",
+        "central":  "chinòonga-kōˑj",
+        "coast":  "linôhala-kōˑi",
+        "teressa":  "chinònga-kōˑi",
+        "chowra":  "marāla-kōˑi",
+        "car":  "marôˑlòng (tall)"
+    },
+    {
+        "english":  "Tame(domesticated)",
+        "central":  "chūˑa-chakâ",
+        "coast":  "tanòlshe-ēt",
+        "teressa":  "salēˑät",
+        "chowra":  "anēˑänshe-yanˑhe",
+        "car":  "â-pâtī"
+    },
+    {
+        "english":  "Tear(s.)",
+        "central":  "dâk-mat",
+        "coast":  "dâk-mat",
+        "teressa":  "râk-mät",
+        "chowra":  "râk-mât",
+        "car":  "mak-mat"
+    },
+    {
+        "english":  "They(dual)",
+        "central":  "onâ",
+        "coast":  "nâˑa",
+        "teressa":  "unâ",
+        "chowra":  "unâ",
+        "car":  "nâˑa; nan"
+    },
+    {
+        "english":  "They(plural)",
+        "central":  "ofē",
+        "coast":  "fēˑa",
+        "teressa":  "ôhôˑe",
+        "chowra":  "ofē",
+        "car":  "yin"
+    },
+    {
+        "english":  "Think(regard)",
+        "central":  "tatòi",
+        "coast":  "tadök",
+        "teressa":  "tatō",
+        "chowra":  "tatō",
+        "car":  "lōn"
+    },
+    {
+        "english":  "Thirsty",
+        "central":  "hilēˑang",
+        "coast":  "lē(t)",
+        "teressa":  "hilīˑang",
+        "chowra":  "hilēˑang",
+        "car":  "yâl"
+    },
+    {
+        "english":  "three",
+        "central":  "lōe",
+        "coast":  "lūe",
+        "teressa":  "lūe",
+        "chowra":  "lūe",
+        "car":  "lūe"
+    },
+    {
+        "english":  "Tide(ebb)",
+        "central":  "tōˑa",
+        "coast":  "-",
+        "teressa":  "chôh",
+        "chowra":  "katok",
+        "car":  "tâhāˑt"
+    },
+    {
+        "english":  "Tide(flood)",
+        "central":  "hēˑo",
+        "coast":  "-",
+        "teressa":  "ra",
+        "chowra":  "parūˑe",
+        "car":  "pârūˑi"
+    },
+    {
+        "english":  "To-morrow",
+        "central":  "hakī",
+        "coast":  "wala-hē; hakī",
+        "teressa":  "horòich",
+        "chowra":  "tâha-kōˑi",
+        "car":  "hurēch; huròch"
+    },
+    {
+        "english":  "To-morrow(day after-)",
+        "central":  "shaiyūh-lâng",
+        "coast":  "taâṅ",
+        "teressa":  "sâhē",
+        "chowra":  "sâhē",
+        "car":  "taâ"
+    },
+    {
+        "english":  "Tobacco",
+        "central":  "omhòiṅ",
+        "coast":  "tombeg",
+        "teressa":  "taṅòṅ",
+        "chowra":  "omhôṅ",
+        "car":  "sanòi-am"
+    },
+    {
+        "english":  "Today",
+        "central":  "lin-heṅ",
+        "coast":  "lin-heṅ; âha-nī",
+        "teressa":  "nēˑe-heṅ; nä-heṅ",
+        "chowra":  "eäng-he",
+        "car":  "tangâˑmo"
+    },
+    {
+        "english":  "Toe",
+        "central":  "kane-lâh",
+        "coast":  "-",
+        "teressa":  "mòṅh-läh",
+        "chowra":  "kenūsh-läh",
+        "car":  "kun-drān"
+    },
+    {
+        "english":  "Tongue",
+        "central":  "kale-tâk",
+        "coast":  "kale-tâk",
+        "teressa":  "kali-tâk",
+        "chowra":  "kalitâk",
+        "car":  "litâk"
+    },
+    {
+        "english":  "Tooth",
+        "central":  "kanâp",
+        "coast":  "kâangˑan; kanâp",
+        "teressa":  "kanâp",
+        "chowra":  "kanâp",
+        "car":  "kânàp"
+    },
+    {
+        "english":  "Toothache",
+        "central":  "chòk-kanâp",
+        "coast":  "chòk-kâangˑan",
+        "teressa":  "shakī-kanâp",
+        "chowra":  "shakī-kanâp",
+        "car":  "chak-ka-kâˑnàp"
+    },
+    {
+        "english":  "Tortoise",
+        "central":  "ok-tēˑka",
+        "coast":  "itēṅˑi",
+        "teressa":  "itīˑkare",
+        "chowra":  "-",
+        "car":  "ta-karöˑpa; pēnyūˑt"
+    },
+    {
+        "english":  "Tree",
+        "central":  "chīˑa-oñīhaṅ",
+        "coast":  "dòir-wī",
+        "teressa":  "yīˑa-chiô",
+        "chowra":  "yīˑang-aphòp",
+        "car":  "chōn"
+    },
+    {
+        "english":  "Turtle",
+        "central":  "kâp",
+        "coast":  "putôˑwa",
+        "teressa":  "kâp",
+        "chowra":  "kâp",
+        "car":  "kâp"
+    },
+    {
+        "english":  "Turtle-shell",
+        "central":  "ok-kâp",
+        "coast":  "tomnôˑit-putôˑwa",
+        "teressa":  "ok-kâp",
+        "chowra":  "ok-kâp",
+        "car":  "ok-kâp"
+    },
+    {
+        "english":  "two",
+        "central":  "âṅ",
+        "coast":  "âṅ",
+        "teressa":  "âṅ",
+        "chowra":  "âṅ",
+        "car":  "neät"
+    },
+    {
+        "english":  "Uncle",
+        "central":  "ho-chīˑa enkòiˑña",
+        "coast":  "kenmīˑa-otäˑha",
+        "teressa":  "hoyīˑa-maiōh",
+        "chowra":  "hēyīa-mohēˑo",
+        "car":  "kânòi.ña"
+    },
+    {
+        "english":  "Vein",
+        "central":  "ihē",
+        "coast":  "ihē",
+        "teressa":  "ihē",
+        "chowra":  "ihē",
+        "car":  "trâˑhe"
+    },
+    {
+        "english":  "Village",
+        "central":  "mattai",
+        "coast":  "pattai",
+        "teressa":  "mattai",
+        "chowra":  "pânam",
+        "car":  "pânòm"
+    },
+    {
+        "english":  "Vomit",
+        "central":  "oàu-hala",
+        "coast":  "okö-hala",
+        "teressa":  "o-ōˑhala",
+        "chowra":  "ku-àu",
+        "car":  "kūˑaua"
+    },
+    {
+        "english":  "waist",
+        "central":  "",
+        "coast":  "",
+        "teressa":  "",
+        "chowra":  "",
+        "car":  ""
+    },
+    {
+        "english":  "Walk",
+        "central":  "ong-shòng-ha",
+        "coast":  "shòng",
+        "teressa":  "ong-shòngha",
+        "chowra":  "ēˑda",
+        "car":  "wâˑng-ngare"
+    },
+    {
+        "english":  "Water(fresh)",
+        "central":  "dâk",
+        "coast":  "dâk",
+        "teressa":  "râk",
+        "chowra":  "râk",
+        "car":  "mak"
+    },
+    {
+        "english":  "Water(salt)",
+        "central":  "kamalē",
+        "coast":  "ô",
+        "teressa":  "enlīˑang",
+        "chowra":  "shama-ràu",
+        "car":  "mai"
+    },
+    {
+        "english":  "We (dual)",
+        "central":  "heṅ",
+        "coast":  "hâṅ-a",
+        "teressa":  "haiṅ-hâ",
+        "chowra":  "chīˑa-hâṅ",
+        "car":  "hôl-chyū"
+    },
+    {
+        "english":  "We(plural)",
+        "central":  "hē",
+        "coast":  "hēˑi",
+        "teressa":  "hē",
+        "chowra":  "hē",
+        "car":  "īˑha"
+    },
+    {
+        "english":  "West",
+        "central":  "ta-ngaiche",
+        "coast":  "ta-ngaiche",
+        "teressa":  "ta-ngâh-ha",
+        "chowra":  "tang-ngeh",
+        "car":  "lâ sūng"
+    },
+    {
+        "english":  "What(interrog.)",
+        "central":  "chūˑa; chya",
+        "coast":  "-",
+        "teressa":  "kū",
+        "chowra":  "kahō",
+        "car":  "chīˑap; âsūap"
+    },
+    {
+        "english":  "Whistle",
+        "central":  "chanēˑo",
+        "coast":  "chanēˑo",
+        "teressa":  "chanīˑau",
+        "chowra":  "henpēp",
+        "car":  "fhā"
+    },
+    {
+        "english":  "White",
+        "central":  "teyeṅ",
+        "coast":  "kēˑyeṅ",
+        "teressa":  "ē-ngamät",
+        "chowra":  "shòh",
+        "car":  "tisˑsoh"
+    },
+    {
+        "english":  "Widow",
+        "central":  "menchūˑtat",
+        "coast":  "menchūˑtat",
+        "teressa":  "kâpäh-kòin",
+        "chowra":  "kapäh-kamayū",
+        "car":  "kâpâh-hâpīˑha"
+    },
+    {
+        "english":  "Wife",
+        "central":  "kân",
+        "coast":  "kân",
+        "teressa":  "keän",
+        "chowra":  "kân",
+        "car":  "pīˑha"
+    },
+    {
+        "english":  "Wind",
+        "central":  "sho-hōng",
+        "coast":  "shin-hoânga; shamhàu",
+        "teressa":  "shi-hōng",
+        "chowra":  "sam-hàuṅ",
+        "car":  "sūng"
+    },
+    {
+        "english":  "Wind",
+        "central":  "hâṅsh",
+        "coast":  "-",
+        "teressa":  "hâṅsn",
+        "chowra":  "fän",
+        "car":  "kofat"
+    },
+    {
+        "english":  "Wing",
+        "central":  "danuaiˑ",
+        "coast":  "danōˑai",
+        "teressa":  "tēnga",
+        "chowra":  "rôṅpnga",
+        "car":  "kētü"
+    },
+    {
+        "english":  "Woman",
+        "central":  "en-kâˑna",
+        "coast":  "oyüˑha",
+        "teressa":  "en-kēˑäna",
+        "chowra":  "en-kâˑna",
+        "car":  "kikâˑna"
+    },
+    {
+        "english":  "Woman(countrywoman)",
+        "central":  "paiyūˑh",
+        "coast":  "pôh(-oyüˑha)",
+        "teressa":  "pai(en-kēˑäna)",
+        "chowra":  "pâeh(en-kâˑna)",
+        "car":  "târik-(-kikâna)"
+    },
+    {
+        "english":  "Woman(other-Nicobar)",
+        "central":  "-",
+        "coast":  "-",
+        "teressa":  "-",
+        "chowra":  "-",
+        "car":  "tâˑa(-kikâna)"
+    },
+    {
+        "english":  "Wood",
+        "central":  "oñīˑhaṅ",
+        "coast":  "wī",
+        "teressa":  "chiô",
+        "chowra":  "ap-hòp",
+        "car":  "chōn"
+    },
+    {
+        "english":  "Wrestle",
+        "central":  "halīˑna",
+        "coast":  "shilīˑna",
+        "teressa":  "kapôt",
+        "chowra":  "kapôt",
+        "car":  "kirˑip"
+    },
+    {
+        "english":  "Wrist",
+        "central":  "ok-loaka-koâl",
+        "coast":  "ok-lâka-koâl",
+        "teressa":  "at-lāka-kôr",
+        "chowra":  "ok-lāka-nôˑe",
+        "car":  "lin-kalˑnga"
+    },
+    {
+        "english":  "Yam",
+        "central":  "ko-peng",
+        "coast":  "kobi(d)",
+        "teressa":  "taūˑal",
+        "chowra":  "kopeng",
+        "car":  "takenīˑa; tâūˑla"
+    },
+    {
+        "english":  "Yawn",
+        "central":  "hing-âap",
+        "coast":  "angâp",
+        "teressa":  "hing-âp",
+        "chowra":  "hing-âp",
+        "car":  "fâp"
+    },
+    {
+        "english":  "Year",
+        "central":  "shom-en-yūh",
+        "coast":  "shâü",
+        "teressa":  "samen-nēoh",
+        "chowra":  "samâīˑha",
+        "car":  "sòmyüˑhu"
+    },
+    {
+        "english":  "Yes",
+        "central":  "aṅ",
+        "coast":  "haṅ",
+        "teressa":  "aṅ",
+        "chowra":  "aṅ",
+        "car":  "haṅ; hòṅ"
+    },
+    {
+        "english":  "Yesterday",
+        "central":  "minyüˑi",
+        "coast":  "dihē",
+        "teressa":  "wa hai",
+        "chowra":  "wa hē",
+        "car":  "wâˑhe"
+    },
+    {
+        "english":  "You(dual)",
+        "central":  "inâ",
+        "coast":  "ñâö",
+        "teressa":  "inâ",
+        "chowra":  "inâ",
+        "car":  "nâˑa"
+    },
+    {
+        "english":  "You(plural)",
+        "central":  "lfē",
+        "coast":  "hēˑe",
+        "teressa":  "ihe",
+        "chowra":  "ehē",
+        "car":  "yīˑa"
+    },
+    {
+        "english":  "You(sing.)/Thou",
+        "central":  "meṅ",
+        "coast":  "emeṅh; emeṅhˑa",
+        "teressa":  "mē",
+        "chowra":  "meṅ",
+        "car":  "meṅ; meṅh; mäh"
+    }
+]

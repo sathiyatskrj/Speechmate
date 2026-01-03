@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum DictionaryType { words, phrases, nature, numbers, animals, magic, family }
+enum DictionaryType { words, phrases, nature, numbers, animals, magic, family, dialects }
 
 class DictionaryService {
   final Map<DictionaryType, List<Map<String, dynamic>>> _dictionaries = {};
@@ -16,6 +16,7 @@ class DictionaryService {
     DictionaryType.family: 'assets/data/dictionary_family.json',
     DictionaryType.nature: 'assets/data/dictionary.json', // Reuse main dict
     DictionaryType.numbers: 'assets/data/dictionary.json', // Reuse main dict
+    DictionaryType.dialects: 'assets/data/dictionary_dialects.json', // NEW
   };
 
   Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
@@ -189,6 +190,12 @@ class DictionaryService {
   }
 
   Future<List<Map<String, dynamic>>> getDictionary(DictionaryType type) => loadDictionary(type);
+
+  Future<List<Map<String, dynamic>>> getDialectItems() async {
+    // New method for Beta Chat
+    // Load explicitly if not cached (though loadDictionary handles check)
+    return loadDictionary(DictionaryType.dialects);
+  }
 
   Future<Map<String, dynamic>?> translateSentence(String input) async {
     if (input.trim().isEmpty) return null;

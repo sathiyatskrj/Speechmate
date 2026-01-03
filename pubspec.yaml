@@ -72,6 +72,7 @@ flutter:
     - assets/data/dictionary_family.json 
     - assets/icons/branding.png
     - assets/models/ggml-tiny.en.bin
+    - assets/data/dictionary_dialects.json
 
 dependency_overrides:
   record_linux: ^1.2.0

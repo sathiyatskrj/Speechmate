@@ -27,6 +27,8 @@ import 'package:speechmate/screens/colors_page.dart';
 import 'package:speechmate/screens/things_page.dart';
 import 'package:speechmate/screens/culture_screen.dart'; // [NEW] Link
 import 'package:speechmate/screens/voice_vault_screen.dart'; // [NEW] Link
+import 'package:speechmate/screens/beta_chat_screen.dart';
+
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -219,6 +221,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     {"word": "Family", "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const FamilyPage(), "icon": Icons.family_restroom_rounded},
 
     {"word": "Voice Vault", "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded}, // [NEW]
+    {"word": "Beta Chat", "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
     {"word": "Community", "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
   ];
 

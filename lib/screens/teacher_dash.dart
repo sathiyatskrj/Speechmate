@@ -21,6 +21,8 @@ import '../widgets/ai_assistant_overlay.dart'; // Mic Support
 import 'package:speechmate/screens/common_phrases_screen.dart'; // Placeholder for new screen
 import 'package:speechmate/screens/voice_vault_screen.dart'; // Placeholder for Record feature
 import 'package:speechmate/screens/culture_screen.dart'; // [NEW] Link
+import 'package:speechmate/screens/beta_chat_screen.dart';
+
 
 
 class TeacherDash extends StatefulWidget {
@@ -385,6 +387,13 @@ class _TeacherDashState extends State<TeacherDash> {
                       icon: Icons.account_balance,
                       color: Colors.tealAccent,
                       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
+                    ),
+                    _buildFeatureCard(
+                      context,
+                      title: "Beta Chat",
+                      icon: Icons.forum,
+                      color: Colors.indigoAccent,
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
                     ),
                   ],
                 ),
