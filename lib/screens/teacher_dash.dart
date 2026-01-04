@@ -5,11 +5,16 @@ import 'package:speechmate/screens/community_screen.dart';
 import 'package:speechmate/screens/quiz_screen.dart';
 import 'package:speechmate/screens/progress_screen.dart';
 import 'package:speechmate/screens/chat_translate_screen.dart';
-import 'package:speechmate/screens/teacher_levels_screen.dart'; // Assuming this exists or using generic
+import 'package:speechmate/screens/teacher_levels_screen.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
-import 'package:speechmate/widgets/smart_dashboard_header.dart'; // [NEW] Link
-import 'package:speechmate/widgets/voice_reactive_aurora.dart'; // [NEW] Link
-import 'package:speechmate/core/app_theme.dart'; // [NEW] Link
+import 'package:speechmate/screens/common_phrases_screen.dart'; // [FIX] Added
+import 'package:speechmate/screens/voice_vault_screen.dart'; // [FIX] Added
+import 'package:speechmate/screens/culture_screen.dart'; // [FIX] Added
+import 'package:speechmate/services/dictionary_service.dart'; // [FIX] Added
+import 'package:speechmate/services/tts_service.dart'; // [FIX] Added
+import 'package:speechmate/widgets/smart_dashboard_header.dart';
+import 'package:speechmate/widgets/voice_reactive_aurora.dart';
+import 'package:speechmate/core/app_theme.dart';
 
 
 
