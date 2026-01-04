@@ -54,4 +54,26 @@ class CommunityService {
        await docRef.update({'likes': FieldValue.increment(1)});
     }
   }
+
+  /// [ADMIN] Delete a post
+  Future<void> deletePost(String postId) async {
+    try {
+      await _firestore.collection(_collection).doc(postId).delete();
+    } catch (e) {
+      debugPrint("Error deleting post: $e");
+      rethrow;
+    }
+  }
+
+  /// [ADMIN] Verify a post (Gold Badge)
+  Future<void> toggleVerification(String postId, bool currentStatus) async {
+    try {
+      await _firestore.collection(_collection).doc(postId).update({
+        'isVerified': !currentStatus
+      });
+    } catch (e) {
+      debugPrint("Error verifying post: $e");
+      rethrow;
+    }
+  }
 }

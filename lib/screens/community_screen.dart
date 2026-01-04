@@ -17,18 +17,47 @@ class _CommunityScreenState extends State<CommunityScreen> {
   final CommunityService _communityService = CommunityService();
 
   // Local state to track "liked" posts by this device/session
-  // Since we aren't doing full auth, this is a visual trick
   final Set<String> _likedPostIds = {};
+  
+  // Admin State
+  bool _isAdmin = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Community Hub 🌏"),
+        title: Row(
+          children: [
+            const Text("Community Hub 🌏"),
+            if (_isAdmin) ...[
+                const SizedBox(width: 8),
+                Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(12)),
+                    child: const Text("ADMIN", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                )
+            ]
+          ],
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+            if (!_isAdmin)
+              IconButton(
+                  icon: const Icon(Icons.admin_panel_settings_outlined, color: Colors.white),
+                  tooltip: "Admin Login",
+                  onPressed: _showAdminLoginDialog, // Login
+              )
+            else
+              IconButton(
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  tooltip: "Logout Admin",
+                  onPressed: () {
+                      setState(() => _isAdmin = false);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Admin logged out")));
+                  },
+              ),
             IconButton(
                 icon: const Icon(Icons.info_outline, color: Colors.white),
                 tooltip: "About Community Hub",
@@ -38,12 +67,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showPostDialog,
-        backgroundColor: Colors.deepPurpleAccent,
-        icon: const Icon(Icons.edit),
-        label: const Text("Contribute"),
+        backgroundColor: _isAdmin ? Colors.redAccent : Colors.deepPurpleAccent,
+        icon: Icon(_isAdmin ? Icons.campaign : Icons.edit),
+        label: Text(_isAdmin ? "Admin Post" : "Contribute"),
       ),
       body: Background(
-        colors: const [Color(0xFF89f7fe), Color(0xFF66a6ff)], 
+        colors: _isAdmin 
+            ? const [Color(0xFF2b2b2b), Color(0xFF4a148c)] // Darker theme for admin
+            : const [Color(0xFF89f7fe), Color(0xFF66a6ff)], 
         child: SafeArea(
           child: Column(
             children: [
@@ -87,6 +118,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
+  // ... (EmptyState, SyncBanner, TrendingSection omitted for brevity, logic remains same)
+
   Widget _buildEmptyState() {
       return Center(
           child: Column(
@@ -113,9 +146,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                  Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.greenAccent, shape: BoxShape.circle)).animate(onPlay: (c) => c.repeat()).fadeIn(duration: 1.seconds).fadeOut(duration: 1.seconds),
+                  Container(width: 8, height: 8, decoration: BoxDecoration(color: _isAdmin ? Colors.red : Colors.greenAccent, shape: BoxShape.circle)).animate(onPlay: (c) => c.repeat()).fadeIn(duration: 1.seconds).fadeOut(duration: 1.seconds),
                   const SizedBox(width: 8),
-                  const Text("LIVE • Global Community Feed", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(_isAdmin ? "ADMIN MODE ACTIVE • REGULATING" : "LIVE • Global Community Feed", style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
               ],
           ),
       );
@@ -173,6 +206,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: _isAdmin && post.isVerified ? Border.all(color: Colors.green, width: 2) : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -209,12 +243,26 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   ],
                 ),
                 const Spacer(),
-                Text(timeAgo, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                if (_isAdmin) ...[
+                    // ADMIN CONTROLS
+                    IconButton(
+                        icon: Icon(post.isVerified ? Icons.verified_user : Icons.verified_user_outlined, color: Colors.green),
+                        tooltip: "Toggle Verify",
+                        onPressed: () => _communityService.toggleVerification(post.id, post.isVerified),
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.delete_forever, color: Colors.red),
+                        tooltip: "Delete Post",
+                        onPressed: () => _confirmDelete(post.id),
+                    ),
+                ] else 
+                    Text(timeAgo, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
               ],
             ),
             const SizedBox(height: 12),
             Text(post.content, style: const TextStyle(fontSize: 15, height: 1.4, color: Colors.black87)),
             const SizedBox(height: 16),
+            if (!_isAdmin)
             Row(
               children: [
                 _buildActionButton(
@@ -250,6 +298,27 @@ class _CommunityScreenState extends State<CommunityScreen> {
     ).animate().fadeIn().slideY(begin: 0.1);
   }
 
+  void _confirmDelete(String postId) {
+      showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+              title: const Text("Delete Post?"),
+              content: const Text("This action cannot be undone."),
+              actions: [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
+                  TextButton(
+                      onPressed: () {
+                          Navigator.pop(ctx);
+                          _communityService.deletePost(postId);
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Post deleted by Admin")));
+                      },
+                      child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                  )
+              ],
+          )
+      );
+  }
+
   String _formatTime(DateTime? timestamp) {
       if (timestamp == null) return "Just now";
       final diff = DateTime.now().difference(timestamp);
@@ -281,7 +350,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
           context: context,
           builder: (context) => AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: const Text("Contribute to Hub ✍️"),
+              title: Text(_isAdmin ? "Admin Announcement 📢" : "Contribute to Hub ✍️"),
               content: TextField(
                   controller: textController,
                   maxLines: 3,
@@ -297,11 +366,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           if (textController.text.isNotEmpty) {
                               Navigator.pop(context);
                               _communityService.addPost(
-                                  author: "Guest User", // Default for now
-                                  role: "Community Member",
+                                  author: _isAdmin ? "SpeechMate Admin" : "Guest User",
+                                  role: _isAdmin ? "Administrator" : "Community Member",
                                   content: textController.text,
-                                  avatar: "G",
-                                  color: Colors.teal.value
+                                  avatar: _isAdmin ? "A" : "G",
+                                  color: _isAdmin ? Colors.redAccent.value : Colors.teal.value
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text("Posting to cloud... ☁️"))
@@ -313,6 +382,49 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   )
               ],
           ),
+      );
+  }
+
+  void _showAdminLoginDialog() {
+      final TextEditingController userController = TextEditingController();
+      final TextEditingController passController = TextEditingController();
+
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: const Text("Admin Login 🛡️"),
+              content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                      TextField(
+                          controller: userController,
+                          decoration: const InputDecoration(labelText: "Username", prefixIcon: Icon(Icons.person)),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                          controller: passController,
+                          obscureText: true,
+                          decoration: const InputDecoration(labelText: "Password", prefixIcon: Icon(Icons.lock)),
+                      )
+                  ],
+              ),
+              actions: [
+                  TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+                  ElevatedButton(
+                      onPressed: () {
+                          if (userController.text.trim() == "Admin" && passController.text.trim() == "speechmate2026") {
+                              Navigator.pop(context);
+                              setState(() => _isAdmin = true);
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Welcome, Admin! Regulation Mode Active.")));
+                          } else {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Invalid Credentials ❌")));
+                          }
+                      },
+                      child: const Text("Login"),
+                  )
+              ],
+          )
       );
   }
 
