@@ -311,4 +311,87 @@ class _TeacherDashState extends State<TeacherDash> {
       ),
     );
   }
+  }
+}
+
+class TranslationCard extends StatelessWidget {
+  final String nicobarese;
+  final String english;
+  final bool searchedNicobarese;
+  final bool isError;
+  final bool showSpeaker;
+  final VoidCallback onSpeak;
+
+  const TranslationCard({
+    super.key,
+    required this.nicobarese,
+    required this.english,
+    required this.searchedNicobarese,
+    this.isError = false,
+    this.showSpeaker = true,
+    required this.onSpeak,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: isError ? Colors.redAccent.withOpacity(0.1) : Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isError ? Colors.redAccent.withOpacity(0.3) : Colors.white.withOpacity(0.2)),
+        boxShadow: [
+             BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 15, offset: const Offset(0, 5))
+        ]
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isError ? "Not Found" : (searchedNicobarese ? "English Translation" : "Nicobarese Translation"),
+                style: TextStyle(
+                  color: isError ? Colors.redAccent : Colors.cyanAccent,
+                  fontSize: 12,
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (showSpeaker && !isError)
+                IconButton(
+                  onPressed: onSpeak,
+                  icon: const Icon(Icons.volume_up_rounded, color: Colors.cyanAccent),
+                  tooltip: "Pronounce",
+                ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          Text(
+            nicobarese,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              height: 1.2,
+            ),
+          ),
+          if (!isError && english.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                english,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white70,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+          ]
+        ],
+      ),
+    );
+  }
 }
