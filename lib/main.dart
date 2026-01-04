@@ -6,8 +6,18 @@ import 'package:flutter/services.dart';
 import 'package:speechmate/screens/emotional_splash_screen.dart';
 import 'package:speechmate/widgets/instant_popup_transition.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  try {
+      await Firebase.initializeApp();
+  } catch (e) {
+      // If firebase fails (e.g. no google-services.json), we don't want to crash the whole app startup
+      debugPrint("Firebase init failed: $e");
+  }
+
   final prefs = await SharedPreferences.getInstance();
   final languageSelected = prefs.getBool('language_selected') ?? false;
 

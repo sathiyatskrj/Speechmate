@@ -1,8 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:speechmate/widgets/background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speechmate/services/community_service.dart';
+import 'package:speechmate/models/community_post.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -12,152 +14,11 @@ class CommunityScreen extends StatefulWidget {
 }
 
 class _CommunityScreenState extends State<CommunityScreen> {
-  // Initial Mock Data
-  List<Map<String, dynamic>> _posts = [
-     {
-      "author": "SpeechMate Connect",
-      "role": "Admin",
-      "avatar": "A",
-      "color": 0xFF2196F3, // Colors.blue.value
-      "content": "Welcome to the Community Hub! Connect, share, and learn together. 🌏❤️",
-      "likes": 156,
-      "comments": 42,
-      "time": "1 day ago",
-      "isLiked": true,
-      "isVerified": true,
-    },
-    {
-      "author": "Sneha Ghosh.",
-      "role": "Teacher Level 5",
-      "avatar": "S",
-      "color": 0xFF9C27B0, // Colors.purple.value
-      "content": "Just finished Level 5! The new words for 'School' are so helpful. 🏫✨",
-      "likes": 24,
-      "comments": 5,
-      "time": "2 hrs ago",
-      "isLiked": false,
-      "isVerified": true,
-    },
-    {
-      "author": "Gladys",
-      "role": "Student",
-      "avatar": "R",
-      "color": 0xFFFF9800, // Colors.orange.value
-      "content": "Can anyone help me pronounce 'Möhakööp'? 🤔",
-      "likes": 12,
-      "comments": 8,
-      "time": "4 hrs ago",
-      "isLiked": false,
-      "isVerified": false,
-    },
-    {
-      "author": "Kunal Patel",
-      "role": "Teacher Level 2",
-      "avatar": "P",
-      "color": 0xFFE91E63, // Colors.pink.value
-      "content": "I shared a new quiz on 'Nature'. Check it out!",
-      "likes": 8,
-      "comments": 1,
-      "time": "5 hrs ago",
-      "isLiked": false,
-      "isVerified": false,
-    },
-    {
-      "author": "Joseph (Elder)",
-      "role": "Native Speaker",
-      "avatar": "Ro",
-      "color": 0xFF009688, // Colors.teal.value
-      "content": "Suggestion: We should add the word for 'Cycloned' (Pū-yö). It is important for our history. 🌪️",
-      "likes": 45,
-      "comments": 12,
-      "time": "6 hrs ago",
-      "isLiked": false,
-      "isVerified": true,
-    },
-    {
-      "author": "Daniel",
-      "role": "Student",
-      "avatar": "An",
-      "color": 0xFF795548, // Colors.brown.value
-      "content": "Found a missing word! 'Boat' is called 'Kū-ö' in my village dialect. 🛶",
-      "likes": 32,
-      "comments": 4,
-      "time": "8 hrs ago",
-      "isLiked": true,
-      "isVerified": false,
-    },
-  ];
+  final CommunityService _communityService = CommunityService();
 
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPosts();
-  }
-
-  Future<void> _loadPosts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedPosts = prefs.getString('community_posts');
-    if (storedPosts != null) {
-      setState(() {
-        _posts = List<Map<String, dynamic>>.from(jsonDecode(storedPosts));
-        _isLoading = false;
-      });
-    } else {
-        setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _savePosts() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('community_posts', jsonEncode(_posts));
-  }
-
-  Future<void> _addPost(String content) async {
-      // Simulate Network Delay
-      showDialog(
-          context: context, 
-          barrierDismissible: false,
-          builder: (_) => const Center(child: CircularProgressIndicator(color: Colors.white))
-      );
-      
-      await Future.delayed(const Duration(seconds: 1)); // Fake network lag
-      Navigator.pop(context); // Close loader
-
-      setState(() {
-          _posts.insert(0, {
-              "author": "You",
-              "role": "Contributor",
-              "avatar": "Y",
-              "color": Colors.green.value,
-              "content": content,
-              "likes": 0,
-              "comments": 0,
-              "time": "Just now",
-              "isLiked": false,
-              "isVerified": false,
-          });
-      });
-      _savePosts();
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Posted to Community Hub 🚀"))
-      );
-  }
-
-  void _toggleLike(int index) {
-    setState(() {
-      if (_posts[index]['isLiked'] == true) {
-        _posts[index]['likes']--;
-        _posts[index]['isLiked'] = false;
-      } else {
-        _posts[index]['likes']++;
-        _posts[index]['isLiked'] = true;
-      }
-    });
-    _savePosts();
-  }
+  // Local state to track "liked" posts by this device/session
+  // Since we aren't doing full auth, this is a visual trick
+  final Set<String> _likedPostIds = {};
 
   @override
   Widget build(BuildContext context) {
@@ -188,23 +49,60 @@ class _CommunityScreenState extends State<CommunityScreen> {
             children: [
                 _buildSyncBanner(),
                 Expanded(
-                  child: _isLoading 
-                    ? const Center(child: CircularProgressIndicator(color: Colors.white))
-                    : ListView.builder(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: _communityService.getPostsStream(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Something went wrong: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator(color: Colors.white));
+                      }
+
+                      if (snapshot.data!.docs.isEmpty) {
+                         return _buildEmptyState();
+                      }
+
+                      return ListView.builder(
                         padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
                         physics: const BouncingScrollPhysics(),
-                        itemCount: _posts.length + 1,
+                        itemCount: snapshot.data!.docs.length + 1,
                         itemBuilder: (context, index) {
                           if (index == 0) return _buildTrendingSection();
-                          return _buildPostCard(_posts[index - 1], index - 1);
+                          
+                          DocumentSnapshot doc = snapshot.data!.docs[index - 1];
+                          CommunityPost post = CommunityPost.fromFirestore(doc);
+                          
+                          return _buildPostCard(post);
                         },
-                      ),
+                      );
+                    },
+                  ),
                 ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildEmptyState() {
+      return Center(
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                  const Icon(Icons.chat_bubble_outline, size: 60, color: Colors.white70),
+                  const SizedBox(height: 16),
+                  const Text("No posts yet.", style: TextStyle(color: Colors.white, fontSize: 18)),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                      onPressed: _showPostDialog,
+                      child: const Text("Be the first to post!"),
+                  )
+              ],
+          ),
+      );
   }
 
   Widget _buildSyncBanner() {
@@ -217,7 +115,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               children: [
                   Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.greenAccent, shape: BoxShape.circle)).animate(onPlay: (c) => c.repeat()).fadeIn(duration: 1.seconds).fadeOut(duration: 1.seconds),
                   const SizedBox(width: 8),
-                  const Text("Live Sync Active • Decentralized Node", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  const Text("LIVE • Global Community Feed", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
               ],
           ),
       );
@@ -266,7 +164,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  Widget _buildPostCard(Map<String, dynamic> post, int index) {
+  Widget _buildPostCard(CommunityPost post) {
+    bool isLikedByMe = _likedPostIds.contains(post.id);
+    String timeAgo = _formatTime(post.timestamp);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -288,8 +189,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Color(post['color']),
-                  child: Text(post['avatar'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  backgroundColor: Color(post.color),
+                  child: Text(post.avatar, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -297,36 +198,46 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(post['author'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        if (post['isVerified'] == true) ...[
+                        Text(post.author, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        if (post.isVerified) ...[
                           const SizedBox(width: 4),
                           const Icon(Icons.verified, color: Colors.blue, size: 16),
                         ],
                       ],
                     ),
-                    Text(post['role'], style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                    Text(post.role, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                   ],
                 ),
                 const Spacer(),
-                Text(post['time'], style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                Text(timeAgo, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
               ],
             ),
             const SizedBox(height: 12),
-            Text(post['content'], style: const TextStyle(fontSize: 15, height: 1.4, color: Colors.black87)),
+            Text(post.content, style: const TextStyle(fontSize: 15, height: 1.4, color: Colors.black87)),
             const SizedBox(height: 16),
             Row(
               children: [
                 _buildActionButton(
-                  icon: post['isLiked'] ? Icons.favorite : Icons.favorite_border,
-                  color: post['isLiked'] ? Colors.red : Colors.grey,
-                  count: post['likes'],
-                  onTap: () => _toggleLike(index),
+                  icon: isLikedByMe ? Icons.favorite : Icons.favorite_border,
+                  color: isLikedByMe ? Colors.red : Colors.grey,
+                  count: post.likes,
+                  onTap: () {
+                     setState(() {
+                        if (isLikedByMe) {
+                            _likedPostIds.remove(post.id);
+                            _communityService.toggleLike(post.id, true);
+                        } else {
+                            _likedPostIds.add(post.id);
+                            _communityService.toggleLike(post.id, false);
+                        }
+                     });
+                  },
                 ),
                 const SizedBox(width: 20),
                 _buildActionButton(
                   icon: Icons.comment_outlined,
                   color: Colors.grey,
-                  count: post['comments'],
+                  count: post.comments,
                   onTap: () {},
                 ),
                 const Spacer(),
@@ -337,6 +248,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
         ),
       ),
     ).animate().fadeIn().slideY(begin: 0.1);
+  }
+
+  String _formatTime(DateTime? timestamp) {
+      if (timestamp == null) return "Just now";
+      final diff = DateTime.now().difference(timestamp);
+      if (diff.inMinutes < 1) return "Just now";
+      if (diff.inHours < 1) return "${diff.inMinutes}m ago";
+      if (diff.inDays < 1) return "${diff.inHours}h ago";
+      return "${diff.inDays}d ago";
   }
 
   Widget _buildActionButton({required IconData icon, required Color color, required int count, required VoidCallback onTap}) {
@@ -376,7 +296,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       onPressed: () {
                           if (textController.text.isNotEmpty) {
                               Navigator.pop(context);
-                              _addPost(textController.text);
+                              _communityService.addPost(
+                                  author: "Guest User", // Default for now
+                                  role: "Community Member",
+                                  content: textController.text,
+                                  avatar: "G",
+                                  color: Colors.teal.value
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Posting to cloud... ☁️"))
+                              );
                           }
                       },
                       icon: const Icon(Icons.send),
@@ -400,10 +329,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       children: [
                           const Text("About Community Hub", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
                           const SizedBox(height: 15),
-                          _buildInfoSection("What is this?", "The Community Hub is a decentralized, offline-capable collaborative space where native speakers, teachers, and students contribute, validate, and preserve tribal language data ethically."),
-                          _buildInfoSection("Why needed?", "Tribal languages are low-resource. This hub allows native speakers to contribute words ensuring linguistic authenticity."),
-                          _buildInfoSection("Is it online?", "It is offline-first. Contributions are stored locally and synced when connectivity is available."),
-                          _buildInfoSection("Privacy", "No data is uploaded without consent. Voice samples are recorded only after permission."),
+                          _buildInfoSection("What is this?", "A Live, connection to the global Speechmate community."),
+                          _buildInfoSection("Real-Time?", "Yes! Posts appear instantly for everyone online."),
+                          _buildInfoSection("Privacy", "No personal data is uploaded. Be kind and respectful."),
                           const SizedBox(height: 20),
                           Center(
                               child: ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text("Got it!"))

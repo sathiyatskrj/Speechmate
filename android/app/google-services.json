@@ -1,0 +1,29 @@
+{
+    "project_info": {
+        "project_number": "300078500168",
+        "project_id": "speechmate-30a09",
+        "storage_bucket": "speechmate-30a09.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:300078500168:android:32e551cb297697d905cb7d",
+                "android_client_info": {
+                    "package_name": "com.speechmate.speechmate"
+                }
+            },
+            "oauth_client": [],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyAvQAv0XjIFSDWJr-przG5EvG-RyRq_yPs"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": []
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}
