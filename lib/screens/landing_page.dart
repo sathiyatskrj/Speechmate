@@ -52,7 +52,7 @@ class _LandingPageState extends State<LandingPage> {
                                   ),
                                 ).animate().fadeIn().slideX(begin: -0.2),
                                 Text(
-                                  "Enterprise Edition",
+                                  "where language barriers end",
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     color: Colors.cyanAccent,
@@ -89,7 +89,7 @@ class _LandingPageState extends State<LandingPage> {
                     
                     const SizedBox(height: 16),
                     Text(
-                      "The premier bilingual assistant for Nicobarese education and translation.",
+                      "Your Personal bilingual assistant ",
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         color: Colors.white70,
@@ -100,7 +100,7 @@ class _LandingPageState extends State<LandingPage> {
                     const Spacer(flex: 2),
                     
                     Text(
-                      "SELECT PREFERENCE",
+                      "YOU ARE",
                       style: GoogleFonts.inter(
                          fontSize: 12, 
                          fontWeight: FontWeight.bold, 
