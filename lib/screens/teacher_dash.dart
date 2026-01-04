@@ -311,7 +311,6 @@ class _TeacherDashState extends State<TeacherDash> {
       ),
     );
   }
-  }
 }
 
 class TranslationCard extends StatelessWidget {
