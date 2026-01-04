@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/widgets/about.dart';
-import '../widgets/background.dart';
-import '../widgets/button.dart';
-import '../widgets/tap_scale.dart';
+import 'package:speechmate/widgets/button.dart';
+import 'package:speechmate/widgets/tap_scale.dart';
+import 'package:speechmate/widgets/voice_reactive_aurora.dart';
+import 'package:speechmate/core/app_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -19,117 +22,196 @@ class _LandingPageState extends State<LandingPage> {
     return Scaffold(
       body: Stack(
         children: [
-          Background(
-            colors: const [Color(0xFFB3F4FF), Color(0xFF00D1FF)],
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 60), // space below info button
+          // Enterprise Background: 
+          // Default to Teacher mode (Dark) for initial premium look, 
+          // or dynamic based on selection? Let's use Dark for that "Tech/Enterprise" feel initially.
+          VoiceReactiveAurora(
+            isDark: selectedRole != 'student', 
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
+                    
+                    // Header Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                Text(
+                                  "SpeechMate",
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    letterSpacing: -1.0,
+                                  ),
+                                ).animate().fadeIn().slideX(begin: -0.2),
+                                Text(
+                                  "Enterprise Edition",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: Colors.cyanAccent,
+                                    letterSpacing: 2.0,
+                                    fontWeight: FontWeight.w600
+                                  ),
+                                ).animate().fadeIn(delay: 300.ms),
+                            ],
+                        ),
+                        // Using the new theme's icon style if possible, or manual clear override
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              shape: BoxShape.circle
+                          ),
+                          child: const InfoButton(),
+                        )
+                      ],
+                    ),
 
-                const Text(
-                  "Welcome to Speechmate",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
+                    const Spacer(flex: 1),
+
+                    // Main Title
+                    Text(
+                      "Break Barriers.\nConnect Worlds.",
+                      style: GoogleFonts.outfit(
+                        fontSize: 48,
+                        height: 1.1,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ).animate().fadeIn().slideY(begin: 0.3, end: 0),
+                    
+                    const SizedBox(height: 16),
+                    Text(
+                      "The premier bilingual assistant for Nicobarese education and translation.",
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: Colors.white70,
+                        height: 1.5,
+                      ),
+                    ).animate().fadeIn(delay: 500.ms),
+
+                    const Spacer(flex: 2),
+                    
+                    Text(
+                      "SELECT PREFERENCE",
+                      style: GoogleFonts.inter(
+                         fontSize: 12, 
+                         fontWeight: FontWeight.bold, 
+                         color: Colors.white54,
+                         letterSpacing: 1.5
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Role Selection Cards
+                    Row(
+                        children: [
+                             Expanded(
+                                 child: _buildRoleCard(
+                                     title: "Student",
+                                     subtitle: "Learn & Play",
+                                     icon: Icons.school_rounded,
+                                     id: "student",
+                                     color: Colors.pinkAccent,
+                                 ),
+                             ),
+                             const SizedBox(width: 16),
+                             Expanded(
+                                 child: _buildRoleCard(
+                                     title: "Teacher",
+                                     subtitle: "Manage & Guide",
+                                     icon: Icons.cast_for_education_rounded,
+                                     id: "teacher",
+                                     color: Colors.cyanAccent,
+                                 ),
+                             ),
+                        ],
+                    ),
+
+                    const Spacer(flex: 1),
+
+                    // Continue Button
+                    AnimatedOpacity(
+                        opacity: selectedRole.isNotEmpty ? 1.0 : 0.0,
+                        duration: 300.ms,
+                        child: Center(
+                            child: NextButton(selectedRole: selectedRole)
+                        ),
+                    ),
+                    
+                    const SizedBox(height: 40),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  "your personal bilingual assistant",
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-
-                const SizedBox(height: 40),
-                const Text(
-                  "Select your role.",
-                  style: TextStyle(fontSize: 16, color: Colors.black87),
-                ),
-
-                const SizedBox(height: 20),
-
-                // STUDENT BUTTON
-                _roleButton(
-                  title: "STUDENT 🎓",
-                  selected: selectedRole == "student",
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFF6F6F), Color(0xFFB03FFF)],
-                  ),
-                  onTap: () {
-                    setState(() => selectedRole = "student");
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // TEACHER BUTTON
-                _roleButton(
-                  title: "TEACHER 🏫",
-                  selected: selectedRole == "teacher",
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF9F80FF), Color(0xFF6FB8FF)],
-                  ),
-                  onTap: () {
-                    setState(() => selectedRole = "teacher");
-                  },
-                ),
-
-                const Spacer(),
-
-                Center(child: NextButton(selectedRole: selectedRole)),
-              ],
+              ),
             ),
-          ),
-
-          // INFO BUTTON (Top-Right Overlay)
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 12,
-            right: 16,
-            child: const InfoButton(),
           ),
         ],
       ),
     );
   }
 
-  Widget _roleButton({
-    required String title,
-    required bool selected,
-    required Gradient gradient,
-    required VoidCallback onTap,
+  Widget _buildRoleCard({
+      required String title, 
+      required String subtitle, 
+      required IconData icon, 
+      required String id, 
+      required Color color
   }) {
-    return TapScale(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 1),
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 22),
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selected ? Colors.white : Colors.transparent,
-            width: 2,
+      final isSelected = selectedRole == id;
+      
+      return TapScale(
+          onTap: () {
+              setState(() => selectedRole = id);
+          },
+          child: AnimatedContainer(
+              duration: 300.ms,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                  color: isSelected ? color.withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                  border: Border.all(
+                      color: isSelected ? color : Colors.white.withOpacity(0.1),
+                      width: isSelected ? 2 : 1
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                      Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                              color: isSelected ? color : Colors.white.withOpacity(0.1),
+                              shape: BoxShape.circle
+                          ),
+                          child: Icon(icon, color: isSelected ? Colors.white : Colors.white70, size: 24),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                          title,
+                          style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white
+                          ),
+                      ),
+                      const SizedBox(height: 4),
+                       Text(
+                          subtitle,
+                          style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: Colors.white60
+                          ),
+                      ),
+                  ],
+              ),
           ),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 4,
-              offset: Offset(2, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      ),
-    );
+      );
   }
 }

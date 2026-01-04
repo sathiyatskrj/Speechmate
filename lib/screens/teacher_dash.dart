@@ -6,22 +6,11 @@ import 'package:speechmate/screens/quiz_screen.dart';
 import 'package:speechmate/screens/progress_screen.dart';
 import 'package:speechmate/screens/chat_translate_screen.dart';
 import 'package:speechmate/screens/teacher_levels_screen.dart'; // Assuming this exists or using generic
-import '../widgets/background.dart';
-import '../widgets/search_bar.dart';
-import '../widgets/translation_card.dart';
-import '../services/dictionary_service.dart';
-import '../services/tts_service.dart';
-import '../services/tts_service.dart';
-import '../services/whisper_service.dart'; // Mic Support
-import 'package:record/record.dart'; // Mic Support
-import 'package:path_provider/path_provider.dart'; // Mic Support
-import 'dart:io'; // Mic Support
-import 'dart:typed_data'; // Mic Support
-import '../widgets/ai_assistant_overlay.dart'; // Mic Support
-import 'package:speechmate/screens/common_phrases_screen.dart'; // Placeholder for new screen
-import 'package:speechmate/screens/voice_vault_screen.dart'; // Placeholder for Record feature
-import 'package:speechmate/screens/culture_screen.dart'; // [NEW] Link
 import 'package:speechmate/screens/beta_chat_screen.dart';
+import 'package:speechmate/widgets/smart_dashboard_header.dart'; // [NEW] Link
+import 'package:speechmate/widgets/voice_reactive_aurora.dart'; // [NEW] Link
+import 'package:speechmate/core/app_theme.dart'; // [NEW] Link
+
 
 
 
@@ -36,18 +25,14 @@ class _TeacherDashState extends State<TeacherDash> {
   final TextEditingController _searchController = TextEditingController();
   final DictionaryService _dictionaryService = DictionaryService();
   final TtsService _ttsService = TtsService();
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  // AudioRecorder removed
   
   bool _isLoading = false;
   Map<String, dynamic>? _result;
   bool _searchedNicobarese = false;
   bool _hasSearched = false;
   Map<String, dynamic>? _dailyWord;
-  
-  // AI Mic State
-  bool _isRecording = false;
-  bool _showAiOverlay = false;
-  String _aiText = "";
+
 
   @override
   void initState() {
@@ -71,20 +56,18 @@ class _TeacherDashState extends State<TeacherDash> {
     }
   }
 
-  Future<void> _performSearch() async {
+  Future<void> _performSearch(String query) async {
     FocusScope.of(context).unfocus();
-    if (_searchController.text.isEmpty) return;
+    if (query.isEmpty) return;
 
     setState(() => _isLoading = true);
 
     // 1. Direct Search
-    var searchResult = await _dictionaryService.searchEverywhere(
-      _searchController.text,
-    );
+    var searchResult = await _dictionaryService.searchEverywhere(query);
     
     // 2. NLP Translation Fallback
     if (searchResult == null) {
-        searchResult = await _dictionaryService.translateSentence(_searchController.text);
+        searchResult = await _dictionaryService.translateSentence(query);
     }
 
     if (mounted) {
@@ -97,9 +80,9 @@ class _TeacherDashState extends State<TeacherDash> {
           } else if (searchResult!.containsKey('_isGenerated')) {
              _searchedNicobarese = false; 
           } else {
-              final query = _searchController.text.trim().toLowerCase();
+              final q = query.trim().toLowerCase();
               _searchedNicobarese =
-                  searchResult!['nicobarese'].toString().toLowerCase() == query;
+                  searchResult!['nicobarese'].toString().toLowerCase() == q;
           }
         } else {
           _searchedNicobarese = false;
@@ -119,180 +102,44 @@ class _TeacherDashState extends State<TeacherDash> {
 
   @override
   void dispose() {
-    _audioRecorder.dispose();
     super.dispose();
   }
+  // Removed Mic/Whisper logic (now in header)
 
-  // --- MIC & WHISPER LOGIC ---
-  Future<String> _getModelPath() async {
-     final Directory appDocDir = await getApplicationDocumentsDirectory();
-     final String modelPath = '${appDocDir.path}/ggml-tiny.en.bin';
-     
-     if (!File(modelPath).existsSync()) {
-       try {
-         final ByteData data = await DefaultAssetBundle.of(context).load('assets/models/ggml-tiny.en.bin');
-         final List<int> bytes = data.buffer.asUint8List();
-         await File(modelPath).writeAsBytes(bytes);
-       } catch (e) {
-         print("Error copying model: $e");
-       }
-     }
-     return modelPath;
-  }
-
-  Future<void> _startRecording() async {
-    try {
-      if (await _audioRecorder.hasPermission()) {
-        final Directory appDocDir = await getApplicationDocumentsDirectory();
-        final String filePath = '${appDocDir.path}/temp_recording_teacher.wav';
-        
-        await _audioRecorder.start(
-          const RecordConfig(
-            encoder: AudioEncoder.wav,
-            sampleRate: 16000,
-            numChannels: 1,
-          ), 
-          path: filePath
-        );
-        
-        setState(() {
-          _isRecording = true;
-          _showAiOverlay = true; 
-          _aiText = "Listening...";
-        });
-      }
-    } catch (e) {
-      debugPrint("Error starting record: $e");
-      if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to start recording: $e")));
-      }
-    }
-  }
-
-  Future<void> _stopRecording() async {
-    try {
-      final path = await _audioRecorder.stop();
-        await Future.delayed(const Duration(milliseconds: 300)); // Flush buffer
-      setState(() {
-        _isRecording = false;
-        _aiText = "Thinking..."; 
-      });
-
-      if (path != null) {
-        final modelPath = await _getModelPath();
-        final text = await WhisperService().transcribe(modelPath, path);
-        
-        if (text.startsWith("Error")) {
-           setState(() => _aiText = "Oops! I didn't catch that.");
-        } else {
-           final cleanText = text.replaceAll("[BLANK_AUDIO]", "").trim();
-           setState(() {
-               _aiText = cleanText.isEmpty ? "I heard silence..." : cleanText;
-               _searchController.text = cleanText; 
-           });
-           
-           if (cleanText.isNotEmpty) {
-               await Future.delayed(const Duration(seconds: 2));
-               if (mounted) {
-                   setState(() => _showAiOverlay = false);
-                   _performSearch();
-               }
-               return; 
-           }
-        }
-      }
-    } catch (e) {
-       setState(() => _aiText = "Error: $e");
-       debugPrint("Recording Error: $e");
-    }
-  }
-  
-  void _onMicTap() {
-      if (_isRecording) {
-          _stopRecording();
-      } else {
-          _startRecording();
-      }
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Background(
-            colors: const [Color(0xFF141E30), Color(0xFF243B55)],
-            padding: EdgeInsets.zero,
-            child: SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Teacher Panel",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Where language barriers end.",
-                          style: TextStyle(color: Colors.cyanAccent, fontSize: 14, fontStyle: FontStyle.italic),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.logout, color: Colors.white70),
-                      onPressed: () => Navigator.pop(context),
-                    )
-                  ],
-                ),
-                
-                const SizedBox(height: 25),
+    return Theme(
+      data: AppTheme.teacherTheme,
+      child: Scaffold(
+        body: VoiceReactiveAurora(
+          isDark: true,
+          child: Column(
+            children: [
+              SmartDashboardHeader(
+                isTeacher: true,
+                searchController: _searchController,
+                onSearch: _performSearch,
+                onClear: _clearSearch,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                        if (_dailyWord != null) ...[
+                          _buildDailyWordCard(_dailyWord!),
+                          const SizedBox(height: 25),
+                        ],
 
-                // DAILY WORD
-                if (_dailyWord != null)
-                  _buildDailyWordCard(_dailyWord!),
-                
-                const SizedBox(height: 25),
-
-                // TRANSLATION TOOL
-                const Text(
-                  "QUICK TRANSLATE",
-                  style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                   padding: const EdgeInsets.all(16),
-                   decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                   ),
-                   child: Column(
-                     children: [
-                        Search(
-                          controller: _searchController, 
-                          onSearch: _performSearch, 
-                          onClear: _clearSearch, 
-                          onMicTap: _onMicTap, 
-                        ),
                         if (_isLoading)
-                           const Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: Colors.cyanAccent)),
+                           const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
                         
                         if (!_isLoading && _hasSearched)
                            Padding(
-                             padding: const EdgeInsets.only(top: 15),
+                             padding: const EdgeInsets.only(bottom: 25),
                              child: TranslationCard(
                                 nicobarese: _result != null ? _result!['nicobarese'] : "No match found",
                                 english: _result != null ? (_result!['english'] ?? _result!['text'] ?? "") : "",
@@ -311,113 +158,99 @@ class _TeacherDashState extends State<TeacherDash> {
                                     }
                                 },
                              ),
-                           )
-                     ],
-                   ),
-                ),
+                           ),
 
-                const SizedBox(height: 25),
-
-                // FEATURES GRID
-                const Text(
-                  "TOOLS & RESOURCES",
-                  style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                ),
-                const SizedBox(height: 15),
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio: 1.3,
-                  children: [
-                    _buildFeatureCard(
-                      context,
-                      title: "Certification",
-                      icon: Icons.verified,
-                      color: Colors.amberAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Community",
-                      icon: Icons.public,
-                      color: Colors.blueAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Quiz Mode",
-                      icon: Icons.quiz,
-                      color: Colors.purpleAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Progress",
-                      icon: Icons.bar_chart,
-                      color: Colors.greenAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Translator",
-                      icon: Icons.translate,
-                      color: Colors.orangeAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Common Phrases",
-                      icon: Icons.chat_bubble_outline,
-                      color: Colors.pinkAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Voice Vault",
-                      icon: Icons.mic,
-                      color: Colors.redAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Culture",
-                      icon: Icons.account_balance,
-                      color: Colors.tealAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
-                    ),
-                    _buildFeatureCard(
-                      context,
-                      title: "Beta Chat",
-                      icon: Icons.forum,
-                      color: Colors.indigoAccent,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-              ],
+                  // FEATURES GRID
+                  const Text(
+                    "TOOLS & RESOURCES",
+                    style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                  ),
+                  const SizedBox(height: 15),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                    childAspectRatio: 1.3,
+                    children: [
+                      _buildFeatureCard(
+                        context,
+                        title: "Certification",
+                        icon: Icons.verified,
+                        color: Colors.amberAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Community",
+                        icon: Icons.public,
+                        color: Colors.blueAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Quiz Mode",
+                        icon: Icons.quiz,
+                        color: Colors.purpleAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Progress",
+                        icon: Icons.bar_chart,
+                        color: Colors.greenAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Translator",
+                        icon: Icons.translate,
+                        color: Colors.orangeAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Common Phrases",
+                        icon: Icons.chat_bubble_outline,
+                        color: Colors.pinkAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Voice Vault",
+                        icon: Icons.mic,
+                        color: Colors.redAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Culture",
+                        icon: Icons.account_balance,
+                        color: Colors.tealAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Beta Chat",
+                        icon: Icons.forum,
+                        color: Colors.indigoAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
+              ],
+            ), 
         ),
-      ),
-          _buildAiOverlay(),
-        ],
       ),
     );
   }
 
-  Widget _buildAiOverlay() {
-      if (!_showAiOverlay) return const SizedBox.shrink();
-      return AiAssistantOverlay(
-          isListening: _isRecording,
-          currentText: _aiText,
-          onMicPressed: _onMicTap,
-          onClose: () => setState(() => _showAiOverlay = false),
-      );
-  }
 
   Widget _buildDailyWordCard(Map<String, dynamic> word) {
     return Container(

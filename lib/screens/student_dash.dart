@@ -1,16 +1,12 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:record/record.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:speechmate/services/dictionary_service.dart';
-import 'package:speechmate/services/whisper_service.dart';
 import 'package:speechmate/services/tts_service.dart';
-import 'package:speechmate/widgets/background.dart';
-import 'package:speechmate/widgets/search_bar.dart';
 import 'package:speechmate/widgets/translation_card.dart';
 import 'package:speechmate/widgets/gamification_header.dart';
-import 'package:speechmate/widgets/ai_assistant_overlay.dart';
+import 'package:speechmate/widgets/smart_dashboard_header.dart'; // [NEW] Shared Component
+import 'package:speechmate/widgets/voice_reactive_aurora.dart'; // [NEW] Wow Factor
+import 'package:speechmate/core/app_theme.dart'; // [NEW] Theme
+
 
 // Screen Imports
 import 'package:speechmate/screens/number_page.dart';
@@ -41,16 +37,12 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   final TextEditingController searchController = TextEditingController();
   final DictionaryService dictionaryService = DictionaryService();
   final TtsService ttsService = TtsService();
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  // removed: AudioRecorder, WhisperLogic (handled by Header)
 
   Map<String, dynamic>? result;
   bool searchedNicobarese = false;
   bool isLoading = false;
-  
-  // AI Assistant State
-  bool _isRecording = false;
-  bool _showAiOverlay = false;
-  String _aiText = ""; 
+ 
 
   @override
   void initState() {
@@ -67,7 +59,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     searchController.dispose();
     dictionaryService.unload(DictionaryType.words);
-    _audioRecorder.dispose();
     super.dispose();
   }
 
@@ -79,20 +70,18 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> performSearch() async {
+  Future<void> performSearch(String query) async {
     FocusScope.of(context).unfocus();
-    if (searchController.text.isEmpty) return;
+    if (query.isEmpty) return;
 
     setState(() => isLoading = true);
 
     // 1. Direct Search
-    var searchResult = await dictionaryService.searchEverywhere(
-      searchController.text,
-    );
+    var searchResult = await dictionaryService.searchEverywhere(query);
     
     // 2. NLP Translation Fallback
     if (searchResult == null) {
-        searchResult = await dictionaryService.translateSentence(searchController.text);
+        searchResult = await dictionaryService.translateSentence(query);
     }
 
     if (mounted) {
@@ -105,9 +94,9 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
           } else if (searchResult!.containsKey('_isGenerated')) {
              searchedNicobarese = false; 
           } else {
-              final query = searchController.text.trim().toLowerCase();
+              final q = query.trim().toLowerCase();
               searchedNicobarese =
-                  searchResult!['nicobarese'].toString().toLowerCase() == query;
+                  searchResult!['nicobarese'].toString().toLowerCase() == q;
           }
         } else {
           searchedNicobarese = false;
@@ -116,97 +105,8 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       });
     }
   }
+  // Removed: _getModelPath, _startRecording, _stopRecording, _onMicTap (Moving to Header)
 
-  Future<String> _getModelPath() async {
-     final Directory appDocDir = await getApplicationDocumentsDirectory();
-     final String modelPath = '${appDocDir.path}/ggml-tiny.en.bin';
-     
-     if (!File(modelPath).existsSync()) {
-       try {
-         final ByteData data = await DefaultAssetBundle.of(context).load('assets/models/ggml-tiny.en.bin');
-         final List<int> bytes = data.buffer.asUint8List();
-         await File(modelPath).writeAsBytes(bytes);
-       } catch (e) {
-         print("Error copying model: $e");
-       }
-     }
-     return modelPath;
-  }
-
-  Future<void> _startRecording() async {
-    try {
-      if (await _audioRecorder.hasPermission()) {
-        final Directory appDocDir = await getApplicationDocumentsDirectory();
-        final String filePath = '${appDocDir.path}/temp_recording.wav';
-        
-        await _audioRecorder.start(
-          const RecordConfig(
-            encoder: AudioEncoder.wav,
-            sampleRate: 16000,
-            numChannels: 1,
-          ), 
-          path: filePath
-        );
-        
-        setState(() {
-          _isRecording = true;
-          _showAiOverlay = true; 
-          _aiText = "Listening...";
-        });
-      }
-    } catch (e) {
-      debugPrint("Error starting record: $e");
-      if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to start recording: $e")));
-      }
-    }
-  }
-
-  Future<void> _stopRecording() async {
-    try {
-      final path = await _audioRecorder.stop();
-      await Future.delayed(const Duration(milliseconds: 300)); // Flush buffer
-      setState(() {
-        _isRecording = false;
-        _aiText = "Thinking..."; 
-      });
-
-      if (path != null) {
-        final modelPath = await _getModelPath();
-        final text = await WhisperService().transcribe(modelPath, path);
-        
-        if (text.startsWith("Error")) {
-           setState(() => _aiText = "Oops! I didn't catch that.");
-        } else {
-           final cleanText = text.replaceAll("[BLANK_AUDIO]", "").trim();
-           setState(() {
-               _aiText = cleanText.isEmpty ? "I heard silence..." : cleanText;
-               searchController.text = cleanText; 
-           });
-           
-           if (cleanText.isNotEmpty) {
-               await Future.delayed(const Duration(seconds: 2));
-               if (mounted) {
-                   setState(() => _showAiOverlay = false);
-                   performSearch();
-               }
-               return; 
-           }
-        }
-      }
-    } catch (e) {
-       setState(() => _aiText = "Error: $e");
-       debugPrint("Recording Error: $e");
-    }
-  }
-  
-  void _onMicTap() {
-      if (_isRecording) {
-          _stopRecording();
-      } else {
-          _startRecording();
-      }
-  }
 
   final List<Map<String, dynamic>> learningTiles = [
     {"word": "Numbers", "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": NumberPage(), "icon": Icons.format_list_numbered_rounded},
@@ -227,90 +127,46 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          Background(
-            colors: const [Color(0xFFFFDEE9), Color(0xFFB5FFFC)], // Fairyland Gradient (Pink -> Cyan)
-            padding: EdgeInsets.zero,
-            child: SafeArea(
-              child: Column(
-                children: [
-                   _buildHeroHeader(context),
-                   const SizedBox(height: 10),
-                   Expanded(
-                     child: SingleChildScrollView(
-                       physics: const BouncingScrollPhysics(),
-                       child: Column(
-                         children: [
-                             if (isLoading)
-                               const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)))
-                             else if (searchController.text.isNotEmpty)
-                               _buildSearchResults(),
-                             
-                             _buildDashboardContent(),
-                         ],
-                       ),
+    return Theme(
+      data: AppTheme.studentTheme,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        body: VoiceReactiveAurora(
+          isDark: false, // Student Mode (Bright)
+          child: SafeArea(
+            child: Column(
+              children: [
+                 SmartDashboardHeader(
+                   isTeacher: false,
+                   searchController: searchController,
+                   onSearch: performSearch,
+                   onClear: clearSearch,
+                 ),
+                 const SizedBox(height: 10),
+                 Expanded(
+                   child: SingleChildScrollView(
+                     physics: const BouncingScrollPhysics(),
+                     child: Column(
+                       children: [
+                           if (isLoading)
+                             const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)))
+                           else if (searchController.text.isNotEmpty)
+                             _buildSearchResults(),
+                           
+                           _buildDashboardContent(),
+                       ],
                      ),
                    ),
-                ],
-              ),
+                 ),
+              ],
             ),
           ),
-          
-          if (_showAiOverlay)
-            AiAssistantOverlay(
-                isListening: _isRecording,
-                currentText: _aiText,
-                onMicPressed: _onMicTap,
-                onClose: () => setState(() => _showAiOverlay = false),
-            )
-        ],
+        ),
       ),
     );
   }
+  // _buildHeroHeader removed
 
-  Widget _buildHeroHeader(BuildContext context) {
-      return Container(
-         padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
-         decoration: BoxDecoration(
-           gradient: LinearGradient(colors: [Colors.white.withOpacity(0.1), Colors.white.withOpacity(0.05)]),
-           borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
-           border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.1))),
-         ),
-         child: Column(
-           children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("SpeechMate", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.purple, letterSpacing: 1.5)),
-                      Text("Where language barriers end.", style: TextStyle(color: Colors.purpleAccent, fontSize: 14, fontStyle: FontStyle.italic)),
-                    ],
-                  ),
-                  Container(
-                    decoration: BoxDecoration(color: Colors.cyanAccent.withOpacity(0.2), shape: BoxShape.circle),
-                    child: IconButton(
-                        icon: const Icon(Icons.mic_none_outlined, color: Colors.cyanAccent),
-                        onPressed: _onMicTap, 
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 25),
-              Search(
-                 controller: searchController,
-                 onSearch: performSearch,
-                 onClear: clearSearch,
-                 onMicTap: _onMicTap,
-              ),
-           ],
-         ),
-      );
-  }
 
   Widget _buildSearchResults() {
       return Padding(
