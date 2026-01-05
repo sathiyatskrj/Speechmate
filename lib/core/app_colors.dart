@@ -6,8 +6,12 @@ class AppColors {
   static const Color studentAccent = Color(0xFF00FFFF); // Cyan Accent
   static const Color studentGlass = Color(0x33FFFFFF); // White at 20%
   static const List<Color> studentGradient = [
-    Color(0xFFFFDEE9), // Light Pink
-    Color(0xFFB5FFFC), // Light Cyan
+    Color(0xFFFF9A9E), // Warm Pink
+    Color(0xFFFECFEF), // Soft Pink
+    Color(0xFFF6D365), // Sunny Yellow
+    Color(0xFFFDA085), // Peach Orange
+    Color(0xFF84FAB0), // Mint Green
+    Color(0xFF8FD3F4), // Sky Blue
   ];
 
   // --- Teacher Palette (Professional) ---
