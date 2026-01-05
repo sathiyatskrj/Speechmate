@@ -21,9 +21,6 @@ class VoiceReactiveAurora extends StatefulWidget {
 
 class _VoiceReactiveAuroraState extends State<VoiceReactiveAurora> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  // Simulated voice intensity (would be connected to mic amplitude in a real fully integrated implementation)
-  double _voiceIntensity = 0.0; 
-  Timer? _simulationTimer;
 
   @override
   void initState() {
@@ -32,32 +29,11 @@ class _VoiceReactiveAuroraState extends State<VoiceReactiveAurora> with SingleTi
       vsync: this, 
       duration: const Duration(seconds: 10),
     )..repeat();
-    
-    // simulate subtle breathing when idle
-    _startSimulation();
-  }
-
-  void _startSimulation() {
-    // In a real implementation this would listen to the AudioStream
-    // Here we create a "fake" natural movement for visual flair
-    _simulationTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      if (!mounted) return;
-      setState(() {
-         // Random subtle fluctuation
-         double noise = (Random().nextDouble() - 0.5) * 0.1;
-         _voiceIntensity = (_voiceIntensity + noise).clamp(0.0, 1.0);
-         
-         // Drift back to valid range
-         if (_voiceIntensity < 0.2) _voiceIntensity += 0.05;
-         if (_voiceIntensity > 0.8) _voiceIntensity -= 0.05;
-      });
-    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _simulationTimer?.cancel();
     super.dispose();
   }
 
@@ -80,13 +56,16 @@ class _VoiceReactiveAuroraState extends State<VoiceReactiveAurora> with SingleTi
         AnimatedBuilder(
           animation: _controller,
           builder: (context, _) {
-            return CustomPaint(
-              painter: _AuroraPainter(
-                animationValue: _controller.value,
-                intensity: _voiceIntensity,
-                isDark: widget.isDark,
+            // Optimize: Only repaint when necessary is handled by CustomPainter
+            // We use RepaintBoundary to isolate the painting layer
+            return RepaintBoundary(
+              child: CustomPaint(
+                painter: _AuroraPainter(
+                  animationValue: _controller.value,
+                  isDark: widget.isDark,
+                ),
+                child: Container(),
               ),
-              child: Container(),
             );
           },
         ),
@@ -100,10 +79,9 @@ class _VoiceReactiveAuroraState extends State<VoiceReactiveAurora> with SingleTi
 
 class _AuroraPainter extends CustomPainter {
   final double animationValue;
-  final double intensity;
   final bool isDark;
 
-  _AuroraPainter({required this.animationValue, required this.intensity, required this.isDark});
+  _AuroraPainter({required this.animationValue, required this.isDark});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -114,15 +92,19 @@ class _AuroraPainter extends CustomPainter {
     final Color baseColor = isDark ? Colors.cyanAccent : Colors.purpleAccent;
     final Color secondaryColor = isDark ? Colors.purpleAccent : Colors.pinkAccent;
 
+    // Use derived noise from animation value to avoid separate state
+    // intensity oscillates slowly between 0.3 and 0.7
+    final double derivedIntensity = 0.3 + (0.4 * (0.5 + 0.5 * sin(animationValue * 2 * pi)));
+
     // We draw multiple flowing curves
     for (int i = 0; i < 3; i++) {
-        _drawRibbon(canvas, size, paint, baseColor, i, 1.0);
-        _drawRibbon(canvas, size, paint, secondaryColor, i, -1.0);
+        _drawRibbon(canvas, size, paint, baseColor, i, 1.0, derivedIntensity);
+        _drawRibbon(canvas, size, paint, secondaryColor, i, -1.0, derivedIntensity);
     }
   }
 
-  void _drawRibbon(Canvas canvas, Size size, Paint paint, Color color, int index, double direction) {
-    paint.color = color.withOpacity(0.15 + (intensity * 0.1)); // Reacts to "voice"
+  void _drawRibbon(Canvas canvas, Size size, Paint paint, Color color, int index, double direction, double intensity) {
+    paint.color = color.withOpacity(0.15 + (intensity * 0.1));
     
     final path = Path();
     final double waveHeight = size.height * 0.5;
@@ -133,7 +115,8 @@ class _AuroraPainter extends CustomPainter {
     
     path.moveTo(0, size.height);
     
-    for (double x = 0; x <= size.width; x += 20) {
+    // OPTIMIZATION: Increased step from 20 to 40 to reduce Path operations by 50%
+    for (double x = 0; x <= size.width; x += 40) {
        final double normalizedX = x / size.width;
        final double sine1 = sin(normalizedX * 4 * pi + t);
        final double sine2 = cos(normalizedX * 2 * pi - t * 0.5);
@@ -142,12 +125,13 @@ class _AuroraPainter extends CustomPainter {
                         (sine1 * 50 * direction) + 
                         (sine2 * 30) + 
                         yOffset + 
-                        (sin(t * 2) * 20 * intensity); // Jitter on intensity
+                        (sin(t * 2) * 20 * intensity); 
 
        if (x == 0) path.moveTo(x, y);
        path.lineTo(x, y);
     }
     
+    // Close the shape to bottom
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
@@ -158,6 +142,6 @@ class _AuroraPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _AuroraPainter oldDelegate) {
      return oldDelegate.animationValue != animationValue || 
-            oldDelegate.intensity != intensity;
+            oldDelegate.isDark != isDark;
   }
 }

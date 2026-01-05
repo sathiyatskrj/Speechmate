@@ -52,26 +52,50 @@ class _LandingPageState extends State<LandingPage> {
           
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
                    const SizedBox(height: 20),
                    // Top Bar: Logo & Info
                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                          Text(
-                            "SpeechMate",
-                            style: GoogleFonts.outfit(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 1.0,
-                              shadows: [
-                                Shadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
-                              ]
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "SpeechMate",
+                                style: GoogleFonts.outfit(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 1.0,
+                                  shadows: [
+                                    Shadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                                  ]
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Where Language Barriers End",
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.9),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
                           ),
+                          // Restored Info Button
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const InfoButton(),
+                          )
                       ],
                    ),
 
@@ -84,7 +108,7 @@ class _LandingPageState extends State<LandingPage> {
                           Text(
                             "Who is learning today?",
                             style: GoogleFonts.outfit(
-                               fontSize: 22, 
+                               fontSize: 24, 
                                fontWeight: FontWeight.w600, 
                                color: Colors.white,
                                shadows: [Shadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0,2))]
@@ -99,14 +123,14 @@ class _LandingPageState extends State<LandingPage> {
                               children: [
                                    _buildRoleCard(
                                        title: "Student",
-                                       icon: Icons.face_retouching_natural_rounded,
+                                       emoji: "🙋🏻‍♂️",
                                        id: "student",
                                        color: Colors.pinkAccent,
                                    ),
-                                   const SizedBox(width: 25),
+                                   const SizedBox(width: 20),
                                    _buildRoleCard(
                                        title: "Teacher",
-                                       icon: Icons.school_rounded,
+                                       emoji: "👨🏻‍🏫",
                                        id: "teacher",
                                        color: Colors.blueAccent,
                                    ),
@@ -136,7 +160,7 @@ class _LandingPageState extends State<LandingPage> {
 
   Widget _buildRoleCard({
       required String title, 
-      required IconData icon, 
+      required String emoji, 
       required String id, 
       required Color color
   }) {
@@ -148,8 +172,8 @@ class _LandingPageState extends State<LandingPage> {
           },
           child: AnimatedContainer(
               duration: 300.ms,
-              width: 140,
-              height: 180,
+              width: 150, // Slightly wider for comfort
+              height: 190,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                   color: isSelected 
@@ -175,10 +199,9 @@ class _LandingPageState extends State<LandingPage> {
                               color: isSelected ? color.withOpacity(0.1) : Colors.white.withOpacity(0.2),
                               shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            icon, 
-                            color: isSelected ? color : Colors.white, 
-                            size: 32
+                          child: Text(
+                            emoji, 
+                            style: const TextStyle(fontSize: 40), // Large Emoji
                           ),
                       ),
                       const SizedBox(height: 20),
