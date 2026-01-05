@@ -30,6 +30,7 @@ class SmartDashboardHeader extends StatefulWidget {
   State<SmartDashboardHeader> createState() => _SmartDashboardHeaderState();
 }
 
+class _SmartDashboardHeaderState extends State<SmartDashboardHeader> {
   // --- VOICE LOGIC ---
   Future<void> _onMicTap() async {
        final result = await VoiceAssistantDialog.show(context);
