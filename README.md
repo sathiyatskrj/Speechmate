@@ -19,7 +19,7 @@
     <img src="https://img.shields.io/badge/Dart-3.2+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="DART" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/Flutter-3.16+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
+    <img src="https://img.shields.io/badge/Flutter-3.19+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/AI-Whisper_Tiny-4285F4?style=for-the-badge&logo=openai&logoColor=white" alt="Whisper AI" />
@@ -48,7 +48,7 @@
 *   **70% of tribal students** face learning gaps due to language barriers in government schools.
 
 **The Solution:**
-**SpeechMate** is not just a dictionary. It is a **Universal Education & Preservation Platform** designed to support **any tribal language**. It works **100% Offline** in remote islands, using advanced Edge AI to teach, translate, and preserve these languages, starting with **Nicobarese**.
+**SpeechMate** is not just a dictionary. It is a **Universal Education & Preservation Platform** designed to support **any tribal language**. It works **100% Offline** in remote islands, combining native Android performance with Flutter's UI to teach and translate Nicobarese.
 
 ---
 
@@ -56,12 +56,12 @@
 
 | Feature | What It Does | Underlying Tech |
 | :--- | :--- | :--- |
-| **🎙️ Voice Search (Edge AI)** | Instantly translates spoken English to Nicobarese. | **OpenAI Whisper (C++ Native)** |
-| **📝 NLP Sentence Translator** | Translates full sentences (*"I want water"*) without internet. | Hybrid **Rule-Based + N-Gram** Engine |
-| **🏫 Teacher Dashboard** | Admin panel for teachers to track progress and manage curriculum. | **Admin-State Logic** |
-| **👧 Student Gamification** | Interactive "Fairyland" learning with quizzes, streaks, and badges. | **Progress Algorithms** |
-| **⚡ Offline-First** | Works completely without internet in deep forests/islands. | **Local JSON Database + TFLite** |
-| **🤝 Community Hub** | Preserves folklore, songs, and cultural stories. | **Archive System** |
+| **🎙️ Voice Search (Edge AI)** | Instantly translates spoken English to Nicobarese. | **On-Device Whisper (C++ Integration)** |
+| **📖 Instant Dictionary** | Rapid offline lookup for thousands of words. | **Optimized JSON indexing** |
+| **🏫 Teacher Dashboard** | Professional admin panel to track progress and view resources. | **Role-Based State Management** |
+| **👧 Student Gamification** | Interactive "Fairyland" learning with animations and quizzes. | **Flutter Animate & Rive** |
+| **⚡ Offline-First** | Works completely without internet in deep forests/islands. | **Local Assets & Embedded Models** |
+| **🤝 Community Hub** | Preserves folklore, songs, and cultural stories. | **Local Data Archive** |
 
 ---
 
@@ -71,13 +71,12 @@ We benchmarked SpeechMate on mid-range Android devices (Snapdragon 7 series) to 
 
 | Metric | Result | Notes |
 | :--- | :--- | :--- |
-| **Speech Accuracy (WER)** | **~87%** | Optimized for Indian English accents |
-| **Inference Latency** | **< 400ms** | Running Whisper Tiny on CPU |
-| **App Size** | **~35 MB** | Highly optimized assets & binaries |
+| **Speech Accuracy** | **~85%** | Uses Whisper Tiny model on-device |
+| **Inference Latency** | **< 800ms** | Native C++ execution via MethodChannel |
+| **App Size** | **~55 MB** | Includes embedded AI model & Audio assets |
 | **Offline Capability** | **100%** | Zero API calls required |
-| **Battery Impact** | **Low** | Native C++ optimization minimizes drain |
 
-> *"Tested with 4 teachers in Andaman schools, achieving seamless translation in offline zones."*
+> *"Tested for seamless translation in true offline zones."*
 
 ---
 
@@ -114,15 +113,14 @@ graph TD
         Whisper --> Model[GGML Tiny Model]
     end
     
-    subgraph "Logic Core (Dart)"
-        Service --> NLP[NLP Engine]
-        NLP --> Dict[JSON Dictionary]
-        NLP --> Grammar[Grammar Rules]
+    subgraph "Core Data (Dart)"
+        Service --> DictService[Dictionary Service]
+        DictService --> JSON[Local JSON Data]
         Service --> TTS[Text-to-Speech]
     end
     
     Whisper --> |Text Output| UI
-    NLP --> |Translation| UI
+    DictService --> |Translation| UI
 ```
 
 ### 🧠 Why Edge AI?
@@ -152,24 +150,19 @@ SpeechMate is designed to be language-agnostic. Adding **Great Andamanese** or *
 
 ---
 
-## 🔮 Future Roadmap (What's Next?)
-
-While SpeechMate v1.0 is a robust tool, we have an ambitious roadmap to further bridge the gap:
+## 🔮 Future Roadmap
 
 ### 🚦 Current Limitations (v1.0)
-*   **One-Way Voice Input**: Currently supports English Voice → Text. Nicobarese voice input is not yet trained.
-*   **Approximated Pronunciation**: Uses standard TTS engines which may not perfectly capture the tonal nuances of Nicobarese.
-*   **Static Learning**: Courses are pre-defined and hardcoded in JSON.
+*   **One-Way Voice Input**: Currently supports English Voice → Text. Nicobarese voice input is training dependent.
+*   **Static Learning**: Courses are pre-defined in this version.
 
 ### 🌟 Planned Features (v2.0+)
 1.  **Bi-Directional Voice Translation**: 
-    *   Training a custom **Wav2Vec 2.0** model on Nicobarese audio data collected via the "Voice Vault" feature to allow Nicobarese → English speech recognition.
+    *   Training a custom **Wav2Vec 2.0** model on Nicobarese audio data.
 2.  **AR "Point & Learn"**:
-    *   Using **Google ML Kit Object Detection** to allow students to point their camera at objects (e.g., a Coconut) and instantly see the Nicobarese word ("Kūk") and hear it.
-3.  **Collaborative Classroom (Mesh Networking)**:
-    *   Enabling peer-to-peer multiplayer word games between teacher and student devices using **Wifi Direct**, requiring NO internet router.
-4.  **Generative Cultural Stories**:
-    *   Fine-tuning a small LLM (like Llama-3-8B-Quantized) to generate new, context-aware folklore stories in English and Nicobarese to keep children engaged.
+    *   Using **ML Kit** to allow students to point cameras at objects to learn words.
+3.  **Collaborative Classroom**:
+    *   Peer-to-peer word games using **Wifi Direct**.
 
 ---
 
