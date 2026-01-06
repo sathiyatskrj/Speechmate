@@ -31,9 +31,14 @@ allprojects {
 subprojects {
     afterEvaluate { project ->
         if (project.extensions.findByName("android") != null) {
-            def androidExtension = project.extensions.getByName("android")
-            if (androidExtension.namespace == null) {
-                androidExtension.namespace = project.group
+            try {
+                def androidExtension = project.extensions.getByName("android")
+                if (androidExtension.namespace == null) {
+                    androidExtension.namespace = project.group
+                }
+            } catch (Exception e) {
+                // Ignore errors for specific plugins that don't play nice
+                println "Skipping namespace configuration for project ${project.name}: ${e.message}"
             }
         }
     }
