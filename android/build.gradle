@@ -29,19 +29,8 @@ allprojects {
 
 // Aggressively force subprojects (plugins) to use the good repo
 subprojects {
-    afterEvaluate { project ->
-        if (project.extensions.findByName("android") != null) {
-            try {
-                def androidExtension = project.extensions.getByName("android")
-                if (androidExtension.namespace == null) {
-                    androidExtension.namespace = project.group
-                }
-            } catch (Exception e) {
-                // Ignore errors for specific plugins that don't play nice
-                println "Skipping namespace configuration for project ${project.name}: ${e.message}"
-            }
-        }
-    }
+    // Namespace configuration logic removed as it conflicts with some plugins (flutter_tts)
+    // Plugins should handle their own namespace or use default behavior.
     
     // Hack to replace repositories in buildscript
     buildscript.repositories.all { repo ->
