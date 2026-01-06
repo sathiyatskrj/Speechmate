@@ -26,6 +26,7 @@ import 'package:speechmate/screens/voice_vault_screen.dart'; // [NEW] Link
 import 'package:speechmate/screens/feedback_screen.dart'; // [NEW]
 import 'package:speechmate/widgets/exit_feedback_dialog.dart'; // [NEW]
 import 'package:speechmate/services/neural_engine_service.dart'; // [NEW]
+import 'package:speechmate/screens/beta_chat_screen.dart'; // [NEW]
 import 'package:speechmate/screens/lessons/lesson_screen.dart'; // [NEW] Interactive Lessons
 import 'package:speechmate/models/lesson_models.dart'; // [NEW] Lesson Models
 
@@ -194,9 +195,8 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
               ],
             ),
           ),
-        ),
       ),
-    );
+    ));
   }
   // _buildHeroHeader removed
 

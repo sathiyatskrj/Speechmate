@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Lesson {
   final String id;
   final String title;
@@ -32,7 +34,7 @@ class LessonSlide {
   });
 }
 
-import 'package:flutter/material.dart';
+
 
 // Pre-defined static data for the lessons
 final List<Lesson> interactiveLessons = [
