@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.speechmate.speechmate"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 34
         versionCode = 2 // Updated to match pubspec (1.2.0+2)
         versionName = "1.4.6" // Updated to match pubspec
