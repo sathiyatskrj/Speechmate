@@ -23,8 +23,9 @@ import 'package:speechmate/screens/colors_page.dart';
 import 'package:speechmate/screens/things_page.dart';
 import 'package:speechmate/screens/culture_screen.dart'; // [NEW] Link
 import 'package:speechmate/screens/voice_vault_screen.dart'; // [NEW] Link
-import 'package:speechmate/screens/beta_chat_screen.dart';
-
+import 'package:speechmate/screens/feedback_screen.dart'; // [NEW]
+import 'package:speechmate/widgets/exit_feedback_dialog.dart'; // [NEW]
+import 'package:speechmate/services/neural_engine_service.dart'; // [NEW]
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -37,6 +38,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   final TextEditingController searchController = TextEditingController();
   final DictionaryService dictionaryService = DictionaryService();
   final TtsService ttsService = TtsService();
+  final NeuralEngineService _neuralEngine = NeuralEngineService(); // [NEW]
   // removed: AudioRecorder, WhisperLogic (handled by Header)
 
   Map<String, dynamic>? result;
@@ -70,18 +72,30 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     });
   }
 
+
+
   Future<void> performSearch(String query) async {
     FocusScope.of(context).unfocus();
     if (query.isEmpty) return;
 
     setState(() => isLoading = true);
 
-    // 1. Direct Search
+    // 1. Direct Search (Exact/Fuzzy from Dictionary)
     var searchResult = await dictionaryService.searchEverywhere(query);
     
-    // 2. NLP Translation Fallback
+    // 2. Neural Engine Fallback (Context-aware Translation)
     if (searchResult == null) {
-        searchResult = await dictionaryService.translateSentence(query);
+        final neuralResult = await _neuralEngine.predict(query);
+        
+        // Only show if we have some confidence (not just returning original text entirely)
+        if (neuralResult.text.isNotEmpty) {
+             searchResult = {
+                'english': query,
+                'nicobarese': neuralResult.text,
+                '_isGenerated': true,
+                '_confidence': neuralResult.confidence
+             };
+        }
     }
 
     if (mounted) {
@@ -92,7 +106,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
           if (searchResult!.containsKey('_searchedNicobarese')) {
               searchedNicobarese = searchResult!['_searchedNicobarese'];
           } else if (searchResult!.containsKey('_isGenerated')) {
-             searchedNicobarese = false; 
+             searchedNicobarese = false; // We assume input was English for Neural Engine
           } else {
               final q = query.trim().toLowerCase();
               searchedNicobarese =
@@ -120,18 +134,31 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     {"word": "Magic Words", "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const MagicWordsPage(), "icon": Icons.auto_fix_high_rounded},
     {"word": "Family", "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const FamilyPage(), "icon": Icons.family_restroom_rounded},
 
-    {"word": "Voice Vault", "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded}, // [NEW]
+    {"word": "Voice Vault", "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
     {"word": "Beta Chat", "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
     {"word": "Community", "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
+    
+    // [NEW] Feedback Tile
+    {"word": "Feedback", "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.studentTheme,
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        body: VoiceReactiveAurora(
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) async {
+           if (didPop) return;
+           final shouldExit = await showDialog(
+             context: context,
+             builder: (context) => const ExitFeedbackDialog()
+           );
+           // Dialog handles exit, but if they click outside, we do nothing (stay).
+        },
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          body: VoiceReactiveAurora(
           isDark: false, // Student Mode (Bright)
           child: SafeArea(
             child: Column(

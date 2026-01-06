@@ -19,6 +19,10 @@ import 'package:speechmate/core/app_theme.dart';
 
 
 
+import 'package:speechmate/screens/feedback_screen.dart'; // [FIX] Added
+import 'package:speechmate/widgets/exit_feedback_dialog.dart'; // [FIX] Added
+import 'package:speechmate/services/neural_engine_service.dart'; // [NEW]
+
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
 
@@ -30,6 +34,7 @@ class _TeacherDashState extends State<TeacherDash> {
   final TextEditingController _searchController = TextEditingController();
   final DictionaryService _dictionaryService = DictionaryService();
   final TtsService _ttsService = TtsService();
+  final NeuralEngineService _neuralEngine = NeuralEngineService(); // [NEW]
   // AudioRecorder removed
   
   bool _isLoading = false;
@@ -61,6 +66,8 @@ class _TeacherDashState extends State<TeacherDash> {
     }
   }
 
+
+
   Future<void> _performSearch(String query) async {
     FocusScope.of(context).unfocus();
     if (query.isEmpty) return;
@@ -70,9 +77,18 @@ class _TeacherDashState extends State<TeacherDash> {
     // 1. Direct Search
     var searchResult = await _dictionaryService.searchEverywhere(query);
     
-    // 2. NLP Translation Fallback
+    // 2. Neural Engine Fallback
     if (searchResult == null) {
-        searchResult = await _dictionaryService.translateSentence(query);
+        final neuralResult = await _neuralEngine.predict(query);
+        
+        if (neuralResult.text.isNotEmpty) {
+             searchResult = {
+                'english': query,
+                'nicobarese': neuralResult.text,
+                '_isGenerated': true,
+                '_confidence': neuralResult.confidence
+             };
+        }
     }
 
     if (mounted) {
@@ -116,9 +132,18 @@ class _TeacherDashState extends State<TeacherDash> {
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.teacherTheme,
-      child: Scaffold(
-        body: VoiceReactiveAurora(
-          isDark: true,
+      child: PopScope(
+        canPop: false,
+        onPopInvoked: (didPop) async {
+          if (didPop) return;
+          await showDialog(
+            context: context,
+            builder: (context) => const ExitFeedbackDialog(),
+          );
+        },
+        child: Scaffold(
+          body: VoiceReactiveAurora(
+            isDark: true,
           child: Column(
             children: [
               SmartDashboardHeader(
@@ -241,6 +266,13 @@ class _TeacherDashState extends State<TeacherDash> {
                         icon: Icons.forum,
                         color: Colors.indigoAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Feedback",
+                        icon: Icons.rate_review,
+                        color: Colors.pinkAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())),
                       ),
                     ],
                   ),

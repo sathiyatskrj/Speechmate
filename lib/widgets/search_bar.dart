@@ -40,6 +40,7 @@ class Search extends StatelessWidget {
                 hintStyle: TextStyle(color: Colors.black45),
                 border: InputBorder.none,
               ),
+              style: const TextStyle(color: Colors.black87), // Force dark text on white bg
               onSubmitted: (_) => onSearch(), // Enable Enter key search
               textInputAction: TextInputAction.search,
             ),

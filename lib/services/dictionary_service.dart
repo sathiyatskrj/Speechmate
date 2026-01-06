@@ -198,6 +198,25 @@ class DictionaryService {
     return loadDictionary(DictionaryType.dialects);
   }
 
+  Future<String?> lookupExact(String word) async {
+    final words = await loadDictionary(DictionaryType.words);
+    if (words.isEmpty) return null;
+    
+    final q = word.trim().toLowerCase();
+    try {
+      // Prioritize English match
+      final result = words.firstWhere((w) => (w['english']?.toString().toLowerCase() == q),
+        orElse: () => {});
+      
+      if (result.isNotEmpty) {
+        return result['nicobarese'];
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<Map<String, dynamic>?> translateSentence(String input) async {
     if (input.trim().isEmpty) return null;
     
