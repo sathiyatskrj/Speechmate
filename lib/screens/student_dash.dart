@@ -26,6 +26,8 @@ import 'package:speechmate/screens/voice_vault_screen.dart'; // [NEW] Link
 import 'package:speechmate/screens/feedback_screen.dart'; // [NEW]
 import 'package:speechmate/widgets/exit_feedback_dialog.dart'; // [NEW]
 import 'package:speechmate/services/neural_engine_service.dart'; // [NEW]
+import 'package:speechmate/screens/lessons/lesson_screen.dart'; // [NEW] Interactive Lessons
+import 'package:speechmate/models/lesson_models.dart'; // [NEW] Lesson Models
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -123,6 +125,10 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
 
 
   final List<Map<String, dynamic>> learningTiles = [
+    // [NEW] Interactive Lessons (Child-Friendly)
+    {"word": "Jungle Adventure", "emoji": "🦁", "colors": [Color(0xFFFF9966), Color(0xFFFF5E62)], "navigateTo": LessonScreen(lesson: interactiveLessons[0]), "icon": Icons.terrain_rounded},
+    {"word": "Island Colors", "emoji": "🏝️", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": LessonScreen(lesson: interactiveLessons[1]), "icon": Icons.beach_access_rounded},
+
     {"word": "Numbers", "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": NumberPage(), "icon": Icons.format_list_numbered_rounded},
     {"word": "Nature", "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": NaturePage(), "icon": Icons.eco_rounded},
     {"word": "Feelings", "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": FeelingsPage(), "icon": Icons.emoji_emotions_rounded},
@@ -130,10 +136,10 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     {"word": "Things", "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const ThingsPage(), "icon": Icons.chair_rounded},
     {"word": "Body Parts", "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": BodyPartsScreen(), "icon": Icons.accessibility_new_rounded},
     {"word": "Games", "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
-    {"word": "Animals", "emoji": "🦁", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const AnimalsPage(), "icon": Icons.pets_rounded},
+    {"word": "Animals", "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const AnimalsPage(), "icon": Icons.pets_rounded},
     {"word": "Magic Words", "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const MagicWordsPage(), "icon": Icons.auto_fix_high_rounded},
     {"word": "Family", "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const FamilyPage(), "icon": Icons.family_restroom_rounded},
-
+ 
     {"word": "Voice Vault", "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
     {"word": "Beta Chat", "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
     {"word": "Community", "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
