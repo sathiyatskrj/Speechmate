@@ -7,6 +7,8 @@ import 'package:speechmate/core/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import 'package:speechmate/core/app_colors.dart';
+
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
 
@@ -19,20 +21,25 @@ class _LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Define Gradients
-    final teacherGradient = [
-      const Color(0xFF00E5FF), // Bright Cyan
-      const Color(0xFF00B8D4), // Teal Cyan
+    // Neutral Gradient (Inviting Blue/Purple for Unselected)
+    final neutralGradient = [
+       const Color(0xFFE0C3FC), 
+       const Color(0xFF8EC5FC), 
     ];
 
-    final studentGradient = [
-       const Color(0xFFFF9A9E), // Pink
-       const Color(0xFFFECFEF), // Light Pink
-       const Color(0xFFF6D365), // Yellow
-       const Color(0xFFFDA085), // Orange
-       const Color(0xFF84FAB0), // Green
-       const Color(0xFF8FD3F4), // Blue
-    ];
+    // Get gradients from AppColors
+    final teacherGradient = AppColors.teacherGradient;
+    final studentGradient = AppColors.studentGradient;
+
+    // Determine current gradient
+    List<Color> currentGradient;
+    if (selectedRole == 'student') {
+      currentGradient = studentGradient;
+    } else if (selectedRole == 'teacher') {
+      currentGradient = teacherGradient;
+    } else {
+      currentGradient = neutralGradient;
+    }
 
     return Scaffold(
       body: Stack(
@@ -45,7 +52,7 @@ class _LandingPageState extends State<LandingPage> {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: selectedRole == 'student' ? studentGradient : teacherGradient,
+                colors: currentGradient,
               ),
             ),
           ),
