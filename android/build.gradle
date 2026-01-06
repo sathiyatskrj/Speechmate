@@ -39,13 +39,13 @@ subprojects {
     
     // Hack to replace repositories in buildscript
     buildscript.repositories.all { repo ->
-        if (repo instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository && repo.url.toString().contains("repo.maven.apache.org")) {
+        if ((repo.getClass().getName().contains("MavenArtifactRepository") || repo.getClass().getName().contains("DefaultMavenArtifactRepository")) && repo.url.toString().contains("repo.maven.apache.org")) {
             repo.url = uri("https://repo1.maven.org/maven2")
         }
     }
     // Hack to replace repositories in project
     repositories.all { repo ->
-        if (repo instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository && repo.url.toString().contains("repo.maven.apache.org")) {
+        if ((repo.getClass().getName().contains("MavenArtifactRepository") || repo.getClass().getName().contains("DefaultMavenArtifactRepository")) && repo.url.toString().contains("repo.maven.apache.org")) {
             repo.url = uri("https://repo1.maven.org/maven2")
         }
     }
