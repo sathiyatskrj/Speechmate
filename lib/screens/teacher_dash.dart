@@ -285,7 +285,7 @@ class _TeacherDashState extends State<TeacherDash> {
             ), 
         ),
       ),
-    )));
+    ));
   }
 
 
