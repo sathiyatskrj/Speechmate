@@ -196,7 +196,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
             ),
           ),
       ),
-    ));
+    )));
   }
   // _buildHeroHeader removed
 
