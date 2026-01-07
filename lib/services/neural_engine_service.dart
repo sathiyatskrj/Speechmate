@@ -9,8 +9,10 @@ class NeuralEngineService {
   bool _isInit = false;
 
   // Simple "Stop Words" that we might want to ignore if not found
+  // Common auxiliary verbs to ignore for "Pidgin" translation
+  // e.g., "I am hungry" -> "I hungry" -> "Chu-ö Hāhëūk"
   final Set<String> _stopWords = {
-    'the', 'a', 'an', 'is', 'are', 'was', 'were', 'to', 'of', 'in', 'on', 'at'
+    'is', 'am', 'are', 'was', 'were', 'the', 'a', 'an', 'to', 'of', 'in', 'on', 'at'
   };
 
   // Maps common English synonyms to words we MIGHT have in our dictionary
@@ -51,14 +53,26 @@ class NeuralEngineService {
 
     for (String token in tokens) {
       if (token.trim().isEmpty) continue;
-      final String lowerToken = token.toLowerCase();
+      
+      // Remove punctuation for lookup
+      String cleanToken = token.replaceAll(RegExp(r'[^\w\s]'), '');
+      String punctuation = token.replaceAll(RegExp(r'[\w\s]'), ''); // simple assumption
+      
+      final String lowerToken = cleanToken.toLowerCase();
+      
+      // 0. Skip Stop Words (Auxiliary verbs) entirely
+      if (_stopWords.contains(lowerToken)) {
+          // Skip adding it to result, essentially "dropping" it
+          // This improves "I am hungry" -> "Chu-ö Hāhëūk"
+          continue; 
+      }
+
       String? translation;
 
       // 1. Exact Lookup
-      translation = await _dictionaryService.lookupExact(lowerToken);
+      translation = await _dictionaryService.lookupExact(cleanToken); // Maintain case for lookup? usually svc handles lower
 
       // 2. Stemming Lookup (remove 'ing', 'ed', 's')
-      // Only stem if no exact match (e.g. "running" -> "run")
       if (translation == null) {
          String stem = _simpleStemmer(lowerToken);
          if (stem != lowerToken) {
@@ -74,18 +88,13 @@ class NeuralEngineService {
 
       // Result Handling
       if (translation != null) {
-        translatedTokens.add(translation);
+        translatedTokens.add(translation + punctuation);
         confidenceAccumulator += 1.0;
         wordsTranslated++;
       } else {
-        // If it's a stop word and we missed it, mark confidence down but check context
-        if (_stopWords.contains(lowerToken)) {
-           translatedTokens.add(token);
-           confidenceAccumulator += 0.5; // Partial credit
-        } else {
-           translatedTokens.add(token); // Keep original
-           confidenceAccumulator += 0.0; // No credit
-        }
+         // Keep original word (e.g. Names)
+         translatedTokens.add(token);
+         confidenceAccumulator += 0.0;
       }
     }
 
