@@ -27,9 +27,6 @@
   <a href="#">
     <img src="https://img.shields.io/badge/Native-C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white" alt="C++" />
   </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Status-Hack_For_Social-Cause-green?style=for-the-badge" alt="Status" />
-  </a>
 </p>
 
 <p align="center">
@@ -196,5 +193,6 @@ SpeechMate is designed to be language-agnostic. Adding **Great Andamanese** or *
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
+
 
 
