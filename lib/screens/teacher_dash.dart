@@ -132,8 +132,6 @@ class _TeacherDashState extends State<TeacherDash> {
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.teacherTheme,
-    return Theme(
-      data: AppTheme.teacherTheme,
       child: Scaffold(
           body: VoiceReactiveAurora(
             isDark: true,

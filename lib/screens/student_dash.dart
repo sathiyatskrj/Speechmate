@@ -153,8 +153,6 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.studentTheme,
-    return Theme(
-      data: AppTheme.studentTheme,
       child: Scaffold(
           extendBodyBehindAppBar: true,
           body: VoiceReactiveAurora(
