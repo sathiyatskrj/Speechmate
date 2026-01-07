@@ -132,16 +132,9 @@ class _TeacherDashState extends State<TeacherDash> {
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.teacherTheme,
-      child: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) async {
-          if (didPop) return;
-          await showDialog(
-            context: context,
-            builder: (context) => const ExitFeedbackDialog(),
-          );
-        },
-        child: Scaffold(
+    return Theme(
+      data: AppTheme.teacherTheme,
+      child: Scaffold(
           body: VoiceReactiveAurora(
             isDark: true,
           child: Column(
@@ -163,7 +156,6 @@ class _TeacherDashState extends State<TeacherDash> {
                           _buildDailyWordCard(_dailyWord!),
                           const SizedBox(height: 25),
                         ],
-
                         if (_isLoading)
                            const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
                         
@@ -189,7 +181,6 @@ class _TeacherDashState extends State<TeacherDash> {
                                 },
                              ),
                            ),
-
                   // FEATURES GRID
                   const Text(
                     "TOOLS & RESOURCES",
@@ -285,7 +276,7 @@ class _TeacherDashState extends State<TeacherDash> {
             ), 
         ),
       ),
-    ));
+    );
   }
 
 

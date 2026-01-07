@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../../models/lesson_models.dart';
 import '../../widgets/anim/floating_widget.dart';
 import '../../widgets/anim/confetti_overlay.dart';
@@ -16,6 +17,7 @@ class LessonScreen extends StatefulWidget {
 class _LessonScreenState extends State<LessonScreen> with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   final FlutterTts _flutterTts = FlutterTts();
+  final AudioPlayer _audioPlayer = AudioPlayer();
   
   // Animation for the main character (Bounce)
   late AnimationController _bounceController;
@@ -79,6 +81,7 @@ class _LessonScreenState extends State<LessonScreen> with TickerProviderStateMix
     _bounceController.dispose();
     _pulseController.dispose();
     _flutterTts.stop();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -88,10 +91,49 @@ class _LessonScreenState extends State<LessonScreen> with TickerProviderStateMix
     // Trigger bounce
     _bounceController.forward(from: 0.0);
 
-    // Speak
+    setState(() => _isPlayingAudio = true);
+
+    // 1. Speak English (Always TTS or maybe English audio if we had it, but TTS is fine)
     await _flutterTts.speak(slide.englishText);
-    await Future.delayed(const Duration(milliseconds: 800));
-    await _flutterTts.speak(slide.nicobareseText);
+    
+    // Wait for English to likely finish + pause
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    // 2. Nicobarese: Play Audio File OR Fallback to TTS
+    if (slide.audioAsset != null && slide.audioAsset!.isNotEmpty) {
+       try {
+         // Using AssetSource requires the path relative to 'assets/' usually?
+         // If string is "assets/audio/goat.mp3", AssetSource might need "audio/goat.mp3"
+         // Let's try to parse it safely.
+         String path = slide.audioAsset!;
+         if (path.startsWith('assets/')) {
+           path = path.substring(7); // Remove 'assets/' prefix for AssetSource
+         }
+         await _audioPlayer.play(AssetSource(path));
+         
+         // Wait for audio duration? AudioPlayer doesn't await completion on play()
+         // We can listen to onPlayerComplete or just wait a generic time
+         // check onPlayerComplete manually or rely on State 
+         // For simplicity here, we rely on the player completion listener we should set up
+         
+       } catch (e) {
+          // Fallback
+          await _flutterTts.speak(slide.nicobareseText);
+          await Future.delayed(const Duration(seconds: 1)); // approximate
+       }
+    } else {
+       await _flutterTts.speak(slide.nicobareseText);
+       await Future.delayed(const Duration(seconds: 1));
+    }
+
+    // Reset state after a safe delay if we didn't use TTS completion handler perfectly for AudioPlayer
+    // But since _flutterTts.speak is awaited but finish isn't always perfect...
+    // Actually _flutterTts.speak(await) waits for start, not finish on Android sometimes.
+    
+    // Safety timeout to ensure flag is cleared
+    Future.delayed(const Duration(seconds: 2), () {
+       if (mounted) setState(() => _isPlayingAudio = false);
+    });
   }
 
   @override

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:speechmate/core/app_colors.dart';
+import 'package:speechmate/widgets/exit_feedback_dialog.dart';
 
 class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
@@ -41,126 +42,136 @@ class _LandingPageState extends State<LandingPage> {
       currentGradient = neutralGradient;
     }
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Background with Animated Transition
-          AnimatedContainer(
-            duration: 800.ms,
-            curve: Curves.easeInOut,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: currentGradient,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+         if (didPop) return;
+         await showDialog(
+           context: context,
+           builder: (context) => const ExitFeedbackDialog()
+         );
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Background with Animated Transition
+            AnimatedContainer(
+              duration: 800.ms,
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: currentGradient,
+                ),
               ),
             ),
-          ),
-          
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                children: [
-                   const SizedBox(height: 20),
-                   // Top Bar: Logo & Info
-                   Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "SpeechMate",
-                                style: GoogleFonts.outfit(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 1.0,
-                                  shadows: [
-                                    Shadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
-                                  ]
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "Where Language Barriers End",
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(0.9),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          // Restored Info Button
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const InfoButton(),
-                          )
-                      ],
-                   ),
-
-                   // Centered Content
-                   Expanded(
-                     child: Column(
-                       mainAxisAlignment: MainAxisAlignment.center,
-                       children: [
-                          // User focused prompt
-                          Text(
-                            "Who is learning today?",
-                            style: GoogleFonts.outfit(
-                               fontSize: 24, 
-                               fontWeight: FontWeight.w600, 
-                               color: Colors.white,
-                               shadows: [Shadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0,2))]
-                            ),
-                          ).animate().fadeIn().slideY(begin: -0.2, end: 0),
-                          
-                          const SizedBox(height: 40),
-
-                          // Profile Cards
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+            
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  children: [
+                     const SizedBox(height: 20),
+                     // Top Bar: Logo & Info
+                     Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                   _buildRoleCard(
-                                       title: "Student",
-                                       emoji: "🙋🏻‍♂️",
-                                       id: "student",
-                                       color: Colors.pinkAccent,
-                                   ),
-                                   const SizedBox(width: 20),
-                                   _buildRoleCard(
-                                       title: "Teacher",
-                                       emoji: "👨🏻‍🏫",
-                                       id: "teacher",
-                                       color: Colors.blueAccent,
-                                   ),
+                                Text(
+                                  "SpeechMate",
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 1.0,
+                                    shadows: [
+                                      Shadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                                    ]
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "Where Language Barriers End",
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withOpacity(0.9),
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
                               ],
-                          ),
-                       ],
+                            ),
+                            // Restored Info Button
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const InfoButton(),
+                            )
+                        ],
                      ),
-                   ),
 
-                   // Bottom Action Area
-                   AnimatedOpacity(
-                       opacity: selectedRole.isNotEmpty ? 1.0 : 0.0,
-                       duration: 300.ms,
-                       child: Padding(
-                         padding: const EdgeInsets.only(bottom: 40),
-                         child: NextButton(selectedRole: selectedRole),
-                       )
-                   ),
-                ],
+                     // Centered Content
+                     Expanded(
+                       child: Column(
+                         mainAxisAlignment: MainAxisAlignment.center,
+                         children: [
+                            // User focused prompt
+                            Text(
+                              "You are:",
+                              style: GoogleFonts.outfit(
+                                 fontSize: 24, 
+                                 fontWeight: FontWeight.w600, 
+                                 color: Colors.white,
+                                 shadows: [Shadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0,2))]
+                              ),
+                            ).animate().fadeIn().slideY(begin: -0.2, end: 0),
+                            
+                            const SizedBox(height: 40),
+
+                            // Profile Cards
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                     _buildRoleCard(
+                                         title: "Student",
+                                         emoji: "🙋🏻‍♂️",
+                                         id: "student",
+                                         color: Colors.pinkAccent,
+                                     ),
+                                     const SizedBox(width: 20),
+                                     _buildRoleCard(
+                                         title: "Teacher",
+                                         emoji: "👨🏻‍🏫",
+                                         id: "teacher",
+                                         color: Colors.blueAccent,
+                                     ),
+                                ],
+                            ),
+                         ],
+                       ),
+                     ),
+
+                     // Bottom Action Area
+                     AnimatedOpacity(
+                         opacity: selectedRole.isNotEmpty ? 1.0 : 0.0,
+                         duration: 300.ms,
+                         child: Padding(
+                           padding: const EdgeInsets.only(bottom: 40),
+                           child: NextButton(selectedRole: selectedRole),
+                         )
+                     ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

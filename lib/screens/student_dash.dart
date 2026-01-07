@@ -153,17 +153,9 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.studentTheme,
-      child: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) async {
-           if (didPop) return;
-           final shouldExit = await showDialog(
-             context: context,
-             builder: (context) => const ExitFeedbackDialog()
-           );
-           // Dialog handles exit, but if they click outside, we do nothing (stay).
-        },
-        child: Scaffold(
+    return Theme(
+      data: AppTheme.studentTheme,
+      child: Scaffold(
           extendBodyBehindAppBar: true,
           body: VoiceReactiveAurora(
           isDark: false, // Student Mode (Bright)
@@ -196,7 +188,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
             ),
           ),
       ),
-    )));
+    ));
   }
   // _buildHeroHeader removed
 

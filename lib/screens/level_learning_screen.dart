@@ -199,7 +199,7 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text("Lab Module ${widget.level}"),
+        title: Text("Nicobarese Module ${widget.level}"),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,

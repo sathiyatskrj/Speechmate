@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../services/dictionary_service.dart';
+import '../services/neural_engine_service.dart';
 
 class ChatTranslateScreen extends StatefulWidget {
   const ChatTranslateScreen({super.key});
@@ -11,6 +12,7 @@ class ChatTranslateScreen extends StatefulWidget {
 
 class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerProviderStateMixin {
   final DictionaryService dictionaryService = DictionaryService();
+  final NeuralEngineService neuralEngine = NeuralEngineService(); // [NEW] Added Neural Engine
   final TextEditingController controller = TextEditingController();
   final ScrollController scrollController = ScrollController();
   
@@ -81,15 +83,32 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
     // Simulate typing delay
     await Future.delayed(const Duration(milliseconds: 800));
 
-    final result = await dictionaryService.searchWord(input);
+    // 1. Try Direct Lookup
+    var result = await dictionaryService.searchWord(input);
 
     String responseText;
     String emoji = "💬";
 
+    // 2. Fallback to Neural Engine (for sentences or fuzzy words)
+    if (result == null) {
+      final neuralResult = await neuralEngine.predict(input);
+      if (neuralResult.text.isNotEmpty) {
+          result = {
+            'english': input,
+            'nicobarese': neuralResult.text,
+            'generated': true
+          };
+      }
+    }
+
     if (result != null) {
       final isNicobarese = result['nicobarese'].toString().toLowerCase() == input.toLowerCase();
       
-      if (isNicobarese) {
+      if (result.containsKey('generated')) {
+          // Neural Engine Result
+          responseText = "✨ ${result['nicobarese']}\n\n🤖 AI Translation";
+          emoji = "🤖";
+      } else if (isNicobarese) {
         responseText = "✨ ${result['english']}\n\n🔤 English translation";
         emoji = "🌴";
       } else {

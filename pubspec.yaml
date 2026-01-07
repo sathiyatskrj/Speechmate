@@ -59,6 +59,7 @@ flutter:
     - assets/icons/logo_main.png
     - assets/audio/numbers/
     - assets/audio/phrases/
+    - assets/audio/words/
     - assets/audio/nature/
     - assets/audio/body_parts/
     - assets/audio/colors/

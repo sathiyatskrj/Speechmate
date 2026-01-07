@@ -54,7 +54,7 @@ class _TeacherLevelsScreenState extends State<TeacherLevelsScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Neural Pathways 🧠"),
+        title: const Text("Road Map to Learn Nicobarese"),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.white,
