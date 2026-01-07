@@ -59,7 +59,7 @@
 | **🎙️ Voice Search (Edge AI)** | Instantly translates spoken English to Nicobarese. | **On-Device Whisper (C++ Integration)** |
 | **📖 Instant Dictionary** | Rapid offline lookup for thousands of words. | **Optimized JSON indexing** |
 | **🏫 Teacher Dashboard** | Professional admin panel to track progress and view resources. | **Role-Based State Management** |
-| **👧 Student Gamification** | Interactive "Fairyland" learning with animations and quizzes. | **Flutter Animate & Rive** |
+| **👧 Student Gamification** | Interactive "Gamified" learning with animations and quizzes. | **Flutter Animate** |
 | **⚡ Offline-First** | Works completely without internet in deep forests/islands. | **Local Assets & Embedded Models** |
 | **🤝 Community Hub** | Preserves folklore, songs, and cultural stories. | **Local Data Archive** |
 
@@ -73,7 +73,7 @@ We benchmarked SpeechMate on mid-range Android devices (Snapdragon 7 series) to 
 | :--- | :--- | :--- |
 | **Speech Accuracy** | **~85%** | Uses Whisper Tiny model on-device |
 | **Inference Latency** | **< 800ms** | Native C++ execution via MethodChannel |
-| **App Size** | **~55 MB** | Includes embedded AI model & Audio assets |
+| **App Size** | **~78 MB** | Includes embedded AI model & Audio assets |
 | **Offline Capability** | **100%** | Zero API calls required |
 
 > *"Tested for seamless translation in true offline zones."*
@@ -196,3 +196,4 @@ SpeechMate is designed to be language-agnostic. Adding **Great Andamanese** or *
 <p align="center">
   *Preserving the past, coding the future.*
 </p>
+
