@@ -7,14 +7,33 @@ class GamificationService {
 
   final ProgressService _progressService = ProgressService();
 
+  // Static cached values for UI access
+  static int xp = 0;
+  static int currentLevel = 1;
+  static int nextLevelXp = 100;
+  static int currentStreak = 0;
+
   // XP thresholds per level
   static const List<int> _levelThresholds = [0, 100, 250, 500, 850, 1300, 2000, 3000, 4500, 7000];
 
+  /// Initialize and load stats
+  static Future<void> initialize() async {
+     await _instance.syncWithProgress();
+  }
+
+  /// Sync real progress stats into cached static values
+  Future<void> syncWithProgress() async {
+    xp = await getXP();
+    currentLevel = await getCurrentLevel();
+    nextLevelXp = await getNextLevelXP();
+    currentStreak = await getCurrentStreak();
+  }
+
   /// Get current level from real XP data
   Future<int> getCurrentLevel() async {
-    final xp = await getXP();
+    final currentXp = await getXP();
     for (int i = _levelThresholds.length - 1; i >= 0; i--) {
-      if (xp >= _levelThresholds[i]) return i + 1;
+      if (currentXp >= _levelThresholds[i]) return i + 1;
     }
     return 1;
   }
@@ -33,12 +52,30 @@ class GamificationService {
       final wordsLearned = stats['wordsLearned'] ?? 0;
       final quizzesTaken = stats['quizzesTaken'] ?? 0;
       final dayStreak = stats['dayStreak'] ?? 0;
+      final communityPosts = stats['communityPosts'] ?? 0;
       
-      // XP formula: 10pts per word + 25pts per quiz + 5pts per streak day
-      return (wordsLearned * 10) + (quizzesTaken * 25) + (dayStreak * 5);
+      // XP formula: 10pts per word + 25pts per quiz + 5pts per streak day + 15pts per community post
+      return (wordsLearned * 10) + (quizzesTaken * 25) + (dayStreak * 5) + (communityPosts * 15);
     } catch (_) {
       return 0;
     }
+  }
+
+  /// Refreshes the cached stats from the underlying progress service
+  static Future<void> refresh() async {
+     await initialize();
+  }
+
+  Future<int> getCurrentLevelFromXp(int xpVal) async {
+    for (int i = _levelThresholds.length - 1; i >= 0; i--) {
+      if (xpVal >= _levelThresholds[i]) return i + 1;
+    }
+    return 1;
+  }
+
+  Future<int> getNextLevelXpFromLevel(int level) async {
+     if (level >= _levelThresholds.length) return _levelThresholds.last;
+    return _levelThresholds[level];
   }
 
   /// Get current daily streak from real data

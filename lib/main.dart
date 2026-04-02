@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:speechmate/screens/auth_screen.dart';
+import 'package:speechmate/features/gamification/gamification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,13 @@ void main() async {
   } catch (e) {
       // If firebase fails (e.g. no google-services.json), we don't want to crash the whole app startup
       debugPrint("Firebase init failed: $e");
+  }
+
+  // Initialize Gamification stats
+  try {
+      await GamificationService.initialize();
+  } catch (e) {
+      debugPrint("Gamification init failed: $e");
   }
 
   final prefs = await SharedPreferences.getInstance();

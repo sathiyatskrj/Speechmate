@@ -3,6 +3,8 @@ import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/widgets/background.dart';
+import 'package:speechmate/features/gamification/gamification_service.dart';
+import 'package:speechmate/services/progress_service.dart';
 import 'dart:math' as math;
 
 class FlashcardReviewScreen extends StatefulWidget {
@@ -111,10 +113,16 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                                     _handleGrade(1); // Fail
                                   }
                                 },
-                                onEnd: () {
-                                   setState(() {
-                                     _dueCards.clear();
-                                   });
+                                onEnd: () async {
+                                   // Award XP for completing the session via ProgressService
+                                   await ProgressService().recordQuizTaken();
+                                   await GamificationService.refresh();
+                                   
+                                   if (mounted) {
+                                      setState(() {
+                                        _dueCards.clear();
+                                      });
+                                   }
                                 },
                                 cardBuilder: (context, index) {
                                   return GestureDetector(

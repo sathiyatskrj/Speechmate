@@ -4,8 +4,9 @@ import 'package:speechmate/widgets/background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/community_service.dart';
 import 'package:speechmate/models/community_post.dart';
-import 'package:speechmate/core/app_colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:speechmate/features/gamification/gamification_service.dart';
+import 'package:speechmate/services/progress_service.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -378,8 +379,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                                   avatar: _isAdmin ? "A" : "G",
                                   color: _isAdmin ? Colors.redAccent.value : Colors.teal.value
                               );
+                              // Award XP for contributing
+                              ProgressService().recordCommunityPost().then((_) {
+                                  GamificationService.refresh();
+                              });
+                              
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Posting to cloud... ☁️"))
+                                  const SnackBar(content: Text("Posting to cloud... ☁️ +XP!"))
                               );
                           }
                       },

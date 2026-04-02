@@ -1,12 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-
 class ProgressService {
   static const String _keySearchCount = 'search_count';
   static const String _keyWordsLearned = 'words_learned';
   static const String _keyStreakDate = 'streak_last_date';
   static const String _keyStreakCount = 'streak_count';
   static const String _keyQuizScores = 'quiz_scores';
+  static const String _keyCommunityPosts = 'community_posts';
 
   Future<int> getSearchCount() async {
     final prefs = await SharedPreferences.getInstance();
@@ -89,6 +88,13 @@ class ProgressService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_keyQuizzesTaken) ?? 0;
   }
+  
+  Future<void> recordCommunityPost() async {
+    final prefs = await SharedPreferences.getInstance();
+    int current = prefs.getInt(_keyCommunityPosts) ?? 0;
+    await prefs.setInt(_keyCommunityPosts, current + 1);
+    await _updateStreak();
+  }
 
   /// Aggregate stats used by GamificationService and dashboard
   Future<Map<String, int>> getProgressStats() async {
@@ -98,6 +104,7 @@ class ProgressService {
       'searchCount': prefs.getInt(_keySearchCount) ?? 0,
       'dayStreak': prefs.getInt(_keyStreakCount) ?? 0,
       'quizzesTaken': prefs.getInt(_keyQuizzesTaken) ?? 0,
+      'communityPosts': prefs.getInt(_keyCommunityPosts) ?? 0,
     };
   }
 }
