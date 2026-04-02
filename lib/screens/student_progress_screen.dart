@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/services/dictionary_service.dart';
 import 'package:speechmate/services/progress_service.dart';
+import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/screens/flashcard_review_screen.dart';
+import 'package:speechmate/screens/qr_sync_screen.dart'; // [NEW] QR
 import '../widgets/background.dart';
 
 class StudentProgressScreen extends StatefulWidget {
@@ -17,6 +20,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen> with Sing
   int _wordsLearned = 0;
   int _streak = 0;
   List<String> _quizScores = [];
+  int _dueFlashcards = 0;
   
   late AnimationController _animationController;
   late Animation<double> _progressAnimation;
@@ -46,6 +50,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen> with Sing
     final wordsLearned = await _progressService.getWordsLearnedCount();
     final streak = await _progressService.getStreak();
     final quizScores = await _progressService.getQuizScores();
+    final dueCards = await DatabaseManager.instance.getDueFlashcards();
     
     if (mounted) {
       setState(() {
@@ -53,6 +58,7 @@ class _StudentProgressScreenState extends State<StudentProgressScreen> with Sing
         _wordsLearned = wordsLearned;
         _streak = streak;
         _quizScores = quizScores;
+        _dueFlashcards = dueCards.length;
       });
     }
   }
@@ -71,6 +77,13 @@ class _StudentProgressScreenState extends State<StudentProgressScreen> with Sing
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text("My Progress", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_2, color: Colors.white),
+            tooltip: "Sync via QR",
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QrSyncScreen())),
+          ),
+        ],
       ),
       body: Background(
         colors: const [Color(0xFFFFDEE9), Color(0xFFB5FFFC)],
@@ -181,6 +194,39 @@ class _StudentProgressScreenState extends State<StudentProgressScreen> with Sing
                 ),
                 
                 const SizedBox(height: 25),
+
+                if (_dueFlashcards > 0) ...[
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const FlashcardReviewScreen())).then((value) => _loadProgress());
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFFFF9966), Color(0xFFFF5E62)]),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [BoxShadow(color: const Color(0xFFFF9966).withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 4))],
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.style, color: Colors.white, size: 40),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("Spaced Repetition Review", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                                Text("You have $_dueFlashcards cards due today!", style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                ],
                 
                 // Achievements Section
                 const Text(

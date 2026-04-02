@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../services/dictionary_service.dart';
 import '../services/neural_engine_service.dart';
+import '../services/database_manager.dart';
+import '../widgets/nicobarese_keyboard.dart';
 
 class ChatTranslateScreen extends StatefulWidget {
   const ChatTranslateScreen({super.key});
@@ -23,6 +25,10 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
   // Magic Easter egg
   bool showConfetti = false;
   late AnimationController confettiController;
+  
+  // Custom Keyboard
+  bool _showCustomKeyboard = false;
+  final FocusNode _focusNode = FocusNode();
   
   @override
   void initState() {
@@ -63,6 +69,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       isTyping = true;
       messageCount++;
       controller.clear();
+      _showCustomKeyboard = false; // Hide keyboard on send
     });
 
     _scrollToBottom();
@@ -128,6 +135,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
           "type": "bot",
           "emoji": emoji,
           "timestamp": DateTime.now(),
+          "word_data": result, // Important for flashcards
         });
       });
     }
@@ -152,6 +160,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
     scrollController.dispose();
     controller.dispose();
     confettiController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -285,6 +294,27 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                       softWrap: true,
                                     ),
                                   ),
+                                  if (!isUser && msg.containsKey('word_data') && msg['word_data'] != null && !msg['word_data'].containsKey('generated')) ...[
+                                    const SizedBox(width: 4),
+                                    Container(
+                                      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
+                                      child: IconButton(
+                                        icon: const Icon(Icons.bookmark_add_rounded, size: 20, color: Colors.orangeAccent),
+                                        padding: const EdgeInsets.all(6),
+                                        constraints: const BoxConstraints(),
+                                        tooltip: 'Save to Flashcards',
+                                        onPressed: () async {
+                                          final word = msg['word_data'];
+                                          final english = word['english'] ?? word['text'];
+                                          final nicobarese = word['nicobarese'];
+                                          if (english != null && nicobarese != null) {
+                                              await DatabaseManager.instance.saveFlashcard(english.toString(), nicobarese.toString());
+                                              if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to your Flashcards! 📚')));
+                                          }
+                                        },
+                                      )
+                                    )
+                                  ],
                                   if (isUser) ...[
                                     const SizedBox(width: 8),
                                     Text(emoji, style: const TextStyle(fontSize: 20)),
@@ -324,6 +354,9 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                             ),
                             child: TextField(
                               controller: controller,
+                              focusNode: _focusNode,
+                              readOnly: _showCustomKeyboard,
+                              showCursor: true,
                               decoration: InputDecoration(
                                 hintText: "Type a word...",
                                 hintStyle: TextStyle(
@@ -374,9 +407,33 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                             padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
                           ),
                         ),
+                        // [NEW] Toggle custom keyboard
+                        IconButton(
+                          icon: Icon(_showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, color: Colors.teal.shade700),
+                          onPressed: () {
+                             setState(() {
+                               _showCustomKeyboard = !_showCustomKeyboard;
+                               if (_showCustomKeyboard) {
+                                  _focusNode.unfocus(); // hide system keyboard
+                               } else {
+                                  _focusNode.requestFocus(); // show system keyboard
+                               }
+                             });
+                          },
+                        ),
                       ],
                     ),
                   ),
+                  
+                  if (_showCustomKeyboard)
+                     NicobareseKeyboard(
+                        controller: controller,
+                        onSubmitted: translateText,
+                        onClose: () => setState(() {
+                            _showCustomKeyboard = false;
+                            _focusNode.requestFocus();
+                        })
+                     ),
                 ],
               ),
             ),

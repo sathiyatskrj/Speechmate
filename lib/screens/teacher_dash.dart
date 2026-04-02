@@ -12,6 +12,8 @@ import 'package:speechmate/screens/voice_vault_screen.dart'; // [FIX] Added
 import 'package:speechmate/screens/culture_screen.dart'; // [FIX] Added
 import 'package:speechmate/services/dictionary_service.dart'; // [FIX] Added
 import 'package:speechmate/services/tts_service.dart'; // [FIX] Added
+import 'package:speechmate/services/report_generator.dart'; // [NEW] Offline PDF
+import 'package:speechmate/services/p2p_sync_service.dart'; // [NEW] P2P Export
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
 import 'package:speechmate/widgets/voice_reactive_aurora.dart';
 import 'package:speechmate/core/app_theme.dart';
@@ -262,6 +264,25 @@ class _TeacherDashState extends State<TeacherDash> {
                         icon: Icons.rate_review,
                         color: Colors.pinkAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())),
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Generate Report",
+                        icon: Icons.picture_as_pdf_outlined,
+                        color: Colors.deepOrangeAccent,
+                        onTap: () async {
+                           await ReportGenerator.generateAndPrintReport("Student");
+                        },
+                      ),
+                      _buildFeatureCard(
+                        context,
+                        title: "Export Vocab",
+                        icon: Icons.share_rounded,
+                        color: Colors.lightGreenAccent,
+                        onTap: () async {
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...')));
+                           await P2PSyncService.exportAndShare();
+                        },
                       ),
                     ],
                   ),

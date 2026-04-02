@@ -8,21 +8,13 @@ import 'package:speechmate/widgets/voice_reactive_aurora.dart'; // [NEW] Wow Fac
 import 'package:speechmate/core/app_theme.dart'; // [NEW] Theme
 
 
-// Screen Imports
-import 'package:speechmate/screens/number_page.dart';
-import 'package:speechmate/screens/nature_page.dart';
-import 'package:speechmate/screens/feelings_page.dart';
-import 'package:speechmate/screens/mybody_part.dart'; // BodyPartsScreen
 import 'package:speechmate/screens/games/games_hub_screen.dart';
-import 'package:speechmate/screens/animals_page.dart';
-import 'package:speechmate/screens/magic_words_page.dart';
-import 'package:speechmate/screens/family_page.dart';
 import 'package:speechmate/screens/community_screen.dart';
 import 'package:speechmate/screens/student_progress_screen.dart';
-import 'package:speechmate/screens/colors_page.dart';
-import 'package:speechmate/screens/things_page.dart';
 import 'package:speechmate/screens/culture_screen.dart'; // [NEW] Link
 import 'package:speechmate/screens/voice_vault_screen.dart'; // [NEW] Link
+import 'package:speechmate/screens/dynamic_category_screen.dart'; // [NEW] Dynamic Module
+import 'package:speechmate/services/database_manager.dart'; // [NEW] DB
 import 'package:speechmate/screens/feedback_screen.dart'; // [NEW]
 import 'package:speechmate/widgets/exit_feedback_dialog.dart'; // [NEW]
 import 'package:speechmate/services/neural_engine_service.dart'; // [NEW]
@@ -57,6 +49,34 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     dictionaryService.loadDictionary(DictionaryType.words);
     dictionaryService.loadDictionary(DictionaryType.phrases);
     ttsService.init();
+    _seedDynamicData();
+  }
+
+  Future<void> _seedDynamicData() async {
+     await DatabaseManager.instance.seedCategoryFromJson('animals', 'assets/data/dictionary_animals.json');
+     await DatabaseManager.instance.seedCategoryFromJson('family', 'assets/data/dictionary_family.json');
+     await DatabaseManager.instance.seedCategoryFromJson('magic', 'assets/data/dictionary_magic.json');
+     await DatabaseManager.instance.seedCategoryFromJson('numbers', 'assets/data/dictionary.json');
+     await DatabaseManager.instance.seedCategoryFromJson('nature', 'assets/data/dictionary.json');
+     
+     // Sample color insertion if json doesn't exist
+     await DatabaseManager.instance.seedCategoryFromList('colors', [
+       {"name": "Blue", "nicobarese": "tö lingū", "emoji": "🌊"},
+       {"name": "Green", "nicobarese": "tö rōy chōn", "emoji": "🥥"},
+       {"name": "Orange", "nicobarese": "Föl", "emoji": "🌅"}
+     ]);
+     
+     await DatabaseManager.instance.seedCategoryFromList('feelings', [
+       {"name": "Happy", "nicobarese": "Vah", "emoji": "😁"}
+     ]);
+     
+     await DatabaseManager.instance.seedCategoryFromList('things', [
+       {"name": "House", "nicobarese": "Pati", "emoji": "🏠"}
+     ]);
+     
+     await DatabaseManager.instance.seedCategoryFromList('body_parts', [
+       {"name": "Eye", "nicobarese": "Mötö", "emoji": "👁️"}
+     ]);
   }
 
   @override
@@ -130,16 +150,16 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
     {"word": "Jungle Adventure", "emoji": "🦁", "colors": [Color(0xFFFF9966), Color(0xFFFF5E62)], "navigateTo": LessonScreen(lesson: interactiveLessons[0]), "icon": Icons.terrain_rounded},
     {"word": "Island Colors", "emoji": "🏝️", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": LessonScreen(lesson: interactiveLessons[1]), "icon": Icons.beach_access_rounded},
 
-    {"word": "Numbers", "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": NumberPage(), "icon": Icons.format_list_numbered_rounded},
-    {"word": "Nature", "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": NaturePage(), "icon": Icons.eco_rounded},
-    {"word": "Feelings", "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": FeelingsPage(), "icon": Icons.emoji_emotions_rounded},
-    {"word": "Colors", "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const ColorsPage(), "icon": Icons.palette_rounded},
-    {"word": "Things", "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const ThingsPage(), "icon": Icons.chair_rounded},
-    {"word": "Body Parts", "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": BodyPartsScreen(), "icon": Icons.accessibility_new_rounded},
+    {"word": "Numbers", "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers', bgColors: [Color(0xFF6A11CB), Color(0xFF2575FC)]), "icon": Icons.format_list_numbered_rounded},
+    {"word": "Nature", "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature', bgColors: [Color(0xFF11998E), Color(0xFF38EF7D)]), "icon": Icons.eco_rounded},
+    {"word": "Feelings", "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings', bgColors: [Color(0xFFFF512F), Color(0xFFDD2476)]), "icon": Icons.emoji_emotions_rounded},
+    {"word": "Colors", "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors', bgColors: [Color(0xFFff9a9e), Color(0xFFfad0c4)]), "icon": Icons.palette_rounded},
+    {"word": "Things", "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things', bgColors: [Color(0xFFa18cd1), Color(0xFFfbc2eb)]), "icon": Icons.chair_rounded},
+    {"word": "Body Parts", "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const DynamicCategoryScreen(categoryId: 'body_parts', title: 'Body Parts', bgColors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)]), "icon": Icons.accessibility_new_rounded},
     {"word": "Games", "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
-    {"word": "Animals", "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const AnimalsPage(), "icon": Icons.pets_rounded},
-    {"word": "Magic Words", "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const MagicWordsPage(), "icon": Icons.auto_fix_high_rounded},
-    {"word": "Family", "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const FamilyPage(), "icon": Icons.family_restroom_rounded},
+    {"word": "Animals", "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals', bgColors: [Color(0xFFFF8008), Color(0xFFFFC837)]), "icon": Icons.pets_rounded},
+    {"word": "Magic Words", "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words', bgColors: [Color(0xFFCC2B5E), Color(0xFF753A88)]), "icon": Icons.auto_fix_high_rounded},
+    {"word": "Family", "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family', bgColors: [Color(0xFF2193B0), Color(0xFF6DD5ED)]), "icon": Icons.family_restroom_rounded},
  
     {"word": "Voice Vault", "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
     {"word": "Beta Chat", "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
