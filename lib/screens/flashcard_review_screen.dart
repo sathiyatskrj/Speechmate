@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/widgets/background.dart';

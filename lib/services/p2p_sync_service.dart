@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:speechmate/services/database_manager.dart';
 
 class P2PSyncService {
@@ -59,7 +60,7 @@ class P2PSyncService {
         for (var item in wordsList) {
            // Basic upsert logic could go here based on word id/english
            // For now, simulating import
-           batch.insert('words', item, conflictAlgorithm: null); // Handle conflict properly in prod
+           batch.insert('words', item, conflictAlgorithm: ConflictAlgorithm.replace);
         }
         await batch.commit(noResult: true);
       }

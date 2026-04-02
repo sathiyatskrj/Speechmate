@@ -165,8 +165,10 @@ class _LandingPageState extends State<LandingPage> {
                             const SizedBox(height: 40),
 
                             // Profile Cards
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                            Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 20,
+                                runSpacing: 20,
                                 children: [
                                      _buildRoleCard(
                                          title: "Student",
@@ -174,7 +176,6 @@ class _LandingPageState extends State<LandingPage> {
                                          id: "student",
                                          color: Colors.pinkAccent,
                                      ),
-                                     const SizedBox(width: 20),
                                      _buildRoleCard(
                                          title: "Teacher",
                                          emoji: "👨🏻‍🏫",

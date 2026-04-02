@@ -75,4 +75,30 @@ class ProgressService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyTeacherLevel, currentLevel + 1);
   }
+
+  static const String _keyQuizzesTaken = 'quizzes_taken';
+
+  Future<void> recordQuizTaken() async {
+    final prefs = await SharedPreferences.getInstance();
+    int current = prefs.getInt(_keyQuizzesTaken) ?? 0;
+    await prefs.setInt(_keyQuizzesTaken, current + 1);
+    await _updateStreak();
+  }
+
+  Future<int> getQuizzesTaken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyQuizzesTaken) ?? 0;
+  }
+
+  /// Aggregate stats used by GamificationService and dashboard
+  Future<Map<String, int>> getProgressStats() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'wordsLearned': prefs.getInt(_keyWordsLearned) ?? 0,
+      'searchCount': prefs.getInt(_keySearchCount) ?? 0,
+      'dayStreak': prefs.getInt(_keyStreakCount) ?? 0,
+      'quizzesTaken': prefs.getInt(_keyQuizzesTaken) ?? 0,
+    };
+  }
 }
+

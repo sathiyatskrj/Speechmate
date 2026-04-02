@@ -219,7 +219,7 @@ class _QuizScreenState extends State<QuizScreen> {
                    
                    const SizedBox(height: 40),
                    
-                   ...List.generate(4, (index) {
+                   ...List.generate(options.length, (index) {
                      Color color = Colors.white;
                      if (answered) {
                        if (index == correctOptionIndex) {

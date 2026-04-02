@@ -4,13 +4,19 @@ import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/languages.dart';
 import 'package:flutter/services.dart';
 import 'package:speechmate/screens/emotional_splash_screen.dart';
-import 'package:speechmate/widgets/instant_popup_transition.dart';
+import 'package:speechmate/core/app_theme.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Global error handler to catch unhandled Flutter errors
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('FlutterError: ${details.exceptionAsString()}');
+  };
+
   try {
       await Firebase.initializeApp();
   } catch (e) {
@@ -20,31 +26,41 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final languageSelected = prefs.getBool('language_selected') ?? false;
+  final isTeacher = prefs.getBool('is_teacher') ?? false;
+  final hasSeenSplash = prefs.getBool('has_seen_splash') ?? false;
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  runApp(MyApp(languageSelected: languageSelected));
+  runApp(MyApp(
+    languageSelected: languageSelected, 
+    isTeacher: isTeacher,
+    hasSeenSplash: hasSeenSplash,
+  ));
 }
 
 class MyApp extends StatelessWidget {
   final bool languageSelected;
+  final bool isTeacher;
+  final bool hasSeenSplash;
 
-  const MyApp({super.key, required this.languageSelected});
+  const MyApp({
+    super.key, 
+    required this.languageSelected, 
+    this.isTeacher = false,
+    this.hasSeenSplash = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    Widget nextScreen = languageSelected
+            ? const Languages()
+            : const LanguageSelectionScreen();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        pageTransitionsTheme: PageTransitionsTheme(
-          builders: {TargetPlatform.android: NoTransition()},
-        ),
-      ),
-      home: EmotionalSplashScreen(
-        nextScreen: languageSelected
-            ? const Languages()
-            : const LanguageSelectionScreen(),
-      ),
+      title: 'SpeechMate - Nicobarese Language Learning',
+      theme: isTeacher ? AppTheme.teacherTheme : AppTheme.studentTheme,
+      home: hasSeenSplash ? nextScreen : EmotionalSplashScreen(nextScreen: nextScreen),
     );
   }
 }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
-import 'package:speechmate/screens/app_language_select.dart';
-import 'package:speechmate/screens/languages.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EmotionalSplashScreen extends StatefulWidget {
   final Widget nextScreen;
@@ -75,10 +73,14 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
 
     _mainController.forward();
 
-    _mainController.addStatusListener((status) {
+    _mainController.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
         // Haptic Feedback for impact
         HapticFeedback.mediumImpact();
+        
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('has_seen_splash', true);
+
         Future.delayed(const Duration(milliseconds: 500), () {
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(

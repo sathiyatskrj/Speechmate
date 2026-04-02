@@ -7,6 +7,11 @@ import 'logger_service.dart';
 enum DictionaryType { words, phrases, nature, numbers, animals, magic, family, dialects }
 
 class DictionaryService {
+  // Singleton pattern
+  static final DictionaryService _instance = DictionaryService._internal();
+  factory DictionaryService() => _instance;
+  DictionaryService._internal();
+
   final Map<DictionaryType, List<Map<String, dynamic>>> _dictionaries = {};
 
   final Map<DictionaryType, String> _paths = {
@@ -15,9 +20,9 @@ class DictionaryService {
     DictionaryType.animals: 'assets/data/dictionary_animals.json',
     DictionaryType.magic: 'assets/data/dictionary_magic.json',
     DictionaryType.family: 'assets/data/dictionary_family.json',
-    DictionaryType.nature: 'assets/data/dictionary.json', // Reuse main dict
-    DictionaryType.numbers: 'assets/data/dictionary.json', // Reuse main dict
-    DictionaryType.dialects: 'assets/data/dictionary_dialects.json', // NEW
+    DictionaryType.nature: 'assets/data/dictionary.json',
+    DictionaryType.numbers: 'assets/data/dictionary.json',
+    DictionaryType.dialects: 'assets/data/dictionary_dialects.json',
   };
 
   Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
@@ -38,7 +43,6 @@ class DictionaryService {
     } catch (e) {
       LoggerService.error('Failed to load dictionary $type', e);
       
-      // Fallback for Words if asset loading fails (Critical for demo)
       if (type == DictionaryType.words) {
          LoggerService.warning('Using fallback dictionary for words');
          final fallback = [
@@ -138,7 +142,7 @@ class DictionaryService {
       final animals = await getAnimalsItems();
       final animal = animals.firstWhere(
         (e) => (e['text'] ?? e['english']).toString().toLowerCase() == q,
-        orElse: () => {}, 
+        orElse: () => <String, dynamic>{},
       );
       
       if (animal.isNotEmpty) {
@@ -181,7 +185,6 @@ class DictionaryService {
     int wordsPerLevel = 10;
     int startIndex = (level - 1) * wordsPerLevel;
     
-    // Ensure we don't go out of bounds
     if (startIndex >= words.length) return [];
     
     int endIndex = startIndex + wordsPerLevel;
@@ -193,8 +196,6 @@ class DictionaryService {
   Future<List<Map<String, dynamic>>> getDictionary(DictionaryType type) => loadDictionary(type);
 
   Future<List<Map<String, dynamic>>> getDialectItems() async {
-    // New method for Beta Chat
-    // Load explicitly if not cached (though loadDictionary handles check)
     return loadDictionary(DictionaryType.dialects);
   }
 
@@ -204,9 +205,10 @@ class DictionaryService {
     
     final q = word.trim().toLowerCase();
     try {
-      // Prioritize English match
-      final result = words.firstWhere((w) => (w['english']?.toString().toLowerCase() == q),
-        orElse: () => {});
+      final result = words.firstWhere(
+        (w) => (w['english']?.toString().toLowerCase() == q),
+        orElse: () => <String, dynamic>{},
+      );
       
       if (result.isNotEmpty) {
         return result['nicobarese'];
@@ -220,7 +222,6 @@ class DictionaryService {
   Future<Map<String, dynamic>?> translateSentence(String input) async {
     if (input.trim().isEmpty) return null;
     
-    // 1. Load Data if needed
     if (!_dictionaries.containsKey(DictionaryType.words)) {
         await loadDictionary(DictionaryType.words);
     }
@@ -230,7 +231,6 @@ class DictionaryService {
 
     final String query = input.trim().toLowerCase();
     
-    // 2. CHECK EXACT PHRASE MATCH FIRST 
     final phrases = _dictionaries[DictionaryType.phrases] ?? [];
     for (var phrase in phrases) {
        final eng = (phrase['text'] ?? phrase['english'] ?? '').toString().toLowerCase();
@@ -244,7 +244,6 @@ class DictionaryService {
        }
     }
 
-    // 3. WORD-BY-WORD TRANSLATION
     final List<String> tokens = input.split(' ');
     List<String> translatedTokens = [];
     bool foundAtLeastOne = false;

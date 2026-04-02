@@ -71,6 +71,6 @@ mixin SearchableDashboardMixin<T extends StatefulWidget> on State<T> {
   }
 
   void disposeMixinSearch() {
-    dashSearchDictService.unload(DictionaryType.words);
+    // Dictionary service is a singleton, do not unload here as it breaks other screens
   }
 }

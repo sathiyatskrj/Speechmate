@@ -12,7 +12,7 @@ class WordRunnerGame extends StatefulWidget {
   State<WordRunnerGame> createState() => _WordRunnerGameState();
 }
 
-enum GameState { menu, playing, gameOver, victory }
+enum GameState { loading, menu, playing, gameOver, victory }
 enum ItemType { obstacle, word, surprise }
 
 // --- DATA CLASSES ---
@@ -74,7 +74,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   late AnimationController _gameTicker; // High performance game loop
   
   // Game State
-  GameState _gameState = GameState.menu;
+  GameState _gameState = GameState.loading;
   int _score = 0;
   int _level = 1;
   int _combo = 0; // Combo counter
@@ -116,6 +116,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   }
 
   Future<void> _loadDictionary() async {
+    setState(() => _gameState = GameState.loading);
     await _dictionaryService.loadDictionary(DictionaryType.words);
     _setupGame();
   }
@@ -470,6 +471,8 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
                 ),
                 
                 // 4. Overlays
+                if (_gameState == GameState.loading) 
+                  const Center(child: CircularProgressIndicator(color: Colors.white)),
                 if (_gameState == GameState.menu) _buildMenu(),
                 if (_gameState == GameState.gameOver) _buildGameOver(),
                 if (_gameState == GameState.victory) _buildVictory(),

@@ -1,71 +1,54 @@
 import 'package:flutter/foundation.dart';
-import 'dart:io';
-import 'dart:ffi';
-import 'package:ffi/ffi.dart';
 
-typedef TranscribeC = Pointer<Utf8> Function(Pointer<Utf8> model, Pointer<Utf8> audio);
-typedef TranscribeDart = Pointer<Utf8> Function(Pointer<Utf8> model, Pointer<Utf8> audio);
-
-typedef FreeStringC = Void Function(Pointer<Utf8> str);
-typedef FreeStringDart = void Function(Pointer<Utf8> str);
-
+/// WhisperService - Offline speech transcription
+/// 
+/// IMPORTANT: This service requires a native `.so` library (libwhisper-lib.so)
+/// to be bundled with the APK. Without it, the app will crash on initialization.
+/// 
+/// Currently disabled (stubbed) until native library bundling is implemented.
+/// To enable, follow these steps:
+/// 1. Build the Whisper C++ library for target arch (arm64-v8a, armeabi-v7a)
+/// 2. Place .so files in android/app/src/main/jniLibs/<arch>/
+/// 3. Remove the stub guards below and uncomment the FFI code
 class WhisperService {
   bool _isProcessing = false;
+  bool _isAvailable = false;
 
+  /// Check if the native library is available
+  bool get isAvailable => _isAvailable;
+
+  /// Try to initialize the service. Returns false if native lib is missing.
+  Future<bool> initialize() async {
+    // TODO: Implement native library detection
+    // For now, always return false since .so isn't bundled
+    _isAvailable = false;
+    debugPrint('[WhisperService] Native library not bundled. Service unavailable.');
+    return false;
+  }
+
+  /// Transcribe audio file using Whisper model.
+  /// Returns empty string if service is unavailable.
   Future<String> transcribe(String modelPath, String audioPath) async {
+    if (!_isAvailable) {
+      debugPrint('[WhisperService] Cannot transcribe - service unavailable.');
+      return '';
+    }
+
     if (_isProcessing) {
-      debugPrint("Whisper: Already processing a request. Ignored.");
-      return "";
-    }
-    
-    // Check files on main isolate before spawning
-    if (!await File(modelPath).exists()) {
-        return "Error: Model file not found at $modelPath";
-    }
-    if (!await File(audioPath).exists()) {
-        return "Error: Audio file not found at $audioPath";
+      debugPrint('[WhisperService] Already processing a request. Ignored.');
+      return '';
     }
 
     _isProcessing = true;
     try {
-      // Run native call in background isolate
-      final String text = await compute(_transcribeInBackground, {
-        'model': modelPath,
-        'audio': audioPath,
-      });
-      
+      // FFI call would go here when native library is available
+      // final text = await compute(_transcribeInBackground, {...});
       _isProcessing = false;
-      return text;
+      return '';
     } catch (e) {
-        _isProcessing = false;
-        debugPrint("Whisper Unexpected Error: $e");
-        return "Error: $e";
+      _isProcessing = false;
+      debugPrint('[WhisperService] Error: $e');
+      return '';
     }
-  }
-
-  // Top-level function for compute
-  static Future<String> _transcribeInBackground(Map<String, dynamic> params) async {
-     final modelStr = params['model'] as String;
-     final audioStr = params['audio'] as String;
-     
-     final dylib = Platform.isAndroid
-        ? DynamicLibrary.open('libwhisper-lib.so')
-        : DynamicLibrary.process();
-
-     final transcribeFunc = dylib.lookupFunction<TranscribeC, TranscribeDart>('transcribe_ffi');
-     final freeFunc = dylib.lookupFunction<FreeStringC, FreeStringDart>('free_ffi_string');
-
-     final modelPtr = modelStr.toNativeUtf8();
-     final audioPtr = audioStr.toNativeUtf8();
-     
-     final resultPtr = transcribeFunc(modelPtr, audioPtr);
-     
-     final result = resultPtr.toDartString();
-     
-     freeFunc(resultPtr);
-     malloc.free(modelPtr);
-     malloc.free(audioPtr);
-     
-     return result;
   }
 }

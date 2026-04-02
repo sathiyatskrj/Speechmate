@@ -166,15 +166,17 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isSmallScreen = screenSize.width < 360;
-    final isMediumScreen = screenSize.width < 400;
-    
-    final messageFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final messageMaxWidth = screenSize.width * 0.75;
-    final messagePadding = isSmallScreen ? 12.0 : 14.0;
-    
-    return Scaffold(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final isSmallScreen = screenWidth < 360;
+        final isMediumScreen = screenWidth < 400;
+        
+        final messageFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
+        final messageMaxWidth = screenWidth * 0.75;
+        final messagePadding = isSmallScreen ? 12.0 : 14.0;
+        
+        return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
@@ -454,6 +456,8 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
             ),
         ],
       ),
+    );
+      },
     );
   }
 
