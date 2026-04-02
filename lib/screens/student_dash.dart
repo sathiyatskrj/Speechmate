@@ -331,7 +331,7 @@ class _StudentDashState extends State<StudentDash>
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: const Text("Enter", fontWeight: FontWeight.bold),
+                        child: const Text("Enter", style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
