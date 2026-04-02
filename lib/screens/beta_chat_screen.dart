@@ -61,7 +61,6 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget.isStudent ? _studentTheme : _teacherTheme;
     final bgColor = widget.isStudent ? const Color(0xFFF0F4F8) : Colors.white;
 
     return Scaffold(
@@ -126,14 +125,6 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   }
 
   // --- Student UI (Colorful, Card-based) ---
-  final _studentTheme = ThemeData(
-    primaryColor: const Color(0xFFFF6B6B),
-    cardTheme: CardTheme(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 4,
-    ),
-  );
-
   Widget _buildStudentCard(Map<String, dynamic> item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -206,11 +197,6 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   }
 
   // --- Teacher UI (Professional, Dense) ---
-  final _teacherTheme = ThemeData(
-    primaryColor: Colors.blueGrey,
-    cardTheme: const CardTheme(elevation: 1),
-  );
-
   Widget _buildTeacherRow(Map<String, dynamic> item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),

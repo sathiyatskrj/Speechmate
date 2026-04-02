@@ -31,7 +31,7 @@ dependencies:
   archive: ^3.3.7
   qr_flutter: ^4.1.0
   appinio_swiper: ^2.1.1
-  fl_chart: ^1.2.0
+  fl_chart: ^0.68.0
   firebase_auth: ^5.7.0
   google_sign_in: ^7.2.0
 
