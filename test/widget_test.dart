@@ -1,34 +1,59 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:speechmate/screens/community_screen.dart';
+import 'package:speechmate/widgets/gamification_header.dart';
+import 'package:speechmate/features/gamification/gamification_service.dart';
 
 void main() {
-  testWidgets('CommunityScreen renders correctly', (WidgetTester tester) async {
-    // 1. Pump the widget
-    // We wrap it in a MaterialApp because CommunityScreen uses Scaffold and Theme,
-    // which require a MaterialApp ancestor.
-    await tester.pumpWidget(const MaterialApp(home: CommunityScreen()));
+  group('Widget Smoke Tests', () {
+    testWidgets('GamificationHeader renders without crashing', (WidgetTester tester) async {
+      // Set up known static state before rendering
+      GamificationService.xp = 150;
+      GamificationService.currentLevel = 2;
+      GamificationService.nextLevelXp = 250;
+      GamificationService.currentStreak = 3;
 
-    // 2. Verify initial state
-    // Check if the title "Community Hub" is present
-    expect(find.text('Community Hub 🌏'), findsOneWidget);
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: GamificationHeader(),
+          ),
+        ),
+      );
 
-    // Check if the "New Post" button is present
-    expect(find.text('New Post'), findsOneWidget);
-    expect(find.byIcon(Icons.edit), findsOneWidget);
+      // Verify level number is displayed
+      expect(find.text('2'), findsOneWidget);
 
-    // 3. Interact with the widget
-    // Tap the "Admin Panel" toggle button (second action button)
-    // The icon is admin_panel_settings_outlined in default mode
-    await tester.tap(find.byIcon(Icons.admin_panel_settings_outlined));
-    await tester.pump(); // Rebuild the widget after the state change
+      // Verify level title is displayed
+      expect(find.text('Seed Planter'), findsOneWidget);
 
-    // 4. Verify state change
-    // The title should now be "Admin Panel"
-    expect(find.text('Admin Panel 🛡️'), findsOneWidget);
-    
-    // Check for snackbar
-    expect(find.text('Admin Mode Activated 🛡️'), findsOneWidget);
+      // Verify XP text is displayed
+      expect(find.text('150 / 250 XP'), findsOneWidget);
+
+      // Verify streak is displayed
+      expect(find.text('3'), findsOneWidget);
+
+      // Verify fire icon is present
+      expect(find.byIcon(Icons.local_fire_department), findsOneWidget);
+    });
+
+    testWidgets('GamificationHeader updates when static values change', (WidgetTester tester) async {
+      GamificationService.xp = 500;
+      GamificationService.currentLevel = 4;
+      GamificationService.nextLevelXp = 850;
+      GamificationService.currentStreak = 7;
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: GamificationHeader(),
+          ),
+        ),
+      );
+
+      expect(find.text('4'), findsOneWidget);
+      expect(find.text('Story Teller'), findsOneWidget);
+      expect(find.text('500 / 850 XP'), findsOneWidget);
+      expect(find.text('7'), findsOneWidget);
+    });
   });
 }

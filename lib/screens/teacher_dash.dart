@@ -19,6 +19,8 @@ import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/widgets/exit_feedback_dialog.dart';
+import 'package:speechmate/widgets/ai_assistant_overlay.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -31,6 +33,7 @@ class _TeacherDashState extends State<TeacherDash>
     with SearchableDashboardMixin {
   final TextEditingController _searchController = TextEditingController();
   final TtsService _ttsService = TtsService();
+  bool _showAiAssistant = false;
   
   Map<String, dynamic>? _dailyWord;
 
@@ -70,179 +73,192 @@ class _TeacherDashState extends State<TeacherDash>
     return Theme(
       data: AppTheme.teacherTheme,
       child: Scaffold(
-          body: VoiceReactiveAurora(
-            isDark: true,
-          child: Column(
-            children: [
-              SmartDashboardHeader(
-                isTeacher: true,
-                searchController: _searchController,
-                onSearch: _onSearch,
-                onClear: _clearSearch,
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                        if (_dailyWord != null) ...[
-                          _buildDailyWordCard(_dailyWord!),
-                          const SizedBox(height: 25),
+        body: Stack(
+          children: [
+            VoiceReactiveAurora(
+              isDark: true,
+              child: Column(
+                children: [
+                  SmartDashboardHeader(
+                    isTeacher: true,
+                    searchController: _searchController,
+                    onSearch: _onSearch,
+                    onClear: _clearSearch,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                            if (_dailyWord != null) ...[
+                              _buildDailyWordCard(_dailyWord!),
+                              const SizedBox(height: 25),
+                            ],
+                            if (isSearchLoading)
+                               const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
+                            
+                            if (!isSearchLoading && hasSearched)
+                               Padding(
+                                 padding: const EdgeInsets.only(bottom: 25),
+                                 child: TranslationCard(
+                                    nicobarese: searchResult != null ? searchResult!['nicobarese'] : "No match found",
+                                    english: searchResult != null ? (searchResult!['english'] ?? searchResult!['text'] ?? "") : "",
+                                    searchedNicobarese: searchedNicobarese,
+                                    isError: searchResult == null,
+                                    showSpeaker: searchResult != null, 
+                                    onSpeak: () {
+                                        if (searchResult == null) return;
+                                        if (searchedNicobarese) {
+                                            _ttsService.speakEnglish(searchResult!['english'] ?? searchResult!['text'] ?? "");
+                                        } else {
+                                            _ttsService.speakNicobarese(
+                                              searchResult!['nicobarese'] ?? "",
+                                              englishWord: searchResult!['english'] ?? searchResult!['text']
+                                            );
+                                        }
+                                    },
+                                 ),
+                               ),
+
+                      // ────── LEARNING TOOLS SECTION ──────
+                      _buildSectionHeader("LEARNING TOOLS", Icons.school_rounded, Colors.purpleAccent),
+                      const SizedBox(height: 12),
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15,
+                        childAspectRatio: 1.3,
+                        children: [
+                          _buildFeatureCard(context,
+                            title: "Certification",
+                            icon: Icons.verified,
+                            color: Colors.amberAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Quiz Mode",
+                            icon: Icons.quiz,
+                            color: Colors.purpleAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Progress",
+                            icon: Icons.bar_chart,
+                            color: Colors.greenAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Common Phrases",
+                            icon: Icons.chat_bubble_outline,
+                            color: Colors.pinkAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
+                          ),
                         ],
-                        if (isSearchLoading)
-                           const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
-                        
-                        if (!isSearchLoading && hasSearched)
-                           Padding(
-                             padding: const EdgeInsets.only(bottom: 25),
-                             child: TranslationCard(
-                                nicobarese: searchResult != null ? searchResult!['nicobarese'] : "No match found",
-                                english: searchResult != null ? (searchResult!['english'] ?? searchResult!['text'] ?? "") : "",
-                                searchedNicobarese: searchedNicobarese,
-                                isError: searchResult == null,
-                                showSpeaker: searchResult != null, 
-                                onSpeak: () {
-                                    if (searchResult == null) return;
-                                    if (searchedNicobarese) {
-                                        _ttsService.speakEnglish(searchResult!['english'] ?? searchResult!['text'] ?? "");
-                                    } else {
-                                        _ttsService.speakNicobarese(
-                                          searchResult!['nicobarese'] ?? "",
-                                          englishWord: searchResult!['english'] ?? searchResult!['text']
-                                        );
-                                    }
-                                },
-                             ),
-                           ),
+                      ),
+                      const SizedBox(height: 24),
 
-                  // ────── LEARNING TOOLS SECTION ──────
-                  _buildSectionHeader("LEARNING TOOLS", Icons.school_rounded, Colors.purpleAccent),
-                  const SizedBox(height: 12),
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
-                    childAspectRatio: 1.3,
-                    children: [
-                      _buildFeatureCard(context,
-                        title: "Certification",
-                        icon: Icons.verified,
-                        color: Colors.amberAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
+                      // ────── CLASSROOM TOOLS SECTION ──────
+                      _buildSectionHeader("CLASSROOM TOOLS", Icons.class_rounded, Colors.orangeAccent),
+                      const SizedBox(height: 12),
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15,
+                        childAspectRatio: 1.3,
+                        children: [
+                          _buildFeatureCard(context,
+                            title: "Translator",
+                            icon: Icons.translate,
+                            color: Colors.orangeAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Voice Vault",
+                            icon: Icons.mic,
+                            color: Colors.redAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Culture",
+                            icon: Icons.account_balance,
+                            color: Colors.tealAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Generate Report",
+                            icon: Icons.picture_as_pdf_outlined,
+                            color: Colors.deepOrangeAccent,
+                            onTap: () async => await ReportGenerator.generateAndPrintReport("Student"),
+                          ),
+                        ],
                       ),
-                      _buildFeatureCard(context,
-                        title: "Quiz Mode",
-                        icon: Icons.quiz,
-                        color: Colors.purpleAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
+                      const SizedBox(height: 24),
+
+                      // ────── COMMUNITY & SETTINGS SECTION ──────
+                      _buildSectionHeader("COMMUNITY & SETTINGS", Icons.people_alt_rounded, Colors.blueAccent),
+                      const SizedBox(height: 12),
+                      GridView.count(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15,
+                        childAspectRatio: 1.3,
+                        children: [
+                          _buildFeatureCard(context,
+                            title: "Community",
+                            icon: Icons.public,
+                            color: Colors.blueAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Beta Chat",
+                            icon: Icons.forum,
+                            color: Colors.indigoAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Export Vocab",
+                            icon: Icons.share_rounded,
+                            color: Colors.lightGreenAccent,
+                            onTap: () async {
+                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...')));
+                               await P2PSyncService.exportAndShare();
+                            },
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Feedback",
+                            icon: Icons.rate_review,
+                            color: Colors.pinkAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())),
+                          ),
+                        ],
                       ),
-                      _buildFeatureCard(context,
-                        title: "Progress",
-                        icon: Icons.bar_chart,
-                        color: Colors.greenAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
-                      ),
-                      _buildFeatureCard(context,
-                        title: "Common Phrases",
-                        icon: Icons.chat_bubble_outline,
-                        color: Colors.pinkAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
-                      ),
+                      const SizedBox(height: 40),
                     ],
                   ),
-                  const SizedBox(height: 24),
-
-                  // ────── CLASSROOM TOOLS SECTION ──────
-                  _buildSectionHeader("CLASSROOM TOOLS", Icons.class_rounded, Colors.orangeAccent),
-                  const SizedBox(height: 12),
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
-                    childAspectRatio: 1.3,
-                    children: [
-                      _buildFeatureCard(context,
-                        title: "Translator",
-                        icon: Icons.translate,
-                        color: Colors.orangeAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
-                      ),
-                      _buildFeatureCard(context,
-                        title: "Voice Vault",
-                        icon: Icons.mic,
-                        color: Colors.redAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
-                      ),
-                      _buildFeatureCard(context,
-                        title: "Culture",
-                        icon: Icons.account_balance,
-                        color: Colors.tealAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
-                      ),
-                      _buildFeatureCard(context,
-                        title: "Generate Report",
-                        icon: Icons.picture_as_pdf_outlined,
-                        color: Colors.deepOrangeAccent,
-                        onTap: () async => await ReportGenerator.generateAndPrintReport("Student"),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  // ────── COMMUNITY & SETTINGS SECTION ──────
-                  _buildSectionHeader("COMMUNITY & SETTINGS", Icons.people_alt_rounded, Colors.blueAccent),
-                  const SizedBox(height: 12),
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
-                    childAspectRatio: 1.3,
-                    children: [
-                      _buildFeatureCard(context,
-                        title: "Community",
-                        icon: Icons.public,
-                        color: Colors.blueAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
-                      ),
-                      _buildFeatureCard(context,
-                        title: "Beta Chat",
-                        icon: Icons.forum,
-                        color: Colors.indigoAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
-                      ),
-                      _buildFeatureCard(context,
-                        title: "Export Vocab",
-                        icon: Icons.share_rounded,
-                        color: Colors.lightGreenAccent,
-                        onTap: () async {
-                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...')));
-                           await P2PSyncService.exportAndShare();
-                        },
-                      ),
-                      _buildFeatureCard(context,
-                        title: "Feedback",
-                        icon: Icons.rate_review,
-                        color: Colors.pinkAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                ],
+                ),
               ),
+                ],
+              ), 
             ),
-          ),
-              ],
-            ), 
+            if (_showAiAssistant)
+              AiAssistantOverlay(
+                onClose: () => setState(() => _showAiAssistant = false),
+              ),
+          ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => setState(() => _showAiAssistant = true),
+          backgroundColor: Colors.deepPurpleAccent,
+          child: const Icon(Icons.auto_awesome, color: Colors.white),
+        ).animate().scale(delay: 500.ms, duration: 500.ms),
       ),
     );
   }
