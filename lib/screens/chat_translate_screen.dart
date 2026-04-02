@@ -4,6 +4,7 @@ import '../services/dictionary_service.dart';
 import '../services/neural_engine_service.dart';
 import '../services/database_manager.dart';
 import '../widgets/nicobarese_keyboard.dart';
+import '../widgets/anim/confetti_overlay.dart';
 
 class ChatTranslateScreen extends StatefulWidget {
   const ChatTranslateScreen({super.key});
@@ -24,7 +25,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
   
   // Magic Easter egg
   bool showConfetti = false;
-  late AnimationController confettiController;
+  // Removed local confettiController to use ConfettiOverlay state management
   
   // Custom Keyboard
   bool _showCustomKeyboard = false;
@@ -35,10 +36,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
     super.initState();
     dictionaryService.loadDictionary(DictionaryType.words);
     
-    confettiController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
+    // Removed local confettiController initialization
     
     // Welcome message
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -79,7 +77,6 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           setState(() => showConfetti = true);
-          confettiController.forward(from: 0);
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) setState(() => showConfetti = false);
           });
@@ -159,7 +156,6 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
   void dispose() {
     scrollController.dispose();
     controller.dispose();
-    confettiController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -177,286 +173,271 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
         final messagePadding = isSmallScreen ? 12.0 : 14.0;
         
         return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: Colors.greenAccent,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Text("Chat Translator"),
-          ],
-        ),
-        backgroundColor: Colors.teal.shade700,
-        foregroundColor: Colors.white,
-        elevation: 2,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            tooltip: 'Tip: Every 10th message has a surprise! 🎉',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('💡 Tip: Keep chatting for surprises!'),
-                  duration: Duration(seconds: 2),
+          appBar: AppBar(
+            title: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.greenAccent,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.teal.shade50,
-                  Colors.white,
-                ],
-              ),
+                const SizedBox(width: 8),
+                const Text("Chat Translator"),
+              ],
             ),
-            child: SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-                      itemCount: messages.length + (isTyping ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == messages.length && isTyping) {
-                          return _buildTypingIndicator();
-                        }
-
-                        final msg = messages[index];
-                        final isUser = msg['type'] == 'user';
-                        final emoji = msg['emoji'] ?? (isUser ? '👤' : '🤖');
-
-                        return TweenAnimationBuilder(
-                          duration: const Duration(milliseconds: 300),
-                          tween: Tween<double>(begin: 0, end: 1),
-                          builder: (context, double value, child) {
-                            return Transform.scale(
-                              scale: value,
-                              child: Opacity(
-                                opacity: value,
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: Align(
-                            alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 6),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (!isUser) ...[
-                                    Text(emoji, style: const TextStyle(fontSize: 20)),
-                                    const SizedBox(width: 8),
-                                  ],
-                                  Container(
-                                    constraints: BoxConstraints(maxWidth: messageMaxWidth),
-                                    padding: EdgeInsets.all(messagePadding),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: isUser
-                                            ? [Colors.teal.shade600, Colors.teal.shade700]
-                                            : [Colors.white, Colors.grey.shade50],
-                                      ),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: const Radius.circular(16),
-                                        topRight: const Radius.circular(16),
-                                        bottomLeft: Radius.circular(isUser ? 16 : 4),
-                                        bottomRight: Radius.circular(isUser ? 4 : 16),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      msg['text']!,
-                                      style: TextStyle(
-                                        color: isUser ? Colors.white : Colors.black87,
-                                        fontSize: messageFontSize,
-                                        height: 1.4,
-                                      ),
-                                      softWrap: true,
-                                    ),
-                                  ),
-                                  if (!isUser && msg.containsKey('word_data') && msg['word_data'] != null && !msg['word_data'].containsKey('generated')) ...[
-                                    const SizedBox(width: 4),
-                                    Container(
-                                      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
-                                      child: IconButton(
-                                        icon: const Icon(Icons.bookmark_add_rounded, size: 20, color: Colors.orangeAccent),
-                                        padding: const EdgeInsets.all(6),
-                                        constraints: const BoxConstraints(),
-                                        tooltip: 'Save to Flashcards',
-                                        onPressed: () async {
-                                          final word = msg['word_data'];
-                                          final english = word['english'] ?? word['text'];
-                                          final nicobarese = word['nicobarese'];
-                                          if (english != null && nicobarese != null) {
-                                              await DatabaseManager.instance.saveFlashcard(english.toString(), nicobarese.toString());
-                                              if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to your Flashcards! 📚')));
-                                          }
-                                        },
-                                      )
-                                    )
-                                  ],
-                                  if (isUser) ...[
-                                    const SizedBox(width: 8),
-                                    Text(emoji, style: const TextStyle(fontSize: 20)),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+            backgroundColor: Colors.teal.shade700,
+            foregroundColor: Colors.white,
+            elevation: 2,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                tooltip: 'Tip: Every 10th message has a surprise! 🎉',
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('💡 Tip: Keep chatting for surprises!'),
+                      duration: Duration(seconds: 2),
                     ),
-                  ),
-
-                  // Input Bar
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isSmallScreen ? 8 : 12,
-                      vertical: isSmallScreen ? 8 : 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, -2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: TextField(
-                              controller: controller,
-                              focusNode: _focusNode,
-                              readOnly: _showCustomKeyboard,
-                              showCursor: true,
-                              decoration: InputDecoration(
-                                hintText: "Type a word...",
-                                hintStyle: TextStyle(
-                                  fontSize: isSmallScreen ? 14 : 16,
-                                  color: Colors.grey.shade600,
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: isSmallScreen ? 16 : 18,
-                                  vertical: 12,
-                                ),
-                                suffixIcon: controller.text.isNotEmpty
-                                    ? IconButton(
-                                        icon: const Icon(Icons.clear, size: 20),
-                                        onPressed: () {
-                                          setState(() => controller.clear());
-                                        },
-                                      )
-                                    : null,
-                              ),
-                              style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                              onChanged: (value) {
-                                setState(() {}); // Rebuild for clear button
-                              },
-                              onSubmitted: (_) => translateText(),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.teal.shade600, Colors.teal.shade700],
-                            ),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.teal.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: IconButton(
-                            icon: Icon(Icons.send_rounded, size: isSmallScreen ? 20 : 22),
-                            color: Colors.white,
-                            onPressed: translateText,
-                            padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
-                          ),
-                        ),
-                        // [NEW] Toggle custom keyboard
-                        IconButton(
-                          icon: Icon(_showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, color: Colors.teal.shade700),
-                          onPressed: () {
-                             setState(() {
-                               _showCustomKeyboard = !_showCustomKeyboard;
-                               if (_showCustomKeyboard) {
-                                  _focusNode.unfocus(); // hide system keyboard
-                               } else {
-                                  _focusNode.requestFocus(); // show system keyboard
-                               }
-                             });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  if (_showCustomKeyboard)
-                     NicobareseKeyboard(
-                        controller: controller,
-                        onSubmitted: translateText,
-                        onClose: () => setState(() {
-                            _showCustomKeyboard = false;
-                            _focusNode.requestFocus();
-                        })
-                     ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Confetti Animation (Easter Egg)
-          if (showConfetti)
-            IgnorePointer(
-              child: AnimatedBuilder(
-                animation: confettiController,
-                builder: (context, child) {
-                  return CustomPaint(
-                    painter: ConfettiPainter(confettiController.value),
-                    size: Size.infinite,
                   );
                 },
               ),
+            ],
+          ),
+          body: ConfettiOverlay(
+            isPlaying: showConfetti,
+            child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.teal.shade50,
+                      Colors.white,
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          controller: scrollController,
+                          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+                          itemCount: messages.length + (isTyping ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == messages.length && isTyping) {
+                              return _buildTypingIndicator();
+                            }
+
+                            final msg = messages[index];
+                            final isUser = msg['type'] == 'user';
+                            final emoji = msg['emoji'] ?? (isUser ? '👤' : '🤖');
+
+                            return TweenAnimationBuilder(
+                              duration: const Duration(milliseconds: 300),
+                              tween: Tween<double>(begin: 0, end: 1),
+                              builder: (context, double value, child) {
+                                return Transform.scale(
+                                  scale: value,
+                                  child: Opacity(
+                                    opacity: value,
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: Align(
+                                alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 6),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (!isUser) ...[
+                                        Text(emoji, style: const TextStyle(fontSize: 20)),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      Container(
+                                        constraints: BoxConstraints(maxWidth: messageMaxWidth),
+                                        padding: EdgeInsets.all(messagePadding),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: isUser
+                                                ? [Colors.teal.shade600, Colors.teal.shade700]
+                                                : [Colors.white, Colors.grey.shade50],
+                                          ),
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: const Radius.circular(16),
+                                            topRight: const Radius.circular(16),
+                                            bottomLeft: Radius.circular(isUser ? 16 : 4),
+                                            bottomRight: Radius.circular(isUser ? 4 : 16),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.1),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          msg['text']!,
+                                          style: TextStyle(
+                                            color: isUser ? Colors.white : Colors.black87,
+                                            fontSize: messageFontSize,
+                                            height: 1.4,
+                                          ),
+                                          softWrap: true,
+                                        ),
+                                      ),
+                                      if (!isUser && msg.containsKey('word_data') && msg['word_data'] != null && !msg['word_data'].containsKey('generated')) ...[
+                                        const SizedBox(width: 4),
+                                        Container(
+                                          decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
+                                          child: IconButton(
+                                            icon: const Icon(Icons.bookmark_add_rounded, size: 20, color: Colors.orangeAccent),
+                                            padding: const EdgeInsets.all(6),
+                                            constraints: const BoxConstraints(),
+                                            tooltip: 'Save to Flashcards',
+                                            onPressed: () async {
+                                              final word = msg['word_data'];
+                                              final english = word['english'] ?? word['text'];
+                                              final nicobarese = word['nicobarese'];
+                                              if (english != null && nicobarese != null) {
+                                                  await DatabaseManager.instance.saveFlashcard(english.toString(), nicobarese.toString());
+                                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to your Flashcards! 📚')));
+                                              }
+                                            },
+                                          )
+                                        )
+                                      ],
+                                      if (isUser) ...[
+                                        const SizedBox(width: 8),
+                                        Text(emoji, style: const TextStyle(fontSize: 20)),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      // Input Bar
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isSmallScreen ? 8 : 12,
+                          vertical: isSmallScreen ? 8 : 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, -2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                child: TextField(
+                                  controller: controller,
+                                  focusNode: _focusNode,
+                                  readOnly: _showCustomKeyboard,
+                                  showCursor: true,
+                                  decoration: InputDecoration(
+                                    hintText: "Type a word...",
+                                    hintStyle: TextStyle(
+                                      fontSize: isSmallScreen ? 14 : 16,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: isSmallScreen ? 16 : 18,
+                                      vertical: 12,
+                                    ),
+                                    suffixIcon: controller.text.isNotEmpty
+                                        ? IconButton(
+                                            icon: const Icon(Icons.clear, size: 20),
+                                            onPressed: () {
+                                              setState(() => controller.clear());
+                                            },
+                                          )
+                                        : null,
+                                  ),
+                                  style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
+                                  onChanged: (value) {
+                                    setState(() {}); // Rebuild for clear button
+                                  },
+                                  onSubmitted: (_) => translateText(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.teal.shade600, Colors.teal.shade700],
+                                ),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.teal.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.send_rounded, size: isSmallScreen ? 20 : 22),
+                                color: Colors.white,
+                                onPressed: translateText,
+                                padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
+                              ),
+                            ),
+                            // [NEW] Toggle custom keyboard
+                            IconButton(
+                              icon: Icon(_showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, color: Colors.teal.shade700),
+                              onPressed: () {
+                                 setState(() {
+                                   _showCustomKeyboard = !_showCustomKeyboard;
+                                   if (_showCustomKeyboard) {
+                                      _focusNode.unfocus(); // hide system keyboard
+                                   } else {
+                                      _focusNode.requestFocus(); // show system keyboard
+                                   }
+                                 });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      if (_showCustomKeyboard)
+                         NicobareseKeyboard(
+                            controller: controller,
+                            onSubmitted: translateText,
+                            onClose: () => setState(() {
+                                _showCustomKeyboard = false;
+                                _focusNode.requestFocus();
+                            })
+                         ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-        ],
-      ),
-    );
+          );
       },
     );
   }
@@ -505,53 +486,4 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       },
     );
   }
-}
-
-// Confetti Painter for Easter Egg
-class ConfettiPainter extends CustomPainter {
-  final double progress;
-  final Random random = Random(42);
-
-  ConfettiPainter(this.progress);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    
-    for (int i = 0; i < 50; i++) {
-      final x = random.nextDouble() * size.width;
-      final startY = -20.0;
-      final endY = size.height;
-      final y = startY + (endY - startY) * progress;
-      
-      final colors = [
-        Colors.red,
-        Colors.blue,
-        Colors.green,
-        Colors.yellow,
-        Colors.purple,
-        Colors.orange,
-        Colors.pink,
-      ];
-      
-      paint.color = colors[i % colors.length].withOpacity(0.8);
-      
-      final rotation = (progress * 360 * (i % 3)) * pi / 180;
-      
-      canvas.save();
-      canvas.translate(x, y);
-      canvas.rotate(rotation);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          const Rect.fromLTWH(-5, -5, 10, 10),
-          const Radius.circular(2),
-        ),
-        paint,
-      );
-      canvas.restore();
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
