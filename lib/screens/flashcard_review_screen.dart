@@ -104,11 +104,45 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                                 onTap: () {
                                   if (!_isFlipped) setState(() => _isFlipped = true);
                                 },
-                                child: TweenAnimationBuilder(
-                                  tween: Tween<double>(begin: 0, end: _isFlipped ? pi : 0),
-                                  duration: const Duration(milliseconds: 400),
-                                  builder: (context, double value, child) {
-                                    bool isFront = value < (pi / 2);
+                                child: Dismissible(
+                                  key: Key('${_dueCards[_currentIndex]['word_id']}_$_isFlipped'),
+                                  direction: _isFlipped ? DismissDirection.horizontal : DismissDirection.none,
+                                  background: Container(
+                                    decoration: BoxDecoration(color: Colors.green.withOpacity(0.8), borderRadius: BorderRadius.circular(20)),
+                                    alignment: Alignment.centerLeft,
+                                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                                    child: const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.check_circle_outline, color: Colors.white, size: 50),
+                                        Text('Good', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                                      ],
+                                    ),
+                                  ),
+                                  secondaryBackground: Container(
+                                    decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.8), borderRadius: BorderRadius.circular(20)),
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                                    child: const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.cancel_outlined, color: Colors.white, size: 50),
+                                        Text('Fail', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                                      ],
+                                    ),
+                                  ),
+                                  onDismissed: (direction) {
+                                    if (direction == DismissDirection.startToEnd) {
+                                      _handleGrade(4); // Good
+                                    } else {
+                                      _handleGrade(1); // Fail
+                                    }
+                                  },
+                                  child: TweenAnimationBuilder(
+                                    tween: Tween<double>(begin: 0, end: _isFlipped ? pi : 0),
+                                    duration: const Duration(milliseconds: 400),
+                                    builder: (context, double value, child) {
+                                      bool isFront = value < (pi / 2);
                                     return Transform(
                                       alignment: Alignment.center,
                                       transform: Matrix4.identity()
@@ -119,7 +153,8 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                                           transform: Matrix4.identity()..rotateY(pi),
                                           child: _buildCardBack()),
                                     );
-                                  },
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
@@ -135,12 +170,14 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                                  Row(
                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                    children: [
-                                     _buildGradeBtn("Fail", 1, Colors.redAccent, "F"),
-                                     _buildGradeBtn("Hard", 3, Colors.orangeAccent, "H"),
-                                     _buildGradeBtn("Good", 4, Colors.green, "G"),
-                                     _buildGradeBtn("Easy", 5, Colors.blue, "E"),
+                                     _buildGradeBtn("Fail", 1, Colors.redAccent, "😖"),
+                                     _buildGradeBtn("Hard", 3, Colors.orangeAccent, "😐"),
+                                     _buildGradeBtn("Good", 4, Colors.green, "😊"),
+                                     _buildGradeBtn("Easy", 5, Colors.blue, "🤩"),
                                    ],
-                                 )
+                                 ),
+                                 const SizedBox(height: 15),
+                                 const Text("...or swipe card Left (Fail) / Right (Good)", style: TextStyle(color: Colors.white54, fontSize: 13, fontStyle: FontStyle.italic)),
                                ],
                              ),
                            )

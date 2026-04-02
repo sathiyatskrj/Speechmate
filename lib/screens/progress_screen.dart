@@ -79,13 +79,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     value: wordsLearned.toString(),
                     color: Colors.green,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
                   
                   const Text(
-                    "📊 Quiz History",
+                    "📊 Recent Quiz Performance",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   
                   if (quizScores.isEmpty)
                     Container(
@@ -101,23 +101,70 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                     )
                   else
-                    ...quizScores.reversed.take(5).map((score) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text("Quiz Score:", style: TextStyle(fontWeight: FontWeight.w500)),
-                            Text(score, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      );
-                    }),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10)],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(
+                            height: 150,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: quizScores.reversed.take(6).map((scoreString) {
+                                // Parse e.g., "4/5" string
+                                double percentage = 0.0;
+                                try {
+                                  final parts = scoreString.split('/');
+                                  if (parts.length == 2) {
+                                    percentage = double.parse(parts[0]) / double.parse(parts[1]);
+                                  }
+                                } catch (_) {}
+                                
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(scoreString, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                    const SizedBox(height: 6),
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 800),
+                                      curve: Curves.easeOutQuart,
+                                      width: 30,
+                                      height: percentage * 100 + 10, // min height 10
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.bottomCenter,
+                                          end: Alignment.topCenter,
+                                          colors: [
+                                            Colors.blue.shade400,
+                                            Colors.blue.shade300.withOpacity(percentage),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList().reversed.toList(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              for (int i = 0; i < (quizScores.length > 6 ? 6 : quizScores.length); i++)
+                                Text("Q${i+1}", style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 20),
                 ],
               ),
       ),

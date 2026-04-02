@@ -95,18 +95,28 @@ class _CommunityScreenState extends State<CommunityScreen> {
                          return _buildEmptyState();
                       }
 
-                      return ListView.builder(
-                        padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: snapshot.data!.docs.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == 0) return _buildTrendingSection();
-                          
-                          DocumentSnapshot doc = snapshot.data!.docs[index - 1];
-                          CommunityPost post = CommunityPost.fromFirestore(doc);
-                          
-                          return _buildPostCard(post);
+                      return RefreshIndicator(
+                        color: Colors.deepPurple,
+                        backgroundColor: Colors.white,
+                        onRefresh: () async {
+                           // Firestore streams are real-time, but users expect a pull-to-refresh gesture
+                           // We simulate a network artificial delay and rebuild the tree to confirm connection
+                           await Future.delayed(const Duration(seconds: 1));
+                           if (mounted) setState(() {});
                         },
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
+                          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                          itemCount: snapshot.data!.docs.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == 0) return _buildTrendingSection();
+                            
+                            DocumentSnapshot doc = snapshot.data!.docs[index - 1];
+                            CommunityPost post = CommunityPost.fromFirestore(doc);
+                            
+                            return _buildPostCard(post);
+                          },
+                        ),
                       );
                     },
                   ),
