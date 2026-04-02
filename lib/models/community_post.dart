@@ -10,6 +10,7 @@ class CommunityPost {
   final int likes;
   final int comments;
   final bool isVerified;
+  final List<dynamic> likedBy;
   final DateTime? timestamp;
 
   CommunityPost({
@@ -22,6 +23,7 @@ class CommunityPost {
     required this.likes,
     required this.comments,
     required this.isVerified,
+    this.likedBy = const [],
     this.timestamp,
   });
 
@@ -37,6 +39,7 @@ class CommunityPost {
       likes: data['likes'] ?? 0,
       comments: data['comments'] ?? 0,
       isVerified: data['isVerified'] ?? false,
+      likedBy: data['likedBy'] ?? [],
       timestamp: (data['timestamp'] as Timestamp?)?.toDate(),
     );
   }

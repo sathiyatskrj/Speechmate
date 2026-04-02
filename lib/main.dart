@@ -7,6 +7,9 @@ import 'package:speechmate/screens/emotional_splash_screen.dart';
 import 'package:speechmate/core/app_theme.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:speechmate/screens/auth_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +22,11 @@ void main() async {
 
   try {
       await Firebase.initializeApp();
+      // Enable Firestore offline persistence
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: true,
+        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+      );
   } catch (e) {
       // If firebase fails (e.g. no google-services.json), we don't want to crash the whole app startup
       debugPrint("Firebase init failed: $e");
@@ -52,15 +60,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget nextScreen = languageSelected
+    Widget internalScreen = languageSelected
             ? const Languages()
             : const LanguageSelectionScreen();
+
+    // Avoid using FirebaseAuth if initialization failed.
+    Widget targetScreen = internalScreen;
+    try {
+      if (FirebaseAuth.instance.currentUser == null) {
+        targetScreen = AuthScreen(nextScreen: internalScreen);
+      }
+    } catch (_) {}
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SpeechMate - Nicobarese Language Learning',
       theme: isTeacher ? AppTheme.teacherTheme : AppTheme.studentTheme,
-      home: hasSeenSplash ? nextScreen : EmotionalSplashScreen(nextScreen: nextScreen),
+      home: hasSeenSplash ? targetScreen : EmotionalSplashScreen(nextScreen: targetScreen),
     );
   }
 }

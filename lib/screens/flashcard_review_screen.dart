@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/widgets/background.dart';
@@ -100,62 +101,45 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                           child: Center(
                             child: Padding(
                               padding: const EdgeInsets.all(20.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (!_isFlipped) setState(() => _isFlipped = true);
+                              child: AppinioSwiper(
+                                cardCount: _dueCards.length,
+                                onSwipeEnd: (int previousIndex, int targetIndex, dynamic direction) {
+                                  // AppinioSwiper 2.x often uses onSwipeEnd or onSwipe
+                                  if (direction.name == 'right' || direction.toString().contains('right')) {
+                                    _handleGrade(4); // Good
+                                  } else {
+                                    _handleGrade(1); // Fail
+                                  }
                                 },
-                                child: Dismissible(
-                                  key: Key('${_dueCards[_currentIndex]['word_id']}_$_isFlipped'),
-                                  direction: _isFlipped ? DismissDirection.horizontal : DismissDirection.none,
-                                  background: Container(
-                                    decoration: BoxDecoration(color: Colors.green.withOpacity(0.8), borderRadius: BorderRadius.circular(20)),
-                                    alignment: Alignment.centerLeft,
-                                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                                    child: const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.check_circle_outline, color: Colors.white, size: 50),
-                                        Text('Good', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
-                                      ],
-                                    ),
-                                  ),
-                                  secondaryBackground: Container(
-                                    decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.8), borderRadius: BorderRadius.circular(20)),
-                                    alignment: Alignment.centerRight,
-                                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                                    child: const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.cancel_outlined, color: Colors.white, size: 50),
-                                        Text('Fail', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
-                                      ],
-                                    ),
-                                  ),
-                                  onDismissed: (direction) {
-                                    if (direction == DismissDirection.startToEnd) {
-                                      _handleGrade(4); // Good
-                                    } else {
-                                      _handleGrade(1); // Fail
-                                    }
-                                  },
-                                  child: TweenAnimationBuilder(
-                                    tween: Tween<double>(begin: 0, end: _isFlipped ? pi : 0),
-                                    duration: const Duration(milliseconds: 400),
-                                    builder: (context, double value, child) {
-                                      bool isFront = value < (pi / 2);
-                                    return Transform(
-                                      alignment: Alignment.center,
-                                      transform: Matrix4.identity()
-                                        ..setEntry(3, 2, 0.001)
-                                        ..rotateY(value),
-                                      child: isFront ? _buildCardFront() : Transform(
-                                          alignment: Alignment.center,
-                                          transform: Matrix4.identity()..rotateY(pi),
-                                          child: _buildCardBack()),
-                                    );
+                                onEnd: () {
+                                   setState(() {
+                                     _dueCards.clear();
+                                   });
+                                },
+                                cardBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (!_isFlipped) setState(() => _isFlipped = true);
                                     },
-                                  ),
-                                ),
+                                    child: TweenAnimationBuilder(
+                                      tween: Tween<double>(begin: 0, end: _isFlipped ? pi : 0),
+                                      duration: const Duration(milliseconds: 400),
+                                      builder: (context, double value, child) {
+                                        bool isFront = value < (pi / 2);
+                                      return Transform(
+                                        alignment: Alignment.center,
+                                        transform: Matrix4.identity()
+                                          ..setEntry(3, 2, 0.001)
+                                          ..rotateY(value),
+                                        child: isFront ? _buildCardFront(index) : Transform(
+                                            alignment: Alignment.center,
+                                            transform: Matrix4.identity()..rotateY(pi),
+                                            child: _buildCardBack(index)),
+                                      );
+                                      },
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -193,8 +177,9 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
     );
   }
 
-  Widget _buildCardFront() {
-    final card = _dueCards[_currentIndex];
+  Widget _buildCardFront(int index) {
+    if (index >= _dueCards.length) return const SizedBox();
+    final card = _dueCards[index];
     return Container(
       width: double.infinity,
       height: 300,
@@ -215,8 +200,9 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
     );
   }
 
-  Widget _buildCardBack() {
-    final card = _dueCards[_currentIndex];
+  Widget _buildCardBack(int index) {
+    if (index >= _dueCards.length) return const SizedBox();
+    final card = _dueCards[index];
     return Container(
       width: double.infinity,
       height: 300,

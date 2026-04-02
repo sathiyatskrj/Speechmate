@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CommunityService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -29,6 +31,7 @@ class CommunityService {
         'avatar': avatar,
         'color': color,
         'likes': 0,
+        'likedBy': [],
         'comments': 0,
         'isVerified': false, // New users are not verified by default
         'timestamp': FieldValue.serverTimestamp(),
@@ -39,20 +42,56 @@ class CommunityService {
     }
   }
 
-  /// Toggle like status (Simplistic implementation: increments/decrements count on server)
-  /// Note: A real production app would track "who" liked it in a subcollection to prevent double voting.
-  /// For this hackathon/MVP, we just increment/decrement.
+
+  /// Get the set of liked post IDs from local storage
+  Future<Set<String>> getLikedPosts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final likedList = prefs.getStringList('liked_community_posts') ?? [];
+    return likedList.toSet();
+  }
+
+  /// Toggle like status and persist securely
   Future<void> toggleLike(String postId, bool currentLikeStatus) async {
     final docRef = _firestore.collection(_collection).doc(postId);
-    
-    // In a real app we'd also store the user ID in a 'likedBy' array
-    if (currentLikeStatus) {
-       // Unlike
-       await docRef.update({'likes': FieldValue.increment(-1)});
-    } else {
-       // Like
-       await docRef.update({'likes': FieldValue.increment(1)});
+    final String uid = FirebaseAuth.instance.currentUser?.uid ?? 'anonymous_device';
+
+    try {
+      await _firestore.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef);
+        if (!snapshot.exists) return;
+
+        List<dynamic> likedBy = [];
+        if (snapshot.data()!.containsKey('likedBy')) {
+            likedBy = snapshot.get('likedBy');
+        }
+
+        if (likedBy.contains(uid)) {
+          // Already liked, so unlike
+          transaction.update(docRef, {
+            'likedBy': FieldValue.arrayRemove([uid]),
+            'likes': FieldValue.increment(-1),
+          });
+        } else {
+          // Not liked, so like
+          transaction.update(docRef, {
+            'likedBy': FieldValue.arrayUnion([uid]),
+            'likes': FieldValue.increment(1),
+          });
+        }
+      });
+    } catch (e) {
+      debugPrint('Error toggling like: $e');
     }
+    
+    // Update local prefs for backward compatibility with UI assuming quick updates
+    final prefs = await SharedPreferences.getInstance();
+    final likedPosts = await getLikedPosts();
+    if (currentLikeStatus) {
+       likedPosts.remove(postId);
+    } else {
+       likedPosts.add(postId);
+    }
+    await prefs.setStringList('liked_community_posts', likedPosts.toList());
   }
 
   /// [ADMIN] Delete a post

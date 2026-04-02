@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/community_service.dart';
 import 'package:speechmate/models/community_post.dart';
 import 'package:speechmate/core/app_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -16,11 +17,15 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen> {
   final CommunityService _communityService = CommunityService();
 
-  // Local state to track "liked" posts by this device/session
-  final Set<String> _likedPostIds = {};
-  
   // Admin State
   bool _isAdmin = false;
+  String? _currentUid;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUid = FirebaseAuth.instance.currentUser?.uid;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,9 +105,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         backgroundColor: Colors.white,
                         onRefresh: () async {
                            // Firestore streams are real-time, but users expect a pull-to-refresh gesture
-                           // We simulate a network artificial delay and rebuild the tree to confirm connection
-                           await Future.delayed(const Duration(seconds: 1));
-                           if (mounted) setState(() {});
+                           // We can force a re-fetch or just delay for UX
+                           setState(() {}); 
+                           await Future.delayed(const Duration(milliseconds: 800));
                         },
                         child: ListView.builder(
                           padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
@@ -208,8 +213,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
   }
 
   Widget _buildPostCard(CommunityPost post) {
-    bool isLikedByMe = _likedPostIds.contains(post.id);
-    String timeAgo = _formatTime(post.timestamp);
+    List<dynamic> likedBy = post.likedBy; // Need to ensure CommunityPost model has likedBy
+    bool isLikedByMe = _currentUid != null && likedBy.contains(_currentUid);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -254,7 +259,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ),
                 const Spacer(),
                 if (_isAdmin) ...[
-                    // ADMIN CONTROLS
                     IconButton(
                         icon: Icon(post.isVerified ? Icons.verified_user : Icons.verified_user_outlined, color: Colors.green),
                         tooltip: "Toggle Verify",
@@ -266,42 +270,34 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         onPressed: () => _confirmDelete(post.id),
                     ),
                 ] else 
-                    Text(timeAgo, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                    Text(_formatTime(post.timestamp), style: TextStyle(color: Colors.grey[400], fontSize: 12)),
               ],
             ),
             const SizedBox(height: 12),
             Text(post.content, style: const TextStyle(fontSize: 15, height: 1.4, color: Colors.black87)),
             const SizedBox(height: 16),
             if (!_isAdmin)
-            Row(
-              children: [
-                _buildActionButton(
-                  icon: isLikedByMe ? Icons.favorite : Icons.favorite_border,
-                  color: isLikedByMe ? Colors.red : Colors.grey,
-                  count: post.likes,
-                  onTap: () {
-                     setState(() {
-                        if (isLikedByMe) {
-                            _likedPostIds.remove(post.id);
-                            _communityService.toggleLike(post.id, true);
-                        } else {
-                            _likedPostIds.add(post.id);
-                            _communityService.toggleLike(post.id, false);
-                        }
-                     });
-                  },
-                ),
-                const SizedBox(width: 20),
-                _buildActionButton(
-                  icon: Icons.comment_outlined,
-                  color: Colors.grey,
-                  count: post.comments,
-                  onTap: () {},
-                ),
-                const Spacer(),
-                const Icon(Icons.share_outlined, color: Colors.grey, size: 20),
-              ],
-            ),
+              Row(
+                children: [
+                   _buildActionButton(
+                      icon: isLikedByMe ? Icons.favorite : Icons.favorite_border,
+                      color: isLikedByMe ? Colors.red : Colors.grey,
+                      count: post.likes,
+                      onTap: () {
+                         _communityService.toggleLike(post.id, isLikedByMe);
+                      },
+                    ),
+                    const SizedBox(width: 20),
+                    _buildActionButton(
+                      icon: Icons.comment_outlined,
+                      color: Colors.grey,
+                      count: post.comments,
+                      onTap: () {},
+                    ),
+                    const Spacer(),
+                    const Icon(Icons.share_outlined, color: Colors.grey, size: 20),
+                ],
+              ),
           ],
         ),
       ),

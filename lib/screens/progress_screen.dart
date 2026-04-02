@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../services/dictionary_service.dart';
 import '../services/progress_service.dart';
 import '../widgets/background.dart';
@@ -111,55 +112,81 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          SizedBox(
-                            height: 150,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: quizScores.reversed.take(6).map((scoreString) {
-                                // Parse e.g., "4/5" string
-                                double percentage = 0.0;
-                                try {
-                                  final parts = scoreString.split('/');
-                                  if (parts.length == 2) {
-                                    percentage = double.parse(parts[0]) / double.parse(parts[1]);
-                                  }
-                                } catch (_) {}
-                                
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(scoreString, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
-                                    const SizedBox(height: 6),
-                                    AnimatedContainer(
-                                      duration: const Duration(milliseconds: 800),
-                                      curve: Curves.easeOutQuart,
-                                      width: 30,
-                                      height: percentage * 100 + 10, // min height 10
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
-                                          colors: [
-                                            Colors.blue.shade400,
-                                            Colors.blue.shade300.withOpacity(percentage),
-                                          ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }).toList().reversed.toList(),
-                            ),
+                          const Text(
+                            "Quiz Accuracy",
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                            textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              for (int i = 0; i < (quizScores.length > 6 ? 6 : quizScores.length); i++)
-                                Text("Q${i+1}", style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w500)),
-                            ],
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: 200,
+                            child: BarChart(
+                              BarChartData(
+                                alignment: BarChartAlignment.spaceEvenly,
+                                maxY: 1.0,
+                                barTouchData: BarTouchData(
+                                  enabled: true,
+                                  touchTooltipData: BarTouchTooltipData(
+                                    getTooltipColor: (_) => Colors.blueAccent,
+                                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                      return BarTooltipItem(
+                                        '${(rod.toY * 100).round()}%',
+                                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                titlesData: FlTitlesData(
+                                  show: true,
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      getTitlesWidget: (value, meta) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8),
+                                          child: Text('Q${value.toInt() + 1}', style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                ),
+                                borderData: FlBorderData(show: false),
+                                gridData: const FlGridData(show: false),
+                                barGroups: quizScores.reversed.take(6).toList().reversed.toList().asMap().entries.map((entry) {
+                                  int idx = entry.key;
+                                  String scoreStr = entry.value;
+                                  double percentage = 0.0;
+                                  try {
+                                    final parts = scoreStr.split('/');
+                                    if (parts.length == 2 && double.parse(parts[1]) > 0) {
+                                      percentage = double.parse(parts[0]) / double.parse(parts[1]);
+                                    }
+                                  } catch (_) {}
+
+                                  return BarChartGroupData(
+                                    x: idx,
+                                    barRods: [
+                                      BarChartRodData(
+                                        toY: percentage,
+                                        color: Colors.blueAccent,
+                                        width: 22,
+                                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(6)),
+                                        backDrawRodData: BackgroundBarChartRodData(
+                                          show: true,
+                                          toY: 1.0,
+                                          color: Colors.blue.withOpacity(0.1),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ),
                           ),
                         ],
                       ),
