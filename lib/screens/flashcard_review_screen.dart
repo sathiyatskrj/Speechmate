@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/widgets/background.dart';
@@ -135,10 +135,10 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                                  Row(
                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                    children: [
-                                     _buildGradeBtn("Fail", 1, Colors.redAccent),
-                                     _buildGradeBtn("Hard", 3, Colors.orangeAccent),
-                                     _buildGradeBtn("Good", 4, Colors.green),
-                                     _buildGradeBtn("Easy", 5, Colors.blue),
+                                     _buildGradeBtn("Fail", 1, Colors.redAccent, "F"),
+                                     _buildGradeBtn("Hard", 3, Colors.orangeAccent, "H"),
+                                     _buildGradeBtn("Good", 4, Colors.green, "G"),
+                                     _buildGradeBtn("Easy", 5, Colors.blue, "E"),
                                    ],
                                  )
                                ],
@@ -200,11 +200,32 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
     );
   }
 
-  Widget _buildGradeBtn(String label, int grade, Color color) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.white),
-      onPressed: () => _handleGrade(grade),
-      child: Text(label),
+  Widget _buildGradeBtn(String label, int grade, Color color, String emoji) {
+    return GestureDetector(
+      onTap: () => _handleGrade(grade),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(color: color.withOpacity(0.6), width: 1.5),
+          boxShadow: [
+            BoxShadow(color: color.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,26 +1,24 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:speechmate/services/dictionary_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/translation_card.dart';
 import 'package:speechmate/widgets/gamification_header.dart';
-import 'package:speechmate/widgets/smart_dashboard_header.dart'; // [NEW] Shared Component
-import 'package:speechmate/widgets/voice_reactive_aurora.dart'; // [NEW] Wow Factor
-import 'package:speechmate/core/app_theme.dart'; // [NEW] Theme
-
+import 'package:speechmate/widgets/smart_dashboard_header.dart';
+import 'package:speechmate/widgets/voice_reactive_aurora.dart';
+import 'package:speechmate/core/app_theme.dart';
+import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 
 import 'package:speechmate/screens/games/games_hub_screen.dart';
 import 'package:speechmate/screens/community_screen.dart';
-import 'package:speechmate/screens/student_progress_screen.dart';
-import 'package:speechmate/screens/culture_screen.dart'; // [NEW] Link
-import 'package:speechmate/screens/voice_vault_screen.dart'; // [NEW] Link
-import 'package:speechmate/screens/dynamic_category_screen.dart'; // [NEW] Dynamic Module
-import 'package:speechmate/services/database_manager.dart'; // [NEW] DB
-import 'package:speechmate/screens/feedback_screen.dart'; // [NEW]
-import 'package:speechmate/widgets/exit_feedback_dialog.dart'; // [NEW]
-import 'package:speechmate/services/neural_engine_service.dart'; // [NEW]
-import 'package:speechmate/screens/beta_chat_screen.dart'; // [NEW]
-import 'package:speechmate/screens/lessons/lesson_screen.dart'; // [NEW] Interactive Lessons
-import 'package:speechmate/models/lesson_models.dart'; // [NEW] Lesson Models
+import 'package:speechmate/screens/culture_screen.dart';
+import 'package:speechmate/screens/voice_vault_screen.dart';
+import 'package:speechmate/screens/dynamic_category_screen.dart';
+import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/screens/feedback_screen.dart';
+import 'package:speechmate/widgets/exit_feedback_dialog.dart';
+import 'package:speechmate/screens/beta_chat_screen.dart';
+import 'package:speechmate/screens/lessons/lesson_screen.dart';
+import 'package:speechmate/models/lesson_models.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -29,26 +27,17 @@ class StudentDash extends StatefulWidget {
   State<StudentDash> createState() => _StudentDashState();
 }
 
-class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
+class _StudentDashState extends State<StudentDash>
+    with WidgetsBindingObserver, SearchableDashboardMixin {
   final TextEditingController searchController = TextEditingController();
-  final DictionaryService dictionaryService = DictionaryService();
   final TtsService ttsService = TtsService();
-  final NeuralEngineService _neuralEngine = NeuralEngineService(); // [NEW]
-  // removed: AudioRecorder, WhisperLogic (handled by Header)
-
-  Map<String, dynamic>? result;
-  bool searchedNicobarese = false;
-  bool isLoading = false;
- 
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Preload dictionaries
-    dictionaryService.loadDictionary(DictionaryType.words);
-    dictionaryService.loadDictionary(DictionaryType.phrases);
     ttsService.init();
+    initSearch();
     _seedDynamicData();
   }
 
@@ -83,66 +72,16 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     searchController.dispose();
-    dictionaryService.unload(DictionaryType.words);
+    disposeMixinSearch();
     super.dispose();
   }
 
-  void clearSearch() {
-    setState(() {
-      searchController.clear();
-      result = null;
-      searchedNicobarese = false;
-    });
-  }
-
-
-
-  Future<void> performSearch(String query) async {
+  void _onSearch(String query) {
     FocusScope.of(context).unfocus();
-    if (query.isEmpty) return;
-
-    setState(() => isLoading = true);
-
-    // 1. Direct Search (Exact/Fuzzy from Dictionary)
-    var searchResult = await dictionaryService.searchEverywhere(query);
-    
-    // 2. Neural Engine Fallback (Context-aware Translation)
-    if (searchResult == null) {
-        final neuralResult = await _neuralEngine.predict(query);
-        
-        // Only show if we have some confidence (not just returning original text entirely)
-        if (neuralResult.text.isNotEmpty) {
-             searchResult = {
-                'english': query,
-                'nicobarese': neuralResult.text,
-                '_isGenerated': true,
-                '_confidence': neuralResult.confidence
-             };
-        }
-    }
-
-    if (mounted) {
-      setState(() {
-        result = searchResult;
-        
-        if (searchResult != null) {
-          if (searchResult!.containsKey('_searchedNicobarese')) {
-              searchedNicobarese = searchResult!['_searchedNicobarese'];
-          } else if (searchResult!.containsKey('_isGenerated')) {
-             searchedNicobarese = false; // We assume input was English for Neural Engine
-          } else {
-              final q = query.trim().toLowerCase();
-              searchedNicobarese =
-                  searchResult!['nicobarese'].toString().toLowerCase() == q;
-          }
-        } else {
-          searchedNicobarese = false;
-        }
-        isLoading = false;
-      });
-    }
+    performMixinSearch(query);
   }
-  // Removed: _getModelPath, _startRecording, _stopRecording, _onMicTap (Moving to Header)
+
+  void _onClear() => clearMixinSearch(searchController);
 
 
   final List<Map<String, dynamic>> learningTiles = [
@@ -183,8 +122,8 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                  SmartDashboardHeader(
                    isTeacher: false,
                    searchController: searchController,
-                   onSearch: performSearch,
-                   onClear: clearSearch,
+                   onSearch: _onSearch,
+                   onClear: _onClear,
                  ),
                  const SizedBox(height: 10),
                  Expanded(
@@ -192,7 +131,7 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
                      physics: const BouncingScrollPhysics(),
                      child: Column(
                        children: [
-                           if (isLoading)
+                           if (isSearchLoading)
                              const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)))
                            else if (searchController.text.isNotEmpty)
                              _buildSearchResults(),
@@ -215,23 +154,23 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
       return Padding(
         padding: const EdgeInsets.all(20),
         child: TranslationCard(
-          nicobarese: result != null ? (result!['nicobarese'] ?? "Translation not available") : "No match found",
-          english: result != null ? (result!['english'] ?? result!['text'] ?? "No translation") : "",
-          isError: result == null,
+          nicobarese: searchResult != null ? (searchResult!['nicobarese'] ?? "Translation not available") : "No match found",
+          english: searchResult != null ? (searchResult!['english'] ?? searchResult!['text'] ?? "No translation") : "",
+          isError: searchResult == null,
           searchedNicobarese: searchedNicobarese,
-          showSpeaker: result != null, 
+          showSpeaker: searchResult != null, 
           onSpeak: () {
-              if (result == null) return;
+              if (searchResult == null) return;
               final textToSpeak = searchedNicobarese 
-                  ? (result!['english'] ?? result!['text'] ?? "")
-                  : (result!['nicobarese'] ?? "");
+                  ? (searchResult!['english'] ?? searchResult!['text'] ?? "")
+                  : (searchResult!['nicobarese'] ?? "");
               if (textToSpeak.isEmpty) return;
               if (searchedNicobarese) {
                   ttsService.speakEnglish(textToSpeak);
               } else {
                   ttsService.speakNicobarese(
                     textToSpeak, 
-                    englishWord: result!['english'] ?? result!['text']
+                    englishWord: searchResult!['english'] ?? searchResult!['text']
                   );
               }
           },
@@ -313,43 +252,94 @@ class _StudentDashState extends State<StudentDash> with WidgetsBindingObserver {
   }
 
   void _showSecretAccessDialog(BuildContext context, Widget targetScreen) {
-    final TextEditingController _controller = TextEditingController();
+    final answerController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Senior Student Access 🔒"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Solve this to enter:\n\n12 + 15 = ?"),
-            const SizedBox(height: 10),
-            TextField(
-              controller: _controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(hintText: "Enter answer"),
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              gradient: LinearGradient(
+                colors: [Colors.white.withOpacity(0.15), Colors.white.withOpacity(0.05)],
+                begin: Alignment.topLeft, end: Alignment.bottomRight,
+              ),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 30)],
             ),
-          ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("🔒", style: TextStyle(fontSize: 40)),
+                const SizedBox(height: 12),
+                const Text("Senior Student Access",
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                const Text("Solve this to enter:\n12 + 15 = ?",
+                    style: TextStyle(color: Colors.white70, fontSize: 15),
+                    textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: answerController,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  decoration: InputDecoration(
+                    hintText: "?",
+                    hintStyle: const TextStyle(color: Colors.white38),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.1),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (answerController.text.trim() == "27") {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => targetScreen));
+                          } else {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Incorrect. Access Denied 🚫")));
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.cyanAccent,
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text("Enter", fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_controller.text.trim() == "27") {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => targetScreen));
-              } else {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Incorrect. Access Denied 🚫")),
-                );
-              }
-            },
-            child: const Text("Enter"),
-          ),
-        ],
       ),
     );
   }

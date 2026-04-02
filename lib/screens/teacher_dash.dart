@@ -7,23 +7,18 @@ import 'package:speechmate/screens/progress_screen.dart';
 import 'package:speechmate/screens/chat_translate_screen.dart';
 import 'package:speechmate/screens/teacher_levels_screen.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
-import 'package:speechmate/screens/common_phrases_screen.dart'; // [FIX] Added
-import 'package:speechmate/screens/voice_vault_screen.dart'; // [FIX] Added
-import 'package:speechmate/screens/culture_screen.dart'; // [FIX] Added
-import 'package:speechmate/services/dictionary_service.dart'; // [FIX] Added
-import 'package:speechmate/services/tts_service.dart'; // [FIX] Added
-import 'package:speechmate/services/report_generator.dart'; // [NEW] Offline PDF
-import 'package:speechmate/services/p2p_sync_service.dart'; // [NEW] P2P Export
+import 'package:speechmate/screens/common_phrases_screen.dart';
+import 'package:speechmate/screens/voice_vault_screen.dart';
+import 'package:speechmate/screens/culture_screen.dart';
+import 'package:speechmate/services/tts_service.dart';
+import 'package:speechmate/services/report_generator.dart';
+import 'package:speechmate/services/p2p_sync_service.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
 import 'package:speechmate/widgets/voice_reactive_aurora.dart';
 import 'package:speechmate/core/app_theme.dart';
-
-
-
-
-import 'package:speechmate/screens/feedback_screen.dart'; // [FIX] Added
-import 'package:speechmate/widgets/exit_feedback_dialog.dart'; // [FIX] Added
-import 'package:speechmate/services/neural_engine_service.dart'; // [NEW]
+import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
+import 'package:speechmate/screens/feedback_screen.dart';
+import 'package:speechmate/widgets/exit_feedback_dialog.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -32,17 +27,11 @@ class TeacherDash extends StatefulWidget {
   State<TeacherDash> createState() => _TeacherDashState();
 }
 
-class _TeacherDashState extends State<TeacherDash> {
+class _TeacherDashState extends State<TeacherDash>
+    with SearchableDashboardMixin {
   final TextEditingController _searchController = TextEditingController();
-  final DictionaryService _dictionaryService = DictionaryService();
   final TtsService _ttsService = TtsService();
-  final NeuralEngineService _neuralEngine = NeuralEngineService(); // [NEW]
-  // AudioRecorder removed
   
-  bool _isLoading = false;
-  Map<String, dynamic>? _result;
-  bool _searchedNicobarese = false;
-  bool _hasSearched = false;
   Map<String, dynamic>? _dailyWord;
 
 
@@ -50,84 +39,30 @@ class _TeacherDashState extends State<TeacherDash> {
   void initState() {
     super.initState();
     _ttsService.init();
-    _loadData();
+    initSearch();
+    _loadDailyWord();
   }
 
-  Future<void> _loadData() async {
-    // CRITICAL: Load dictionaries to prevent crashes
-    await _dictionaryService.loadDictionary(DictionaryType.words);
-    await _dictionaryService.loadDictionary(DictionaryType.phrases);
-    
-    // Load Daily Word
-    final daily = await _dictionaryService.getDailyWord();
-    
-    if (mounted) {
-      setState(() {
-        _dailyWord = daily;
-      });
-    }
+  Future<void> _loadDailyWord() async {
+    final daily = await dashSearchDictService.getDailyWord();
+    if (mounted) setState(() => _dailyWord = daily);
   }
 
 
 
-  Future<void> _performSearch(String query) async {
+  Future<void> _onSearch(String query) async {
     FocusScope.of(context).unfocus();
-    if (query.isEmpty) return;
-
-    setState(() => _isLoading = true);
-
-    // 1. Direct Search
-    var searchResult = await _dictionaryService.searchEverywhere(query);
-    
-    // 2. Neural Engine Fallback
-    if (searchResult == null) {
-        final neuralResult = await _neuralEngine.predict(query);
-        
-        if (neuralResult.text.isNotEmpty) {
-             searchResult = {
-                'english': query,
-                'nicobarese': neuralResult.text,
-                '_isGenerated': true,
-                '_confidence': neuralResult.confidence
-             };
-        }
-    }
-
-    if (mounted) {
-      setState(() {
-        _result = searchResult;
-        _hasSearched = true;
-        if (searchResult != null) {
-          if (searchResult!.containsKey('_searchedNicobarese')) {
-              _searchedNicobarese = searchResult!['_searchedNicobarese'];
-          } else if (searchResult!.containsKey('_isGenerated')) {
-             _searchedNicobarese = false; 
-          } else {
-              final q = query.trim().toLowerCase();
-              _searchedNicobarese =
-                  searchResult!['nicobarese'].toString().toLowerCase() == q;
-          }
-        } else {
-          _searchedNicobarese = false;
-        }
-        _isLoading = false;
-      });
-    }
+    await performMixinSearch(query);
   }
 
-  void _clearSearch() {
-    setState(() {
-      _searchController.clear();
-      _result = null;
-      _hasSearched = false;
-    });
-  }
+  void _clearSearch() => clearMixinSearch(_searchController);
 
   @override
   void dispose() {
+    _searchController.dispose();
+    disposeMixinSearch();
     super.dispose();
   }
-  // Removed Mic/Whisper logic (now in header)
 
 
   @override
@@ -142,7 +77,7 @@ class _TeacherDashState extends State<TeacherDash> {
               SmartDashboardHeader(
                 isTeacher: true,
                 searchController: _searchController,
-                onSearch: _performSearch,
+                onSearch: _onSearch,
                 onClear: _clearSearch,
               ),
               Expanded(
@@ -156,37 +91,35 @@ class _TeacherDashState extends State<TeacherDash> {
                           _buildDailyWordCard(_dailyWord!),
                           const SizedBox(height: 25),
                         ],
-                        if (_isLoading)
+                        if (isSearchLoading)
                            const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
                         
-                        if (!_isLoading && _hasSearched)
+                        if (!isSearchLoading && hasSearched)
                            Padding(
                              padding: const EdgeInsets.only(bottom: 25),
                              child: TranslationCard(
-                                nicobarese: _result != null ? _result!['nicobarese'] : "No match found",
-                                english: _result != null ? (_result!['english'] ?? _result!['text'] ?? "") : "",
-                                searchedNicobarese: _searchedNicobarese,
-                                isError: _result == null,
-                                showSpeaker: _result != null, 
+                                nicobarese: searchResult != null ? searchResult!['nicobarese'] : "No match found",
+                                english: searchResult != null ? (searchResult!['english'] ?? searchResult!['text'] ?? "") : "",
+                                searchedNicobarese: searchedNicobarese,
+                                isError: searchResult == null,
+                                showSpeaker: searchResult != null, 
                                 onSpeak: () {
-                                    if (_result == null) return;
-                                    if (_searchedNicobarese) {
-                                        _ttsService.speakEnglish(_result!['english'] ?? _result!['text'] ?? "");
+                                    if (searchResult == null) return;
+                                    if (searchedNicobarese) {
+                                        _ttsService.speakEnglish(searchResult!['english'] ?? searchResult!['text'] ?? "");
                                     } else {
                                         _ttsService.speakNicobarese(
-                                          _result!['nicobarese'] ?? "",
-                                          englishWord: _result!['english'] ?? _result!['text']
+                                          searchResult!['nicobarese'] ?? "",
+                                          englishWord: searchResult!['english'] ?? searchResult!['text']
                                         );
                                     }
                                 },
                              ),
                            ),
-                  // FEATURES GRID
-                  const Text(
-                    "TOOLS & RESOURCES",
-                    style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2),
-                  ),
-                  const SizedBox(height: 15),
+
+                  // ────── LEARNING TOOLS SECTION ──────
+                  _buildSectionHeader("LEARNING TOOLS", Icons.school_rounded, Colors.purpleAccent),
+                  const SizedBox(height: 12),
                   GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -195,87 +128,97 @@ class _TeacherDashState extends State<TeacherDash> {
                     mainAxisSpacing: 15,
                     childAspectRatio: 1.3,
                     children: [
-                      _buildFeatureCard(
-                        context,
+                      _buildFeatureCard(context,
                         title: "Certification",
                         icon: Icons.verified,
                         color: Colors.amberAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
                       ),
-                      _buildFeatureCard(
-                        context,
-                        title: "Community",
-                        icon: Icons.public,
-                        color: Colors.blueAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
-                      ),
-                      _buildFeatureCard(
-                        context,
+                      _buildFeatureCard(context,
                         title: "Quiz Mode",
                         icon: Icons.quiz,
                         color: Colors.purpleAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
                       ),
-                      _buildFeatureCard(
-                        context,
+                      _buildFeatureCard(context,
                         title: "Progress",
                         icon: Icons.bar_chart,
                         color: Colors.greenAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
                       ),
-                      _buildFeatureCard(
-                        context,
-                        title: "Translator",
-                        icon: Icons.translate,
-                        color: Colors.orangeAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
-                      ),
-                      _buildFeatureCard(
-                        context,
+                      _buildFeatureCard(context,
                         title: "Common Phrases",
                         icon: Icons.chat_bubble_outline,
                         color: Colors.pinkAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
                       ),
-                      _buildFeatureCard(
-                        context,
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ────── CLASSROOM TOOLS SECTION ──────
+                  _buildSectionHeader("CLASSROOM TOOLS", Icons.class_rounded, Colors.orangeAccent),
+                  const SizedBox(height: 12),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                    childAspectRatio: 1.3,
+                    children: [
+                      _buildFeatureCard(context,
+                        title: "Translator",
+                        icon: Icons.translate,
+                        color: Colors.orangeAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
+                      ),
+                      _buildFeatureCard(context,
                         title: "Voice Vault",
                         icon: Icons.mic,
                         color: Colors.redAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
                       ),
-                      _buildFeatureCard(
-                        context,
+                      _buildFeatureCard(context,
                         title: "Culture",
                         icon: Icons.account_balance,
                         color: Colors.tealAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
                       ),
-                      _buildFeatureCard(
-                        context,
+                      _buildFeatureCard(context,
+                        title: "Generate Report",
+                        icon: Icons.picture_as_pdf_outlined,
+                        color: Colors.deepOrangeAccent,
+                        onTap: () async => await ReportGenerator.generateAndPrintReport("Student"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ────── COMMUNITY & SETTINGS SECTION ──────
+                  _buildSectionHeader("COMMUNITY & SETTINGS", Icons.people_alt_rounded, Colors.blueAccent),
+                  const SizedBox(height: 12),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                    childAspectRatio: 1.3,
+                    children: [
+                      _buildFeatureCard(context,
+                        title: "Community",
+                        icon: Icons.public,
+                        color: Colors.blueAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
+                      ),
+                      _buildFeatureCard(context,
                         title: "Beta Chat",
                         icon: Icons.forum,
                         color: Colors.indigoAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
                       ),
-                      _buildFeatureCard(
-                        context,
-                        title: "Feedback",
-                        icon: Icons.rate_review,
-                        color: Colors.pinkAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())),
-                      ),
-                      _buildFeatureCard(
-                        context,
-                        title: "Generate Report",
-                        icon: Icons.picture_as_pdf_outlined,
-                        color: Colors.deepOrangeAccent,
-                        onTap: () async {
-                           await ReportGenerator.generateAndPrintReport("Student");
-                        },
-                      ),
-                      _buildFeatureCard(
-                        context,
+                      _buildFeatureCard(context,
                         title: "Export Vocab",
                         icon: Icons.share_rounded,
                         color: Colors.lightGreenAccent,
@@ -283,6 +226,12 @@ class _TeacherDashState extends State<TeacherDash> {
                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...')));
                            await P2PSyncService.exportAndShare();
                         },
+                      ),
+                      _buildFeatureCard(context,
+                        title: "Feedback",
+                        icon: Icons.rate_review,
+                        color: Colors.pinkAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())),
                       ),
                     ],
                   ),
@@ -298,6 +247,26 @@ class _TeacherDashState extends State<TeacherDash> {
     );
   }
 
+
+  Widget _buildSectionHeader(String title, IconData icon, Color color) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 16),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2),
+        ),
+      ],
+    );
+  }
 
   Widget _buildDailyWordCard(Map<String, dynamic> word) {
     return Container(

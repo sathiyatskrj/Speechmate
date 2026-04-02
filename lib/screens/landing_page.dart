@@ -6,6 +6,9 @@ import 'package:speechmate/widgets/voice_reactive_aurora.dart';
 import 'package:speechmate/core/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speechmate/screens/student_dash.dart';
+import 'package:speechmate/screens/teacher_dash.dart';
 
 import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/widgets/exit_feedback_dialog.dart';
@@ -19,9 +22,36 @@ class LandingPage extends StatefulWidget {
 
 class _LandingPageState extends State<LandingPage> {
   String selectedRole = ""; // student / teacher
+  bool _isCheckingRole = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedRole();
+  }
+
+  Future<void> _checkSavedRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedRole = prefs.getString('user_role') ?? '';
+    if (savedRole.isNotEmpty && mounted) {
+      // Auto-navigate to the saved dashboard
+      final screen = savedRole == 'teacher'
+          ? const TeacherDash()
+          : const StudentDash();
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => screen));
+    } else {
+      if (mounted) setState(() => _isCheckingRole = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isCheckingRole) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     // Neutral Gradient (Inviting Blue/Purple for Unselected)
     final neutralGradient = [
        const Color(0xFFE0C3FC), 
