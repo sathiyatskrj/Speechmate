@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:speechmate/services/speech_service.dart';
+import 'package:speechmate/services/neural_engine_service.dart';
+import 'package:speechmate/services/tts_service.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class AiAssistantOverlay extends StatefulWidget {
-  final bool isListening;
-  final String currentText;
-  final VoidCallback onMicPressed;
   final VoidCallback onClose;
+  final Function(String transcription)? onResult; // If provided, returns result and closes
 
   const AiAssistantOverlay({
     Key? key,
-    required this.isListening,
-    required this.currentText,
-    required this.onMicPressed,
     required this.onClose,
+    this.onResult,
   }) : super(key: key);
 
   @override
@@ -21,6 +21,15 @@ class AiAssistantOverlay extends StatefulWidget {
 
 class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
+  final SpeechService _speechService = SpeechService();
+  final NeuralEngineService _neuralEngine = NeuralEngineService();
+  final TtsService _ttsService = TtsService();
+
+  bool _isListening = false;
+  bool _isProcessing = false;
+  String _currentText = "";
+  String _resultText = "";
+  double _confidence = 0.0;
 
   @override
   void initState() {
@@ -29,12 +38,82 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+    
+    _initServices();
+  }
+
+  Future<void> _initServices() async {
+    await _speechService.init();
+    await _neuralEngine.init();
+    await _ttsService.init();
+    
+    // Auto-start listening if provided as a "Return Result" bot
+    if (widget.onResult != null) {
+        _startListening();
+    }
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
+    _speechService.stop();
+    _ttsService.stop();
     super.dispose();
+  }
+
+  void _onMicPressed() {
+    if (_isListening) {
+      _stopListening();
+    } else {
+      _startListening();
+    }
+  }
+
+  void _startListening() {
+    setState(() {
+      _isListening = true;
+      _currentText = "";
+      _resultText = "";
+      _isProcessing = false;
+    });
+
+    _speechService.listen(
+      onResult: (text) {
+        setState(() {
+          _currentText = text;
+        });
+      },
+    );
+  }
+
+  Future<void> _stopListening() async {
+    await _speechService.stop();
+    setState(() {
+      _isListening = false;
+      _isProcessing = true;
+    });
+
+    if (_currentText.isNotEmpty) {
+      if (widget.onResult != null) {
+          // Mode: Search/STT
+          widget.onResult!(_currentText);
+          return;
+      }
+
+      // Mode: AI Conversation
+      final result = await _neuralEngine.predict(_currentText);
+      setState(() {
+        _resultText = result.text;
+        _confidence = result.confidence;
+        _isProcessing = false;
+      });
+
+      if (_resultText.isNotEmpty) {
+        await _ttsService.speakNicobarese(_resultText, englishWord: _currentText.split(' ').first);
+      }
+    } else {
+      setState(() => _isProcessing = false);
+    }
   }
 
   @override
@@ -43,7 +122,6 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
       color: Colors.transparent,
       child: Stack(
         children: [
-          // Darken background
           GestureDetector(
             onTap: widget.onClose,
             child: Container(
@@ -54,7 +132,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              height: 400,
+              height: 420,
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E2C),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
@@ -69,7 +147,6 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Magic AI Orb
                   AnimatedBuilder(
                     animation: _pulseController,
                     builder: (context, child) {
@@ -80,82 +157,99 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
                             colors: [
-                              Colors.cyanAccent,
-                              Colors.blueAccent,
-                              Colors.purpleAccent.withOpacity(0.5),
+                              _isListening ? Colors.redAccent : Colors.cyanAccent,
+                              _isListening ? Colors.deepOrange : Colors.blueAccent,
+                              _isListening ? Colors.purpleAccent.withOpacity(0.5) : Colors.purpleAccent.withOpacity(0.5),
                             ],
-                            stops: [0.2, 0.6, 1.0],
+                            stops: const [0.2, 0.6, 1.0],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.cyanAccent.withOpacity(0.6),
-                              blurRadius: 30 + (10 * _pulseController.value),
-                              spreadRadius: 5 + (5 * _pulseController.value),
+                              color: _isListening ? Colors.redAccent.withOpacity(0.6) : Colors.cyanAccent.withOpacity(0.6),
+                              blurRadius: 30 + (20 * _pulseController.value),
+                              spreadRadius: 5 + (10 * _pulseController.value),
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.auto_awesome,
+                        child: Icon(
+                          _isProcessing ? Icons.sync : Icons.auto_awesome,
                           color: Colors.white,
                           size: 50,
-                        ),
+                        ).animate(onPlay: (controller) => controller.repeat())
+                         .rotate(duration: 2.seconds, begin: 0, end: _isProcessing ? 1 : 0),
                       );
                     },
                   ),
-                  
                   const SizedBox(height: 30),
-                  
-                  // Text Area
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(
-                      widget.isListening 
-                          ? "I am listening to you..." 
-                          : (widget.currentText.isEmpty ? "Tap the mic to ask something!" : widget.currentText),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Roboto', // Replace with custom font if available
-                        height: 1.5,
-                      ),
+                    child: Column(
+                      children: [
+                        Text(
+                          _isListening 
+                              ? (_currentText.isEmpty ? "I am listening to you..." : _currentText)
+                              : (_isProcessing ? "Translating with Offline Brain..." : ""),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            height: 1.5,
+                          ),
+                        ),
+                        if (_resultText.isNotEmpty && !_isListening && !_isProcessing) 
+                          Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              Text(
+                                _resultText,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.cyanAccent,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Confidence: ${(_confidence * 100).toStringAsFixed(0)}%",
+                                style: TextStyle(color: Colors.white24, fontSize: 10),
+                              ),
+                            ],
+                          ),
+                        if (_currentText.isEmpty && !_isListening && !_isProcessing && _resultText.isEmpty)
+                          const Text(
+                            "Tap the mic to ask something!",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                      ],
                     ),
                   ),
-                  
                   const SizedBox(height: 40),
-                  
-                  // Controls
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildButton(
-                        icon: Icons.close,
-                        color: Colors.redAccent,
-                        onTap: widget.onClose,
-                      ),
+                      _buildButton(icon: Icons.close, color: Colors.redAccent, onTap: widget.onClose),
                       const SizedBox(width: 30),
                       GestureDetector(
-                        onTap: widget.onMicPressed,
+                        onTap: _onMicPressed,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: widget.isListening ? Colors.red : Colors.cyanAccent,
+                            color: _isListening ? Colors.red : Colors.cyanAccent,
                             boxShadow: [
                               BoxShadow(
-                                color: widget.isListening ? Colors.red.withOpacity(0.4) : Colors.cyan.withOpacity(0.4),
+                                color: _isListening ? Colors.red.withOpacity(0.4) : Colors.cyan.withOpacity(0.4),
                                 blurRadius: 15,
                                 spreadRadius: 2,
                               )
                             ],
                           ),
-                          child: Icon(
-                            widget.isListening ? Icons.stop : Icons.mic,
-                            color: Colors.white,
-                            size: 32,
-                          ),
+                          child: Icon(_isListening ? Icons.stop : Icons.mic, color: Colors.white, size: 32),
                         ),
                       ),
                     ],

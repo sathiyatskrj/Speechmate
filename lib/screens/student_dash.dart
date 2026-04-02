@@ -10,15 +10,15 @@ import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 
 import 'package:speechmate/screens/games/games_hub_screen.dart';
 import 'package:speechmate/screens/community_screen.dart';
-import 'package:speechmate/screens/culture_screen.dart';
 import 'package:speechmate/screens/voice_vault_screen.dart';
 import 'package:speechmate/screens/dynamic_category_screen.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
-import 'package:speechmate/widgets/exit_feedback_dialog.dart';
-import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/lessons/lesson_screen.dart';
 import 'package:speechmate/models/lesson_models.dart';
+import 'package:speechmate/widgets/ai_assistant_overlay.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speechmate/screens/beta_chat_screen.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -31,6 +31,7 @@ class _StudentDashState extends State<StudentDash>
     with WidgetsBindingObserver, SearchableDashboardMixin {
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
+  bool _showAiAssistant = false;
 
   @override
   void initState() {
@@ -113,39 +114,57 @@ class _StudentDashState extends State<StudentDash>
     return Theme(
       data: AppTheme.studentTheme,
       child: Scaffold(
-          extendBodyBehindAppBar: true,
-          body: VoiceReactiveAurora(
-          isDark: false, // Student Mode (Bright)
-          child: SafeArea(
-            child: Column(
-              children: [
-                 SmartDashboardHeader(
-                   isTeacher: false,
-                   searchController: searchController,
-                   onSearch: _onSearch,
-                   onClear: _onClear,
-                 ),
-                 const SizedBox(height: 10),
-                 Expanded(
-                   child: SingleChildScrollView(
-                     physics: const BouncingScrollPhysics(),
-                     child: Column(
-                       children: [
-                           if (isSearchLoading)
-                             const Padding(padding: EdgeInsets.all(20), child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)))
-                           else if (searchController.text.isNotEmpty)
-                             _buildSearchResults(),
-                           
-                           _buildDashboardContent(),
-                       ],
-                     ),
-                   ),
-                 ),
-              ],
+        extendBodyBehindAppBar: true,
+        body: Stack(
+          children: [
+            VoiceReactiveAurora(
+              isDark: false, // Student Mode (Bright)
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    SmartDashboardHeader(
+                      isTeacher: false,
+                      searchController: searchController,
+                      onSearch: _onSearch,
+                      onClear: _onClear,
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            if (isSearchLoading)
+                              const Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Center(
+                                  child: CircularProgressIndicator(color: Colors.cyanAccent),
+                                ),
+                              )
+                            else if (searchController.text.isNotEmpty)
+                              _buildSearchResults(),
+                            _buildDashboardContent(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
+            if (_showAiAssistant)
+              AiAssistantOverlay(
+                onClose: () => setState(() => _showAiAssistant = false),
+              ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => setState(() => _showAiAssistant = true),
+          backgroundColor: Colors.cyanAccent,
+          child: const Icon(Icons.auto_awesome, color: Colors.blueAccent),
+        ).animate().scale(delay: 500.ms, duration: 500.ms),
       ),
-    ));
+    );
   }
   // _buildHeroHeader removed
 

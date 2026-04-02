@@ -1,38 +1,28 @@
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:speechmate/services/dictionary_service.dart';
 
 // The "Offline Brain" of SpeechMate
 // Uses Symbolic AI + Fuzzy Logic instead of huge neural networks
 class NeuralEngineService {
+  static final NeuralEngineService _instance = NeuralEngineService._internal();
+  factory NeuralEngineService() => _instance;
+  NeuralEngineService._internal();
+
   final DictionaryService _dictionaryService = DictionaryService();
   bool _isInit = false;
 
   // Simple "Stop Words" that we might want to ignore if not found
-  // Common auxiliary verbs to ignore for "Pidgin" translation
-  // e.g., "I am hungry" -> "I hungry" -> "Chu-ö Hāhëūk"
   final Set<String> _stopWords = {
-    'is', 'am', 'are', 'was', 'were', 'the', 'a', 'an', 'to', 'of', 'in', 'on', 'at'
+    'is', 'am', 'are', 'was', 'were', 'the', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'very', 'really'
   };
 
   // Maps common English synonyms to words we MIGHT have in our dictionary
   final Map<String, String> _synonyms = {
-    'hello': 'greeting',
-    'hi': 'greeting',
-    'kid': 'child',
-    'dad': 'father',
-    'mom': 'mother',
-    'mum': 'mother',
-    'glad': 'happy',
-    'joy': 'happy',
-    'sadness': 'sad',
-    'angry': 'anger',
-    'mad': 'angry',
-    'scared': 'afraid',
-    'frightened': 'afraid',
-    'home': 'house', 
-    'run': 'running',
-    'walk': 'walking',
+    'hello': 'greeting', 'hi': 'greeting', 'kid': 'child', 'dad': 'father', 'mom': 'mother',
+    'mum': 'mother', 'glad': 'happy', 'joy': 'happy', 'sadness': 'sad', 'angry': 'anger',
+    'mad': 'angry', 'scared': 'afraid', 'frightened': 'afraid', 'home': 'house', 
+    'run': 'running', 'walk': 'walking', 'beach': 'sand', 'jungle': 'forest', 
+    'magic': 'mystery', 'ocean': 'sea', 'eat': 'food', 'drink': 'water'
   };
 
   Future<void> init() async {
@@ -49,28 +39,25 @@ class NeuralEngineService {
     final List<String> tokens = _tokenize(sentence);
     List<String> translatedTokens = [];
     double confidenceAccumulator = 0.0;
-    int wordsTranslated = 0;
+    int wordsProcessed = 0;
 
     for (String token in tokens) {
       if (token.trim().isEmpty) continue;
+      wordsProcessed++;
       
       // Remove punctuation for lookup
       String cleanToken = token.replaceAll(RegExp(r'[^\w\s]'), '');
-      String punctuation = token.replaceAll(RegExp(r'[\w\s]'), ''); // simple assumption
+      String punctuation = token.replaceAll(RegExp(r'[\w\s]'), ''); 
       
       final String lowerToken = cleanToken.toLowerCase();
       
       // 0. Skip Stop Words (Auxiliary verbs) entirely
-      if (_stopWords.contains(lowerToken)) {
-          // Skip adding it to result, essentially "dropping" it
-          // This improves "I am hungry" -> "Chu-ö Hāhëūk"
-          continue; 
-      }
+      if (_stopWords.contains(lowerToken)) continue; 
 
       String? translation;
 
       // 1. Exact Lookup
-      translation = await _dictionaryService.lookupExact(cleanToken); // Maintain case for lookup? usually svc handles lower
+      translation = await _dictionaryService.lookupExact(cleanToken);
 
       // 2. Stemming Lookup (remove 'ing', 'ed', 's')
       if (translation == null) {
@@ -90,16 +77,14 @@ class NeuralEngineService {
       if (translation != null) {
         translatedTokens.add(translation + punctuation);
         confidenceAccumulator += 1.0;
-        wordsTranslated++;
       } else {
          // Keep original word (e.g. Names)
          translatedTokens.add(token);
-         confidenceAccumulator += 0.0;
+         confidenceAccumulator += 0.2; 
       }
     }
 
-    double finalConfidence = tokens.isEmpty ? 0.0 : (confidenceAccumulator / tokens.where((t) => t.trim().isNotEmpty).length);
-    // Cap confidence
+    double finalConfidence = wordsProcessed == 0 ? 0.0 : (confidenceAccumulator / wordsProcessed);
     if (finalConfidence > 1.0) finalConfidence = 1.0;
 
     String resultText = translatedTokens.join(" ");
@@ -117,9 +102,7 @@ class NeuralEngineService {
   }
 
   List<String> _tokenize(String text) {
-    // Simple split by space, preserving basic punctuation could be an enhancement
-    // For now, simple split
-    return text.split(' ');
+    return text.split(RegExp(r'\s+'));
   }
 
   String _simpleStemmer(String word) {
