@@ -20,6 +20,7 @@ import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/srs_review_screen.dart';
+import 'package:speechmate/screens/great_andamanese_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 
 class StudentDash extends StatefulWidget {
@@ -105,6 +106,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
     {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
     {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
+    {"word": "Great Andamanese", "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GreatAndamaneseScreen(), "icon": Icons.language_rounded},
   ];
 
   @override

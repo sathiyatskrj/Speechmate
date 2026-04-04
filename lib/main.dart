@@ -54,6 +54,18 @@ void main() async {
         'teressa': item['teressa']?.toString() ?? '',
         'chowra': item['chowra']?.toString() ?? '',
       });
+      // Great Andamanese data
+      await DatabaseManager.instance.seedExtraFromJson('ga_dictionary', 'assets/data/dictionary_great_andamanese.json', (item) => {
+        'english': item['english']?.toString() ?? '',
+        'great_andamanese': item['great_andamanese']?.toString() ?? '',
+        'pos': item['pos']?.toString() ?? '',
+        'audio': item['audio']?.toString() ?? '',
+      });
+      await DatabaseManager.instance.seedExtraFromJson('ga_phrases', 'assets/data/phrases_great_andamanese.json', (item) => {
+        'english': item['english']?.toString() ?? '',
+        'great_andamanese': item['great_andamanese']?.toString() ?? '',
+        'audio': item['audio']?.toString() ?? '',
+      });
   } catch (e) {
       debugPrint("Database init failed: $e");
   }

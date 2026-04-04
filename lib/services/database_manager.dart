@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
 class DatabaseManager {
@@ -21,10 +22,30 @@ class DatabaseManager {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
+      onOpen: _createIndexes,
     );
+  }
+
+  // Simple in-memory query cache
+  final Map<String, dynamic> _cache = {};
+  void clearCache() => _cache.clear();
+
+  /// Create performance indexes on frequently queried columns
+  Future<void> _createIndexes(Database db) async {
+    try {
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_words_category ON words(category_id)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_words_english ON words(english)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_flashcards_word ON flashcards(word_id)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_flashcards_review ON flashcards(next_review_date)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_phrases_english ON phrases(english)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_dialects_english ON dialects(english)');
+      debugPrint('[DatabaseManager] Indexes created/verified.');
+    } catch (e) {
+      debugPrint('[DatabaseManager] Index creation failed: $e');
+    }
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -64,6 +85,30 @@ class DatabaseManager {
          chowra TEXT
        )
        ''');
+     }
+     if (oldVersion < 4) {
+       debugPrint('[DatabaseManager] Upgraded to v4 (performance indexes).');
+     }
+     if (oldVersion < 5) {
+       const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+       await db.execute('''
+       CREATE TABLE ga_dictionary (
+         id $idType,
+         english TEXT,
+         great_andamanese TEXT,
+         pos TEXT,
+         audio TEXT
+       )
+       ''');
+       await db.execute('''
+       CREATE TABLE ga_phrases (
+         id $idType,
+         english TEXT,
+         great_andamanese TEXT,
+         audio TEXT
+       )
+       ''');
+       debugPrint('[DatabaseManager] Upgraded to v5 (Great Andamanese tables).');
      }
   }
 
@@ -116,6 +161,25 @@ class DatabaseManager {
       coast TEXT,
       teressa TEXT,
       chowra TEXT
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE ga_dictionary (
+      id $idType,
+      english TEXT,
+      great_andamanese TEXT,
+      pos TEXT,
+      audio TEXT
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE ga_phrases (
+      id $idType,
+      english TEXT,
+      great_andamanese TEXT,
+      audio TEXT
     )
     ''');
   }
@@ -254,4 +318,127 @@ class DatabaseManager {
       whereArgs: [wordId],
     );
   }
+
+  // === SRS Dashboard Statistics ===
+
+  /// Get count of flashcards due for review right now
+  Future<int> getDueFlashcardCount() async {
+    final db = await instance.database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM flashcards WHERE next_review_date <= ?',
+      [now],
+    );
+    return result.first['count'] as int? ?? 0;
+  }
+
+  /// Get total flashcard count
+  Future<int> getTotalFlashcardCount() async {
+    final db = await instance.database;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM flashcards');
+    return result.first['count'] as int? ?? 0;
+  }
+
+  /// Get average ease factor (retention indicator)
+  Future<double> getAverageEaseFactor() async {
+    final db = await instance.database;
+    final result = await db.rawQuery('SELECT AVG(ease_factor) as avg_ease FROM flashcards');
+    return (result.first['avg_ease'] as double?) ?? 2.5;
+  }
+
+  /// Get flashcard distribution by repetition count
+  Future<Map<String, int>> getFlashcardDistribution() async {
+    final db = await instance.database;
+    final newCards = await db.rawQuery(
+      'SELECT COUNT(*) as c FROM flashcards WHERE repetition = 0',
+    );
+    final learning = await db.rawQuery(
+      'SELECT COUNT(*) as c FROM flashcards WHERE repetition BETWEEN 1 AND 3',
+    );
+    final mature = await db.rawQuery(
+      'SELECT COUNT(*) as c FROM flashcards WHERE repetition > 3',
+    );
+    return {
+      'new': newCards.first['c'] as int? ?? 0,
+      'learning': learning.first['c'] as int? ?? 0,
+      'mature': mature.first['c'] as int? ?? 0,
+    };
+  }
+
+  // === Dialect query helpers ===
+
+  /// Get all available dialects for a word
+  Future<Map<String, dynamic>?> getDialectsForWord(String english) async {
+    final db = await instance.database;
+    final results = await db.query(
+      'dialects',
+      where: 'LOWER(english) = ?',
+      whereArgs: [english.trim().toLowerCase()],
+      limit: 1,
+    );
+    if (results.isNotEmpty) return results.first;
+    return null;
+  }
+
+  /// Get all dialect entries
+  Future<List<Map<String, dynamic>>> getAllDialects() async {
+    final db = await instance.database;
+    return await db.query('dialects', orderBy: 'english ASC');
+  }
+
+  // === Great Andamanese helpers ===
+
+  /// Get all GA dictionary entries
+  Future<List<Map<String, dynamic>>> getGADictionary() async {
+    final db = await instance.database;
+    return await db.query('ga_dictionary', orderBy: 'english ASC');
+  }
+
+  /// Search GA dictionary
+  Future<List<Map<String, dynamic>>> searchGADictionary(String query) async {
+    final db = await instance.database;
+    final q = '%${query.trim().toLowerCase()}%';
+    return await db.query(
+      'ga_dictionary',
+      where: 'LOWER(english) LIKE ? OR LOWER(great_andamanese) LIKE ?',
+      whereArgs: [q, q],
+    );
+  }
+
+  /// Get GA dictionary filtered by part of speech
+  Future<List<Map<String, dynamic>>> getGAByPOS(String pos) async {
+    final db = await instance.database;
+    return await db.query(
+      'ga_dictionary',
+      where: 'pos = ?',
+      whereArgs: [pos],
+      orderBy: 'english ASC',
+    );
+  }
+
+  /// Get all GA phrases
+  Future<List<Map<String, dynamic>>> getGAPhrases() async {
+    final db = await instance.database;
+    return await db.query('ga_phrases');
+  }
+
+  /// Save a Great Andamanese word as a flashcard for SRS
+  Future<void> saveGAFlashcard(String english, String greatAndamanese) async {
+    final db = await instance.database;
+    final wordId = 'ga_${english.toLowerCase().replaceAll(' ', '_')}';
+
+    final result = await db.query('flashcards', where: 'word_id = ?', whereArgs: [wordId]);
+    if (result.isNotEmpty) return;
+
+    await db.insert('flashcards', {
+      'word_id': wordId,
+      'english': english,
+      'nicobarese': greatAndamanese, // Reusing column for GA translation
+      'interval': 0,
+      'repetition': 0,
+      'ease_factor': 2.5,
+      'next_review_date': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
 }
+

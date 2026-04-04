@@ -32,4 +32,23 @@ class AppColors {
   
   // --- Magic Wow Factors ---
   static const Color auroraGlow = Color(0x66B388FF); // Deep Purple Glow
+
+  // --- Student Dark Palette ---
+  static const Color studentDarkBg = Color(0xFF1A1A2E);
+  static const Color studentDarkSurface = Color(0xFF16213E);
+  static const Color studentDarkAccent = Color(0xFFE94560);
+  static const List<Color> studentDarkGradient = [
+    Color(0xFF1A1A2E),
+    Color(0xFF16213E),
+    Color(0xFF0F3460),
+  ];
+
+  // --- Teacher Dark Palette ---
+  static const Color teacherDarkBg = Color(0xFF0D1117);
+  static const Color teacherDarkSurface = Color(0xFF161B22);
+  static const Color teacherDarkAccent = Color(0xFF58A6FF);
+  static const List<Color> teacherDarkGradient = [
+    Color(0xFF0D1117),
+    Color(0xFF161B22),
+  ];
 }

@@ -17,6 +17,7 @@ import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/widgets/ai_assistant_overlay.dart';
+import 'package:speechmate/screens/great_andamanese_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class TeacherDash extends StatefulWidget {
@@ -153,6 +154,12 @@ class _TeacherDashState extends State<TeacherDash>
                             icon: Icons.chat_bubble_outline,
                             color: Colors.pinkAccent,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Great Andamanese",
+                            icon: Icons.language_rounded,
+                            color: Colors.deepPurpleAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())),
                           ),
                         ],
                       ),

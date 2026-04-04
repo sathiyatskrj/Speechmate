@@ -76,4 +76,57 @@ class AppTheme {
       useMaterial3: true,
     );
   }
+
+  // --- Student Dark Theme ---
+  static ThemeData get studentDarkTheme {
+    return ThemeData(
+      brightness: Brightness.dark,
+      primaryColor: AppColors.studentDarkAccent,
+      scaffoldBackgroundColor: Colors.transparent,
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.bubblegumSans(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: AppColors.studentDarkAccent,
+          letterSpacing: 1.5,
+        ),
+        headlineMedium: GoogleFonts.fredoka(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: Colors.white70,
+        ),
+        bodyLarge: GoogleFonts.fredoka(fontSize: 18, color: Colors.white70),
+        bodyMedium: GoogleFonts.fredoka(fontSize: 16, color: Colors.white60),
+      ),
+      iconTheme: const IconThemeData(color: AppColors.studentDarkAccent, size: 28),
+      useMaterial3: true,
+    );
+  }
+
+  // --- Teacher Dark Theme ---
+  static ThemeData get teacherDarkTheme {
+    return ThemeData(
+      brightness: Brightness.dark,
+      primaryColor: AppColors.teacherDarkAccent,
+      scaffoldBackgroundColor: Colors.transparent,
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.outfit(
+          fontSize: 36,
+          fontWeight: FontWeight.w800,
+          color: AppColors.teacherDarkAccent,
+          letterSpacing: -1.0,
+        ),
+        headlineMedium: GoogleFonts.poppins(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: Colors.white70,
+          letterSpacing: 0.5,
+        ),
+        bodyLarge: GoogleFonts.inter(fontSize: 16, color: Colors.white70, height: 1.5),
+        bodyMedium: GoogleFonts.inter(fontSize: 14, color: Colors.white60),
+      ),
+      iconTheme: const IconThemeData(color: AppColors.teacherDarkAccent, size: 24),
+      useMaterial3: true,
+    );
+  }
 }

@@ -88,6 +88,8 @@ flutter:
     - assets/icons/branding.png
     - assets/models/ggml-tiny.en.bin
     - assets/data/dictionary_dialects.json
+    - assets/data/dictionary_great_andamanese.json
+    - assets/data/phrases_great_andamanese.json
 
 dependency_overrides:
   record_linux: ^1.2.0
