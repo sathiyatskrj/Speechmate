@@ -26,6 +26,7 @@ import 'package:speechmate/screens/dialect_heatmap_screen.dart';
 import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/services/whisper_service.dart';
 import 'package:speechmate/services/season_service.dart';
+import 'package:speechmate/services/llm_manager_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class TeacherDash extends StatefulWidget {
@@ -51,6 +52,13 @@ class _TeacherDashState extends State<TeacherDash>
     _ttsService.init();
     initSearch();
     _loadDailyWord();
+    _checkAiCore();
+  }
+
+  bool _isLlmActive = false;
+  Future<void> _checkAiCore() async {
+    final status = await LlmManagerService().isModelDownloaded();
+    if (mounted) setState(() => _isLlmActive = status);
   }
 
   Future<void> _initSeason() async {
@@ -119,6 +127,8 @@ class _TeacherDashState extends State<TeacherDash>
                               _buildDailyWordCard(_dailyWord!),
                               const SizedBox(height: 25),
                             ],
+                            _buildAiCoreStatus(),
+                            const SizedBox(height: 25),
                             if (isSearchLoading)
                                const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
                             
@@ -148,13 +158,15 @@ class _TeacherDashState extends State<TeacherDash>
                       // ────── LEARNING TOOLS SECTION ──────
                       _buildSectionHeader("LEARNING TOOLS", Icons.school_rounded, Colors.purpleAccent),
                       const SizedBox(height: 12),
-                      GridView.count(
+                      GridView(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15,
-                        childAspectRatio: 1.3,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                          mainAxisExtent: 110,
+                        ),
                         children: [
                           _buildFeatureCard(context,
                             title: "Certification",
@@ -241,13 +253,15 @@ class _TeacherDashState extends State<TeacherDash>
                       // ────── CLASSROOM TOOLS SECTION ──────
                       _buildSectionHeader("CLASSROOM TOOLS", Icons.class_rounded, Colors.orangeAccent),
                       const SizedBox(height: 12),
-                      GridView.count(
+                      GridView(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15,
-                        childAspectRatio: 1.3,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                          mainAxisExtent: 110,
+                        ),
                         children: [
                           _buildFeatureCard(context,
                             title: "Translator",
@@ -286,13 +300,15 @@ class _TeacherDashState extends State<TeacherDash>
                       // ────── COMMUNITY & SETTINGS SECTION ──────
                       _buildSectionHeader("COMMUNITY & SETTINGS", Icons.people_alt_rounded, Colors.blueAccent),
                       const SizedBox(height: 12),
-                      GridView.count(
+                      GridView(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15,
-                        childAspectRatio: 1.3,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                          mainAxisExtent: 110,
+                        ),
                         children: [
                           _buildFeatureCard(context,
                             title: "Community",
@@ -478,6 +494,36 @@ class _TeacherDashState extends State<TeacherDash>
             icon: const Icon(Icons.download_done),
             label: const Text("Import"),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAiCoreStatus() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _isLlmActive ? Colors.purpleAccent.withOpacity(0.3) : Colors.white10),
+      ),
+      child: Row(
+        children: [
+          Icon(_isLlmActive ? Icons.psychology : Icons.auto_awesome, color: _isLlmActive ? Colors.purpleAccent : Colors.cyanAccent, size: 20),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(_isLlmActive ? "GEN-AI CORE: ACTIVE" : "GEN-AI CORE: LITE", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Text(_isLlmActive ? "Advanced Conversational Hub" : "Standard Symbolic Assistant", style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9)),
+            ],
+          ),
+          const Spacer(),
+          if (!_isLlmActive)
+            TextButton(
+              onPressed: () => setState(() => _showAiAssistant = true),
+              child: const Text("UPGRADE", style: TextStyle(color: Colors.amberAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+            ),
         ],
       ),
     );

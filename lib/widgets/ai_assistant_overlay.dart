@@ -6,6 +6,9 @@ import 'package:speechmate/services/neural_engine_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/core/app_strings.dart';
+import 'package:speechmate/services/llm_manager_service.dart';
+import 'package:speechmate/services/gemma_service.dart';
+import 'dart:ui';
 
 class AiAssistantOverlay extends StatefulWidget {
   final VoidCallback onClose;
@@ -35,6 +38,12 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
   String _resultText = "";
   double _confidence = 0.0;
 
+  // LLM State
+  bool _isLlmDownloaded = false;
+  bool _useAdvancedLlm = false;
+  double _downloadProgress = 0.0;
+  bool _isDownloading = false;
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +52,13 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
     
+    _checkModelStatus();
     _initServices();
+  }
+
+  Future<void> _checkModelStatus() async {
+    final status = await LlmManagerService().isModelDownloaded();
+    if (mounted) setState(() => _isLlmDownloaded = status);
   }
 
   Future<void> _initServices() async {
@@ -120,12 +135,21 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
         }
 
         // Mode: AI Conversation
-        final result = await _neuralEngine.predict(_currentText);
-        setState(() {
-          _resultText = result.text;
-          _confidence = result.confidence;
-          _isProcessing = false;
-        });
+        if (_useAdvancedLlm && _isLlmDownloaded) {
+           final genResult = await GemmaService().chat(_currentText);
+           setState(() {
+             _resultText = genResult;
+             _confidence = 0.95; // LLM confidence is high for generation
+             _isProcessing = false;
+           });
+        } else {
+           final result = await _neuralEngine.predict(_currentText);
+           setState(() {
+             _resultText = result.text;
+             _confidence = result.confidence;
+             _isProcessing = false;
+           });
+        }
 
         if (_resultText.isNotEmpty) {
           await _ttsService.speakNicobarese(_resultText, englishWord: _currentText.split(' ').first);
@@ -135,6 +159,28 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
       }
     } else {
       setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _handleDownload() async {
+    setState(() => _isDownloading = true);
+    final service = LlmManagerService();
+    
+    service.progressStream.listen((progress) {
+      if (mounted) setState(() => _downloadProgress = progress);
+    });
+
+    await service.startModelDownload();
+    
+    if (mounted) {
+      setState(() {
+        _isDownloading = false;
+        _isLlmDownloaded = true;
+        _useAdvancedLlm = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("AI Core Activated! Ready for Advanced Conversations."))
+      );
     }
   }
 
@@ -153,129 +199,218 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
           
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              height: 420,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  height: 520,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E1E2C).withOpacity(0.85),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
+                    border: Border.all(color: Colors.white10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _useAdvancedLlm ? Colors.purpleAccent.withOpacity(0.2) : Colors.cyanAccent.withOpacity(0.2),
+                        blurRadius: 40,
+                        spreadRadius: 5,
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+                      const SizedBox(height: 20),
+                      _buildHeader(),
+                      _buildMicSection(),
+                      const Spacer(),
+                      _buildFooter(),
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _useAdvancedLlm ? "SPEECHMATE ADVANCED" : "SPEECHMATE LITE",
+                style: TextStyle(color: _useAdvancedLlm ? Colors.purpleAccent : Colors.cyanAccent, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2),
+              ),
+              const Text("AI Assistant Core", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          if (_isLlmDownloaded)
+            Switch(
+              value: _useAdvancedLlm,
+              activeColor: Colors.purpleAccent,
+              onChanged: (val) => setState(() => _useAdvancedLlm = val),
+            )
+          else if (!_isDownloading)
+            TextButton.icon(
+              onPressed: _handleDownload,
+              icon: const Icon(Icons.bolt, size: 16),
+              label: const Text("UPGRADE", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              style: TextButton.styleFrom(foregroundColor: Colors.amberAccent, backgroundColor: Colors.white.withOpacity(0.05)),
+            )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMicSection() {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (_isDownloading)
+            _buildDownloadUX()
+          else ...[
+            _buildBrainVisualizer(),
+            const SizedBox(height: 30),
+            _buildTranscriptionText(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDownloadUX() {
+    return Padding(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        children: [
+          const Icon(Icons.cloud_download, color: Colors.amberAccent, size: 40),
+          const SizedBox(height: 20),
+          const Text("Syncing AI Core...", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          LinearProgressIndicator(value: _downloadProgress, backgroundColor: Colors.white10, color: Colors.amberAccent, borderRadius: BorderRadius.circular(10)),
+          const SizedBox(height: 8),
+          Text("${(_downloadProgress * 100).toInt()}% Remaining", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+          const SizedBox(height: 20),
+          const Text("Gemma 2B is an offline, heavy brain (~1.5GB). You can keep using Lite mode while we sync.", textAlign: TextAlign.center, style: TextStyle(color: Colors.white38, fontSize: 10)),
+        ],
+      ).animate().fadeIn(),
+    );
+  }
+
+  Widget _buildBrainVisualizer() {
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) {
+        return Container(
+          height: 140,
+          width: 140,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                _isListening ? Colors.redAccent : (_useAdvancedLlm ? Colors.purpleAccent : Colors.cyanAccent),
+                _isListening ? Colors.deepOrange : (_useAdvancedLlm ? Colors.deepPurple : Colors.blueAccent),
+                Colors.black,
+              ],
+              stops: const [0.2, 0.6, 1.0],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: _isListening ? Colors.redAccent.withOpacity(0.6) : (_useAdvancedLlm ? Colors.purpleAccent.withOpacity(0.4) : Colors.cyanAccent.withOpacity(0.4)),
+                blurRadius: 40 + (20 * _pulseController.value),
+                spreadRadius: 5 + (10 * _pulseController.value),
+              ),
+            ],
+          ),
+          child: Icon(
+            _isProcessing ? Icons.sync : (_useAdvancedLlm ? Icons.psychology : Icons.auto_awesome),
+            color: Colors.white,
+            size: 50,
+          ).animate(onPlay: (controller) => controller.repeat())
+           .rotate(duration: 2.seconds, begin: 0, end: _isProcessing ? 1 : 0),
+        );
+      },
+    );
+  }
+
+  Widget _buildTranscriptionText() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        children: [
+          Text(
+            _currentText.isNotEmpty ? _currentText : AppStrings.get('tapMicToRecord'),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 16,
+              fontStyle: FontStyle.italic,
+              height: 1.5,
+            ),
+          ),
+          if (_resultText.isNotEmpty && !_isListening && !_isProcessing) 
+            Column(
+              children: [
+                const SizedBox(height: 10),
+                Text(
+                  _resultText,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _useAdvancedLlm ? Colors.purpleAccent : Colors.cyanAccent,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+                  ),
+                ).animate().slideY(begin: 0.1, end: 0).fadeIn(),
+                if (!_useAdvancedLlm)
+                  Text(
+                    "Confidence: ${(_confidence * 100).toStringAsFixed(0)}%",
+                    style: const TextStyle(color: Colors.white24, fontSize: 10),
+                  ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildButton(icon: Icons.close, color: Colors.white70, onTap: widget.onClose),
+          const SizedBox(width: 40),
+          GestureDetector(
+            onTap: _onMicPressed,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E1E2C),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+                shape: BoxShape.circle,
+                color: _isListening ? Colors.red : (_useAdvancedLlm ? Colors.purpleAccent : Colors.cyanAccent),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.cyanAccent.withOpacity(0.3),
+                    color: _isListening ? Colors.red.withOpacity(0.4) : (_useAdvancedLlm ? Colors.purple.withOpacity(0.4) : Colors.cyan.withOpacity(0.4)),
                     blurRadius: 20,
-                    spreadRadius: 5,
+                    spreadRadius: 2,
                   )
                 ],
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedBuilder(
-                    animation: _pulseController,
-                    builder: (context, child) {
-                      return Container(
-                        height: 120,
-                        width: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              _isListening ? Colors.redAccent : Colors.cyanAccent,
-                              _isListening ? Colors.deepOrange : Colors.blueAccent,
-                              _isListening ? Colors.purpleAccent.withOpacity(0.5) : Colors.purpleAccent.withOpacity(0.5),
-                            ],
-                            stops: const [0.2, 0.6, 1.0],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _isListening ? Colors.redAccent.withOpacity(0.6) : Colors.cyanAccent.withOpacity(0.6),
-                              blurRadius: 30 + (20 * _pulseController.value),
-                              spreadRadius: 5 + (10 * _pulseController.value),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          _isProcessing ? Icons.sync : Icons.auto_awesome,
-                          color: Colors.white,
-                          size: 50,
-                        ).animate(onPlay: (controller) => controller.repeat())
-                         .rotate(duration: 2.seconds, begin: 0, end: _isProcessing ? 1 : 0),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      children: [
-                        Text(
-                          _currentText.isNotEmpty ? _currentText : AppStrings.get('tapMicToRecord'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 16,
-                            fontStyle: FontStyle.italic,
-                            height: 1.5,
-                          ),
-                        ),
-                        if (_resultText.isNotEmpty && !_isListening && !_isProcessing) 
-                          Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              Text(
-                                _resultText,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.cyanAccent,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "Confidence: ${(_confidence * 100).toStringAsFixed(0)}%",
-                                style: TextStyle(color: Colors.white24, fontSize: 10),
-                              ),
-                            ],
-                          ),
-                        if (_currentText.isEmpty && !_isListening && !_isProcessing && _resultText.isEmpty)
-                          const Text(
-                            "Tap the mic to ask something!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildButton(icon: Icons.close, color: Colors.redAccent, onTap: widget.onClose),
-                      const SizedBox(width: 30),
-                      GestureDetector(
-                        onTap: _onMicPressed,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _isListening ? Colors.red : Colors.cyanAccent,
-                            boxShadow: [
-                              BoxShadow(
-                                color: _isListening ? Colors.red.withOpacity(0.4) : Colors.cyan.withOpacity(0.4),
-                                blurRadius: 15,
-                                spreadRadius: 2,
-                              )
-                            ],
-                          ),
-                          child: Icon(_isListening ? Icons.stop : Icons.mic, color: Colors.white, size: 32),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              child: Icon(_isListening ? Icons.stop : Icons.mic, color: Colors.white, size: 36),
             ),
           ),
         ],

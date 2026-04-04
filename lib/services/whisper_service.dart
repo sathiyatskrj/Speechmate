@@ -62,6 +62,7 @@ class WhisperService {
 
         _whisper = Whisper(
           model: _getFlutterModel(_currentSize),
+          modelDir: dir.path,
         );
 
         _isAvailable = true;
