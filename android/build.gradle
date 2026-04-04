@@ -49,6 +49,13 @@ subprojects {
 rootProject.buildDir = file("../build")
 subprojects {
     project.buildDir = file("${rootProject.buildDir}/${project.name}")
+    
+    // Force consistent NDK version across all plugins/subprojects
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android.ndkVersion = "27.0.12077973"
+        }
+    }
 }
 subprojects {
     // project.evaluationDependsOn(":app") // Deprecated content removed

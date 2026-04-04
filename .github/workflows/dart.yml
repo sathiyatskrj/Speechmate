@@ -41,7 +41,9 @@ jobs:
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses || true
+        run: |
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "ndk;27.0.11902837"
 
       - name: Build APK
         run: flutter build apk --release
