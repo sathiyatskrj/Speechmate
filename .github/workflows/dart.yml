@@ -40,6 +40,9 @@ jobs:
       - name: Restore .env file
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
       - name: Build APK
         run: flutter build apk --release
 
