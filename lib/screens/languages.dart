@@ -1,121 +1,147 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/screens/landing_page.dart';
 import 'package:speechmate/screens/mock_language_screen.dart';
-import 'package:speechmate/widgets/background.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:speechmate/core/app_strings.dart';
+import 'package:speechmate/services/season_service.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-class Languages extends StatelessWidget {
+class Languages extends StatefulWidget {
   const Languages({super.key});
 
-  double? get buttonWidth => 220;
-  double? get buttonHeight => 48;
+  @override
+  State<Languages> createState() => _LanguagesState();
+}
+
+class _LanguagesState extends State<Languages> {
+  final SeasonService _seasonService = SeasonService();
+
+  @override
+  void initState() {
+    super.initState();
+    _initSeason();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
+  }
+
+  double? get buttonWidth => 280;
+  double? get buttonHeight => 70;
+
+  @override
+  Widget build(BuildContext context) {
+  Widget _buildLanguageButton({required String label, required String langCode, required List<Color> colors, required VoidCallback onTap, IconData? icon}) {
+    return Column(
+      children: [
+        TapScale(
+          onTap: onTap,
+          child: Container(
+            width: buttonWidth,
+            height: buttonHeight,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: colors),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [BoxShadow(color: colors.first.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (icon != null) Icon(icon, color: Colors.white, size: 28),
+                Expanded(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+              ],
+            ),
+          ),
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
+        const SizedBox(height: 15),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Background(
-        colors: const [Color(0xFF7FFFD4), Color(0xFF00E5FF)],
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppStrings.get('selectLanguage'),
-              style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 40),
-
-            /// NICO BUTTON
-            TapScale(
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LandingPage()),
-                );
-              },
-              child: Container(
-                width: buttonWidth,
-                height: buttonHeight,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFE91E63), Color(0xFFFF6F00)],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Text(
-                  "Nicobarese",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [_seasonService.themeColor.withOpacity(0.4), Colors.black],
               ),
             ),
+          ),
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                Text(
+                  AppStrings.get('selectLanguage'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Which heritage language do you wish to explore?",
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
+                ),
+                const SizedBox(height: 40),
 
-            const SizedBox(height: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        _buildLanguageButton(
+                          label: "Pū (Car Nicobarese)", 
+                          langCode: "nc", 
+                          colors: [const Color(0xFFE91E63), const Color(0xFFFF6F00)], 
+                          icon: Icons.map,
+                          onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LandingPage())),
+                        ),
+                        _buildLanguageButton(
+                          label: "Aka-Jeru (Great Andamanese)", 
+                          langCode: "gn", 
+                          colors: [const Color(0xFF43A047), const Color(0xFFFDD835)], 
+                          icon: Icons.terrain,
+                          onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LandingPage())),
+                        ),
+                        const SizedBox(height: 20),
+                        _buildLanguageButton(
+                          label: "Onges", 
+                          langCode: "on", 
+                          colors: [const Color(0xFF8E24AA), const Color(0xFF1E88E5)], 
+                          icon: Icons.water,
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MockLanguageScreen(languageName: "Onges"))),
+                        ),
 
-            /// MORE BUTTON (DISABLED)
-            /// ONGES BUTTON
-            TapScale(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MockLanguageScreen(languageName: "Onges")),
-                );
-              },
-              child: Container(
-                width: buttonWidth,
-                height: buttonHeight,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8E24AA), Color(0xFF1E88E5)],
+
+                        const SizedBox(height: 20),
+                        const Text(
+                          "*More languages coming soon to the hub.",
+                          style: TextStyle(fontSize: 12, color: Colors.white54, fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Text(
-                  "Onges",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ),
+              ],
             ),
-
-            const SizedBox(height: 20),
-
-            /// GREAT ANDAMANESE BUTTON
-            TapScale(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MockLanguageScreen(languageName: "Great Andamanese")),
-                );
-              },
-              child: Container(
-                width: buttonWidth,
-                height: buttonHeight,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF43A047), Color(0xFFFDD835)],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Text(
-                  "Great Andamanese",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-            const Text(
-              "*More languages coming soon",
-              style: TextStyle(fontSize: 12),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

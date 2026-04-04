@@ -3,8 +3,8 @@ import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/widgets/background.dart';
-import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/progress_service.dart';
+import 'package:speechmate/services/season_service.dart';
 import 'dart:math' as math;
 
 class FlashcardReviewScreen extends StatefulWidget {
@@ -19,11 +19,18 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
   bool _isLoading = true;
   bool _isFlipped = false;
   int _currentIndex = 0;
+  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
+    _initSeason();
     _loadDueCards();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadDueCards() async {
@@ -69,8 +76,17 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
         elevation: 0,
         foregroundColor: Colors.white,
       ),
-      body: Background(
-        colors: const [Color(0xFF6A11CB), Color(0xFF2575FC)],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              _seasonService.themeColor,
+              Colors.black,
+            ],
+          ),
+        ),
         child: SafeArea(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -200,7 +216,7 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-           const Text("Translate to Nicobarese:", style: TextStyle(color: Colors.grey, fontSize: 16)),
+           const Text("Translate Context:", style: TextStyle(color: Colors.grey, fontSize: 16)),
            const SizedBox(height: 20),
            Text(card['english'] as String, style: const TextStyle(color: Colors.black87, fontSize: 32, fontWeight: FontWeight.bold)),
         ],
@@ -223,7 +239,7 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-           const Text("Nicobarese Translation:", style: TextStyle(color: Colors.teal, fontSize: 16)),
+           const Text("Indigenous Translation:", style: TextStyle(color: Colors.teal, fontSize: 16)),
            const SizedBox(height: 20),
            Text(card['nicobarese'] as String, style: const TextStyle(color: Colors.teal, fontSize: 36, fontWeight: FontWeight.bold)),
         ],

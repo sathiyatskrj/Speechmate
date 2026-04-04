@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../widgets/background.dart';
 import '../services/dictionary_service.dart';
+import '../services/season_service.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class CommonPhrasesScreen extends StatefulWidget {
   const CommonPhrasesScreen({super.key});
@@ -14,11 +15,18 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
   final DictionaryService _dictionaryService = DictionaryService();
   final AudioPlayer _audioPlayer = AudioPlayer();
   List<Map<String, dynamic>> _phrases = [];
+  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
+    _initSeason();
     _loadPhrases();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadPhrases() async {
@@ -59,13 +67,23 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Common Phrases"),
+        title: const Text("Common Phrases", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: const BackButton(color: Colors.white),
       ),
       extendBodyBehindAppBar: true,
-      body: Background(
-        colors: const [Color(0xFFee9ca7), Color(0xFFffdde1)],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+               _seasonService.themeColor.withOpacity(0.8),
+               Colors.black
+            ]
+          )
+        ),
         child: _phrases.isEmpty
             ? const Center(child: CircularProgressIndicator())
             : ListView.builder(
@@ -76,28 +94,29 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                   return Card(
                     elevation: 4,
                     margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    color: Colors.white.withOpacity(0.1),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.white24)),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
                       title: Text(
                         item['text'] ?? '', 
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)
                       ),
                       subtitle: item['nicobarese'] != null 
                         ? Text(
                             item['nicobarese'] ?? '', 
-                            style: const TextStyle(color: Colors.teal, fontSize: 16, fontStyle: FontStyle.italic)
+                            style: const TextStyle(color: Colors.amberAccent, fontSize: 16, fontStyle: FontStyle.italic)
                           )
                         : const Text(
                             'Tap to hear pronunciation',
-                            style: TextStyle(color: Colors.grey, fontSize: 14, fontStyle: FontStyle.italic)
+                            style: TextStyle(color: Colors.white54, fontSize: 14, fontStyle: FontStyle.italic)
                           ),
                       trailing: IconButton(
-                        icon: const Icon(Icons.volume_up, color: Colors.blueAccent),
+                        icon: Icon(Icons.volume_up, color: _seasonService.themeColor),
                         onPressed: () => _playAudio(item),
                       ),
                     ),
-                  );
+                  ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.1, end: 0, delay: Duration(milliseconds: (index % 10) * 50));
                 },
               ),
       ),

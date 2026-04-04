@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/services/season_service.dart';
 import 'package:speechmate/widgets/background.dart';
 
 class DynamicCategoryScreen extends StatefulWidget {
@@ -26,11 +27,18 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   List<Map<String, dynamic>> _items = [];
   bool _isLoading = true;
+  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
+    _initSeason();
     _loadData();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadData() async {
@@ -76,8 +84,17 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
         elevation: 0,
         foregroundColor: Colors.black87,
       ),
-      body: Background(
-        colors: widget.bgColors,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              _seasonService.themeColor.withOpacity(0.8),
+              Colors.black,
+            ],
+          ),
+        ),
         child: SafeArea(
           child: _isLoading 
             ? const Center(child: CircularProgressIndicator())
@@ -108,11 +125,12 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
       onTap: () => _playAudio(item['audio'] ?? '', item['english'], item['nicobarese']),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withOpacity(0.1),
           borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: Colors.white24),
           boxShadow: [
             BoxShadow(
-              color: widget.bgColors.first.withOpacity(0.4),
+              color: _seasonService.themeColor.withOpacity(0.2),
               blurRadius: 15,
               offset: const Offset(0, 8),
             )
@@ -124,7 +142,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  color: widget.bgColors.last.withOpacity(0.2),
+                  color: Colors.white.withOpacity(0.05),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
                 ),
                 child: Center(
@@ -133,7 +151,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                         item['emoji'],
                         style: const TextStyle(fontSize: 50),
                       ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(begin: const Offset(1,1), end: const Offset(1.1, 1.1), duration: 2.seconds)
-                    : Icon(Icons.star_rounded, size: 50, color: widget.bgColors.first),
+                    : Icon(Icons.star_rounded, size: 50, color: _seasonService.themeColor),
                 ),
               ),
             ),
@@ -146,8 +164,8 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                   children: [
                     Text(
                       item['english'],
-                      style: TextStyle(
-                        color: Colors.grey.shade800,
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -157,8 +175,8 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                     ),
                      Text(
                       item['nicobarese'],
-                      style: TextStyle(
-                        color: widget.bgColors.first,
+                      style: const TextStyle(
+                        color: Colors.amberAccent,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                         fontStyle: FontStyle.italic

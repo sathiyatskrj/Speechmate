@@ -8,6 +8,7 @@ import 'package:speechmate/models/community_post.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/progress_service.dart';
+import 'package:speechmate/services/season_service.dart';
 import 'package:crypto/crypto.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -23,11 +24,18 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Admin State
   bool _isAdmin = false;
   String? _currentUid;
+  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
+    _initSeason();
     _loadUser();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadUser() async {
@@ -82,16 +90,25 @@ class _CommunityScreenState extends State<CommunityScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showPostDialog,
-        backgroundColor: _isAdmin ? Colors.redAccent : Colors.deepPurpleAccent,
+        backgroundColor: _isAdmin ? Colors.redAccent : _seasonService.themeColor,
         icon: Icon(_isAdmin ? Icons.campaign : Icons.edit),
-        label: Text(_isAdmin ? "Admin Post" : "Contribute"),
+        label: Text(_isAdmin ? "Admin Post" : "Contribute", style: TextStyle(color: Colors.white)),
       ),
-      body: Background(
-        colors: _isAdmin 
-            ? const [Color(0xFF2b2b2b), Color(0xFF4a148c)] // Darker theme for admin
-            : const [Color(0xFF89f7fe), Color(0xFF66a6ff)], 
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: _isAdmin 
+                ? [Colors.black87, Colors.black] 
+                : [
+                    _seasonService.themeColor.withOpacity(0.8),
+                    Colors.black
+                  ],
+          )
+        ),
         child: SafeArea(
-          child: Column(
+           child: Column(
             children: [
                 _buildSyncBanner(),
                 Expanded(
@@ -184,18 +201,19 @@ class _CommunityScreenState extends State<CommunityScreen> {
       margin: const EdgeInsets.only(bottom: 20, top: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withOpacity(0.1),
+        border: Border.all(color: Colors.white24),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)]
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10)]
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.trending_up, color: Colors.deepPurple),
-              SizedBox(width: 8),
-              Text("Trending Topics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+              Icon(Icons.trending_up, color: _seasonService.themeColor),
+              const SizedBox(width: 8),
+              Text("Trending Topics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             ],
           ),
           const SizedBox(height: 10),
@@ -216,9 +234,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget _buildTag(String text) {
     return Chip(
       label: Text(text),
-      backgroundColor: Colors.deepPurple.withOpacity(0.05),
-      labelStyle: const TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.bold),
-      side: BorderSide.none,
+      backgroundColor: _seasonService.themeColor.withOpacity(0.2),
+      labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      side: const BorderSide(color: Colors.white24),
     );
   }
 
@@ -229,12 +247,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: _isAdmin && post.isVerified ? Border.all(color: Colors.green, width: 2) : null,
+        border: _isAdmin && post.isVerified ? Border.all(color: Colors.green, width: 2) : Border.all(color: Colors.white24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -257,14 +275,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(post.author, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text(post.author, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                         if (post.isVerified) ...[
                           const SizedBox(width: 4),
-                          const Icon(Icons.verified, color: Colors.blue, size: 16),
+                          const Icon(Icons.verified, color: Colors.blueAccent, size: 16),
                         ],
                       ],
                     ),
-                    Text(post.role, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                    Text(post.role, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
                   ],
                 ),
                 const Spacer(),
@@ -284,7 +302,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            Text(post.content, style: const TextStyle(fontSize: 15, height: 1.4, color: Colors.black87)),
+            Text(post.content, style: const TextStyle(fontSize: 15, height: 1.4, color: Colors.white)),
             const SizedBox(height: 16),
             if (!_isAdmin)
               Row(

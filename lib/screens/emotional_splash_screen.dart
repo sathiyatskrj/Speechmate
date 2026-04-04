@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speechmate/services/season_service.dart';
 
 class EmotionalSplashScreen extends StatefulWidget {
   final Widget nextScreen;
@@ -29,9 +30,12 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
   final math.Random random = math.Random();
   Offset _touchPosition = Offset.zero;
 
+  final SeasonService _seasonService = SeasonService();
+
   @override
   void initState() {
     super.initState();
+    _initSeason();
     
     // Initialize Particles with Physics properties
     for (int i = 0; i < particleCount; i++) {
@@ -111,6 +115,11 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
     super.dispose();
   }
 
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
+  }
+
   void _onPanUpdate(DragUpdateDetails details) {
     setState(() {
       _touchPosition = details.globalPosition;
@@ -127,19 +136,19 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // DEEP SPACE GRADIENT
+            // DEEP SPACE GRADIENT / SEASONAL INFLUENCE
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: RadialGradient(
                   center: Alignment.bottomCenter,
-                  radius: 1.5, // Expanded depth
+                  radius: 1.5,
                   colors: [  
-                    Color(0xFF4A00E0), // Vibrant Violet
-                    Color(0xFF8E2DE2), // Rich Purple 
-                    Color(0xFF0F0C29), // Deep Space
+                    _seasonService.themeColor, // Dynamic base
+                    const Color(0xFF8E2DE2), // Rich Purple 
+                    const Color(0xFF0F0C29), // Deep Space
                     Colors.black
                   ],
-                  stops: [0.0, 0.3, 0.7, 1.0],
+                  stops: const [0.0, 0.3, 0.7, 1.0],
                 ),
               ),
             ),

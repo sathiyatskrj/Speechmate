@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/dictionary_service.dart';
 import '../services/smart_quiz_service.dart';
 import '../services/logger_service.dart';
+import '../services/season_service.dart';
 import '../widgets/background.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -24,11 +25,18 @@ class _QuizScreenState extends State<QuizScreen> {
   
   List<String> options = [];
   int correctOptionIndex = 0;
+  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
+    _initSeason();
     _loadQuiz();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
 
@@ -178,12 +186,21 @@ class _QuizScreenState extends State<QuizScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("Quiz Mode", style: TextStyle(color: Colors.black)),
+        title: const Text("Language Quiz", style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        leading: const BackButton(color: Colors.black),
+        leading: const BackButton(color: Colors.white),
       ),
-      body: Background(
-        colors: const [Color(0xFF845EC2), Color(0xFFD65DB1)],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+               _seasonService.themeColor.withOpacity(0.8),
+               Colors.black
+            ]
+          )
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
         child: isLoading 
             ? const Center(child: CircularProgressIndicator(color: Colors.white))
@@ -200,17 +217,18 @@ class _QuizScreenState extends State<QuizScreen> {
                    Container(
                      padding: const EdgeInsets.all(30),
                      decoration: BoxDecoration(
-                       color: Colors.white,
+                       color: Colors.white.withOpacity(0.1),
                        borderRadius: BorderRadius.circular(20),
-                       boxShadow: const [BoxShadow(blurRadius: 10, color: Colors.black26)]
+                       border: Border.all(color: Colors.white24),
+                       boxShadow: [BoxShadow(blurRadius: 10, color: _seasonService.themeColor.withOpacity(0.2))]
                      ),
                      child: Column(
                        children: [
-                         const Text("Translate this:", style: TextStyle(color: Colors.grey)),
+                         const Text("Translate this:", style: TextStyle(color: Colors.white54)),
                          const SizedBox(height: 10),
                          Text(
-                           questions[currentIndex]['nicobarese'] ?? '',
-                           style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black87),
+                           questions[currentIndex]['nicobarese'] ?? questions[currentIndex]['great_andamanese'] ?? '',
+                           style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.amberAccent),
                            textAlign: TextAlign.center,
                          ),
                        ],
@@ -233,16 +251,16 @@ class _QuizScreenState extends State<QuizScreen> {
                        padding: const EdgeInsets.only(bottom: 12),
                        child: ElevatedButton(
                          style: ElevatedButton.styleFrom(
-                           backgroundColor: color,
+                           backgroundColor: color == Colors.white ? Colors.white.withOpacity(0.2) : color,
                            padding: const EdgeInsets.symmetric(vertical: 16),
-                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: color == Colors.white ? Colors.white24 : color)),
                          ),
                          onPressed: () => _submitAnswer(index),
                          child: Text(
                            options.length > index ? options[index] : '',
                            style: TextStyle(
                              fontSize: 18, 
-                             color: answered ? Colors.white : Colors.black87
+                             color: Colors.white
                            ),
                          ),
                        ),

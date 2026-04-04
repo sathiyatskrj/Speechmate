@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/dictionary_service.dart';
+import '../services/season_service.dart';
 
 class BetaChatScreen extends StatefulWidget {
   final bool isStudent;
@@ -19,12 +19,19 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   List<Map<String, dynamic>> _filteredDialects = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
+  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
+    _initSeason();
     _loadData();
     _initTts();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _initTts() async {
@@ -59,27 +66,35 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
     await _flutterTts.speak(text);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final bgColor = widget.isStudent ? const Color(0xFFF0F4F8) : Colors.white;
-
     return Scaffold(
-      backgroundColor: bgColor,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
-          "Beta Chat: Nicobar Dialects",
-          style: TextStyle(
-            color: widget.isStudent ? Colors.white : Colors.black87,
+          "Dialect Radar - βeta",
+          style: const TextStyle(
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: widget.isStudent ? const Color(0xFFFF6B6B) : Colors.white,
-        elevation: widget.isStudent ? 4 : 1,
-        iconTheme: IconThemeData(
-          color: widget.isStudent ? Colors.white : Colors.black87,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
         ),
       ),
-      body: _isLoading
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+               _seasonService.themeColor.withOpacity(0.8),
+               Colors.black
+            ]
+          )
+        ),
+        child: SafeArea(
+          child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
@@ -121,6 +136,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
                 ),
               ],
             ),
+        ),
     );
   }
 
@@ -128,23 +144,25 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   Widget _buildStudentCard(Map<String, dynamic> item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: Colors.white.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Colors.white24)),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        iconColor: Colors.white,
+        collapsedIconColor: Colors.white70,
         title: Text(
           item['english'] ?? 'Unknown',
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF2D3436),
+            color: Colors.white,
           ),
         ),
         leading: CircleAvatar(
-          backgroundColor: const Color(0xFFFFEAA7),
+          backgroundColor: _seasonService.themeColor.withOpacity(0.5),
           child: Text(
-            (item['english'] ?? "?")[0],
-            style: const TextStyle(color: Color(0xFFD63031), fontWeight: FontWeight.bold),
+            (item['english'] ?? "?")[0].toUpperCase(),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         children: [
@@ -173,7 +191,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
             ),
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black87,
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
@@ -184,11 +202,11 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.volume_up_rounded, size: 20, color: Colors.grey),
+            icon: Icon(Icons.volume_up_rounded, size: 20, color: _seasonService.themeColor),
             onPressed: () => _speak(value),
           ),
         ],

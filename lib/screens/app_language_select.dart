@@ -2,13 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/screens/languages.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
-import '../widgets/background.dart';
+import 'package:speechmate/services/season_service.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-class LanguageSelectionScreen extends StatelessWidget {
+class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
 
-  double? get buttonWidth => 220;
-  double? get buttonHeight => 48;
+  @override
+  State<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
+}
+
+class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
+  final SeasonService _seasonService = SeasonService();
+
+  @override
+  void initState() {
+    super.initState();
+    _initSeason();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
+  }
+
+  double? get buttonWidth => 280;
+  double? get buttonHeight => 70;
 
   Future<void> selectLanguage(BuildContext context, String langCode) async {
     final prefs = await SharedPreferences.getInstance();
@@ -21,7 +40,7 @@ class LanguageSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageButton({required BuildContext context, required String label, required String langCode, required List<Color> colors}) {
+  Widget _buildLanguageButton({required BuildContext context, required String label, required String langCode, required List<Color> colors, IconData? icon}) {
     return Column(
       children: [
         TapScale(
@@ -29,21 +48,35 @@ class LanguageSelectionScreen extends StatelessWidget {
           child: Container(
             width: buttonWidth,
             height: buttonHeight,
-            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               gradient: LinearGradient(colors: colors),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(color: colors.first.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))
+              ],
             ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (icon != null) Icon(icon, color: Colors.white, size: 28),
+                Expanded(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+              ],
             ),
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 15),
       ],
     );
@@ -52,40 +85,68 @@ class LanguageSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Background(
-        colors: const [Color(0xFF7FFFD4), Color(0xFF00E5FF)],
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "Select App Language",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 40),
-
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildLanguageButton(context: context, label: "English", langCode: "en", colors: [const Color(0xFFE91E63), const Color(0xFFFF6F00)]),
-                    _buildLanguageButton(context: context, label: "हिंदी (Hindi)", langCode: "hi", colors: [const Color(0xFF8E24AA), const Color(0xFF1E88E5)]),
-                    _buildLanguageButton(context: context, label: "தமிழ் (Tamil)", langCode: "ta", colors: [const Color(0xFF43A047), const Color(0xFFFDD835)]),
-                    _buildLanguageButton(context: context, label: "മലയാളം (Malayalam)", langCode: "ml", colors: [const Color(0xFFE53935), const Color(0xFF43A047)]),
-                    _buildLanguageButton(context: context, label: "বাংলা (Bengali)", langCode: "bn", colors: [const Color(0xFF00ACC1), const Color(0xFF5E35B1)]),
-                    _buildLanguageButton(context: context, label: "తెలుగు (Telugu)", langCode: "te", colors: [const Color(0xFFFF6F00), const Color(0xFFE91E63)]),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "*UI texts will be updated dynamically in a future update.",
-                      style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
+      backgroundColor: Colors.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  _seasonService.themeColor.withOpacity(0.4),
+                  Colors.black,
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                const Text(
+                  "Choose Your Mother Tongue",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Help us adapt to your community.",
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
+                ),
+                const SizedBox(height: 40),
+
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        _buildLanguageButton(context: context, label: "Pū (Car Nicobarese)", langCode: "nc", colors: [const Color(0xFF00796B), const Color(0xFF004D40)], icon: Icons.map),
+                        _buildLanguageButton(context: context, label: "Aka-Jeru (Great Andamanese)", langCode: "gn", colors: [const Color(0xFFE64A19), const Color(0xFFD84315)], icon: Icons.terrain),
+                        const SizedBox(height: 30),
+                        const Row(
+                           mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                              Expanded(child: Divider(color: Colors.white24, indent: 40, endIndent: 20)),
+                              Text("Regional", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                              Expanded(child: Divider(color: Colors.white24, indent: 20, endIndent: 40)),
+                           ]
+                        ),
+                        const SizedBox(height: 30),
+                        _buildLanguageButton(context: context, label: "English", langCode: "en", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
+                        _buildLanguageButton(context: context, label: "हिंदी (Hindi)", langCode: "hi", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
+                        _buildLanguageButton(context: context, label: "தமிழ் (Tamil)", langCode: "ta", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
