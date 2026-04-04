@@ -53,12 +53,13 @@
 
 | Feature | What It Does | Underlying Tech |
 | :--- | :--- | :--- |
-| **🎙️ True Offline AI** | Translates spoken English using an on-device native C++ model. | **whisper_flutter_new wrapper** |
-| **📖 Instant Dictionary** | Rapid offline lookup for thousands of words via indexed arrays. | **SQLite Pre-Seeded Database** |
-| **🧠 Spaced Repetition** | SM-2 native scheduling intervals (Again, Hard, Good, Easy) for dynamic learning. | **SRS Engine** |
-| **🏫 Teacher Dashboard** | Professional admin panel to output localized metrics and PDF analytics. | **Progress Analytics** |
-| **⚡ V2 Scalability** | Operates strictly offline in deep canopy environment with local ID mapping (No Firebase required). | **SharedPreferences / Local Mapping** |
-| **🤝 Community Hub** | Preserves folklore, songs, and cultural stories locally. | **Offline Data Archive** |
+| **🎙️ True Offline AI** | Translates spoken English using an on-device native C++ model. | **Whisper V2 (Native C++)** |
+| **🧠 Neural Engine** | Advanced fuzzy-logic & Levenshtein matching for typo recovery. | **Offline Neural Logic** |
+| **📖 Instant Dictionary** | Rapid offline lookup for thousands of words. | **SQLite Pre-Seeded DB** |
+| **🧠 Spaced Repetition** | SM-2 native scheduling (Again, Hard, Good, Easy). | **SRS Engine** |
+| **🌍 Multi-Lingual** | Full UI localization for Hindi, Tamil, Malayalam, Bengali, Telugu. | **Localization Service** |
+| **🏫 Teacher Dashboard** | Professional admin panel with PDF analytics. | **Progress Analytics** |
+| **🤝 Community Hub** | Preserves folklore and cultural stories locally. | **Offline Data Archive** |
 
 ---
 
@@ -112,7 +113,9 @@ graph TD
     subgraph "Relational Data Structure"
         Service --> DB[Database Manager]
         DB --> SQLite[(SQLite DB)]
-        SQLite --> dictionary, scores, spaced_repetition
+        SQLite --> D1[Dictionary Assets]
+        SQLite --> D2[Scores & Metric]
+        SQLite --> D3[Spaced Repetition Maps]
     end
     
     Whisper --> |Assembled Text| UI
