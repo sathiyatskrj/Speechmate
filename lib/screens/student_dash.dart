@@ -19,6 +19,7 @@ import 'package:speechmate/models/lesson_models.dart';
 import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
+import 'package:speechmate/screens/srs_review_screen.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -86,6 +87,9 @@ class _StudentDashState extends State<StudentDash>
 
 
   final List<Map<String, dynamic>> learningTiles = [
+    // [NEW] Daily Review (SRS)
+    {"word": "Daily Review", "emoji": "🧠", "colors": [Color(0xFF00C9FF), Color(0xFF92FE9D)], "navigateTo": const SrsReviewScreen(), "icon": Icons.psychology_rounded},
+    
     // [NEW] Interactive Lessons (Child-Friendly)
     {"word": "Jungle Adventure", "emoji": "🦁", "colors": [Color(0xFFFF9966), Color(0xFFFF5E62)], "navigateTo": LessonScreen(lesson: interactiveLessons[0]), "icon": Icons.terrain_rounded},
     {"word": "Island Colors", "emoji": "🏝️", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": LessonScreen(lesson: interactiveLessons[1]), "icon": Icons.beach_access_rounded},

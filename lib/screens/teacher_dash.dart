@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:speechmate/screens/word_management_screen.dart';
-import 'package:speechmate/screens/about_screen.dart';
 import 'package:speechmate/screens/community_screen.dart';
 import 'package:speechmate/screens/quiz_screen.dart';
 import 'package:speechmate/screens/progress_screen.dart';
@@ -18,7 +16,6 @@ import 'package:speechmate/widgets/voice_reactive_aurora.dart';
 import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
-import 'package:speechmate/widgets/exit_feedback_dialog.dart';
 import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 

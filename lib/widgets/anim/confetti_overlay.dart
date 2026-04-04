@@ -97,7 +97,7 @@ class _ConfettiParticle {
   double x, y;
   double speedX, speedY;
   double size;
-  double rotation;
+  double rotation = 0.0;
   double rotationSpeed;
 
   _ConfettiParticle({
@@ -107,7 +107,6 @@ class _ConfettiParticle {
     required this.speedX,
     required this.speedY,
     required this.size,
-    this.rotation = 0.0,
     required this.rotationSpeed,
   });
 }

@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:async';
 import 'package:flutter/material.dart';
 import '../core/app_colors.dart';
 
@@ -107,7 +106,6 @@ class _AuroraPainter extends CustomPainter {
     paint.color = color.withOpacity(0.15 + (intensity * 0.1));
     
     final path = Path();
-    final double waveHeight = size.height * 0.5;
     final double yOffset = size.height * 0.3 * index;
     
     // Complex sine wave math for organic movement

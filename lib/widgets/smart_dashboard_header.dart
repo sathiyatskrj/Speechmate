@@ -1,8 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart';
 // import 'package:speechmate/services/dictionary_service.dart'; // Unused
 // import 'package:speechmate/services/whisper_service.dart'; // Moved to Dialog
 // import 'package:record/record.dart'; // Moved to Dialog

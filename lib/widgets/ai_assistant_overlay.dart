@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
-import 'package:speechmate/services/speech_service.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:speechmate/services/whisper_service.dart';
 import 'package:speechmate/services/neural_engine_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -21,9 +22,11 @@ class AiAssistantOverlay extends StatefulWidget {
 
 class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
-  final SpeechService _speechService = SpeechService();
+  final WhisperService _whisperService = WhisperService();
   final NeuralEngineService _neuralEngine = NeuralEngineService();
   final TtsService _ttsService = TtsService();
+  late AudioRecorder _audioRecorder;
+  String? _audioFilePath;
 
   bool _isListening = false;
   bool _isProcessing = false;
@@ -43,7 +46,8 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
   }
 
   Future<void> _initServices() async {
-    await _speechService.init();
+    _audioRecorder = AudioRecorder();
+    await _whisperService.initialize();
     await _neuralEngine.init();
     await _ttsService.init();
     
@@ -56,7 +60,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
   @override
   void dispose() {
     _pulseController.dispose();
-    _speechService.stop();
+    _audioRecorder.dispose();
     _ttsService.stop();
     super.dispose();
   }
@@ -69,47 +73,64 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
     }
   }
 
-  void _startListening() {
-    setState(() {
-      _isListening = true;
-      _currentText = "";
-      _resultText = "";
-      _isProcessing = false;
-    });
+  Future<void> _startListening() async {
+    if (await _audioRecorder.hasPermission()) {
+      final dir = await getTemporaryDirectory();
+      _audioFilePath = '${dir.path}/speechmate_temp_record.wav';
+      
+      await _audioRecorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.wav,
+          sampleRate: 16000,
+          numChannels: 1,
+        ),
+        path: _audioFilePath!,
+      );
 
-    _speechService.listen(
-      onResult: (text) {
-        setState(() {
-          _currentText = text;
-        });
-      },
-    );
+      setState(() {
+        _isListening = true;
+        _currentText = "Recording audio... (Offline)";
+        _resultText = "";
+        _isProcessing = false;
+      });
+    }
   }
 
   Future<void> _stopListening() async {
-    await _speechService.stop();
     setState(() {
       _isListening = false;
       _isProcessing = true;
+      _currentText = "Transcribing with Whisper AI...";
     });
 
-    if (_currentText.isNotEmpty) {
-      if (widget.onResult != null) {
-          // Mode: Search/STT
-          widget.onResult!(_currentText);
-          return;
-      }
+    await _audioRecorder.stop();
 
-      // Mode: AI Conversation
-      final result = await _neuralEngine.predict(_currentText);
+    if (_audioFilePath != null) {
+      final text = await _whisperService.transcribe(_audioFilePath!);
       setState(() {
-        _resultText = result.text;
-        _confidence = result.confidence;
-        _isProcessing = false;
+        _currentText = text;
       });
 
-      if (_resultText.isNotEmpty) {
-        await _ttsService.speakNicobarese(_resultText, englishWord: _currentText.split(' ').first);
+      if (_currentText.isNotEmpty) {
+        if (widget.onResult != null) {
+            // Mode: Search/STT
+            widget.onResult!(_currentText);
+            return;
+        }
+
+        // Mode: AI Conversation
+        final result = await _neuralEngine.predict(_currentText);
+        setState(() {
+          _resultText = result.text;
+          _confidence = result.confidence;
+          _isProcessing = false;
+        });
+
+        if (_resultText.isNotEmpty) {
+          await _ttsService.speakNicobarese(_resultText, englishWord: _currentText.split(' ').first);
+        }
+      } else {
+        setState(() => _isProcessing = false);
       }
     } else {
       setState(() => _isProcessing = false);
@@ -186,9 +207,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
                     child: Column(
                       children: [
                         Text(
-                          _isListening 
-                              ? (_currentText.isEmpty ? "I am listening to you..." : _currentText)
-                              : (_isProcessing ? "Translating with Offline Brain..." : ""),
+                          _currentText.isNotEmpty ? _currentText : "Tap mic to record",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.8),

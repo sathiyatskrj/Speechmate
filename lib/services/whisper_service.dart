@@ -1,35 +1,54 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:whisper_flutter_new/whisper_flutter_new.dart';
 
-/// WhisperService - Offline speech transcription
-/// 
-/// IMPORTANT: This service requires a native `.so` library (libwhisper-lib.so)
-/// to be bundled with the APK. Without it, the app will crash on initialization.
-/// 
-/// Currently disabled (stubbed) until native library bundling is implemented.
-/// To enable, follow these steps:
-/// 1. Build the Whisper C++ library for target arch (arm64-v8a, armeabi-v7a)
-/// 2. Place .so files in android/app/src/main/jniLibs/<arch>/
-/// 3. Remove the stub guards below and uncomment the FFI code
 class WhisperService {
   bool _isProcessing = false;
   bool _isAvailable = false;
+  Whisper? _whisper;
 
-  /// Check if the native library is available
+  /// Check if the service is ready
   bool get isAvailable => _isAvailable;
 
-  /// Try to initialize the service. Returns false if native lib is missing.
+  /// Initialize the service by ensuring the model is extracted
   Future<bool> initialize() async {
-    // TODO: Implement native library detection
-    // For now, always return false since .so isn't bundled
-    _isAvailable = false;
-    debugPrint('[WhisperService] Native library not bundled. Service unavailable.');
-    return false;
+    try {
+      final Directory dir = Platform.isAndroid
+          ? await getApplicationSupportDirectory()
+          : await getLibraryDirectory();
+          
+      final String modelPath = '${dir.path}/ggml-tiny.bin';
+      final File modelFile = File(modelPath);
+
+      // Extract model from assets if it doesn't exist
+      if (!modelFile.existsSync()) {
+        debugPrint('[WhisperService] Extracting model from assets to $modelPath...');
+        final ByteData data = await rootBundle.load('assets/models/ggml-tiny.en.bin');
+        final List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+        await modelFile.writeAsBytes(bytes);
+      } else {
+         debugPrint('[WhisperService] Local model found at $modelPath');
+      }
+
+      _whisper = Whisper(
+        model: WhisperModel.tiny,
+      );
+
+      _isAvailable = true;
+      debugPrint('[WhisperService] Initialized successfully.');
+      return true;
+    } catch (e) {
+      _isAvailable = false;
+      debugPrint('[WhisperService] Initialization failed: $e');
+      return false;
+    }
   }
 
-  /// Transcribe audio file using Whisper model.
-  /// Returns empty string if service is unavailable.
-  Future<String> transcribe(String modelPath, String audioPath) async {
-    if (!_isAvailable) {
+  /// Transcribe a WAV audio file using the local Whisper model.
+  Future<String> transcribe(String audioFilePath) async {
+    if (!_isAvailable || _whisper == null) {
       debugPrint('[WhisperService] Cannot transcribe - service unavailable.');
       return '';
     }
@@ -41,10 +60,16 @@ class WhisperService {
 
     _isProcessing = true;
     try {
-      // FFI call would go here when native library is available
-      // final text = await compute(_transcribeInBackground, {...});
+      final TranscribeRequest request = TranscribeRequest(
+        audio: audioFilePath,
+        language: "en", // English model
+        isTranslate: false,
+      );
+
+      final response = await _whisper!.transcribe(transcribeRequest: request);
+      
       _isProcessing = false;
-      return '';
+      return response.text;
     } catch (e) {
       _isProcessing = false;
       debugPrint('[WhisperService] Error: $e');
@@ -52,3 +77,4 @@ class WhisperService {
     }
   }
 }
+

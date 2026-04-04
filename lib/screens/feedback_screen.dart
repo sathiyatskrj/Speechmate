@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/services/feedback_service.dart';
 import 'package:speechmate/widgets/voice_reactive_aurora.dart';
 

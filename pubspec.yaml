@@ -32,7 +32,7 @@ dependencies:
   qr_flutter: ^4.1.0
   appinio_swiper: ^2.1.1
   fl_chart: ^0.68.0
-  firebase_auth: ^5.7.0
+  whisper_flutter_new: ^1.0.1
 
 
 dev_dependencies:
@@ -42,6 +42,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: 2.4.0
   mocktail: ^1.0.4
+  sqflite_common_ffi: ^2.3.0
 
 flutter_launcher_icons:
   android: true

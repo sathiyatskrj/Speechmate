@@ -8,7 +8,7 @@ import '../../widgets/anim/confetti_overlay.dart';
 class LessonScreen extends StatefulWidget {
   final Lesson lesson;
 
-  const LessonScreen({Key? key, required this.lesson}) : super(key: key);
+  const LessonScreen({super.key, required this.lesson});
 
   @override
   State<LessonScreen> createState() => _LessonScreenState();
@@ -363,8 +363,8 @@ class _LessonScreenState extends State<LessonScreen> with TickerProviderStateMix
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FloatingWidget(
-            child: const Icon(Icons.star_rounded, size: 150, color: Colors.amber),
+          const FloatingWidget(
+            child: Icon(Icons.star_rounded, size: 150, color: Colors.amber),
           ),
           const SizedBox(height: 30),
           Text(

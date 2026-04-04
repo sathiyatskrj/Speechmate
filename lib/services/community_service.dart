@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class CommunityService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -53,7 +52,8 @@ class CommunityService {
   /// Toggle like status and persist securely
   Future<void> toggleLike(String postId, bool currentLikeStatus) async {
     final docRef = _firestore.collection(_collection).doc(postId);
-    final String uid = FirebaseAuth.instance.currentUser?.uid ?? 'anonymous_device';
+    final prefs = await SharedPreferences.getInstance();
+    final String uid = prefs.getString('local_device_id') ?? 'anonymous_device';
 
     try {
       await _firestore.runTransaction((transaction) async {
@@ -84,7 +84,6 @@ class CommunityService {
     }
     
     // Update local prefs for backward compatibility with UI assuming quick updates
-    final prefs = await SharedPreferences.getInstance();
     final likedPosts = await getLikedPosts();
     if (currentLikeStatus) {
        likedPosts.remove(postId);

@@ -21,7 +21,7 @@ class DatabaseManager {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -42,6 +42,28 @@ class DatabaseManager {
           audio TEXT
         )
         ''');
+     }
+     if (oldVersion < 3) {
+       const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+       await db.execute('''
+       CREATE TABLE phrases (
+         id $idType,
+         english TEXT,
+         nicobarese TEXT,
+         text TEXT
+       )
+       ''');
+       await db.execute('''
+       CREATE TABLE dialects (
+         id $idType,
+         english TEXT,
+         car TEXT,
+         central TEXT,
+         coast TEXT,
+         teressa TEXT,
+         chowra TEXT
+       )
+       ''');
      }
   }
 
@@ -75,6 +97,70 @@ class DatabaseManager {
       audio TEXT
     )
     ''');
+    
+    await db.execute('''
+    CREATE TABLE phrases (
+      id $idType,
+      english TEXT,
+      nicobarese TEXT,
+      text TEXT
+    )
+    ''');
+    
+    await db.execute('''
+    CREATE TABLE dialects (
+      id $idType,
+      english TEXT,
+      car TEXT,
+      central TEXT,
+      coast TEXT,
+      teressa TEXT,
+      chowra TEXT
+    )
+    ''');
+  }
+
+  Future<void> seedExtraFromJson(String table, String path, Map<String, dynamic> Function(dynamic) mapper) async {
+      final db = await instance.database;
+      final res = await db.query(table, limit: 1);
+      if (res.isNotEmpty) return;
+      
+      try {
+        final String jsonString = await rootBundle.loadString(path);
+        final List<dynamic> jsonList = json.decode(jsonString);
+        Batch batch = db.batch();
+        for (var item in jsonList) {
+          batch.insert(table, mapper(item));
+        }
+        await batch.commit(noResult: true);
+      } catch (e) {
+         // Fail silently
+      }
+  }
+
+  Future<List<Map<String, dynamic>>> queryAll(String table) async {
+    final db = await instance.database;
+    return await db.query(table);
+  }
+
+  Future<Map<String, dynamic>?> searchExact(String query, String table, List<String> columns) async {
+    final db = await instance.database;
+    final qCol = columns.map((c) => 'LOWER($c) = ?').join(' OR ');
+    final q = query.trim().toLowerCase();
+    final List<String> args = List.generate(columns.length, (_) => q);
+
+    final results = await db.query(table, where: qCol, whereArgs: args, limit: 1);
+    if (results.isNotEmpty) return results.first;
+    return null;
+  }
+  
+  Future<List<Map<String, dynamic>>> searchLike(String query, String table, List<String> columns) async {
+    final db = await instance.database;
+    final qCol = columns.map((c) => 'LOWER($c) LIKE ?').join(' OR ');
+    final q = '%${query.trim().toLowerCase()}%';
+    final List<String> args = List.generate(columns.length, (_) => q);
+
+    return await db.query(table, where: qCol, whereArgs: args);
   }
 
   Future<void> seedCategoryFromJson(String categoryId, String path) async {

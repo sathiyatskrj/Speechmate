@@ -13,7 +13,7 @@ class Languages extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        colors: [Color(0xFF7FFFD4), Color(0xFF00E5FF)],
+        colors: const [Color(0xFF7FFFD4), Color(0xFF00E5FF)],
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

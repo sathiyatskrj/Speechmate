@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speechmate/services/dictionary_service.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
   group('DictionaryService Tests', () {
     late DictionaryService service;
 

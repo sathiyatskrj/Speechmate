@@ -12,10 +12,10 @@ class WordMatchGame extends StatefulWidget {
 class _WordMatchGameState extends State<WordMatchGame> {
   final DictionaryService _dictionaryService = DictionaryService();
   List<String> _items = [];
-  Map<String, String> _pairs = {}; // Item -> Match
+  final Map<String, String> _pairs = {}; // Item -> Match
   
   String? _selectedItem;
-  List<String> _matchedItems = [];
+  final List<String> _matchedItems = [];
   bool _isLoading = true;
   bool _isWon = false;
 
@@ -130,7 +130,7 @@ class _WordMatchGameState extends State<WordMatchGame> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             if (!isMatched)
-                              BoxShadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0, 2))
+                              const BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
                           ],
                         ),
                         alignment: Alignment.center,

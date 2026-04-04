@@ -352,7 +352,7 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
                         decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.95),
                             borderRadius: BorderRadius.circular(30),
-                            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 20, offset: const Offset(0,10))],
+                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0,10))],
                         ),
                         child: Column(
                             children: [

@@ -273,30 +273,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
-  firebase_auth:
-    dependency: "direct main"
-    description:
-      name: firebase_auth
-      sha256: "0fed2133bee1369ee1118c1fef27b2ce0d84c54b7819a2b17dada5cfec3b03ff"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.7.0"
-  firebase_auth_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_auth_platform_interface
-      sha256: "871c9df4ec9a754d1a793f7eb42fa3b94249d464cfb19152ba93e14a5966b386"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.7.3"
-  firebase_auth_web:
-    dependency: transitive
-    description:
-      name: firebase_auth_web
-      sha256: d9ada769c43261fd1b18decf113186e915c921a811bd5014f5ea08f4cf4bc57e
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.15.3"
   firebase_core:
     dependency: "direct main"
     description:
@@ -400,6 +376,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  freezed_annotation:
+    dependency: transitive
+    description:
+      name: freezed_annotation
+      sha256: "7294967ff0a6d98638e7acb774aac3af2550777accd8149c90af5b014e6d44d8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   glob:
     dependency: transitive
     description:
@@ -416,54 +400,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.3.3"
-  google_identity_services_web:
-    dependency: transitive
-    description:
-      name: google_identity_services_web
-      sha256: "5d187c46dc59e02646e10fe82665fc3884a9b71bc1c90c2b8b749316d33ee454"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.3+1"
-  google_sign_in:
-    dependency: "direct main"
-    description:
-      name: google_sign_in
-      sha256: "521031b65853b4409b8213c0387d57edaad7e2a949ce6dea0d8b2afc9cb29763"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.2.0"
-  google_sign_in_android:
-    dependency: transitive
-    description:
-      name: google_sign_in_android
-      sha256: be0d0733a6a7c5da165879d844a239aa87587a3c767a9163faedde581f731f76
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.2.10"
-  google_sign_in_ios:
-    dependency: transitive
-    description:
-      name: google_sign_in_ios
-      sha256: ac1e4c1205267cb7999d1d81333fccffdfda29e853f434bbaf71525498bb6950
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.0"
-  google_sign_in_platform_interface:
-    dependency: transitive
-    description:
-      name: google_sign_in_platform_interface
-      sha256: "7f59208c42b415a3cca203571128d6f84f885fead2d5b53eb65a9e27f2965bb5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
-  google_sign_in_web:
-    dependency: transitive
-    description:
-      name: google_sign_in_web
-      sha256: d473003eeca892f96a01a64fc803378be765071cb0c265ee872c7f8683245d14
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.3"
   graphs:
     dependency: transitive
     description:
@@ -1013,6 +949,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.6"
+  sqflite_common_ffi:
+    dependency: "direct dev"
+    description:
+      name: sqflite_common_ffi
+      sha256: c59fcdc143839a77581f7a7c4de018e53682408903a0a0800b95ef2dc4033eff
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.0+2"
   sqflite_darwin:
     dependency: transitive
     description:
@@ -1029,6 +973,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  sqlite3:
+    dependency: transitive
+    description:
+      name: sqlite3
+      sha256: caa693ad15a587a2b4fde093b728131a1827903872171089dedb16f7665d3a91
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
   stack_trace:
     dependency: transitive
     description:
@@ -1157,6 +1109,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  whisper_flutter_new:
+    dependency: "direct main"
+    description:
+      name: whisper_flutter_new
+      sha256: "56f5449cd459ed9bbb9d3641aae6a72ed594e1a200f56b1939891996fbd7dd4d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   win32:
     dependency: transitive
     description:

@@ -8,9 +8,8 @@ import 'package:speechmate/core/app_theme.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:speechmate/screens/auth_screen.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
+import 'package:speechmate/services/database_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +32,29 @@ void main() async {
       debugPrint("Firebase init failed: $e");
   }
 
-  // Initialize Gamification stats
   try {
       await GamificationService.initialize();
   } catch (e) {
       debugPrint("Gamification init failed: $e");
+  }
+
+  try {
+      await DatabaseManager.instance.database;
+      await DatabaseManager.instance.seedExtraFromJson('phrases', 'assets/data/dictionary_phrases.json', (item) => {
+        'english': item['english']?.toString() ?? '',
+        'nicobarese': item['nicobarese']?.toString() ?? '',
+        'text': item['text']?.toString() ?? '',
+      });
+      await DatabaseManager.instance.seedExtraFromJson('dialects', 'assets/data/dictionary_dialects.json', (item) => {
+        'english': item['english']?.toString() ?? '',
+        'car': item['car']?.toString() ?? '',
+        'central': item['central']?.toString() ?? '',
+        'coast': item['coast']?.toString() ?? '',
+        'teressa': item['teressa']?.toString() ?? '',
+        'chowra': item['chowra']?.toString() ?? '',
+      });
+  } catch (e) {
+      debugPrint("Database init failed: $e");
   }
 
   final prefs = await SharedPreferences.getInstance();
@@ -72,13 +89,7 @@ class MyApp extends StatelessWidget {
             ? const Languages()
             : const LanguageSelectionScreen();
 
-    // Avoid using FirebaseAuth if initialization failed.
     Widget targetScreen = internalScreen;
-    try {
-      if (FirebaseAuth.instance.currentUser == null) {
-        targetScreen = AuthScreen(nextScreen: internalScreen);
-      }
-    } catch (_) {}
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

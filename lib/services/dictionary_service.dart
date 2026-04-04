@@ -1,104 +1,41 @@
-import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'logger_service.dart';
+import 'package:speechmate/services/database_manager.dart';
 
 enum DictionaryType { words, phrases, nature, numbers, animals, magic, family, dialects }
 
 class DictionaryService {
-  // Singleton pattern
   static final DictionaryService _instance = DictionaryService._internal();
   factory DictionaryService() => _instance;
   DictionaryService._internal();
 
-  final Map<DictionaryType, List<Map<String, dynamic>>> _dictionaries = {};
-
-  final Map<DictionaryType, String> _paths = {
-    DictionaryType.words: 'assets/data/dictionary.json',
-    DictionaryType.phrases: 'assets/data/dictionary_phrases.json',
-    DictionaryType.animals: 'assets/data/dictionary_animals.json',
-    DictionaryType.magic: 'assets/data/dictionary_magic.json',
-    DictionaryType.family: 'assets/data/dictionary_family.json',
-    DictionaryType.nature: 'assets/data/dictionary.json',
-    DictionaryType.numbers: 'assets/data/dictionary.json',
-    DictionaryType.dialects: 'assets/data/dictionary_dialects.json',
-  };
+  final DatabaseManager _db = DatabaseManager.instance;
 
   Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
-    if (_dictionaries.containsKey(type)) {
-      return _dictionaries[type]!;
-    }
-
-    try {
-      final path = _paths[type];
-      if (path == null) return [];
-
-      final String jsonString = await rootBundle.loadString(path);
-      final List<dynamic> jsonList = json.decode(jsonString);
-      final List<Map<String, dynamic>> items = List<Map<String, dynamic>>.from(jsonList);
-      
-      _dictionaries[type] = items;
-      return items;
-    } catch (e) {
-      LoggerService.error('Failed to load dictionary $type', e);
-      
-      if (type == DictionaryType.words) {
-         LoggerService.warning('Using fallback dictionary for words');
-         final fallback = [
-           {"english": "Teacher", "nicobarese": "Mö-hakööpöti"},
-           {"english": "Student", "nicobarese": "Möhakööp"},
-           {"english": "Water", "nicobarese": "Mak"},
-           {"english": "School", "nicobarese": "Iskul"},
-           {"english": "Good Morning", "nicobarese": "Lööh arōö"},
-           {"english": "Thank You", "nicobarese": "Kīnőng"}
-         ];
-         _dictionaries[type] = fallback;
-         return fallback;
-      }
-      return [];
+    final String category = type.name;
+    
+    if (type == DictionaryType.phrases) {
+      return await _db.queryAll('phrases');
+    } else if (type == DictionaryType.dialects) {
+      return await _db.queryAll('dialects');
+    } else if (type == DictionaryType.words || type == DictionaryType.nature || type == DictionaryType.numbers) {
+      // For general words
+      return await _db.getWordsByCategory('words'); 
+    } else {
+      // animals, magic, family
+      return await _db.getWordsByCategory(category);
     }
   }
 
   Future<void> unload(DictionaryType type) async {
-    _dictionaries.remove(type);
+    // No-op for SQLite, memory is handled by the DB engine
   }
 
   Future<Map<String, dynamic>?> searchWord(String query) async {
-    final words = await loadDictionary(DictionaryType.words);
-    final q = query.trim().toLowerCase();
-    LoggerService.debug('searchWord query', q);
-    
-    if (words.isEmpty) {
-      LoggerService.error('Dictionary is EMPTY! Check if assets are loading');
-      return null;
-    }
-    
-    try {
-      final result = words.firstWhere((w) {
-         return (w['english']?.toString().toLowerCase() == q) ||
-                (w['nicobarese']?.toString().toLowerCase() == q);
-      });
-      LoggerService.debug('Found match for query', q);
-      return result;
-    } catch (e) {
-      LoggerService.debug('No match found for query', q);
-      return null;
-    }
+    return await _db.searchExact(query, 'words', ['english', 'nicobarese']);
   }
 
   Future<Map<String, dynamic>?> searchPhrase(String query) async {
-    final phrases = await loadDictionary(DictionaryType.phrases);
-    final q = query.trim().toLowerCase();
-
-    try {
-      return phrases.firstWhere((p) {
-         return (p['text']?.toString().toLowerCase() == q) || 
-                (p['english']?.toString().toLowerCase() == q);
-      });
-    } catch (e) {
-      return null; 
-    }
+    return await _db.searchExact(query, 'phrases', ['text', 'english']);
   }
 
   Future<List<Map<String, dynamic>>> getAnimalsItems() async {
@@ -118,9 +55,7 @@ class DictionaryService {
 
     final wordResult = await searchWord(query);
     if (wordResult != null) {
-      final isNicobarese =
-          wordResult['nicobarese']?.toString().toLowerCase() == q;
-
+      final isNicobarese = wordResult['nicobarese']?.toString().toLowerCase() == q;
       return {
         ...wordResult,
         '_type': 'words',
@@ -137,23 +72,19 @@ class DictionaryService {
       };
     }
     
-    // Also search in Animals for completeness
+    // Also search in Animals
+    final animals = await getAnimalsItems();
     try {
-      final animals = await getAnimalsItems();
       final animal = animals.firstWhere(
         (e) => (e['text'] ?? e['english']).toString().toLowerCase() == q,
-        orElse: () => <String, dynamic>{},
       );
-      
-      if (animal.isNotEmpty) {
-          return {
-            ...animal,
-            '_type': 'animals',
-            'english': animal['text'] ?? animal['english'] ?? '',
-            'nicobarese': animal['nicobarese'] ?? '',
-            '_searchedNicobarese': false,
-          };
-      }
+      return {
+        ...animal,
+        '_type': 'animals',
+        'english': animal['text'] ?? animal['english'] ?? '',
+        'nicobarese': animal['nicobarese'] ?? '',
+        '_searchedNicobarese': false,
+      };
     } catch (_) {}
 
     return null;
@@ -200,66 +131,39 @@ class DictionaryService {
   }
 
   Future<String?> lookupExact(String word) async {
-    final words = await loadDictionary(DictionaryType.words);
-    if (words.isEmpty) return null;
-    
-    final q = word.trim().toLowerCase();
-    try {
-      final result = words.firstWhere(
-        (w) => (w['english']?.toString().toLowerCase() == q),
-        orElse: () => <String, dynamic>{},
-      );
-      
-      if (result.isNotEmpty) {
-        return result['nicobarese'];
-      }
-      return null;
-    } catch (e) {
-      return null;
+    final result = await searchWord(word);
+    if (result != null) {
+      return result['nicobarese'];
     }
+    return null;
   }
 
   Future<Map<String, dynamic>?> translateSentence(String input) async {
     if (input.trim().isEmpty) return null;
-    
-    if (!_dictionaries.containsKey(DictionaryType.words)) {
-        await loadDictionary(DictionaryType.words);
-    }
-    if (!_dictionaries.containsKey(DictionaryType.phrases)) { 
-        await loadDictionary(DictionaryType.phrases);
-    }
 
     final String query = input.trim().toLowerCase();
     
-    final phrases = _dictionaries[DictionaryType.phrases] ?? [];
-    for (var phrase in phrases) {
-       final eng = (phrase['text'] ?? phrase['english'] ?? '').toString().toLowerCase();
-       if (eng == query) {
-           return {
-               'english': phrase['text'] ?? phrase['english'],
-               'nicobarese': phrase['nicobarese'],
-               '_type': 'phrase',
-               '_isExact': true
-           };
-       }
+    final phraseMatch = await searchPhrase(query);
+    if (phraseMatch != null) {
+      return {
+          'english': phraseMatch['text'] ?? phraseMatch['english'],
+          'nicobarese': phraseMatch['nicobarese'],
+          '_type': 'phrase',
+          '_isExact': true
+      };
     }
 
     final List<String> tokens = input.split(' ');
     List<String> translatedTokens = [];
     bool foundAtLeastOne = false;
 
-    final words = _dictionaries[DictionaryType.words] ?? [];
-    final Map<String, String> wordMap = {};
-    for (var w in words) {
-        wordMap[(w['english'] ?? '').toString().toLowerCase()] = w['nicobarese'] ?? '';
-    }
-
     for (String token in tokens) {
         String cleanToken = token.replaceAll(RegExp(r'[^\w\s]'), '').toLowerCase();
         String punctuation = token.replaceAll(RegExp(r'[\w\s]'), '');
         
-        if (wordMap.containsKey(cleanToken)) {
-            translatedTokens.add(wordMap[cleanToken]! + punctuation);
+        final wordMatch = await searchWord(cleanToken);
+        if (wordMatch != null) {
+            translatedTokens.add((wordMatch['nicobarese'] ?? '') + punctuation);
             foundAtLeastOne = true;
         } else {
             translatedTokens.add(token); 

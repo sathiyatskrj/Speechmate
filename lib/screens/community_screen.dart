@@ -4,7 +4,7 @@ import 'package:speechmate/widgets/background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/community_service.dart';
 import 'package:speechmate/models/community_post.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/progress_service.dart';
 
@@ -25,7 +25,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
   @override
   void initState() {
     super.initState();
-    _currentUid = FirebaseAuth.instance.currentUser?.uid;
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _currentUid = prefs.getString('local_device_id') ?? 'anonymous_device';
+    });
   }
 
   @override

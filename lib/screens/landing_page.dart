@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/widgets/about.dart';
 import 'package:speechmate/widgets/button.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
-import 'package:speechmate/widgets/voice_reactive_aurora.dart';
-import 'package:speechmate/core/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';

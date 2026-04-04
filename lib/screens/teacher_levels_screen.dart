@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../services/progress_service.dart';
 import 'level_learning_screen.dart';
 import '../widgets/background.dart';
-import 'dart:math';
 
 class TeacherLevelsScreen extends StatefulWidget {
   const TeacherLevelsScreen({super.key});

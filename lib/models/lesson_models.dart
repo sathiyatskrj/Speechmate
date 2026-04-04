@@ -38,7 +38,7 @@ class LessonSlide {
 
 // Pre-defined static data for the lessons
 final List<Lesson> interactiveLessons = [
-  Lesson(
+  const Lesson(
     id: 'lesson_animals',
     title: 'Jungle Adventure',
     description: 'Learn about animals of Nicobar!',
@@ -68,7 +68,7 @@ final List<Lesson> interactiveLessons = [
       ),
     ],
   ),
-  Lesson(
+  const Lesson(
     id: 'lesson_nature',
     title: 'Island Colors',
     description: 'The beautiful colors of our island.',

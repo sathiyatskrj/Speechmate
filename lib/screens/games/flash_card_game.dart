@@ -114,7 +114,7 @@ class _FlashCardGameState extends State<FlashCardGame> with SingleTickerProvider
                             decoration: BoxDecoration(
                               color: isBack ? Colors.deepPurpleAccent : Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [const BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 5))],
+                              boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 5))],
                             ),
                             alignment: Alignment.center,
                             child: Column(

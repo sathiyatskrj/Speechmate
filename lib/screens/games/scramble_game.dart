@@ -14,7 +14,7 @@ class _ScrambleGameState extends State<ScrambleGame> {
   
   Map<String, dynamic>? _currentWord;
   List<String> _shuffledLetters = [];
-  List<String> _userAnswer = [];
+  final List<String> _userAnswer = [];
   bool _isLoading = true;
   bool _isCorrect = false;
 
@@ -135,7 +135,7 @@ class _ScrambleGameState extends State<ScrambleGame> {
                         color: Colors.white,
                         border: Border.all(color: Colors.teal),
                         borderRadius: BorderRadius.circular(8),
-                        boxShadow: [const BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+                        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
                       ),
                       alignment: Alignment.center,
                       child: Text(e.value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),

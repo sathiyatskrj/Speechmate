@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:speechmate/services/dictionary_service.dart';
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/screens/flashcard_review_screen.dart';
