@@ -61,17 +61,14 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
     });
   }
 
-  Future<void> _speak(String text) async {
-    if (text.isEmpty || text == '-') return;
-    await _flutterTts.speak(text);
-  }
-
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Dialect Radar - βeta",
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -137,6 +134,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
               ],
             ),
         ),
+      ),
     );
   }
 

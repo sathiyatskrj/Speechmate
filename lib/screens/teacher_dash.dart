@@ -27,6 +27,7 @@ import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/services/whisper_service.dart';
 import 'package:speechmate/services/season_service.dart';
 import 'package:speechmate/services/llm_manager_service.dart';
+import 'package:speechmate/screens/srs_dashboard_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class TeacherDash extends StatefulWidget {

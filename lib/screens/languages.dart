@@ -32,43 +32,6 @@ class _LanguagesState extends State<Languages> {
 
   @override
   Widget build(BuildContext context) {
-  Widget _buildLanguageButton({required String label, required String langCode, required List<Color> colors, required VoidCallback onTap, IconData? icon}) {
-    return Column(
-      children: [
-        TapScale(
-          onTap: onTap,
-          child: Container(
-            width: buttonWidth,
-            height: buttonHeight,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: colors),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: colors.first.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (icon != null) Icon(icon, color: Colors.white, size: 28),
-                Expanded(
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0),
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
-              ],
-            ),
-          ),
-        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
-        const SizedBox(height: 15),
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -143,6 +106,41 @@ class _LanguagesState extends State<Languages> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildLanguageButton({required String label, required String langCode, required List<Color> colors, required VoidCallback onTap, IconData? icon}) {
+    return Column(
+      children: [
+        TapScale(
+          onTap: onTap,
+          child: Container(
+            width: buttonWidth,
+            height: buttonHeight,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: colors),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [BoxShadow(color: colors.first.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (icon != null) Icon(icon, color: Colors.white, size: 28),
+                Expanded(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+              ],
+            ),
+          ),
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
+        const SizedBox(height: 15),
+      ],
     );
   }
 }

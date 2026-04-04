@@ -169,8 +169,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
                      child: Text("Recent Contributions", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 10),
-                  SizedBox(
-                    height: 100,
+                  Expanded(
                     child: ListView.builder(
                       itemCount: _contributions.length,
                       itemBuilder: (context, index) {
@@ -187,6 +186,14 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
                     ),
                   )
                 ]
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildRecordingView() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -357,17 +364,17 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.diversity_3, color: Colors.cyanAccent, size: 40),
-          SizedBox(width: 15),
+          const Icon(Icons.diversity_3, color: Colors.cyanAccent, size: 40),
+          const SizedBox(width: 15),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(_isElderMode ? "Verify Contributions 🛡️" : "Help Us Grow! 🌱", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
-                Text(_isElderMode ? "Listen to community recordings and verify them for accuracy." : "Record words to train our AI and preserve the Nicobarese language forever.", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                Text(_isElderMode ? "Listen to community recordings and verify them for accuracy." : "Record words to train our AI and preserve the Nicobarese language forever.", style: const TextStyle(color: Colors.white70, fontSize: 12)),
               ],
             ),
           )

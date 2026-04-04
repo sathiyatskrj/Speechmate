@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class Background extends StatelessWidget {
-  final Widget child;
+  final Widget? child;
   final List<Color> colors;
   final EdgeInsetsGeometry? padding;
 
   const Background({
     super.key,
-    required this.child,
+    this.child,
     this.colors = const [],
     this.padding,
   });
@@ -35,7 +35,7 @@ class Background extends StatelessWidget {
           end: Alignment.bottomCenter,
         ),
       ),
-      child: child,
+      child: child ?? const SizedBox.shrink(),
     );
   }
 }
