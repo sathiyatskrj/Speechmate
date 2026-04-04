@@ -21,11 +21,12 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/srs_review_screen.dart';
 import 'package:speechmate/screens/great_andamanese_screen.dart';
-import 'package:speechmate/screens/dialect_comparison_screen.dart';
-import 'package:speechmate/screens/srs_dashboard_screen.dart';
-import 'package:speechmate/screens/audio_first_dashboard.dart';
 import 'package:speechmate/screens/flora_fauna_screen.dart';
 import 'package:speechmate/screens/story_radio_screen.dart';
+import 'package:speechmate/screens/kinship_mapper_screen.dart';
+import 'package:speechmate/screens/dialect_heatmap_screen.dart';
+import 'package:speechmate/screens/memory_palace_screen.dart';
+import 'package:speechmate/services/season_service.dart';
 import 'package:speechmate/core/app_strings.dart';
 
 class StudentDash extends StatefulWidget {
@@ -41,13 +42,21 @@ class _StudentDashState extends State<StudentDash>
   final TtsService ttsService = TtsService();
   bool _showAiAssistant = false;
 
+  final SeasonService _seasonService = SeasonService();
+
   @override
   void initState() {
     super.initState();
+    _initSeason();
     WidgetsBinding.instance.addObserver(this);
     ttsService.init();
     initSearch();
     _seedDynamicData();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _seedDynamicData() async {
@@ -114,9 +123,9 @@ class _StudentDashState extends State<StudentDash>
     {"word": "Great Andamanese", "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GreatAndamaneseScreen(), "icon": Icons.language_rounded},
     {"word": "Nature Hub", "emoji": "🌿", "colors": [Color(0xFF1B5E20), Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
     {"word": "Oral History", "emoji": "📻", "colors": [Color(0xFF3E2723), Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
-    {"word": AppStrings.get('audioFirstDash'), "emoji": "🔊", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const AudioFirstDashboard(), "icon": Icons.volume_up_rounded},
-    {"word": AppStrings.get('dialects'), "emoji": "🌏", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const DialectComparisonScreen(), "icon": Icons.compare_arrows_rounded},
-    {"word": "SRS Analytics", "emoji": "📊", "colors": [Color(0xFF6C63FF), Color(0xFF3F3D56)], "navigateTo": const SRSDashboardScreen(), "icon": Icons.bar_chart_rounded},
+    {"word": "Tuhet (Kinship)", "emoji": "🌳", "colors": [Color(0xFF5D4037), Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
+    {"word": "Island Explorer", "emoji": "🧭", "colors": [Color(0xFF0277BD), Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
+    {"word": "Memory Palace", "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
   ];
 
   @override
@@ -137,6 +146,8 @@ class _StudentDashState extends State<StudentDash>
                       searchController: searchController,
                       onSearch: _onSearch,
                       onClear: _onClear,
+                      seasonName: _seasonService.seasonName,
+                      featuredWord: _seasonService.featuredWord,
                     ),
                     const SizedBox(height: 10),
                     Expanded(
@@ -250,7 +261,15 @@ class _StudentDashState extends State<StudentDash>
           },
           child: Container(
               decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: tile['colors'], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      _seasonService.themeColor,
+                      _seasonService.themeColor.withOpacity(0.8),
+                      Colors.black,
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                       BoxShadow(color: (tile['colors'][0] as Color).withOpacity(0.4), blurRadius: 10, offset: const Offset(0,4))

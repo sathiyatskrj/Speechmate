@@ -22,7 +22,7 @@ class DatabaseManager {
 
     return await openDatabase(
       path,
-      version: 7,
+      version: 8,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: _createIndexes,
@@ -45,9 +45,11 @@ class DatabaseManager {
       await db.execute('CREATE INDEX IF NOT EXISTS idx_ga_dict_english ON ga_dictionary(english)');
       await db.execute('CREATE INDEX IF NOT EXISTS idx_ga_phrases_english ON ga_phrases(english)');
       await db.execute('CREATE INDEX IF NOT EXISTS idx_flora_fauna_category ON flora_fauna(category)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_kinship_key ON kinship(rel_key)');
       
       // Seed mock Indigenous Knowledge data
       await _seedMockKnowledge(db);
+      await _seedKinshipAndSeasons(db);
       debugPrint('[DatabaseManager] Indexes created/verified.');
     } catch (e) {
       debugPrint('[DatabaseManager] Index creation failed: $e');
@@ -150,6 +152,30 @@ class DatabaseManager {
        ''');
        debugPrint('[DatabaseManager] Upgraded to v7 (flora_fauna and stories tables).');
      }
+     if (oldVersion < 8) {
+       const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+       await db.execute('''
+       CREATE TABLE kinship (
+         id $idType,
+         rel_key TEXT,
+         native_term TEXT,
+         english_label TEXT,
+         description TEXT,
+         audio_asset TEXT
+       )
+       ''');
+       await db.execute('''
+       CREATE TABLE seasonal_config (
+         id $idType,
+         season_key TEXT,
+         start_month INTEGER,
+         end_month INTEGER,
+         theme_color TEXT,
+         featured_word TEXT
+       )
+       ''');
+       debugPrint('[DatabaseManager] Upgraded to v8 (kinship and seasonal_config tables).');
+     }
   }
 
   Future _createDB(Database db, int version) async {
@@ -247,6 +273,51 @@ class DatabaseManager {
       timestamp INTEGER
     )
     ''');
+
+    await db.execute('''
+    CREATE TABLE kinship (
+      id $idType,
+      rel_key TEXT,
+      native_term TEXT,
+      english_label TEXT,
+      description TEXT,
+      audio_asset TEXT
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE seasonal_config (
+      id $idType,
+      season_key TEXT,
+      start_month INTEGER,
+      end_month INTEGER,
+      theme_color TEXT,
+      featured_word TEXT
+    )
+    ''');
+  }
+
+  static Future<void> _seedKinshipAndSeasons(Database db) async {
+    final kCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM kinship'));
+    if (kCount == null || kCount == 0) {
+      Batch batch = db.batch();
+      batch.insert('kinship', {'rel_key': 'parent', 'native_term': 'Yom', 'english_label': 'Parent', 'description': 'General term for father or mother.', 'audio_asset': 'assets/audio/yom.mp3'});
+      batch.insert('kinship', {'rel_key': 'child', 'native_term': 'Kun', 'english_label': 'Child', 'description': 'The younger generation.', 'audio_asset': 'assets/audio/kun.mp3'});
+      batch.insert('kinship', {'rel_key': 'elder_sibling', 'native_term': 'Mem', 'english_label': 'Elder Sibling/Relative', 'description': 'Anyone older in the family group or Tuhet.', 'audio_asset': 'assets/audio/mem.mp3'});
+      batch.insert('kinship', {'rel_key': 'younger_sibling', 'native_term': 'Kahem', 'english_label': 'Younger Sibling/Cousin', 'description': 'Anyone younger in the family group.', 'audio_asset': 'assets/audio/kahem.mp3'});
+      batch.insert('kinship', {'rel_key': 'spouse', 'native_term': 'Piha', 'english_label': 'Spouse', 'description': 'Marriage partner.', 'audio_asset': 'assets/audio/piha.mp3'});
+      await batch.commit(noResult: true);
+    }
+
+    final sCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM seasonal_config'));
+    if (sCount == null || sCount == 0) {
+      Batch batch = db.batch();
+      // Cho: Nov (11) to April (4)
+      batch.insert('seasonal_config', {'season_key': 'cho', 'start_month': 11, 'end_month': 4, 'theme_color': '0xFFFFA000', 'featured_word': 'Fishing'});
+      // Hwa: May (5) to Oct (10)
+      batch.insert('seasonal_config', {'season_key': 'hwa', 'start_month': 5, 'end_month': 10, 'theme_color': '0xFF00796B', 'featured_word': 'Planting'});
+      await batch.commit(noResult: true);
+    }
   }
 
   static Future<void> _seedMockKnowledge(Database db) async {

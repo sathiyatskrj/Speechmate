@@ -5,54 +5,91 @@ import 'package:path_provider/path_provider.dart';
 import 'package:whisper_flutter_new/whisper_flutter_new.dart';
 import 'pronunciation_scorer.dart';
 
+enum WhisperModelSize {
+  tiny,
+  base,
+  small,
+}
+
 class WhisperService {
   bool _isProcessing = false;
   bool _isAvailable = false;
   Whisper? _whisper;
+  WhisperModelSize _currentSize = WhisperModelSize.tiny;
+  
+  // Model mapping
+  static const Map<WhisperModelSize, String> _modelFiles = {
+    WhisperModelSize.tiny: 'ggml-tiny.bin',
+    WhisperModelSize.base: 'ggml-base.bin',
+    WhisperModelSize.small: 'ggml-small.bin',
+  };
 
   /// Check if the service is ready
   bool get isAvailable => _isAvailable;
   bool get isProcessing => _isProcessing;
+  WhisperModelSize get currentSize => _currentSize;
 
-  /// Initialize the service by ensuring the model is extracted
+  /// Initialize the service by ensuring the default model is extracted.
+  /// To upgrade to base/small, call [downloadAndSwitchModel].
   Future<bool> initialize({int retryCount = 2}) async {
     for (int attempt = 0; attempt <= retryCount; attempt++) {
       try {
-        final Directory dir = Platform.isAndroid
-            ? await getApplicationSupportDirectory()
-            : await getLibraryDirectory();
-            
-        final String modelPath = '${dir.path}/ggml-tiny.bin';
+        final Directory dir = await getApplicationSupportDirectory();
+        final String modelName = _modelFiles[_currentSize]!;
+        final String modelPath = '${dir.path}/$modelName';
         final File modelFile = File(modelPath);
 
-        // Extract model from assets if it doesn't exist
+        // Extract from assets if it doesn't exist
         if (!modelFile.existsSync()) {
-          debugPrint('[WhisperService] Extracting model (attempt ${attempt + 1})...');
-          final ByteData data = await rootBundle.load('assets/models/ggml-tiny.en.bin');
-          final List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-          await modelFile.writeAsBytes(bytes);
-        } else {
-          debugPrint('[WhisperService] Local model found at $modelPath');
+          final String assetPath = 'assets/models/ggml-${_currentSize.name}.bin';
+          // Note: .en.bin for tiny as per current project spec
+          final String actualAsset = _currentSize == WhisperModelSize.tiny ? 'assets/models/ggml-tiny.en.bin' : assetPath;
+          
+          debugPrint('[WhisperService] Extracting bundled $modelName from $actualAsset...');
+          try {
+            final ByteData data = await rootBundle.load(actualAsset);
+            final List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+            await modelFile.writeAsBytes(bytes);
+          } catch (e) {
+            debugPrint('[WhisperService] Bundle extraction failed for $modelName: $e');
+            // If it's not bundled, we can't initialize this size for now
+            if (_currentSize != WhisperModelSize.tiny) {
+               _isAvailable = false;
+               return false;
+            }
+          }
         }
 
         _whisper = Whisper(
-          model: WhisperModel.tiny,
+          model: _getFlutterModel(_currentSize),
         );
 
         _isAvailable = true;
-        debugPrint('[WhisperService] Initialized successfully.');
+        debugPrint('[WhisperService] Initialized with $_currentSize model.');
         return true;
       } catch (e) {
-        debugPrint('[WhisperService] Init attempt ${attempt + 1} failed: $e');
-        if (attempt == retryCount) {
-          _isAvailable = false;
-          return false;
-        }
-        // Wait before retry
+        debugPrint('[WhisperService] Init failed: $e');
+        if (attempt == retryCount) return false;
         await Future.delayed(const Duration(seconds: 1));
       }
     }
     return false;
+  }
+
+  /// Switch to a high-fidelity model bundled with the APK
+  Future<void> downloadAndSwitchModel(WhisperModelSize newSize) async {
+    debugPrint('[WhisperService] Switching to $newSize model (bundled for now)...');
+    
+    _currentSize = newSize;
+    await initialize();
+  }
+
+  WhisperModel _getFlutterModel(WhisperModelSize size) {
+    switch (size) {
+      case WhisperModelSize.tiny: return WhisperModel.tiny;
+      case WhisperModelSize.base: return WhisperModel.base;
+      case WhisperModelSize.small: return WhisperModel.small;
+    }
   }
 
   /// Transcribe a WAV audio file using the local Whisper model.
@@ -71,7 +108,7 @@ class WhisperService {
     try {
       final TranscribeRequest request = TranscribeRequest(
         audio: audioFilePath,
-        language: "en",
+        language: "auto", // Upgrade: Auto-detect language (supports Multilingual models)
         isTranslate: false,
       );
 

@@ -13,6 +13,8 @@ class SmartDashboardHeader extends StatefulWidget {
   final Function(String query) onSearch;
   final Function() onClear;
   final TextEditingController searchController;
+  final String? seasonName;
+  final String? featuredWord;
 
   const SmartDashboardHeader({
     super.key,
@@ -20,6 +22,8 @@ class SmartDashboardHeader extends StatefulWidget {
     required this.onSearch,
     required this.onClear,
     required this.searchController,
+    this.seasonName,
+    this.featuredWord,
   });
 
   @override
@@ -61,17 +65,27 @@ class _SmartDashboardHeaderState extends State<SmartDashboardHeader> {
                Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
-                   Text(
-                     isTeacher ? "Teacher Panel" : "SpeechMate", 
-                     style: theme.textTheme.displayLarge?.copyWith(fontSize: isTeacher ? 32 : 36)
-                   ),
-                   Text(
-                     "Where language barriers end.", 
-                     style: theme.textTheme.bodyMedium?.copyWith(
-                       color: isTeacher ? AppColors.teacherAccent : Colors.purpleAccent,
-                       fontStyle: FontStyle.italic
-                     )
-                   ),
+                    Text(
+                      isTeacher ? "Teacher Panel" : "SpeechMate", 
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        fontSize: isTeacher ? 32 : 36,
+                        color: widget.seasonName != null ? Colors.white : Colors.white70,
+                      )
+                    ),
+                    if (widget.seasonName != null) ...[
+                      Text(
+                        "${widget.seasonName} • Word: ${widget.featuredWord}",
+                        style: const TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold),
+                      )
+                    ] else ...[
+                      Text(
+                        "Where language barriers end.", 
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isTeacher ? AppColors.teacherAccent : Colors.purpleAccent,
+                          fontStyle: FontStyle.italic
+                        )
+                      ),
+                    ],
                  ],
                ),
                if (isTeacher)

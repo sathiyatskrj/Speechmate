@@ -19,9 +19,13 @@ import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:speechmate/screens/great_andamanese_screen.dart';
 import 'package:speechmate/screens/dialect_comparison_screen.dart';
-import 'package:speechmate/screens/srs_dashboard_screen.dart';
 import 'package:speechmate/screens/flora_fauna_screen.dart';
 import 'package:speechmate/screens/story_radio_screen.dart';
+import 'package:speechmate/screens/kinship_mapper_screen.dart';
+import 'package:speechmate/screens/dialect_heatmap_screen.dart';
+import 'package:speechmate/screens/memory_palace_screen.dart';
+import 'package:speechmate/services/whisper_service.dart';
+import 'package:speechmate/services/season_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class TeacherDash extends StatefulWidget {
@@ -38,14 +42,20 @@ class _TeacherDashState extends State<TeacherDash>
   bool _showAiAssistant = false;
   
   Map<String, dynamic>? _dailyWord;
-
+  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
+    _initSeason();
     _ttsService.init();
     initSearch();
     _loadDailyWord();
+  }
+
+  Future<void> _initSeason() async {
+    await _seasonService.init();
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadDailyWord() async {
@@ -53,14 +63,23 @@ class _TeacherDashState extends State<TeacherDash>
     if (mounted) setState(() => _dailyWord = daily);
   }
 
-
-
   Future<void> _onSearch(String query) async {
     FocusScope.of(context).unfocus();
     await performMixinSearch(query);
   }
 
   void _clearSearch() => clearMixinSearch(_searchController);
+
+  void _showWhisperUpgradeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Whisper Pro"),
+        content: const Text("Upgrade to unlock advanced speech-to-text capabilities."),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Close"))],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -86,6 +105,8 @@ class _TeacherDashState extends State<TeacherDash>
                     searchController: _searchController,
                     onSearch: _onSearch,
                     onClear: _clearSearch,
+                    seasonName: _seasonService.seasonName,
+                    featuredWord: _seasonService.featuredWord,
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -176,6 +197,30 @@ class _TeacherDashState extends State<TeacherDash>
                             icon: Icons.radio_rounded,
                             color: Colors.brown,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoryRadioScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Tuhet Mapper",
+                            icon: Icons.account_tree_rounded,
+                            color: Colors.deepOrange,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KinshipMapperScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Island GIS",
+                            icon: Icons.explore_rounded,
+                            color: Colors.blueGrey,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectHeatmapScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Village Hub",
+                            icon: Icons.map_rounded,
+                            color: Colors.teal,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoryPalaceScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Whisper Pro",
+                            icon: Icons.auto_awesome_rounded,
+                            color: Colors.cyan,
+                            onTap: () => _showWhisperUpgradeDialog(context),
                           ),
                           _buildFeatureCard(context,
                             title: "Dialect Comparison",
