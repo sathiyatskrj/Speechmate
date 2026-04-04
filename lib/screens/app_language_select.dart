@@ -72,6 +72,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                     _buildLanguageButton(context: context, label: "தமிழ் (Tamil)", langCode: "ta", colors: [const Color(0xFF43A047), const Color(0xFFFDD835)]),
                     _buildLanguageButton(context: context, label: "മലയാളം (Malayalam)", langCode: "ml", colors: [const Color(0xFFE53935), const Color(0xFF43A047)]),
                     _buildLanguageButton(context: context, label: "বাংলা (Bengali)", langCode: "bn", colors: [const Color(0xFF00ACC1), const Color(0xFF5E35B1)]),
+                    _buildLanguageButton(context: context, label: "తెలుగు (Telugu)", langCode: "te", colors: [const Color(0xFFFF6F00), const Color(0xFFE91E63)]),
                     const SizedBox(height: 20),
                     const Text(
                       "*UI texts will be updated dynamically in a future update.",

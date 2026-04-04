@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
+import 'package:speechmate/core/app_strings.dart';
 
 class SrsReviewScreen extends StatefulWidget {
   const SrsReviewScreen({super.key});
@@ -76,14 +77,14 @@ class _SrsReviewScreenState extends State<SrsReviewScreen> {
 
     if (_dueCards.isEmpty || _currentIndex >= _dueCards.length) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Daily Review')),
-        body: const Center(
+        appBar: AppBar(title: Text(AppStrings.get('srsTitle'))),
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.check_circle_outline, size: 80, color: Colors.green),
-              SizedBox(height: 16),
-              Text("You're all caught up for today!", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Icon(Icons.check_circle_outline, size: 80, color: Colors.green),
+              const SizedBox(height: 16),
+              Text(AppStrings.get('noCardsToday'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -138,9 +139,9 @@ class _SrsReviewScreenState extends State<SrsReviewScreen> {
                             textAlign: TextAlign.center,
                           )
                         else
-                          const Text(
-                            "Tap to reveal answer",
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          Text(
+                            AppStrings.get('showAnswer'),
+                            style: const TextStyle(fontSize: 18, color: Colors.grey),
                           ),
                       ],
                     ),
@@ -153,10 +154,10 @@ class _SrsReviewScreenState extends State<SrsReviewScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildGradeButton("Again", 0, Colors.redAccent),
-                  _buildGradeButton("Hard", 2, Colors.orangeAccent),
-                  _buildGradeButton("Good", 3, Colors.blueAccent),
-                  _buildGradeButton("Easy", 5, Colors.green),
+                  _buildGradeButton(AppStrings.get('again'), 0, Colors.redAccent),
+                  _buildGradeButton(AppStrings.get('hard'), 2, Colors.orangeAccent),
+                  _buildGradeButton(AppStrings.get('good'), 3, Colors.blueAccent),
+                  _buildGradeButton(AppStrings.get('easy'), 5, Colors.green),
                 ],
               )
             else
@@ -168,7 +169,7 @@ class _SrsReviewScreenState extends State<SrsReviewScreen> {
                   elevation: 4,
                 ),
                 onPressed: _flipCard,
-                child: const Text('Show Answer', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
+                child: Text(AppStrings.get('showAnswer'), style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             const SizedBox(height: 24),
           ],

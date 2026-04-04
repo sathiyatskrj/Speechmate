@@ -3,6 +3,7 @@ import 'package:speechmate/screens/landing_page.dart';
 import 'package:speechmate/screens/mock_language_screen.dart';
 import 'package:speechmate/widgets/background.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
+import 'package:speechmate/core/app_strings.dart';
 
 class Languages extends StatelessWidget {
   const Languages({super.key});
@@ -18,9 +19,9 @@ class Languages extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              "Select a Language to translate/learn",
-              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+            Text(
+              AppStrings.get('selectLanguage'),
+              style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 40),
 

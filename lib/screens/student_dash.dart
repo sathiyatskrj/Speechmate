@@ -20,6 +20,7 @@ import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/srs_review_screen.dart';
+import 'package:speechmate/core/app_strings.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -86,31 +87,24 @@ class _StudentDashState extends State<StudentDash>
   void _onClear() => clearMixinSearch(searchController);
 
 
-  final List<Map<String, dynamic>> learningTiles = [
-    // [NEW] Daily Review (SRS)
-    {"word": "Daily Review", "emoji": "🧠", "colors": [Color(0xFF00C9FF), Color(0xFF92FE9D)], "navigateTo": const SrsReviewScreen(), "icon": Icons.psychology_rounded},
-    
-    // [NEW] Interactive Lessons (Child-Friendly)
-    {"word": "Jungle Adventure", "emoji": "🦁", "colors": [Color(0xFFFF9966), Color(0xFFFF5E62)], "navigateTo": LessonScreen(lesson: interactiveLessons[0]), "icon": Icons.terrain_rounded},
-    {"word": "Island Colors", "emoji": "🏝️", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": LessonScreen(lesson: interactiveLessons[1]), "icon": Icons.beach_access_rounded},
-
-    {"word": "Numbers", "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers', bgColors: [Color(0xFF6A11CB), Color(0xFF2575FC)]), "icon": Icons.format_list_numbered_rounded},
-    {"word": "Nature", "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature', bgColors: [Color(0xFF11998E), Color(0xFF38EF7D)]), "icon": Icons.eco_rounded},
-    {"word": "Feelings", "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings', bgColors: [Color(0xFFFF512F), Color(0xFFDD2476)]), "icon": Icons.emoji_emotions_rounded},
-    {"word": "Colors", "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors', bgColors: [Color(0xFFff9a9e), Color(0xFFfad0c4)]), "icon": Icons.palette_rounded},
-    {"word": "Things", "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things', bgColors: [Color(0xFFa18cd1), Color(0xFFfbc2eb)]), "icon": Icons.chair_rounded},
-    {"word": "Body Parts", "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const DynamicCategoryScreen(categoryId: 'body_parts', title: 'Body Parts', bgColors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)]), "icon": Icons.accessibility_new_rounded},
-    {"word": "Games", "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
-    {"word": "Animals", "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals', bgColors: [Color(0xFFFF8008), Color(0xFFFFC837)]), "icon": Icons.pets_rounded},
-    {"word": "Magic Words", "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words', bgColors: [Color(0xFFCC2B5E), Color(0xFF753A88)]), "icon": Icons.auto_fix_high_rounded},
-    {"word": "Family", "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family', bgColors: [Color(0xFF2193B0), Color(0xFF6DD5ED)]), "icon": Icons.family_restroom_rounded},
- 
-    {"word": "Voice Vault", "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
-    {"word": "Beta Chat", "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
-    {"word": "Community", "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
-    
-    // [NEW] Feedback Tile
-    {"word": "Feedback", "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
+  List<Map<String, dynamic>> get learningTiles => [
+    {"word": AppStrings.get('dailyReview'), "emoji": "🧠", "colors": [Color(0xFF00C9FF), Color(0xFF92FE9D)], "navigateTo": const SrsReviewScreen(), "icon": Icons.psychology_rounded},
+    {"word": AppStrings.get('jungleAdventure'), "emoji": "🦁", "colors": [Color(0xFFFF9966), Color(0xFFFF5E62)], "navigateTo": LessonScreen(lesson: interactiveLessons[0]), "icon": Icons.terrain_rounded},
+    {"word": AppStrings.get('islandColors'), "emoji": "🏝️", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": LessonScreen(lesson: interactiveLessons[1]), "icon": Icons.beach_access_rounded},
+    {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers', bgColors: [Color(0xFF6A11CB), Color(0xFF2575FC)]), "icon": Icons.format_list_numbered_rounded},
+    {"word": AppStrings.get('nature'), "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature', bgColors: [Color(0xFF11998E), Color(0xFF38EF7D)]), "icon": Icons.eco_rounded},
+    {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings', bgColors: [Color(0xFFFF512F), Color(0xFFDD2476)]), "icon": Icons.emoji_emotions_rounded},
+    {"word": AppStrings.get('colors'), "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors', bgColors: [Color(0xFFff9a9e), Color(0xFFfad0c4)]), "icon": Icons.palette_rounded},
+    {"word": AppStrings.get('things'), "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things', bgColors: [Color(0xFFa18cd1), Color(0xFFfbc2eb)]), "icon": Icons.chair_rounded},
+    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const DynamicCategoryScreen(categoryId: 'body_parts', title: 'Body Parts', bgColors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)]), "icon": Icons.accessibility_new_rounded},
+    {"word": AppStrings.get('games'), "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
+    {"word": AppStrings.get('animals'), "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals', bgColors: [Color(0xFFFF8008), Color(0xFFFFC837)]), "icon": Icons.pets_rounded},
+    {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words', bgColors: [Color(0xFFCC2B5E), Color(0xFF753A88)]), "icon": Icons.auto_fix_high_rounded},
+    {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family', bgColors: [Color(0xFF2193B0), Color(0xFF6DD5ED)]), "icon": Icons.family_restroom_rounded},
+    {"word": AppStrings.get('voiceVault'), "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
+    {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
+    {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
+    {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
   ];
 
   @override

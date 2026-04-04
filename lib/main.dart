@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/core/app_strings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,6 +59,7 @@ void main() async {
   }
 
   final prefs = await SharedPreferences.getInstance();
+  await AppStrings.load();
   final languageSelected = prefs.getBool('language_selected') ?? false;
   final isTeacher = prefs.getBool('is_teacher') ?? false;
   final hasSeenSplash = prefs.getBool('has_seen_splash') ?? false;

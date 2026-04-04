@@ -7,6 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/screens/student_dash.dart';
 import 'package:speechmate/screens/teacher_dash.dart';
+import 'package:speechmate/core/app_strings.dart';
 
 import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/widgets/exit_feedback_dialog.dart';
@@ -110,7 +111,7 @@ class _LandingPageState extends State<LandingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "SpeechMate",
+                                  AppStrings.get('appName'),
                                   style: GoogleFonts.outfit(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
@@ -123,7 +124,7 @@ class _LandingPageState extends State<LandingPage> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "Where Language Barriers End",
+                                  AppStrings.get('tagline'),
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -151,7 +152,7 @@ class _LandingPageState extends State<LandingPage> {
                          children: [
                             // User focused prompt
                             Text(
-                              "You are:",
+                              AppStrings.get('youAre'),
                               style: GoogleFonts.outfit(
                                  fontSize: 24, 
                                  fontWeight: FontWeight.w600, 
@@ -169,13 +170,13 @@ class _LandingPageState extends State<LandingPage> {
                                 runSpacing: 20,
                                 children: [
                                      _buildRoleCard(
-                                         title: "Student",
+                                         title: AppStrings.get('student'),
                                          emoji: "🙋🏻‍♂️",
                                          id: "student",
                                          color: Colors.pinkAccent,
                                      ),
                                      _buildRoleCard(
-                                         title: "Teacher",
+                                         title: AppStrings.get('teacher'),
                                          emoji: "👨🏻‍🏫",
                                          id: "teacher",
                                          color: Colors.blueAccent,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../services/progress_service.dart';
 import '../widgets/background.dart';
+import 'package:speechmate/core/app_strings.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -46,7 +47,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Your Progress"),
+        title: Text(AppStrings.get('yourProgress')),
         backgroundColor: const Color(0xFF38BDF8),
         elevation: 0,
       ),
@@ -59,7 +60,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 children: [
                   _buildStatCard(
                     icon: Icons.search,
-                    title: "Total Searches",
+                    title: AppStrings.get('totalSearches'),
                     value: searchCount.toString(),
                     color: Colors.blue,
                   ),
@@ -67,15 +68,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   
                   _buildStatCard(
                     icon: Icons.local_fire_department,
-                    title: "Current Streak",
-                    value: "$streak days",
+                    title: AppStrings.get('currentStreak'),
+                    value: "$streak ${AppStrings.get('days')}",
                     color: Colors.orange,
                   ),
                   const SizedBox(height: 16),
                   
                   _buildStatCard(
                     icon: Icons.school,
-                    title: "Words Learned",
+                    title: AppStrings.get('wordsLearned'),
                     value: wordsLearned.toString(),
                     color: Colors.green,
                   ),

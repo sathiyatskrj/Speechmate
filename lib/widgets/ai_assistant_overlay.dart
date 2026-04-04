@@ -5,6 +5,7 @@ import 'package:speechmate/services/whisper_service.dart';
 import 'package:speechmate/services/neural_engine_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speechmate/core/app_strings.dart';
 
 class AiAssistantOverlay extends StatefulWidget {
   final VoidCallback onClose;
@@ -89,7 +90,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
 
       setState(() {
         _isListening = true;
-        _currentText = "Recording audio... (Offline)";
+        _currentText = AppStrings.get('recordingAudio');
         _resultText = "";
         _isProcessing = false;
       });
@@ -100,7 +101,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
     setState(() {
       _isListening = false;
       _isProcessing = true;
-      _currentText = "Transcribing with Whisper AI...";
+      _currentText = AppStrings.get('transcribingWhisper');
     });
 
     await _audioRecorder.stop();
@@ -207,7 +208,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> with SingleTick
                     child: Column(
                       children: [
                         Text(
-                          _currentText.isNotEmpty ? _currentText : "Tap mic to record",
+                          _currentText.isNotEmpty ? _currentText : AppStrings.get('tapMicToRecord'),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.8),
