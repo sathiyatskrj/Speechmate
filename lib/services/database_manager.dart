@@ -22,7 +22,7 @@ class DatabaseManager {
 
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: _createIndexes,
@@ -44,6 +44,10 @@ class DatabaseManager {
       await db.execute('CREATE INDEX IF NOT EXISTS idx_dialects_english ON dialects(english)');
       await db.execute('CREATE INDEX IF NOT EXISTS idx_ga_dict_english ON ga_dictionary(english)');
       await db.execute('CREATE INDEX IF NOT EXISTS idx_ga_phrases_english ON ga_phrases(english)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_flora_fauna_category ON flora_fauna(category)');
+      
+      // Seed mock Indigenous Knowledge data
+      await _seedMockKnowledge(db);
       debugPrint('[DatabaseManager] Indexes created/verified.');
     } catch (e) {
       debugPrint('[DatabaseManager] Index creation failed: $e');
@@ -120,6 +124,32 @@ class DatabaseManager {
        }
        debugPrint('[DatabaseManager] Upgraded to v6 (target_language column).');
      }
+     if (oldVersion < 7) {
+       const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
+       await db.execute('''
+       CREATE TABLE flora_fauna (
+         id $idType,
+         category TEXT,
+         native_name TEXT,
+         english_name TEXT,
+         scientific_name TEXT,
+         traditional_use TEXT,
+         image_asset TEXT,
+         audio_asset TEXT
+       )
+       ''');
+       await db.execute('''
+       CREATE TABLE stories (
+         id $idType,
+         title TEXT,
+         storyteller TEXT,
+         audio_path TEXT,
+         duration_seconds INTEGER,
+         timestamp INTEGER
+       )
+       ''');
+       debugPrint('[DatabaseManager] Upgraded to v7 (flora_fauna and stories tables).');
+     }
   }
 
   Future _createDB(Database db, int version) async {
@@ -193,6 +223,66 @@ class DatabaseManager {
       audio TEXT
     )
     ''');
+
+    await db.execute('''
+    CREATE TABLE flora_fauna (
+      id $idType,
+      category TEXT,
+      native_name TEXT,
+      english_name TEXT,
+      scientific_name TEXT,
+      traditional_use TEXT,
+      image_asset TEXT,
+      audio_asset TEXT
+    )
+    ''');
+    
+    await db.execute('''
+    CREATE TABLE stories (
+      id $idType,
+      title TEXT,
+      storyteller TEXT,
+      audio_path TEXT,
+      duration_seconds INTEGER,
+      timestamp INTEGER
+    )
+    ''');
+  }
+
+  static Future<void> _seedMockKnowledge(Database db) async {
+    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM flora_fauna'));
+    if (count != null && count > 0) return;
+
+    Batch batch = db.batch();
+    batch.insert('flora_fauna', {
+      'category': 'Birds',
+      'native_name': 'Hiyup',
+      'english_name': 'Nicobar Pigeon',
+      'scientific_name': 'Caloenas nicobarica',
+      'traditional_use': 'Culturally significant to the islands. Known for its iridescent feathers. Often featured in folklore.',
+      'image_asset': 'assets/images/nicobar_pigeon.png',
+      'audio_asset': 'assets/audio/hiyup.mp3',
+    });
+    batch.insert('flora_fauna', {
+      'category': 'Plants',
+      'native_name': 'Hòm',
+      'english_name': 'Pandanus',
+      'scientific_name': 'Pandanus odoratifer',
+      'traditional_use': 'A staple food source. The fruit paste is extracted and preserved. Leaves are woven into mats and baskets.',
+      'image_asset': 'assets/images/pandanus.png',
+      'audio_asset': 'assets/audio/hom.mp3',
+    });
+    batch.insert('flora_fauna', {
+      'category': 'Marine Life',
+      'native_name': 'Kapuh',
+      'english_name': 'Dugong',
+      'scientific_name': 'Dugong dugon',
+      'traditional_use': 'State animal of Andaman and Nicobar. Represents the health of seagrass meadows.',
+      'image_asset': 'assets/images/dugong.png',
+      'audio_asset': 'assets/audio/kapuh.mp3',
+    });
+    await batch.commit(noResult: true);
+    debugPrint('[DatabaseManager] Seeded mock flora_fauna data.');
   }
 
   Future<void> seedExtraFromJson(String table, String path, Map<String, dynamic> Function(dynamic) mapper) async {

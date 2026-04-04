@@ -24,6 +24,8 @@ import 'package:speechmate/screens/great_andamanese_screen.dart';
 import 'package:speechmate/screens/dialect_comparison_screen.dart';
 import 'package:speechmate/screens/srs_dashboard_screen.dart';
 import 'package:speechmate/screens/audio_first_dashboard.dart';
+import 'package:speechmate/screens/flora_fauna_screen.dart';
+import 'package:speechmate/screens/story_radio_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 
 class StudentDash extends StatefulWidget {
@@ -110,6 +112,8 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
     {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
     {"word": "Great Andamanese", "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GreatAndamaneseScreen(), "icon": Icons.language_rounded},
+    {"word": "Nature Hub", "emoji": "🌿", "colors": [Color(0xFF1B5E20), Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
+    {"word": "Oral History", "emoji": "📻", "colors": [Color(0xFF3E2723), Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
     {"word": AppStrings.get('audioFirstDash'), "emoji": "🔊", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const AudioFirstDashboard(), "icon": Icons.volume_up_rounded},
     {"word": AppStrings.get('dialects'), "emoji": "🌏", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const DialectComparisonScreen(), "icon": Icons.compare_arrows_rounded},
     {"word": "SRS Analytics", "emoji": "📊", "colors": [Color(0xFF6C63FF), Color(0xFF3F3D56)], "navigateTo": const SRSDashboardScreen(), "icon": Icons.bar_chart_rounded},

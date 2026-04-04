@@ -20,6 +20,8 @@ import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:speechmate/screens/great_andamanese_screen.dart';
 import 'package:speechmate/screens/dialect_comparison_screen.dart';
 import 'package:speechmate/screens/srs_dashboard_screen.dart';
+import 'package:speechmate/screens/flora_fauna_screen.dart';
+import 'package:speechmate/screens/story_radio_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class TeacherDash extends StatefulWidget {
@@ -162,6 +164,18 @@ class _TeacherDashState extends State<TeacherDash>
                             icon: Icons.language_rounded,
                             color: Colors.deepPurpleAccent,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Nature Hub",
+                            icon: Icons.eco_rounded,
+                            color: Colors.green,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FloraFaunaScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Oral History",
+                            icon: Icons.radio_rounded,
+                            color: Colors.brown,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoryRadioScreen())),
                           ),
                           _buildFeatureCard(context,
                             title: "Dialect Comparison",
