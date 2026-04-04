@@ -87,6 +87,18 @@ class DictionaryService {
       };
     } catch (_) {}
 
+    // Also search Great Andamanese dictionary
+    final gaResults = await _db.searchGADictionary(query);
+    if (gaResults.isNotEmpty) {
+      final ga = gaResults.first;
+      return {
+        'english': ga['english'] ?? '',
+        'nicobarese': ga['great_andamanese'] ?? '',
+        '_type': 'great_andamanese',
+        '_searchedNicobarese': false,
+      };
+    }
+
     return null;
   }
 

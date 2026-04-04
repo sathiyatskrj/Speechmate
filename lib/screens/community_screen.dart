@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:speechmate/widgets/background.dart';
@@ -7,6 +8,7 @@ import 'package:speechmate/models/community_post.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/progress_service.dart';
+import 'package:crypto/crypto.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -432,7 +434,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
                   ElevatedButton(
                       onPressed: () {
-                          if (userController.text.trim() == "Admin" && passController.text.trim() == "speechmate2026") {
+                          // SHA-256 hashed credentials — no plaintext in source
+                          final userHash = sha256.convert(utf8.encode(userController.text.trim())).toString();
+                          final passHash = sha256.convert(utf8.encode(passController.text.trim())).toString();
+                          const expectedUserHash = 'c1c224b03cd9bc7b6a86d77f5dace40191766c485cd55dc48caf9ac873335d6f';
+                          const expectedPassHash = '4bd1f55a7f13a2db3c7884164ae85adf727cc461396298199b8641981c218e88';
+                          if (userHash == expectedUserHash && passHash == expectedPassHash) {
                               Navigator.pop(context);
                               setState(() => _isAdmin = true);
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Welcome, Admin! Regulation Mode Active.")));

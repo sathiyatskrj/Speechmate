@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:speechmate/services/dictionary_service.dart';
+import 'package:speechmate/services/database_manager.dart';
 
 // The "Offline Brain" of SpeechMate
 // Uses Symbolic AI + Fuzzy Logic instead of huge neural networks
@@ -87,6 +88,16 @@ class NeuralEngineService {
         translatedTokens.add(translation + punctuation);
         confidenceAccumulator += 1.0;
       } else {
+         // 5. Great Andamanese fallback
+         final gaResults = await DatabaseManager.instance.searchGADictionary(cleanToken);
+         if (gaResults.isNotEmpty) {
+           translation = gaResults.first['great_andamanese']?.toString();
+           if (translation != null) {
+             translatedTokens.add(translation + punctuation);
+             confidenceAccumulator += 0.9;
+             continue;
+           }
+         }
          // Keep original word (e.g. Names)
          translatedTokens.add(token);
          confidenceAccumulator += 0.2; 

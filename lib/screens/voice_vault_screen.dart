@@ -73,7 +73,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
         _recordedPath = path;
       });
     } catch (e) {
-       print(e);
+       debugPrint('[VoiceVault] Recording stop error: $e');
     }
   }
 

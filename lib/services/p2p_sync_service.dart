@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -40,7 +41,7 @@ class P2PSyncService {
        final filePath = await generateDictionaryPayload();
        await Share.shareXFiles([XFile(filePath)], subject: 'SpeechMate Dictionary Update', text: 'Apply this dictionary update via SpeechMate Import tool.');
     } catch (e) {
-       print("Error exporting payload: $e");
+       debugPrint("Error exporting payload: $e");
     }
   }
 

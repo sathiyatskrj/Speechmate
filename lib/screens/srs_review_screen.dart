@@ -92,10 +92,12 @@ class _SrsReviewScreenState extends State<SrsReviewScreen> {
     }
 
     final card = _dueCards[_currentIndex];
+    final targetLang = (card['target_language'] ?? 'nicobarese').toString();
+    final langLabel = targetLang == 'great_andamanese' ? 'Great Andamanese' : 'Nicobarese';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Review (${_currentIndex + 1}/${_dueCards.length})'),
+        title: Text('Review (${_currentIndex + 1}/${_dueCards.length}) — $langLabel'),
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black87,

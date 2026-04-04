@@ -1,4 +1,5 @@
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 
 class SpeechService {
@@ -13,8 +14,8 @@ class SpeechService {
   /// Initialize the speech engine. Returns true if successful.
   Future<bool> init() async {
     _isAvailable = await _speech.initialize(
-      onStatus: (status) => print('STT Status: $status'),
-      onError: (error) => print('STT Error: $error'),
+      onStatus: (status) => debugPrint('STT Status: $status'),
+      onError: (error) => debugPrint('STT Error: $error'),
       debugLogging: true,
     );
     return _isAvailable;

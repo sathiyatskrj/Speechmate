@@ -22,7 +22,7 @@ class DatabaseManager {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: _createIndexes,
@@ -42,6 +42,8 @@ class DatabaseManager {
       await db.execute('CREATE INDEX IF NOT EXISTS idx_flashcards_review ON flashcards(next_review_date)');
       await db.execute('CREATE INDEX IF NOT EXISTS idx_phrases_english ON phrases(english)');
       await db.execute('CREATE INDEX IF NOT EXISTS idx_dialects_english ON dialects(english)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_ga_dict_english ON ga_dictionary(english)');
+      await db.execute('CREATE INDEX IF NOT EXISTS idx_ga_phrases_english ON ga_phrases(english)');
       debugPrint('[DatabaseManager] Indexes created/verified.');
     } catch (e) {
       debugPrint('[DatabaseManager] Index creation failed: $e');
@@ -110,6 +112,14 @@ class DatabaseManager {
        ''');
        debugPrint('[DatabaseManager] Upgraded to v5 (Great Andamanese tables).');
      }
+     if (oldVersion < 6) {
+       try {
+         await db.execute('ALTER TABLE flashcards ADD COLUMN target_language TEXT DEFAULT \'nicobarese\'');
+       } catch (_) {
+         // Column may already exist
+       }
+       debugPrint('[DatabaseManager] Upgraded to v6 (target_language column).');
+     }
   }
 
   Future _createDB(Database db, int version) async {
@@ -127,7 +137,8 @@ class DatabaseManager {
       interval $intType,
       repetition $intType,
       ease_factor $numType,
-      next_review_date $intType
+      next_review_date $intType,
+      target_language TEXT DEFAULT 'nicobarese'
     )
     ''');
     
@@ -295,6 +306,7 @@ class DatabaseManager {
       'repetition': 0,
       'ease_factor': 2.5,
       'next_review_date': DateTime.now().millisecondsSinceEpoch,
+      'target_language': 'nicobarese',
     });
   }
 
@@ -433,11 +445,12 @@ class DatabaseManager {
     await db.insert('flashcards', {
       'word_id': wordId,
       'english': english,
-      'nicobarese': greatAndamanese, // Reusing column for GA translation
+      'nicobarese': greatAndamanese, // Stores translation in nicobarese column for backward compat
       'interval': 0,
       'repetition': 0,
       'ease_factor': 2.5,
       'next_review_date': DateTime.now().millisecondsSinceEpoch,
+      'target_language': 'great_andamanese',
     });
   }
 }

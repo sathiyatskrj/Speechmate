@@ -18,6 +18,8 @@ import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:speechmate/screens/great_andamanese_screen.dart';
+import 'package:speechmate/screens/dialect_comparison_screen.dart';
+import 'package:speechmate/screens/srs_dashboard_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class TeacherDash extends StatefulWidget {
@@ -161,6 +163,18 @@ class _TeacherDashState extends State<TeacherDash>
                             color: Colors.deepPurpleAccent,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())),
                           ),
+                          _buildFeatureCard(context,
+                            title: "Dialect Comparison",
+                            icon: Icons.compare_arrows_rounded,
+                            color: Colors.green,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "SRS Analytics",
+                            icon: Icons.bar_chart_rounded,
+                            color: Colors.deepPurple,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SRSDashboardScreen())),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -199,6 +213,12 @@ class _TeacherDashState extends State<TeacherDash>
                             icon: Icons.picture_as_pdf_outlined,
                             color: Colors.deepOrangeAccent,
                             onTap: () async => await ReportGenerator.generateAndPrintReport("Student"),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Import Vocab",
+                            icon: Icons.download_rounded,
+                            color: Colors.cyan,
+                            onTap: () => _showImportDialog(),
                           ),
                         ],
                       ),
@@ -339,6 +359,67 @@ class _TeacherDashState extends State<TeacherDash>
             Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showImportDialog() {
+    final TextEditingController pathController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Import Vocabulary 📥"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Enter the path to the SpeechMate dictionary update (.zip) file:",
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: pathController,
+              decoration: const InputDecoration(
+                hintText: "/storage/emulated/0/Download/speechmate_update.zip",
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.folder_open),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton.icon(
+            onPressed: () async {
+              final path = pathController.text.trim();
+              if (path.isEmpty) return;
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Importing vocabulary...")),
+              );
+              try {
+                await P2PSyncService.importDictionaryPayload(path);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("✅ Vocabulary imported successfully!")),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("❌ Import failed: $e")),
+                  );
+                }
+              }
+            },
+            icon: const Icon(Icons.download_done),
+            label: const Text("Import"),
+          ),
+        ],
       ),
     );
   }
