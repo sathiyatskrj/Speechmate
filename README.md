@@ -53,12 +53,12 @@
 
 | Feature | What It Does | Underlying Tech |
 | :--- | :--- | :--- |
-| **🎙️ Voice Search (Edge AI)** | Instantly translates spoken English to Nicobarese. | **On-Device Whisper (C++ Integration)** |
-| **📖 Instant Dictionary** | Rapid offline lookup for thousands of words. | **Optimized JSON indexing** |
-| **🏫 Teacher Dashboard** | Professional admin panel to track progress and view resources. | **Role-Based State Management** |
-| **👧 Student Gamification** | Interactive "Gamified" learning with animations and quizzes. | **Flutter Animate** |
-| **⚡ Offline-First** | Works completely without internet in deep forests/islands. | **Local Assets & Embedded Models** |
-| **🤝 Community Hub** | Preserves folklore, songs, and cultural stories. | **Local Data Archive** |
+| **🎙️ True Offline AI** | Translates spoken English using an on-device native C++ model. | **whisper_flutter_new wrapper** |
+| **📖 Instant Dictionary** | Rapid offline lookup for thousands of words via indexed arrays. | **SQLite Pre-Seeded Database** |
+| **🧠 Spaced Repetition** | SM-2 native scheduling intervals (Again, Hard, Good, Easy) for dynamic learning. | **SRS Engine** |
+| **🏫 Teacher Dashboard** | Professional admin panel to output localized metrics and PDF analytics. | **Progress Analytics** |
+| **⚡ V2 Scalability** | Operates strictly offline in deep canopy environment with local ID mapping (No Firebase required). | **SharedPreferences / Local Mapping** |
+| **🤝 Community Hub** | Preserves folklore, songs, and cultural stories locally. | **Offline Data Archive** |
 
 ---
 
@@ -101,23 +101,22 @@ SpeechMate uses a **Hybrid Architecture** combining Flutter for UI and Native C+
 
 ```mermaid
 graph TD
-    User([User Voice/Text]) --> UI[Flutter UI Layer]
-    UI --> Service[Service Layer]
+    User([User Audio/Text]) --> UI[Flutter UI Layer]
+    UI --> Service[Service Framework]
     
-    subgraph "Native Intelligence Layer (C++)"
-        Service --> |MethodChannel| Bridge[JNI Bridge]
-        Bridge --> Whisper[LibWhisper.cpp]
-        Whisper --> Model[GGML Tiny Model]
+    subgraph "Native C++ Intelligence"
+        Service --> |whisper_flutter_new| Whisper[Whisper V2 Engine]
+        Whisper --> Model[Extracted ggml-tiny Model]
     end
     
-    subgraph "Core Data (Dart)"
-        Service --> DictService[Dictionary Service]
-        DictService --> JSON[Local JSON Data]
-        Service --> TTS[Text-to-Speech]
+    subgraph "Relational Data Structure"
+        Service --> DB[Database Manager]
+        DB --> SQLite[(SQLite DB)]
+        SQLite --> dictionary, scores, spaced_repetition
     end
     
-    Whisper --> |Text Output| UI
-    DictService --> |Translation| UI
+    Whisper --> |Assembled Text| UI
+    DB --> |Indexed Lookup| UI
 ```
 
 ### 🧠 Why Edge AI?
