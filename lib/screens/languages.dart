@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/screens/landing_page.dart';
+import 'package:speechmate/screens/mock_language_screen.dart';
 import 'package:speechmate/widgets/background.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 
@@ -55,50 +56,54 @@ class Languages extends StatelessWidget {
             const SizedBox(height: 20),
 
             /// MORE BUTTON (DISABLED)
-            Container(
-              width: buttonWidth,
-              height: buttonHeight,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromARGB(133, 233, 30, 98),
-                    Color.fromARGB(123, 255, 111, 0),
-                  ],
+            /// ONGES BUTTON
+            TapScale(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MockLanguageScreen(languageName: "Onges")),
+                );
+              },
+              child: Container(
+                width: buttonWidth,
+                height: buttonHeight,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF8E24AA), Color(0xFF1E88E5)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Text(
-                "Onges*",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                child: const Text(
+                  "Onges",
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            Container(
-              width: buttonWidth,
-              height: buttonHeight,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [
-                    Color.fromARGB(133, 233, 30, 98),
-                    Color.fromARGB(123, 255, 111, 0),
-                  ],
+            /// GREAT ANDAMANESE BUTTON
+            TapScale(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MockLanguageScreen(languageName: "Great Andamanese")),
+                );
+              },
+              child: Container(
+                width: buttonWidth,
+                height: buttonHeight,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF43A047), Color(0xFFFDD835)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Text(
-                "MORE*",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                child: const Text(
+                  "Great Andamanese",
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
