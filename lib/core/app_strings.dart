@@ -28,6 +28,8 @@ class AppStrings {
     'ml': _ml,
     'bn': _bn,
     'te': _te,
+    'gn': _gn,
+    'nc': _nc,
   };
 
   // ═══════════════════════════════════════════════
@@ -417,5 +419,63 @@ class AppStrings {
     'showAnswer': 'సమాధానం చూపించు',
     'goBack': 'వెనక్కి వెళ్ళు',
     'days': 'రోజులు',
+  };
+
+  // ═══════════════════════════════════════════════
+  // GREAT ANDAMANESE (gn)
+  // ═══════════════════════════════════════════════
+  static final Map<String, String> _gn = {
+    'appName': 'Speecho', // Placeholders until native community consensus
+    'tagline': 'Julu boi-jio',
+    'youAre': 'Ngiyo:',
+    'student': 'Utire',
+    'teacher': 'Oko-jumu',
+    'continueBtn': 'Kato',
+    'guest': 'Ep',
+    'selectLanguage': 'Julu aka',
+    'selectAppLanguage': 'Aka-julu yop',
+    'dailyReview': 'Tare-tare',
+    'jungleAdventure': 'Erem-toro',
+    'islandColors': 'Tobo-chiro',
+    'community': 'Oko-tolo',
+    'voiceVault': 'Puchh-toro',
+    'search': 'Koyo',
+    'quiz': 'Boi-toro',
+    'yourProgress': 'Ngiyo kolo',
+    'tapMicToRecord': 'Mic e-koyo',
+    'recordingAudio': 'Puchh...',
+    'srsTitle': 'Tare',
+    'showAnswer': 'E-koyo',
+    'goBack': 'Tech-chi',
+    'audioFirstDash': 'Puchh-Julu', // Audio-First Mode
+  };
+
+  // ═══════════════════════════════════════════════
+  // NICOBARESE - CAR (nc)
+  // ═══════════════════════════════════════════════
+  static final Map<String, String> _nc = {
+    'appName': 'SpeechMate',
+    'tagline': 'Rinön pö yök',
+    'youAre': 'Cö:',
+    'student': 'Kunö',
+    'teacher': 'Ukuvöt',
+    'continueBtn': 'Lökh',
+    'guest': 'Kamyō',
+    'selectLanguage': 'Hol yök',
+    'selectAppLanguage': 'Hol yök app',
+    'dailyReview': 'Inrē lūm',
+    'jungleAdventure': 'Tōt',
+    'islandColors': 'Pū-cö',
+    'community': 'In-yū',
+    'voiceVault': 'Ngō-in',
+    'search': 'Hol',
+    'quiz': 'U-in',
+    'yourProgress': 'Cö lūm',
+    'tapMicToRecord': 'Mic tōt',
+    'recordingAudio': 'Ngō...',
+    'srsTitle': 'Lūm',
+    'showAnswer': 'Yök in',
+    'goBack': 'Hol back',
+    'audioFirstDash': 'Ngō-Inrē', // Audio-First Mode
   };
 }

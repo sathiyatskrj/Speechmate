@@ -23,6 +23,14 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
   
   // Contribution list
   List<String> _contributions = [];
+  bool _isElderMode = false;
+  
+  // Dummy pending recordings for Elder Verification
+  final List<String> _pendingReviews = [
+    "Recording: Tōt (Jungle)",
+    "Recording: Pū-cö (Island)",
+    "Recording: Kunö (Student)"
+  ];
 
   @override
   void initState() {
@@ -144,118 +152,200 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
+                _buildModeToggle(),
+                const SizedBox(height: 20),
                 _buildHeaderCard(),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
                 
-                // Recording Area
+                // Dynamic Area
                 Expanded(
-                  child: Column(
+                  child: _isElderMode ? _buildElderVerificationView() : _buildRecordingView(),
+                ),
+                
+                if (!_isElderMode) ...[
+                  const SizedBox(height: 20),
+                  const Align(
+                     alignment: Alignment.centerLeft,
+                     child: Text("Recent Contributions", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      itemCount: _contributions.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          color: Colors.white.withOpacity(0.05),
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            leading: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 16),
+                            title: Text(_contributions[_contributions.length - 1 - index], style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                            trailing: const Text("+10 XP", style: TextStyle(color: Colors.amberAccent, fontSize: 12)),
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                ]
+  Widget _buildRecordingView() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+         if (_recordedPath == null) ...[
+            GestureDetector(
+              onTap: _isRecording ? _stopRecording : _startRecording,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: EdgeInsets.all(_isRecording ? 40 : 30),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _isRecording ? Colors.redAccent : Colors.cyanAccent.withOpacity(0.2),
+                  border: Border.all(color: Colors.cyanAccent, width: 2),
+                  boxShadow: [
+                    if (_isRecording)
+                      BoxShadow(color: Colors.redAccent.withOpacity(0.5), blurRadius: 20, spreadRadius: 5)
+                  ]
+                ),
+                child: Icon(
+                  _isRecording ? Icons.stop : Icons.mic,
+                  size: 50,
+                  color: _isRecording ? Colors.white : Colors.cyanAccent,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _isRecording ? "Listening... Tap to Stop" : "Tap to Contribute",
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
+            ),
+         ] else ...[
+            // Review State
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  const Text("Recording Captured!", style: TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 20),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                       if (_recordedPath == null) ...[
-                          GestureDetector(
-                            onTap: _isRecording ? _stopRecording : _startRecording,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              padding: EdgeInsets.all(_isRecording ? 40 : 30),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _isRecording ? Colors.redAccent : Colors.cyanAccent.withOpacity(0.2),
-                                border: Border.all(color: Colors.cyanAccent, width: 2),
-                                boxShadow: [
-                                  if (_isRecording)
-                                    BoxShadow(color: Colors.redAccent.withOpacity(0.5), blurRadius: 20, spreadRadius: 5)
-                                ]
-                              ),
-                              child: Icon(
-                                _isRecording ? Icons.stop : Icons.mic,
-                                size: 50,
-                                color: _isRecording ? Colors.white : Colors.cyanAccent,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            _isRecording ? "Listening... Tap to Stop" : "Tap to Contribute",
-                            style: const TextStyle(color: Colors.white70, fontSize: 16),
-                          ),
-                       ] else ...[
-                          // Review State
-                          Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              children: [
-                                const Text("Recording Captured!", style: TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(_isPlaying ? Icons.stop_circle : Icons.play_circle_fill, size: 50, color: Colors.white),
-                                      onPressed: _playRecording,
-                                    ),
-                                    const SizedBox(width: 20),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete_forever, size: 50, color: Colors.redAccent),
-                                      onPressed: () => setState(() => _recordedPath = null),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: _submitRecording,
-                              icon: const Icon(Icons.cloud_upload),
-                              label: const Text("Submit to Dataset"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.cyanAccent,
-                                foregroundColor: Colors.black,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                              ),
-                            ),
-                          )
-                       ]
+                      IconButton(
+                        icon: Icon(_isPlaying ? Icons.stop_circle : Icons.play_circle_fill, size: 50, color: Colors.white),
+                        onPressed: _playRecording,
+                      ),
+                      const SizedBox(width: 20),
+                      IconButton(
+                        icon: const Icon(Icons.delete_forever, size: 50, color: Colors.redAccent),
+                        onPressed: () => setState(() => _recordedPath = null),
+                      ),
                     ],
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _submitRecording,
+                icon: const Icon(Icons.cloud_upload),
+                label: const Text("Submit to Dataset"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.cyanAccent,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 ),
-                
-                const SizedBox(height: 20),
-                const Align(
-                   alignment: Alignment.centerLeft,
-                   child: Text("Recent Contributions", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    itemCount: _contributions.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        color: Colors.white.withOpacity(0.05),
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 16),
-                          title: Text(_contributions[_contributions.length - 1 - index], style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                          trailing: const Text("+10 XP", style: TextStyle(color: Colors.amberAccent, fontSize: 12)),
-                        ),
-                      );
-                    },
-                  ),
+              ),
+            )
+         ]
+      ],
+    );
+  }
+
+  Widget _buildElderVerificationView() {
+    if (_pendingReviews.isEmpty) {
+      return const Center(child: Text("All caught up! No pending reviews.", style: TextStyle(color: Colors.white70)));
+    }
+    return ListView.builder(
+      itemCount: _pendingReviews.length,
+      itemBuilder: (context, index) {
+        return Card(
+          color: Colors.white.withOpacity(0.1),
+          margin: const EdgeInsets.only(bottom: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_pendingReviews[index], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 5),
+                const Text("Pending Elder Verification", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                        icon: const Icon(Icons.play_circle_fill, size: 40, color: Colors.cyanAccent),
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Playing audio preview...")));
+                        },
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.cancel, size: 40, color: Colors.redAccent),
+                        onPressed: () {
+                           setState(() {
+                             _pendingReviews.removeAt(index);
+                           });
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recording rejected.")));
+                        },
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.check_circle, size: 40, color: Colors.greenAccent),
+                        onPressed: () {
+                           setState(() {
+                             _pendingReviews.removeAt(index);
+                           });
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recording verified and added to Dictionary!")));
+                        },
+                    ),
+                  ],
                 )
               ],
             ),
           ),
-        ),
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildModeToggle() {
+    return Row(
+       mainAxisAlignment: MainAxisAlignment.center,
+       children: [
+         ChoiceChip(
+           label: const Text("Contribute"),
+           selected: !_isElderMode,
+           onSelected: (val) => setState(() => _isElderMode = false),
+           selectedColor: Colors.cyanAccent,
+           labelStyle: TextStyle(color: !_isElderMode ? Colors.black : Colors.white),
+           backgroundColor: Colors.white.withOpacity(0.1),
+         ),
+         const SizedBox(width: 15),
+         ChoiceChip(
+           label: const Text("Elder Verification"),
+           selected: _isElderMode,
+           onSelected: (val) => setState(() => _isElderMode = true),
+           selectedColor: Colors.purpleAccent,
+           labelStyle: TextStyle(color: _isElderMode ? Colors.white : Colors.white),
+           backgroundColor: Colors.white.withOpacity(0.1),
+         ),
+       ],
     );
   }
 
@@ -275,9 +365,9 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Help Us Grow! 🌱", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                SizedBox(height: 5),
-                Text("Record words to train our AI and preserve the Nicobarese language forever.", style: TextStyle(color: Colors.white70, fontSize: 12)),
+                Text(_isElderMode ? "Verify Contributions 🛡️" : "Help Us Grow! 🌱", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 5),
+                Text(_isElderMode ? "Listen to community recordings and verify them for accuracy." : "Record words to train our AI and preserve the Nicobarese language forever.", style: TextStyle(color: Colors.white70, fontSize: 12)),
               ],
             ),
           )

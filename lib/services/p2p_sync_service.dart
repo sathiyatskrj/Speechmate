@@ -11,9 +11,14 @@ class P2PSyncService {
   static Future<String> generateDictionaryPayload() async {
     final db = await DatabaseManager.instance.database;
     final allWords = await db.query('words');
+    final gaDict = await db.query('ga_dictionary');
     
     // Convert to JSON
-    final jsonString = jsonEncode(allWords);
+    final combinedMap = {
+      'words': allWords,
+      'ga_dictionary': gaDict,
+    };
+    final jsonString = jsonEncode(combinedMap);
 
     // Create Archive
     final archive = Archive();
@@ -54,15 +59,25 @@ class P2PSyncService {
       if (file.isFile && file.name == 'dictionary_update.json') {
         final data = file.content as List<int>;
         final jsonString = utf8.decode(data);
-        final List<dynamic> wordsList = jsonDecode(jsonString);
+        final Map<String, dynamic> dataMap = jsonDecode(jsonString);
         
         final db = await DatabaseManager.instance.database;
         final batch = db.batch();
-        for (var item in wordsList) {
-           // Basic upsert logic could go here based on word id/english
-           // For now, simulating import
-           batch.insert('words', item, conflictAlgorithm: ConflictAlgorithm.replace);
+        
+        if (dataMap.containsKey('words')) {
+           final List<dynamic> wordsList = dataMap['words'];
+           for (var item in wordsList) {
+              batch.insert('words', item, conflictAlgorithm: ConflictAlgorithm.replace);
+           }
         }
+        
+        if (dataMap.containsKey('ga_dictionary')) {
+           final List<dynamic> gaList = dataMap['ga_dictionary'];
+           for (var item in gaList) {
+              batch.insert('ga_dictionary', item, conflictAlgorithm: ConflictAlgorithm.replace);
+           }
+        }
+        
         await batch.commit(noResult: true);
       }
     }

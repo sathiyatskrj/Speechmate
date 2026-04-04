@@ -98,32 +98,32 @@ class GamificationService {
 
       return [
         {
-          'icon': '🔥',
-          'name': 'Streak Fire',
+          'icon': '🌊',
+          'name': 'Ocean Navigator',
           'desc': '7 Day Streak',
           'obtained': dayStreak >= 7,
         },
         {
-          'icon': '📖',
-          'name': 'Bookworm',
+          'icon': '🛶',
+          'name': 'Hodi Constructor',
           'desc': 'Learned 50 Words',
           'obtained': wordsLearned >= 50,
         },
         {
-          'icon': '🧠',
-          'name': 'Quiz Master',
+          'icon': '🌿',
+          'name': 'Pandanus Gatherer',
           'desc': 'Completed 10 Quizzes',
           'obtained': quizzesTaken >= 10,
         },
         {
-          'icon': '🏆',
-          'name': 'Century Club',
+          'icon': '🐢',
+          'name': 'Sea Turtle Guide',
           'desc': 'Learned 100 Words',
           'obtained': wordsLearned >= 100,
         },
         {
-          'icon': '⚡',
-          'name': 'Speed Learner',
+          'icon': '🏝️',
+          'name': 'Island Protector',
           'desc': '30 Day Streak',
           'obtained': dayStreak >= 30,
         },
@@ -135,15 +135,15 @@ class GamificationService {
   
   static String getLevelTitle(int level) {
     const titles = [
-      "Novice Explorer",
-      "Seed Planter",
-      "Word Gatherer",
-      "Story Teller",
-      "Village Voice",
-      "Word Hunter",
+      "Island Guest",
+      "Shell Gatherer",
+      "Hodi Weaver",
+      "Turtle Tracker",
+      "Ocean Navigator",
+      "Jungle Guide",
+      "Village Elder",
       "Culture Keeper",
-      "Master Linguist",
-      "Legend",
+      "Oral Historian",
       "Ancestor's Echo"
     ];
     if (level <= 0) return titles[0];
