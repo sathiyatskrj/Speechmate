@@ -60,19 +60,55 @@ class _StudentDashState extends State<StudentDash>
      await DatabaseManager.instance.seedCategoryFromList('colors', [
        {"name": "Blue", "nicobarese": "tö lingū", "emoji": "🌊"},
        {"name": "Green", "nicobarese": "tö rōy chōn", "emoji": "🥥"},
-       {"name": "Orange", "nicobarese": "Föl", "emoji": "🌅"}
+       {"name": "Orange", "nicobarese": "Föl", "emoji": "🌅"},
+       {"name": "Red", "nicobarese": "Chöī", "emoji": "🔴"},
+       {"name": "Yellow", "nicobarese": "Rōy", "emoji": "🌻"},
+       {"name": "White", "nicobarese": "Fūn", "emoji": "⬜"},
+       {"name": "Black", "nicobarese": "Talen", "emoji": "⬛"},
+       {"name": "Brown", "nicobarese": "Ūm Talen", "emoji": "🤎"},
+       {"name": "Pink", "nicobarese": "Chöī Fūn", "emoji": "🩷"},
+       {"name": "Purple", "nicobarese": "Tö lingū chöī", "emoji": "🟣"},
      ]);
      
      await DatabaseManager.instance.seedCategoryFromList('feelings', [
-       {"name": "Happy", "nicobarese": "Vah", "emoji": "😁"}
+       {"name": "Happy", "nicobarese": "Vah", "emoji": "😁"},
+       {"name": "Sad", "nicobarese": "Nö-öt", "emoji": "😢"},
+       {"name": "Angry", "nicobarese": "Kaūn", "emoji": "😡"},
+       {"name": "Scared", "nicobarese": "Takat", "emoji": "😨"},
+       {"name": "Tired", "nicobarese": "Löhöt", "emoji": "😴"},
+       {"name": "Hungry", "nicobarese": "Ön-yā", "emoji": "🤤"},
+       {"name": "Thirsty", "nicobarese": "Ön-nūm", "emoji": "💧"},
+       {"name": "Love", "nicobarese": "Maūn", "emoji": "❤️"},
+       {"name": "Surprise", "nicobarese": "Takūn", "emoji": "😲"},
+       {"name": "Shy", "nicobarese": "Mā-öt", "emoji": "🫣"},
      ]);
      
      await DatabaseManager.instance.seedCategoryFromList('things', [
-       {"name": "House", "nicobarese": "Pati", "emoji": "🏠"}
+       {"name": "House", "nicobarese": "Pati", "emoji": "🏠"},
+       {"name": "Boat", "nicobarese": "Hōdi", "emoji": "🚣"},
+       {"name": "Water", "nicobarese": "Dāk", "emoji": "💧"},
+       {"name": "Fire", "nicobarese": "Yūh", "emoji": "🔥"},
+       {"name": "Stone", "nicobarese": "Lūng", "emoji": "🪨"},
+       {"name": "Tree", "nicobarese": "Dāng", "emoji": "🌳"},
+       {"name": "Coconut", "nicobarese": "Tafūl", "emoji": "🥥"},
+       {"name": "Fish", "nicobarese": "Hīchā", "emoji": "🐟"},
+       {"name": "Clothes", "nicobarese": "Nāra", "emoji": "👕"},
+       {"name": "Food", "nicobarese": "Kānā", "emoji": "🍚"},
      ]);
      
      await DatabaseManager.instance.seedCategoryFromList('body_parts', [
-       {"name": "Eye", "nicobarese": "Mötö", "emoji": "👁️"}
+       {"name": "Eye", "nicobarese": "Mötö", "emoji": "👁️"},
+       {"name": "Ear", "nicobarese": "Tananga", "emoji": "👂"},
+       {"name": "Nose", "nicobarese": "Nöngūm", "emoji": "👃"},
+       {"name": "Mouth", "nicobarese": "Chūm", "emoji": "👄"},
+       {"name": "Hand", "nicobarese": "Kā-öt", "emoji": "✋"},
+       {"name": "Foot", "nicobarese": "Hinyūh", "emoji": "🦶"},
+       {"name": "Head", "nicobarese": "Chöm", "emoji": "🗣️"},
+       {"name": "Teeth", "nicobarese": "Tī", "emoji": "🦷"},
+       {"name": "Hair", "nicobarese": "Yök", "emoji": "💇"},
+       {"name": "Heart", "nicobarese": "Yā", "emoji": "❤️"},
+       {"name": "Stomach", "nicobarese": "Pāk", "emoji": "🫃"},
+       {"name": "Back", "nicobarese": "Tö-kūng", "emoji": "🔙"},
      ]);
   }
 

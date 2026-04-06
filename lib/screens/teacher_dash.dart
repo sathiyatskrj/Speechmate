@@ -17,6 +17,14 @@ import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/screens/camera_translation_screen.dart';
+import 'package:speechmate/screens/great_andamanese_screen.dart';
+import 'package:speechmate/screens/flora_fauna_screen.dart';
+import 'package:speechmate/screens/story_radio_screen.dart';
+import 'package:speechmate/screens/kinship_mapper_screen.dart';
+import 'package:speechmate/screens/dialect_heatmap_screen.dart';
+import 'package:speechmate/screens/memory_palace_screen.dart';
+import 'package:speechmate/screens/dialect_comparison_screen.dart';
+import 'package:speechmate/screens/srs_dashboard_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/core/app_colors.dart';
 

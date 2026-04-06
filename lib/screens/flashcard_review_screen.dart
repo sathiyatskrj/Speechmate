@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
-import 'package:speechmate/widgets/background.dart';
+import 'package:speechmate/features/gamification/gamification_service.dart';
+
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/services/season_service.dart';
+
 import 'dart:math' as math;
 
 class FlashcardReviewScreen extends StatefulWidget {

@@ -131,6 +131,8 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         _buildLanguageButton(context: context, label: "English", langCode: "en", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
                         _buildLanguageButton(context: context, label: "हिंदी (Hindi)", langCode: "hi", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
                         _buildLanguageButton(context: context, label: "தமிழ் (Tamil)", langCode: "ta", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
+                        _buildLanguageButton(context: context, label: "മലയാളം (Malayalam)", langCode: "ml", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
+                        _buildLanguageButton(context: context, label: "తెలుగు (Telugu)", langCode: "te", colors: [const Color(0xFF455A64), const Color(0xFF263238)]),
                         const SizedBox(height: 40),
                       ],
                     ),
