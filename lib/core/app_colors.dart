@@ -1,54 +1,45 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // --- Student Palette (Fairyland) ---
-  static const Color studentPrimary = Color(0xFFFF69B4); // Hot Pink
-  static const Color studentAccent = Color(0xFF00FFFF); // Cyan Accent
-  static const Color studentGlass = Color(0x33FFFFFF); // White at 20%
-  static const List<Color> studentGradient = [
-    Color(0xFFFF9A9E), // Warm Pink
-    Color(0xFFFECFEF), // Soft Pink
-    Color(0xFFF6D365), // Sunny Yellow
-    Color(0xFFFDA085), // Peach Orange
-    Color(0xFF84FAB0), // Mint Green
-    Color(0xFF8FD3F4), // Sky Blue
+  // --- Student Palette (Static Premium) ---
+  static const Color studentPrimary = Color(0xFFFF69B4); 
+  static const Color studentAccent = Color(0xFF00FFFF); 
+  static const Color studentGlass = Color(0x33FFFFFF); 
+  static const List<Color> studentStaticGradient = [
+    Color(0xFF00C9FF), 
+    Color(0xFF92FE9D), 
+    Color(0xFF000000), 
   ];
 
-  // --- Teacher Palette (Professional) ---
-  static const Color teacherPrimary = Color(0xFF1A237E); // Deep Indigo
-  static const Color teacherAccent = Color(0xFF00E5FF); // Cyber Blue
-  static const Color teacherSurface = Color(0xFF243B55); // Dark Blue Grey
-  static const List<Color> teacherGradient = [
-    Color(0xFF141E30), // Dark Metal
-    Color(0xFF243B55), // Deep Sea
+  // --- Teacher Palette (Static Premium) ---
+  static const Color teacherPrimary = Color(0xFF1A237E); 
+  static const Color teacherAccent = Color(0xFF00E5FF); 
+  static const Color teacherSurface = Color(0xFF243B55); 
+  static const List<Color> teacherStaticGradient = [
+    Color(0xFF6A11CB), 
+    Color(0xFF2575FC), 
+    Color(0xFF000000), 
   ];
 
-  // --- Common Semantics ---
+  static const List<Color> studentGradient = studentStaticGradient;
+  static const List<Color> teacherGradient = teacherStaticGradient;
+
   static const Color success = Color(0xFF00C853);
   static const Color error = Color(0xFFFF1744);
   static const Color warning = Color(0xFFFFC107);
   static const Color textLight = Colors.white;
   static const Color textDark = Color(0xFF121212);
   
-  // --- Magic Wow Factors ---
-  static const Color auroraGlow = Color(0x66B388FF); // Deep Purple Glow
+  static const Color auroraGlow = Color(0x66B388FF); 
 
-  // --- Student Dark Palette ---
-  static const Color studentDarkBg = Color(0xFF1A1A2E);
-  static const Color studentDarkSurface = Color(0xFF16213E);
   static const Color studentDarkAccent = Color(0xFFE94560);
-  static const List<Color> studentDarkGradient = [
-    Color(0xFF1A1A2E),
-    Color(0xFF16213E),
-    Color(0xFF0F3460),
-  ];
-
-  // --- Teacher Dark Palette ---
-  static const Color teacherDarkBg = Color(0xFF0D1117);
-  static const Color teacherDarkSurface = Color(0xFF161B22);
   static const Color teacherDarkAccent = Color(0xFF58A6FF);
-  static const List<Color> teacherDarkGradient = [
-    Color(0xFF0D1117),
-    Color(0xFF161B22),
-  ];
+
+  static List<Color> getThemeGradient(bool isTeacher) {
+    return isTeacher ? teacherStaticGradient : studentStaticGradient;
+  }
+
+  static Color getThemeAccent(bool isTeacher) {
+    return (isTeacher) ? teacherAccent : studentAccent;
+  }
 }

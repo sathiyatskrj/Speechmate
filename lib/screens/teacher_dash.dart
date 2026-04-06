@@ -16,19 +16,9 @@ import 'package:speechmate/widgets/voice_reactive_aurora.dart';
 import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
-import 'package:speechmate/widgets/ai_assistant_overlay.dart';
-import 'package:speechmate/screens/great_andamanese_screen.dart';
-import 'package:speechmate/screens/dialect_comparison_screen.dart';
-import 'package:speechmate/screens/flora_fauna_screen.dart';
-import 'package:speechmate/screens/story_radio_screen.dart';
-import 'package:speechmate/screens/kinship_mapper_screen.dart';
-import 'package:speechmate/screens/dialect_heatmap_screen.dart';
-import 'package:speechmate/screens/memory_palace_screen.dart';
-import 'package:speechmate/services/whisper_service.dart';
-import 'package:speechmate/services/season_service.dart';
-import 'package:speechmate/services/llm_manager_service.dart';
-import 'package:speechmate/screens/srs_dashboard_screen.dart';
+import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -41,30 +31,15 @@ class _TeacherDashState extends State<TeacherDash>
     with SearchableDashboardMixin {
   final TextEditingController _searchController = TextEditingController();
   final TtsService _ttsService = TtsService();
-  bool _showAiAssistant = false;
   
   Map<String, dynamic>? _dailyWord;
-  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
     _ttsService.init();
     initSearch();
     _loadDailyWord();
-    _checkAiCore();
-  }
-
-  bool _isLlmActive = false;
-  Future<void> _checkAiCore() async {
-    final status = await LlmManagerService().isModelDownloaded();
-    if (mounted) setState(() => _isLlmActive = status);
-  }
-
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
   }
 
   Future<void> _loadDailyWord() async {
@@ -114,8 +89,8 @@ class _TeacherDashState extends State<TeacherDash>
                     searchController: _searchController,
                     onSearch: _onSearch,
                     onClear: _clearSearch,
-                    seasonName: _seasonService.seasonName,
-                    featuredWord: _seasonService.featuredWord,
+                    seasonName: "Curriculum",
+                    featuredWord: "Focus on learning",
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -128,8 +103,6 @@ class _TeacherDashState extends State<TeacherDash>
                               _buildDailyWordCard(_dailyWord!),
                               const SizedBox(height: 25),
                             ],
-                            _buildAiCoreStatus(),
-                            const SizedBox(height: 25),
                             if (isSearchLoading)
                                const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
                             
@@ -348,17 +321,8 @@ class _TeacherDashState extends State<TeacherDash>
                 ],
               ), 
             ),
-            if (_showAiAssistant)
-              AiAssistantOverlay(
-                onClose: () => setState(() => _showAiAssistant = false),
-              ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => setState(() => _showAiAssistant = true),
-          backgroundColor: Colors.deepPurpleAccent,
-          child: const Icon(Icons.auto_awesome, color: Colors.white),
-        ).animate().scale(delay: 500.ms, duration: 500.ms),
       ),
     );
   }
@@ -500,35 +464,6 @@ class _TeacherDashState extends State<TeacherDash>
     );
   }
 
-  Widget _buildAiCoreStatus() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _isLlmActive ? Colors.purpleAccent.withOpacity(0.3) : Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Icon(_isLlmActive ? Icons.psychology : Icons.auto_awesome, color: _isLlmActive ? Colors.purpleAccent : Colors.cyanAccent, size: 20),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(_isLlmActive ? "GEN-AI CORE: ACTIVE" : "GEN-AI CORE: LITE", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-              Text(_isLlmActive ? "Advanced Conversational Hub" : "Standard Symbolic Assistant", style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9)),
-            ],
-          ),
-          const Spacer(),
-          if (!_isLlmActive)
-            TextButton(
-              onPressed: () => setState(() => _showAiAssistant = true),
-              child: const Text("UPGRADE", style: TextStyle(color: Colors.amberAccent, fontSize: 10, fontWeight: FontWeight.bold)),
-            ),
-        ],
-      ),
-    );
-  }
 }
 
 class TranslationCard extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/dictionary_service.dart';
-import '../services/season_service.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 class BetaChatScreen extends StatefulWidget {
   final bool isStudent;
@@ -19,19 +19,12 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   List<Map<String, dynamic>> _filteredDialects = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
-  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
     _loadData();
     _initTts();
-  }
-
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
   }
 
   Future<void> _initTts() async {

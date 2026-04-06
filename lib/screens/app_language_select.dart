@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/languages.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
-import 'package:speechmate/services/season_service.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
@@ -13,17 +13,10 @@ class LanguageSelectionScreen extends StatefulWidget {
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
-  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
-  }
-
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
   }
 
   double? get buttonWidth => 280;
@@ -95,7 +88,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  _seasonService.themeColor.withOpacity(0.4),
+                  AppColors.studentAccent.withOpacity(0.3),
                   Colors.black,
                 ],
               ),

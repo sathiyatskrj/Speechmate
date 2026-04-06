@@ -33,12 +33,7 @@ void main() async {
       debugPrint("Firebase init failed: $e");
   }
 
-  try {
-      await GamificationService.initialize();
-  } catch (e) {
-      debugPrint("Gamification init failed: $e");
-  }
-
+  // Database initialization remains for core dictionary features
   try {
       await DatabaseManager.instance.database;
       await DatabaseManager.instance.seedExtraFromJson('phrases', 'assets/data/dictionary_phrases.json', (item) => {

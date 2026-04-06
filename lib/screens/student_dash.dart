@@ -16,7 +16,6 @@ import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/screens/lessons/lesson_screen.dart';
 import 'package:speechmate/models/lesson_models.dart';
-import 'package:speechmate/widgets/ai_assistant_overlay.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/srs_review_screen.dart';
@@ -26,9 +25,9 @@ import 'package:speechmate/screens/story_radio_screen.dart';
 import 'package:speechmate/screens/kinship_mapper_screen.dart';
 import 'package:speechmate/screens/dialect_heatmap_screen.dart';
 import 'package:speechmate/screens/memory_palace_screen.dart';
-import 'package:speechmate/services/season_service.dart';
+import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
-import 'package:speechmate/services/llm_manager_service.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -41,30 +40,14 @@ class _StudentDashState extends State<StudentDash>
     with WidgetsBindingObserver, SearchableDashboardMixin {
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
-  bool _showAiAssistant = false;
-
-  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
     WidgetsBinding.instance.addObserver(this);
     ttsService.init();
     initSearch();
     _seedDynamicData();
-    _checkAiCore();
-  }
-
-  bool _isLlmActive = false;
-  Future<void> _checkAiCore() async {
-    final status = await LlmManagerService().isModelDownloaded();
-    if (mounted) setState(() => _isLlmActive = status);
-  }
-
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
   }
 
   Future<void> _seedDynamicData() async {
@@ -74,7 +57,6 @@ class _StudentDashState extends State<StudentDash>
      await DatabaseManager.instance.seedCategoryFromJson('numbers', 'assets/data/dictionary.json');
      await DatabaseManager.instance.seedCategoryFromJson('nature', 'assets/data/dictionary.json');
      
-     // Sample color insertion if json doesn't exist
      await DatabaseManager.instance.seedCategoryFromList('colors', [
        {"name": "Blue", "nicobarese": "tö lingū", "emoji": "🌊"},
        {"name": "Green", "nicobarese": "tö rōy chōn", "emoji": "🥥"},
@@ -109,21 +91,20 @@ class _StudentDashState extends State<StudentDash>
 
   void _onClear() => clearMixinSearch(searchController);
 
-
   List<Map<String, dynamic>> get learningTiles => [
     {"word": AppStrings.get('dailyReview'), "emoji": "🧠", "colors": [Color(0xFF00C9FF), Color(0xFF92FE9D)], "navigateTo": const SrsReviewScreen(), "icon": Icons.psychology_rounded},
     {"word": AppStrings.get('jungleAdventure'), "emoji": "🦁", "colors": [Color(0xFFFF9966), Color(0xFFFF5E62)], "navigateTo": LessonScreen(lesson: interactiveLessons[0]), "icon": Icons.terrain_rounded},
     {"word": AppStrings.get('islandColors'), "emoji": "🏝️", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": LessonScreen(lesson: interactiveLessons[1]), "icon": Icons.beach_access_rounded},
-    {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers', bgColors: [Color(0xFF6A11CB), Color(0xFF2575FC)]), "icon": Icons.format_list_numbered_rounded},
-    {"word": AppStrings.get('nature'), "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature', bgColors: [Color(0xFF11998E), Color(0xFF38EF7D)]), "icon": Icons.eco_rounded},
-    {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings', bgColors: [Color(0xFFFF512F), Color(0xFFDD2476)]), "icon": Icons.emoji_emotions_rounded},
-    {"word": AppStrings.get('colors'), "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors', bgColors: [Color(0xFFff9a9e), Color(0xFFfad0c4)]), "icon": Icons.palette_rounded},
-    {"word": AppStrings.get('things'), "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things', bgColors: [Color(0xFFa18cd1), Color(0xFFfbc2eb)]), "icon": Icons.chair_rounded},
-    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const DynamicCategoryScreen(categoryId: 'body_parts', title: 'Body Parts', bgColors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)]), "icon": Icons.accessibility_new_rounded},
+    {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers'), "icon": Icons.format_list_numbered_rounded},
+    {"word": AppStrings.get('nature'), "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature'), "icon": Icons.eco_rounded},
+    {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings'), "icon": Icons.emoji_emotions_rounded},
+    {"word": AppStrings.get('colors'), "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors'), "icon": Icons.palette_rounded},
+    {"word": AppStrings.get('things'), "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things'), "icon": Icons.chair_rounded},
+    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const DynamicCategoryScreen(categoryId: 'body_parts', title: 'Body Parts'), "icon": Icons.accessibility_new_rounded},
     {"word": AppStrings.get('games'), "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
-    {"word": AppStrings.get('animals'), "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals', bgColors: [Color(0xFFFF8008), Color(0xFFFFC837)]), "icon": Icons.pets_rounded},
-    {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words', bgColors: [Color(0xFFCC2B5E), Color(0xFF753A88)]), "icon": Icons.auto_fix_high_rounded},
-    {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family', bgColors: [Color(0xFF2193B0), Color(0xFF6DD5ED)]), "icon": Icons.family_restroom_rounded},
+    {"word": AppStrings.get('animals'), "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals'), "icon": Icons.pets_rounded},
+    {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words'), "icon": Icons.auto_fix_high_rounded},
+    {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
     {"word": AppStrings.get('voiceVault'), "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
     {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
     {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
@@ -134,6 +115,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": "Tuhet (Kinship)", "emoji": "🌳", "colors": [Color(0xFF5D4037), Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
     {"word": "Island Explorer", "emoji": "🧭", "colors": [Color(0xFF0277BD), Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
     {"word": "Memory Palace", "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
+    {"word": "Camera Lens", "emoji": "📷", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.camera_alt_rounded},
   ];
 
   @override
@@ -142,61 +124,46 @@ class _StudentDashState extends State<StudentDash>
       data: AppTheme.studentTheme,
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        body: Stack(
-          children: [
-            VoiceReactiveAurora(
-              isDark: false, // Student Mode (Bright)
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    SmartDashboardHeader(
-                      isTeacher: false,
-                      searchController: searchController,
-                      onSearch: _onSearch,
-                      onClear: _onClear,
-                      seasonName: _seasonService.seasonName,
-                      featuredWord: _seasonService.featuredWord,
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          children: [
-                            if (isSearchLoading)
-                              const Padding(
-                                padding: EdgeInsets.all(20),
-                                child: Center(
-                                  child: CircularProgressIndicator(color: Colors.cyanAccent),
-                                ),
-                              )
-                            else if (searchController.text.isNotEmpty)
-                              _buildSearchResults(),
-                            _buildDashboardContent(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+        body: VoiceReactiveAurora(
+          isDark: false,
+          child: SafeArea(
+            child: Column(
+              children: [
+                SmartDashboardHeader(
+                  isTeacher: false,
+                  searchController: searchController,
+                  onSearch: _onSearch,
+                  onClear: _onClear,
+                  seasonName: "Explore",
+                  featuredWord: "Preserve the language",
                 ),
-              ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        if (isSearchLoading)
+                          const Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Center(
+                              child: CircularProgressIndicator(color: Colors.cyanAccent),
+                            ),
+                          )
+                        else if (searchController.text.isNotEmpty)
+                          _buildSearchResults(),
+                        _buildDashboardContent(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            if (_showAiAssistant)
-              AiAssistantOverlay(
-                onClose: () => setState(() => _showAiAssistant = false),
-              ),
-          ],
+          ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => setState(() => _showAiAssistant = true),
-          backgroundColor: Colors.cyanAccent,
-          child: const Icon(Icons.auto_awesome, color: Colors.blueAccent),
-        ).animate().scale(delay: 500.ms, duration: 500.ms),
       ),
     );
   }
-  // _buildHeroHeader removed
-
 
   Widget _buildSearchResults() {
       return Padding(
@@ -235,8 +202,6 @@ class _StudentDashState extends State<StudentDash>
                  const Text("YOUR PROGRESS", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                  const SizedBox(height: 10),
                  const GamificationHeader(),
-                 const SizedBox(height: 25),
-                 _buildAiCoreStatus(),
                  const SizedBox(height: 30),
                  const Text("EXPLORE MODULES", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                  const SizedBox(height: 15),
@@ -275,8 +240,8 @@ class _StudentDashState extends State<StudentDash>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      _seasonService.themeColor,
-                      _seasonService.themeColor.withOpacity(0.8),
+                      AppColors.studentAccent,
+                      AppColors.studentAccent.withOpacity(0.8),
                       Colors.black,
                     ],
                   ),
@@ -398,36 +363,6 @@ class _StudentDashState extends State<StudentDash>
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAiCoreStatus() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _isLlmActive ? Colors.purpleAccent.withOpacity(0.3) : Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Icon(_isLlmActive ? Icons.psychology : Icons.auto_awesome, color: _isLlmActive ? Colors.purpleAccent : Colors.cyanAccent, size: 20),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(_isLlmActive ? "GEN-AI CORE: ACTIVE" : "GEN-AI CORE: LITE", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-              Text(_isLlmActive ? "Advanced Conversational Hub" : "Standard Symbolic Assistant", style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 9)),
-            ],
-          ),
-          const Spacer(),
-          if (!_isLlmActive)
-            TextButton(
-              onPressed: () => setState(() => _showAiAssistant = true),
-              child: const Text("UPGRADE", style: TextStyle(color: Colors.amberAccent, fontSize: 10, fontWeight: FontWeight.bold)),
-            ),
-        ],
       ),
     );
   }

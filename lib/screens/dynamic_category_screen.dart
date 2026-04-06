@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/database_manager.dart';
-import 'package:speechmate/services/season_service.dart';
 import 'package:speechmate/widgets/background.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 class DynamicCategoryScreen extends StatefulWidget {
   final String categoryId;
@@ -27,18 +27,11 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   List<Map<String, dynamic>> _items = [];
   bool _isLoading = true;
-  final SeasonService _seasonService = SeasonService();
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
     _loadData();
-  }
-
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
   }
 
   Future<void> _loadData() async {
@@ -90,7 +83,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              _seasonService.themeColor.withOpacity(0.8),
+              AppColors.studentAccent.withOpacity(0.8),
               Colors.black,
             ],
           ),
@@ -130,7 +123,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
           border: Border.all(color: Colors.white24),
           boxShadow: [
             BoxShadow(
-              color: _seasonService.themeColor.withOpacity(0.2),
+              color: AppColors.studentAccent.withOpacity(0.2),
               blurRadius: 15,
               offset: const Offset(0, 8),
             )
@@ -151,7 +144,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                         item['emoji'],
                         style: const TextStyle(fontSize: 50),
                       ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(begin: const Offset(1,1), end: const Offset(1.1, 1.1), duration: 2.seconds)
-                    : Icon(Icons.star_rounded, size: 50, color: _seasonService.themeColor),
+                    : Icon(Icons.star_rounded, size: 50, color: AppColors.studentAccent),
                 ),
               ),
             ),
