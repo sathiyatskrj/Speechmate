@@ -97,8 +97,6 @@ class _TeacherDashState extends State<TeacherDash>
                     searchController: _searchController,
                     onSearch: _onSearch,
                     onClear: _clearSearch,
-                    seasonName: "Curriculum",
-                    featuredWord: "Focus on learning",
                   ),
                   Expanded(
                     child: SingleChildScrollView(

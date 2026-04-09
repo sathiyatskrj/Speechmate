@@ -170,8 +170,6 @@ class _StudentDashState extends State<StudentDash>
                   searchController: searchController,
                   onSearch: _onSearch,
                   onClear: _onClear,
-                  seasonName: "Explore",
-                  featuredWord: "Preserve the language",
                 ),
                 const SizedBox(height: 10),
                 Expanded(
@@ -235,11 +233,11 @@ class _StudentDashState extends State<StudentDash>
          child: Column(
              crossAxisAlignment: CrossAxisAlignment.start,
              children: [
-                 const Text("YOUR PROGRESS", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                 Text(AppStrings.get('yourProgress').toUpperCase(), style: const TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                  const SizedBox(height: 10),
                  const GamificationHeader(),
                  const SizedBox(height: 30),
-                 const Text("EXPLORE MODULES", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                 Text(AppStrings.get('exploreModules') != 'exploreModules' ? AppStrings.get('exploreModules').toUpperCase() : "EXPLORE MODULES", style: const TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                  const SizedBox(height: 15),
                  GridView.builder(
                     shrinkWrap: true,

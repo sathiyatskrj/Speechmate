@@ -49,7 +49,7 @@ class DatabaseManager {
       
       // Seed mock Indigenous Knowledge data
       await _seedMockKnowledge(db);
-      await _seedKinshipAndSeasons(db);
+      await _seedKinship(db);
       debugPrint('[DatabaseManager] Indexes created/verified.');
     } catch (e) {
       debugPrint('[DatabaseManager] Index creation failed: $e');
@@ -164,17 +164,7 @@ class DatabaseManager {
          audio_asset TEXT
        )
        ''');
-       await db.execute('''
-       CREATE TABLE seasonal_config (
-         id $idType,
-         season_key TEXT,
-         start_month INTEGER,
-         end_month INTEGER,
-         theme_color TEXT,
-         featured_word TEXT
-       )
-       ''');
-       debugPrint('[DatabaseManager] Upgraded to v8 (kinship and seasonal_config tables).');
+       debugPrint('[DatabaseManager] Upgraded to v8 (kinship table).');
      }
   }
 
@@ -286,18 +276,10 @@ class DatabaseManager {
     ''');
 
     await db.execute('''
-    CREATE TABLE seasonal_config (
-      id $idType,
-      season_key TEXT,
-      start_month INTEGER,
-      end_month INTEGER,
-      theme_color TEXT,
-      featured_word TEXT
-    )
     ''');
   }
 
-  static Future<void> _seedKinshipAndSeasons(Database db) async {
+  static Future<void> _seedKinship(Database db) async {
     final kCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM kinship'));
     if (kCount == null || kCount == 0) {
       Batch batch = db.batch();
@@ -306,16 +288,6 @@ class DatabaseManager {
       batch.insert('kinship', {'rel_key': 'elder_sibling', 'native_term': 'Mem', 'english_label': 'Elder Sibling/Relative', 'description': 'Anyone older in the family group or Tuhet.', 'audio_asset': 'assets/audio/mem.mp3'});
       batch.insert('kinship', {'rel_key': 'younger_sibling', 'native_term': 'Kahem', 'english_label': 'Younger Sibling/Cousin', 'description': 'Anyone younger in the family group.', 'audio_asset': 'assets/audio/kahem.mp3'});
       batch.insert('kinship', {'rel_key': 'spouse', 'native_term': 'Piha', 'english_label': 'Spouse', 'description': 'Marriage partner.', 'audio_asset': 'assets/audio/piha.mp3'});
-      await batch.commit(noResult: true);
-    }
-
-    final sCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM seasonal_config'));
-    if (sCount == null || sCount == 0) {
-      Batch batch = db.batch();
-      // Cho: Nov (11) to April (4)
-      batch.insert('seasonal_config', {'season_key': 'cho', 'start_month': 11, 'end_month': 4, 'theme_color': '0xFFFFA000', 'featured_word': 'Fishing'});
-      // Hwa: May (5) to Oct (10)
-      batch.insert('seasonal_config', {'season_key': 'hwa', 'start_month': 5, 'end_month': 10, 'theme_color': '0xFF00796B', 'featured_word': 'Planting'});
       await batch.commit(noResult: true);
     }
   }

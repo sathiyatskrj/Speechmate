@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:speechmate/services/season_service.dart';
 
 class EmotionalSplashScreen extends StatefulWidget {
   final Widget nextScreen;
@@ -30,12 +29,9 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
   final math.Random random = math.Random();
   Offset _touchPosition = Offset.zero;
 
-  final SeasonService _seasonService = SeasonService();
-
   @override
   void initState() {
     super.initState();
-    _initSeason();
     
     // Initialize Particles with Physics properties
     for (int i = 0; i < particleCount; i++) {
@@ -115,11 +111,6 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
     super.dispose();
   }
 
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
-  }
-
   void _onPanUpdate(DragUpdateDetails details) {
     setState(() {
       _touchPosition = details.globalPosition;
@@ -143,7 +134,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                   center: Alignment.bottomCenter,
                   radius: 1.5,
                   colors: [  
-                    _seasonService.themeColor, // Dynamic base
+                    Colors.cyan, // Static base
                     const Color(0xFF8E2DE2), // Rich Purple 
                     const Color(0xFF0F0C29), // Deep Space
                     Colors.black
