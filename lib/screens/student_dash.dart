@@ -201,44 +201,50 @@ class _StudentDashState extends State<StudentDash>
                   Navigator.push(context, MaterialPageRoute(builder: (_) => tile['navigateTo']));
               }
           },
-          child: Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.studentAccent,
-                      AppColors.studentAccent.withOpacity(0.8),
-                      Colors.black,
-                    ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          (tile['colors'][0] as Color).withOpacity(0.85),
+                          (tile['colors'][1] as Color).withOpacity(0.65),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                      boxShadow: [
+                          BoxShadow(color: (tile['colors'][0] as Color).withOpacity(0.4), blurRadius: 10, offset: const Offset(0,4))
+                      ]
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                      BoxShadow(color: (tile['colors'][0] as Color).withOpacity(0.4), blurRadius: 10, offset: const Offset(0,4))
-                  ]
+                  child: Stack(
+                      children: [
+                          Positioned(right: -10, bottom: -10, child: Icon(tile['icon'], size: 80, color: Colors.white.withOpacity(0.2))),
+                          Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                      Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+                                          child: Icon(tile['icon'], color: Colors.white, size: 20),
+                                      ),
+                                      Text(tile['word'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                                  ],
+                              ),
+                          )
+                      ],
+                  ),
               ),
-              child: Stack(
-                  children: [
-                      Positioned(right: -10, bottom: -10, child: Icon(tile['icon'], size: 80, color: Colors.white.withOpacity(0.2))),
-                      Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                  Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
-                                      child: Icon(tile['icon'], color: Colors.white, size: 20),
-                                  ),
-                                  Text(tile['word'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                              ],
-                          ),
-                      )
-                  ],
-              ),
+            ),
           ),
-      );
+      ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack);
   }
 
   void _showSecretAccessDialog(BuildContext context, Widget targetScreen) {

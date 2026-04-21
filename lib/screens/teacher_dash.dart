@@ -12,8 +12,8 @@ import 'package:speechmate/widgets/translation_card.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/report_generator.dart';
 import 'package:speechmate/services/p2p_sync_service.dart';
+import 'dart:ui';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
-import 'package:speechmate/widgets/voice_reactive_aurora.dart';
 import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
@@ -89,10 +89,46 @@ class _TeacherDashState extends State<TeacherDash>
     return Theme(
       data: AppTheme.teacherTheme,
       child: Scaffold(
+        backgroundColor: const Color(0xFF0D0D14), // Deep dark base
         body: Stack(
           children: [
-            VoiceReactiveAurora(
-              isDark: true,
+            // Elegant Background Gradients
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Container(
+                width: 400,
+                height: 400,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.blueAccent.withOpacity(0.15),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -150,
+              left: -100,
+              child: Container(
+                width: 500,
+                height: 500,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.purpleAccent.withOpacity(0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Main Content
+            SafeArea(
               child: Column(
                 children: [
                   SmartDashboardHeader(
@@ -405,29 +441,66 @@ class _TeacherDashState extends State<TeacherDash>
   Widget _buildFeatureCard(BuildContext context, {required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 28),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.05),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                )
+              ]
             ),
-            const SizedBox(height: 10),
-            Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ],
+            child: Stack(
+              children: [
+                // Background icon glow
+                Positioned(
+                  right: -15,
+                  bottom: -15,
+                  child: Icon(icon, size: 80, color: color.withOpacity(0.05)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(icon, color: color, size: 24),
+                      ),
+                      const Spacer(),
+                      Text(
+                        title, 
+                        style: const TextStyle(
+                          color: Colors.white, 
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
 
   void _showImportDialog() {
