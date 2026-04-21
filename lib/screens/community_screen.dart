@@ -109,44 +109,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
             children: [
                 _buildSyncBanner(),
                 Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: _communityService.getPostsStream(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Something went wrong: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: Colors.white));
-                      }
-
-                      if (snapshot.data!.docs.isEmpty) {
-                         return _buildEmptyState();
-                      }
-
-                      return RefreshIndicator(
-                        color: Colors.deepPurple,
-                        backgroundColor: Colors.white,
-                        onRefresh: () async {
-                           // Firestore streams are real-time, but users expect a pull-to-refresh gesture
-                           // We can force a re-fetch or just delay for UX
-                           setState(() {}); 
-                           await Future.delayed(const Duration(milliseconds: 800));
-                        },
-                        child: ListView.builder(
-                          padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
-                          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                          itemCount: snapshot.data!.docs.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == 0) return _buildTrendingSection();
-                            
-                            DocumentSnapshot doc = snapshot.data!.docs[index - 1];
-                            CommunityPost post = CommunityPost.fromFirestore(doc);
-                            
-                            return _buildPostCard(post);
-                          },
-                        ),
-                      );
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
+                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    itemCount: _getMockPosts().length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) return _buildTrendingSection();
+                      
+                      CommunityPost post = _getMockPosts()[index - 1];
+                      return _buildPostCard(post);
                     },
                   ),
                 ),
@@ -157,7 +128,49 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  // ... (EmptyState, SyncBanner, TrendingSection omitted for brevity, logic remains same)
+  List<CommunityPost> _getMockPosts() {
+      return [
+        CommunityPost(
+          id: '1',
+          author: 'SpeechMate Admin',
+          role: 'Administrator',
+          content: 'Welcome to the Nicobarese learning community! Feel free to ask questions and share your progress.',
+          avatar: 'A',
+          color: Colors.redAccent.value,
+          likes: 42,
+          likedBy: [],
+          comments: 5,
+          isVerified: true,
+          timestamp: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+        CommunityPost(
+          id: '2',
+          author: 'Neel',
+          role: 'Student',
+          content: 'I finally mastered the common phrases! The audio flashcards are so helpful.',
+          avatar: 'N',
+          color: Colors.blueAccent.value,
+          likes: 12,
+          likedBy: [],
+          comments: 2,
+          isVerified: false,
+          timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+        ),
+        CommunityPost(
+          id: '3',
+          author: 'Dr. Sharma',
+          role: 'Linguist',
+          content: 'Did you know? Nicobarese has incredibly rich semantics related to island ecology. Check out the Nature Hub!',
+          avatar: 'S',
+          color: Colors.green.value,
+          likes: 89,
+          likedBy: [],
+          comments: 14,
+          isVerified: true,
+          timestamp: DateTime.now().subtract(const Duration(hours: 5)),
+        ),
+      ];
+  }
 
   Widget _buildEmptyState() {
       return Center(

@@ -1,6 +1,7 @@
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TtsService {
   final FlutterTts _tts = FlutterTts();
@@ -57,8 +58,11 @@ class TtsService {
   /// [filename] is the mp3 file name (e.g. "good_morning.mp3")
   Future<bool> playFromCategory(String category, String filename) async {
     try {
-      await _audioPlayer.stop();
       final path = 'audio/$category/$filename';
+      // Verify asset exists first before passing to audio player
+      await rootBundle.load('assets/$path'); 
+      
+      await _audioPlayer.stop();
       await _audioPlayer.play(AssetSource(path));
       return true;
     } catch (e) {
@@ -92,6 +96,7 @@ class TtsService {
       for (final folder in _audioFolders) {
         try {
           final assetPath = 'audio/$folder/$cleanName.mp3';
+          await rootBundle.load('assets/$assetPath');
           await _audioPlayer.play(AssetSource(assetPath));
           return; // Success!
         } catch (_) {
@@ -101,6 +106,7 @@ class TtsService {
 
       // Also try root audio/ folder
       try {
+        await rootBundle.load('assets/audio/$cleanName.mp3');
         await _audioPlayer.play(AssetSource('audio/$cleanName.mp3'));
         return;
       } catch (_) {}

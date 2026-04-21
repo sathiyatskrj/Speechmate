@@ -95,11 +95,13 @@ class _DialectHeatmapScreenState extends State<DialectHeatmapScreen> {
             builder: (context, constraints) {
               return Stack(
                 children: [
-                  // Stylized Map Placeholder (Real implementation would use a SVG/Image)
-                  Center(
+                  // Flutter coded map of Nicobar & Andaman
+                  Positioned.fill(
                     child: Opacity(
-                      opacity: 0.2,
-                      child: Icon(Icons.map, size: constraints.maxWidth * 0.8, color: Colors.cyanAccent),
+                      opacity: 0.15,
+                      child: CustomPaint(
+                        painter: _MapPainter(),
+                      ),
                     ),
                   ),
                   
@@ -205,4 +207,91 @@ class _PulseNodeState extends State<_PulseNode> with SingleTickerProviderStateMi
       },
     );
   }
+}
+
+class _MapPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.cyanAccent
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    final fillPaint = Paint()
+      ..color = Colors.cyan.withOpacity(0.1)
+      ..style = PaintingStyle.fill;
+
+    // A stylized representation of the Andaman and Nicobar Islands
+    Path path = Path();
+    
+    // North/Middle/South Andaman
+    path.moveTo(size.width * 0.55, size.height * 0.05);
+    path.quadraticBezierTo(size.width * 0.6, size.height * 0.1, size.width * 0.55, size.height * 0.15);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.2, size.width * 0.52, size.height * 0.3);
+    path.quadraticBezierTo(size.width * 0.55, size.height * 0.35, size.width * 0.5, size.height * 0.4);
+    path.quadraticBezierTo(size.width * 0.45, size.height * 0.3, size.width * 0.45, size.height * 0.2);
+    path.quadraticBezierTo(size.width * 0.45, size.height * 0.1, size.width * 0.55, size.height * 0.05);
+
+    // Little Andaman
+    path.moveTo(size.width * 0.4, size.height * 0.6);
+    path.quadraticBezierTo(size.width * 0.45, size.height * 0.62, size.width * 0.42, size.height * 0.68);
+    path.quadraticBezierTo(size.width * 0.38, size.height * 0.67, size.width * 0.38, size.height * 0.62);
+    path.quadraticBezierTo(size.width * 0.38, size.height * 0.58, size.width * 0.4, size.height * 0.6);
+
+    // Car Nicobar
+    path.moveTo(size.width * 0.45, size.height * 0.15);
+    path.addOval(Rect.fromCircle(center: Offset(size.width * 0.45, size.height * 0.15), radius: size.width * 0.04));
+
+    // Nancowry group
+    path.moveTo(size.width * 0.55, size.height * 0.45);
+    path.quadraticBezierTo(size.width * 0.6, size.height * 0.48, size.width * 0.52, size.height * 0.52);
+    path.quadraticBezierTo(size.width * 0.48, size.height * 0.48, size.width * 0.55, size.height * 0.45);
+
+    // Great Nicobar (Campbell Bay)
+    path.moveTo(size.width * 0.55, size.height * 0.8);
+    path.quadraticBezierTo(size.width * 0.65, size.height * 0.85, size.width * 0.6, size.height * 0.95);
+    path.quadraticBezierTo(size.width * 0.55, size.height * 0.9, size.width * 0.5, size.height * 0.85);
+    path.quadraticBezierTo(size.width * 0.5, size.height * 0.8, size.width * 0.55, size.height * 0.8);
+
+    canvas.drawPath(path, fillPaint);
+    canvas.drawPath(path, paint);
+
+    // Connective dashed lines for shipping routes or cultural ties
+    final dashPaint = Paint()
+      ..color = Colors.cyanAccent.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    
+    _drawDashedLine(canvas, Offset(size.width * 0.52, size.height * 0.3), Offset(size.width * 0.45, size.height * 0.15), dashPaint);
+    _drawDashedLine(canvas, Offset(size.width * 0.52, size.height * 0.3), Offset(size.width * 0.42, size.height * 0.6), dashPaint);
+    _drawDashedLine(canvas, Offset(size.width * 0.42, size.height * 0.6), Offset(size.width * 0.52, size.height * 0.52), dashPaint);
+    _drawDashedLine(canvas, Offset(size.width * 0.52, size.height * 0.52), Offset(size.width * 0.55, size.height * 0.8), dashPaint);
+  }
+
+  void _drawDashedLine(Canvas canvas, Offset p1, Offset p2, Paint paint) {
+    const int dashWidth = 5;
+    const int dashSpace = 5;
+    double startX = p1.dx;
+    double startY = p1.dy;
+    final double dx = p2.dx - p1.dx;
+    final double dy = p2.dy - p1.dy;
+    final double distance = (Offset(dx, dy)).distance;
+    double dashCount = distance / (dashWidth + dashSpace);
+    
+    double dxStep = dx / dashCount;
+    double dyStep = dy / dashCount;
+    
+    for (int i = 0; i < dashCount.floor(); i++) {
+      canvas.drawLine(
+        Offset(startX, startY),
+        Offset(startX + dxStep * (dashWidth / (dashWidth + dashSpace)), startY + dyStep * (dashWidth / (dashWidth + dashSpace))),
+        paint,
+      );
+      startX += dxStep;
+      startY += dyStep;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

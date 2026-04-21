@@ -14,6 +14,7 @@ import 'package:speechmate/services/report_generator.dart';
 import 'package:speechmate/services/p2p_sync_service.dart';
 import 'dart:ui';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
+import 'package:speechmate/widgets/voice_assistant_dialog.dart';
 import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
@@ -251,7 +252,13 @@ class _TeacherDashState extends State<TeacherDash>
                             title: "Whisper Pro",
                             icon: Icons.auto_awesome_rounded,
                             color: Colors.cyan,
-                            onTap: () => _showWhisperUpgradeDialog(context),
+                            onTap: () async {
+                               final result = await VoiceAssistantDialog.show(context);
+                               if (result != null && result.isNotEmpty) {
+                                   _searchController.text = result;
+                                   _onSearch(result);
+                               }
+                            },
                           ),
                           _buildFeatureCard(context,
                             title: "Dialect Comparison",
