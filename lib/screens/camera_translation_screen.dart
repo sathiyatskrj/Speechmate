@@ -21,8 +21,7 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   final TtsService _ttsService = TtsService();
   
   bool _isProcessing = false;
-  String _recognizedText = "";
-  String _translatedText = "";
+  List<Map<String, String>> _translationResults = [];
   String _detectedObject = "";
   
   @override
@@ -69,8 +68,8 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   Future<void> _processImage(String path) async {
     setState(() {
       _isProcessing = true;
-      _recognizedText = "";
-      _translatedText = "";
+      _translationResults.clear();
+      _detectedObject = "";
     });
 
     try {
@@ -85,19 +84,39 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
 
       // 2. Try Text Recognition
       final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
-      String extractedText = recognizedText.text.replaceAll('\n', ' ').trim();
       
-      String queryText = extractedText.isNotEmpty ? extractedText : objectName;
-      
-      if (queryText.isNotEmpty) {
-        // Translate using offline Neural Engine
-        final result = await _neuralEngine.predict(queryText);
+      if (recognizedText.text.trim().isNotEmpty) {
+        // Book Scanner Mode: Split text into blocks or lines
+        List<Map<String, String>> results = [];
+        for (TextBlock block in recognizedText.blocks) {
+          for (TextLine line in block.lines) {
+            String originalText = line.text.trim();
+            if (originalText.isNotEmpty) {
+               // Translate each line using offline Neural Engine
+               final result = await _neuralEngine.predict(originalText);
+               results.add({
+                 "original": originalText,
+                 "translation": result.text.isNotEmpty ? result.text : "Translation unavailable",
+               });
+            }
+          }
+        }
         setState(() {
-          _detectedObject = objectName.isNotEmpty && extractedText.isEmpty ? "Detected Object: $objectName" : "";
-          _recognizedText = queryText;
-          _translatedText = result.text;
+          _detectedObject = "";
+          _translationResults = results;
         });
         _showResultSheet();
+      } else if (objectName.isNotEmpty) {
+         // Object detection fallback
+         final result = await _neuralEngine.predict(objectName);
+         setState(() {
+           _detectedObject = "Detected Object: $objectName";
+           _translationResults = [{
+              "original": objectName,
+              "translation": result.text.isNotEmpty ? result.text : "Translation unavailable",
+           }];
+         });
+         _showResultSheet();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -146,39 +165,68 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
          backgroundColor: Colors.transparent,
          isScrollControlled: true,
          builder: (context) {
-            return Container(
-               decoration: const BoxDecoration(
-                  color: Color(0xFF1E1E2C), // Premium surface color
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-               ),
-               padding: const EdgeInsets.all(24),
-               child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                     if (_detectedObject.isNotEmpty)
-                        Text(_detectedObject, style: const TextStyle(color: Colors.amberAccent, fontSize: 14, fontWeight: FontWeight.bold)),
-                     if (_detectedObject.isNotEmpty)
-                        const SizedBox(height: 8),
-                     const Text("Original", style: TextStyle(color: Colors.white54, fontSize: 12)),
-                     const SizedBox(height: 8),
-                     Text(_recognizedText, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                     const SizedBox(height: 20),
-                     const Divider(color: Colors.white24),
-                     const SizedBox(height: 16),
-                     const Text("Translation (Nicobarese/Great Andamanese)", style: TextStyle(color: Colors.cyanAccent, fontSize: 12)),
-                     const SizedBox(height: 8),
-                     Text(_translatedText, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                     const SizedBox(height: 30),
-                     ElevatedButton.icon(
-                        icon: const Icon(Icons.volume_up, color: Colors.black),
-                        label: const Text("Speak Translation", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.cyanAccent),
-                        onPressed: () => _ttsService.speakNicobarese(_translatedText, englishWord: _recognizedText),
-                     ),
-                     const SizedBox(height: 30),
-                  ]
-               )
+            return DraggableScrollableSheet(
+              initialChildSize: 0.6,
+              minChildSize: 0.4,
+              maxChildSize: 0.9,
+              builder: (_, controller) {
+                return Container(
+                   decoration: const BoxDecoration(
+                      color: Color(0xFF1E1E2C), // Premium surface color
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                   ),
+                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                   child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                         Center(
+                           child: Container(
+                             width: 40, height: 4,
+                             margin: const EdgeInsets.only(bottom: 20),
+                             decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                           ),
+                         ),
+                         if (_detectedObject.isNotEmpty) ...[
+                            Text(_detectedObject, style: const TextStyle(color: Colors.amberAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 16),
+                         ],
+                         Expanded(
+                           child: ListView.separated(
+                             controller: controller,
+                             itemCount: _translationResults.length,
+                             separatorBuilder: (context, index) => const Divider(color: Colors.white12, height: 32),
+                             itemBuilder: (context, index) {
+                               final item = _translationResults[index];
+                               return Column(
+                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                 children: [
+                                   const Text("Original Text", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                                   const SizedBox(height: 4),
+                                   Text(item['original'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 16)),
+                                   const SizedBox(height: 12),
+                                   const Text("Nicobarese Translation", style: TextStyle(color: Colors.cyanAccent, fontSize: 12)),
+                                   const SizedBox(height: 4),
+                                   Row(
+                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                     children: [
+                                       Expanded(
+                                         child: Text(item['translation'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                                       ),
+                                       IconButton(
+                                         icon: const Icon(Icons.volume_up, color: Colors.cyanAccent),
+                                         onPressed: () => _ttsService.speakNicobarese(item['translation'] ?? '', englishWord: item['original']),
+                                       )
+                                     ],
+                                   ),
+                                 ],
+                               );
+                             },
+                           ),
+                         ),
+                      ]
+                   )
+                );
+              }
             );
          }
       );

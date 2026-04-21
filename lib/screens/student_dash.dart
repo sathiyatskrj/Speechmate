@@ -164,7 +164,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": "Tuhet (Kinship)", "emoji": "🌳", "colors": [Color(0xFF5D4037), Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
     {"word": "Island Explorer", "emoji": "🧭", "colors": [Color(0xFF0277BD), Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
     {"word": "Memory Palace", "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
-    {"word": "Camera Lens", "emoji": "📷", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.camera_alt_rounded},
+    {"word": "Book Scanner", "emoji": "📖", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.document_scanner_rounded},
     {"word": "Voice Translate", "emoji": "🎙️", "colors": [Color(0xFFff0844), Color(0xFFffb199)], "navigateTo": const VoiceTranslatorScreen(), "icon": Icons.record_voice_over_rounded},
   ];
 
