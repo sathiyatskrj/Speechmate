@@ -92,12 +92,31 @@ class _StudentDashState extends State<StudentDash>
     return Theme(
       data: AppTheme.studentTheme,
       child: Scaffold(
+        backgroundColor: const Color(0xFFF0F4F8), // Lighter, clean background
         extendBodyBehindAppBar: true,
-        body: VoiceReactiveAurora(
-          isDark: false,
-          child: SafeArea(
-            child: Column(
-              children: [
+        body: Stack(
+          children: [
+            // Elegant Light Background Gradients
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Container(
+                width: 400,
+                height: 400,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.pinkAccent.withOpacity(0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SafeArea(
+              child: Column(
+                children: [
                 SmartDashboardHeader(
                   isTeacher: false,
                   searchController: searchController,
@@ -166,11 +185,11 @@ class _StudentDashState extends State<StudentDash>
          child: Column(
              crossAxisAlignment: CrossAxisAlignment.start,
              children: [
-                 Text(AppStrings.get('yourProgress').toUpperCase(), style: const TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                 Text(AppStrings.get('yourProgress').toUpperCase(), style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                  const SizedBox(height: 10),
                  const GamificationHeader(),
                  const SizedBox(height: 30),
-                 Text(AppStrings.get('exploreModules') != 'exploreModules' ? AppStrings.get('exploreModules').toUpperCase() : "EXPLORE MODULES", style: const TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                 Text(AppStrings.get('exploreModules') != 'exploreModules' ? AppStrings.get('exploreModules').toUpperCase() : "EXPLORE MODULES", style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                  const SizedBox(height: 15),
                  GridView.builder(
                     shrinkWrap: true,

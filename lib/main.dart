@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:speechmate/screens/emotional_splash_screen.dart';
+import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/landing_page.dart';
 import 'package:speechmate/core/app_theme.dart';
 
@@ -93,6 +95,7 @@ void main() async {
       
       // Seed ALL category word data from JSON files
       final categoryJsonFiles = {
+        'words': 'assets/data/dictionary.json',
         'animals': 'assets/data/dictionary_animals.json',
         'family': 'assets/data/dictionary_family.json',
         'magic': 'assets/data/dictionary_magic.json',
@@ -127,7 +130,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SpeechMate - Nicobarese Language Learning',
       theme: AppTheme.studentTheme,
-      home: const LandingPage(),
+      home: const EmotionalSplashScreen(nextScreen: LanguageSelectionScreen()),
     );
   }
 }

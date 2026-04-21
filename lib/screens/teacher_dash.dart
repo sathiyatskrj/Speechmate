@@ -89,10 +89,10 @@ class _TeacherDashState extends State<TeacherDash>
     return Theme(
       data: AppTheme.teacherTheme,
       child: Scaffold(
-        backgroundColor: const Color(0xFF0D0D14), // Deep dark base
+        backgroundColor: const Color(0xFFF8F9FA), // Lighter, clean background
         body: Stack(
           children: [
-            // Elegant Background Gradients
+            // Elegant Light Background Gradients
             Positioned(
               top: -100,
               right: -100,
@@ -103,7 +103,7 @@ class _TeacherDashState extends State<TeacherDash>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      Colors.blueAccent.withOpacity(0.15),
+                      Colors.blueAccent.withOpacity(0.1),
                       Colors.transparent,
                     ],
                   ),
@@ -120,7 +120,7 @@ class _TeacherDashState extends State<TeacherDash>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      Colors.purpleAccent.withOpacity(0.1),
+                      Colors.purpleAccent.withOpacity(0.08),
                       Colors.transparent,
                     ],
                   ),
@@ -447,12 +447,12 @@ class _TeacherDashState extends State<TeacherDash>
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.03),
+              color: Colors.white.withOpacity(0.6), // Frosty white glass
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.5),
+              border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.05),
+                  color: color.withOpacity(0.15),
                   blurRadius: 15,
                   spreadRadius: 2,
                 )
@@ -483,8 +483,8 @@ class _TeacherDashState extends State<TeacherDash>
                       const Spacer(),
                       Text(
                         title, 
-                        style: const TextStyle(
-                          color: Colors.white, 
+                        style: TextStyle(
+                          color: Colors.black87, // Dark text for light mode
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                           letterSpacing: 0.5,
