@@ -54,8 +54,20 @@ class _StudentDashState extends State<StudentDash>
      await DatabaseManager.instance.seedCategoryFromJson('animals', 'assets/data/dictionary_animals.json');
      await DatabaseManager.instance.seedCategoryFromJson('family', 'assets/data/dictionary_family.json');
      await DatabaseManager.instance.seedCategoryFromJson('magic', 'assets/data/dictionary_magic.json');
-     await DatabaseManager.instance.seedCategoryFromJson('numbers', 'assets/data/dictionary.json');
-     await DatabaseManager.instance.seedCategoryFromJson('nature', 'assets/data/dictionary.json');
+     await DatabaseManager.instance.seedCategoryFromList('numbers', [
+       {"name": "One", "nicobarese": "Heng", "emoji": "1️⃣"},
+       {"name": "Two", "nicobarese": "Nēk", "emoji": "2️⃣"},
+       {"name": "Three", "nicobarese": "Lūy", "emoji": "3️⃣"},
+       {"name": "Four", "nicobarese": "Fōan", "emoji": "4️⃣"},
+       {"name": "Five", "nicobarese": "Tanēy", "emoji": "5️⃣"},
+     ]);
+     await DatabaseManager.instance.seedCategoryFromList('nature', [
+       {"name": "Sun", "nicobarese": "Tahaēng", "emoji": "☀️"},
+       {"name": "Moon", "nicobarese": "Kahaēng", "emoji": "🌙"},
+       {"name": "Star", "nicobarese": "Tökaēng", "emoji": "⭐"},
+       {"name": "Rain", "nicobarese": "Kūm-yū", "emoji": "🌧️"},
+       {"name": "Wind", "nicobarese": "Tahaē", "emoji": "🌬️"},
+     ]);
      
      await DatabaseManager.instance.seedCategoryFromList('colors', [
        {"name": "Blue", "nicobarese": "tö lingū", "emoji": "🌊"},
