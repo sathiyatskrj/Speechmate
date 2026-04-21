@@ -27,25 +27,8 @@ class _LandingPageState extends State<LandingPage> {
   @override
   void initState() {
     super.initState();
-
-    _checkSavedRole();
-  }
-
-
-
-  Future<void> _checkSavedRole() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedRole = prefs.getString('user_role') ?? '';
-    if (savedRole.isNotEmpty && mounted) {
-      // Auto-navigate to the saved dashboard
-      final screen = savedRole == 'teacher'
-          ? const TeacherDash()
-          : const StudentDash();
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => screen));
-    } else {
-      if (mounted) setState(() => _isCheckingRole = false);
-    }
+    // No longer auto-redirect — always let user choose
+    _isCheckingRole = false;
   }
 
   @override

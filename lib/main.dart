@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:speechmate/screens/app_language_select.dart';
-import 'package:speechmate/screens/languages.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:speechmate/screens/emotional_splash_screen.dart';
+import 'package:speechmate/screens/landing_page.dart';
 import 'package:speechmate/core/app_theme.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
 
@@ -59,17 +55,15 @@ void main() async {
 
   try {
       await Firebase.initializeApp();
-      // Enable Firestore offline persistence
       FirebaseFirestore.instance.settings = const Settings(
         persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
   } catch (e) {
-      // If firebase fails (e.g. no google-services.json), we don't want to crash the whole app startup
       debugPrint("Firebase init failed: $e");
   }
 
-  // Database initialization remains for core dictionary features
+  // Database initialization
   try {
       await DatabaseManager.instance.database;
       await DatabaseManager.instance.seedExtraFromJson('phrases', 'assets/data/dictionary_phrases.json', (item) => {
@@ -85,7 +79,6 @@ void main() async {
         'teressa': item['teressa']?.toString() ?? '',
         'chowra': item['chowra']?.toString() ?? '',
       });
-      // Great Andamanese data
       await DatabaseManager.instance.seedExtraFromJson('ga_dictionary', 'assets/data/dictionary_great_andamanese.json', (item) => {
         'english': item['english']?.toString() ?? '',
         'great_andamanese': item['great_andamanese']?.toString() ?? '',
@@ -101,48 +94,24 @@ void main() async {
       debugPrint("Database init failed: $e");
   }
 
-  final prefs = await SharedPreferences.getInstance();
   await AppStrings.load();
-  final languageSelected = prefs.getBool('language_selected') ?? false;
-  final isTeacher = prefs.getBool('is_teacher') ?? false;
-  final hasSeenSplash = prefs.getBool('has_seen_splash') ?? false;
-
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  runApp(ProviderScope(
-    child: MyApp(
-      languageSelected: languageSelected, 
-      isTeacher: isTeacher,
-      hasSeenSplash: hasSeenSplash,
-    ),
+  runApp(const ProviderScope(
+    child: MyApp(),
   ));
 }
 
 class MyApp extends StatelessWidget {
-  final bool languageSelected;
-  final bool isTeacher;
-  final bool hasSeenSplash;
-
-  const MyApp({
-    super.key, 
-    required this.languageSelected, 
-    this.isTeacher = false,
-    this.hasSeenSplash = false,
-  });
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Widget internalScreen = languageSelected
-            ? const Languages()
-            : const LanguageSelectionScreen();
-
-    Widget targetScreen = internalScreen;
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SpeechMate - Nicobarese Language Learning',
-      theme: isTeacher ? AppTheme.teacherTheme : AppTheme.studentTheme,
-      home: hasSeenSplash ? targetScreen : EmotionalSplashScreen(nextScreen: targetScreen),
+      theme: AppTheme.studentTheme,
+      home: const LandingPage(),
     );
   }
 }

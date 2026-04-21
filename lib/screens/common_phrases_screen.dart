@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import '../services/dictionary_service.dart';
+import '../services/tts_service.dart';
 import '../core/app_colors.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -13,51 +14,50 @@ class CommonPhrasesScreen extends StatefulWidget {
 
 class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
   final DictionaryService _dictionaryService = DictionaryService();
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  final TtsService _ttsService = TtsService();
   List<Map<String, dynamic>> _phrases = [];
-
 
   @override
   void initState() {
     super.initState();
-
+    _ttsService.init();
     _loadPhrases();
   }
 
-
-
   Future<void> _loadPhrases() async {
-    final data = await _dictionaryService.loadDictionary(DictionaryType.phrases);
-    setState(() {
-      _phrases = data;
-    });
-  }
-
-  Future<void> _playAudio(Map<String, dynamic> phrase) async {
     try {
-      final audio = phrase['audio'];
-      if (audio != null && audio is Map) {
-        final category = audio['category'] ?? 'phrases';
-        final file = audio['file'];
-        if (file != null) {
-          final audioPath = 'audio/$category/$file';
-          await _audioPlayer.stop();
-          await _audioPlayer.play(AssetSource(audioPath));
-        }
+      final data = await _dictionaryService.loadDictionary(DictionaryType.phrases);
+      if (mounted) {
+        setState(() {
+          _phrases = data;
+        });
       }
     } catch (e) {
+      debugPrint("Error loading phrases: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Audio not available: $e')),
-        );
+        setState(() => _phrases = []);
       }
     }
   }
 
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
+  Future<void> _playPhrase(Map<String, dynamic> phrase) async {
+    try {
+      final nicobarese = phrase['nicobarese']?.toString() ?? '';
+      final english = phrase['text']?.toString() ?? phrase['english']?.toString() ?? '';
+      
+      if (nicobarese.isNotEmpty) {
+        _ttsService.speakNicobarese(nicobarese, englishWord: english);
+      } else if (english.isNotEmpty) {
+        _ttsService.speakEnglish(english);
+      }
+    } catch (e) {
+      debugPrint("TTS error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Audio playback not available')),
+        );
+      }
+    }
   }
 
   @override
@@ -96,7 +96,7 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
                       title: Text(
-                        item['text'] ?? '', 
+                        item['text'] ?? item['english'] ?? '', 
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)
                       ),
                       subtitle: item['nicobarese'] != null 
@@ -105,12 +105,12 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                             style: const TextStyle(color: Colors.amberAccent, fontSize: 16, fontStyle: FontStyle.italic)
                           )
                         : const Text(
-                            'Tap to hear pronunciation',
+                            'Tap speaker to hear',
                             style: TextStyle(color: Colors.white54, fontSize: 14, fontStyle: FontStyle.italic)
                           ),
                       trailing: IconButton(
                         icon: Icon(Icons.volume_up, color: AppColors.studentAccent),
-                        onPressed: () => _playAudio(item),
+                        onPressed: () => _playPhrase(item),
                       ),
                     ),
                   ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.1, end: 0, delay: Duration(milliseconds: (index % 10) * 50));
