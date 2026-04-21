@@ -30,89 +30,80 @@ class TranslationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isSmallScreen = screenSize.width < 360;
-    final isMediumScreen = screenSize.width < 400;
-
-    // Responsive font sizes
-    final topFontSize = isSmallScreen ? 20.0 : (isMediumScreen ? 23.0 : 26.0);
-    final bottomFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-    final cardPadding = isSmallScreen ? 12.0 : (isMediumScreen ? 16.0 : 20.0);
-
-    final String topText = searchedNicobarese ? english : nicobarese;
-    final String bottomLabel = searchedNicobarese ? 'Nicobarese' : 'English';
-    final String bottomText = searchedNicobarese ? nicobarese : english;
-
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(
-        maxWidth: screenSize.width * 0.95,
-      ),
-      padding: EdgeInsets.all(cardPadding),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(2, 2)),
-        ],
+        color: isError ? Colors.redAccent.withOpacity(0.1) : Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isError ? Colors.redAccent.withOpacity(0.3) : Colors.white.withOpacity(0.2)),
+        boxShadow: [
+             BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 15, offset: const Offset(0, 5))
+        ]
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Text(
-                  topText,
-                  style: TextStyle(
-                    fontSize: topFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: isError ? Colors.redAccent : Colors.black,
-                  ),
-                  softWrap: true,
-                  overflow: TextOverflow.visible,
+              Text(
+                isError ? "Not Found" : (searchedNicobarese ? "English Translation" : "Nicobarese Translation"),
+                style: TextStyle(
+                  color: isError ? Colors.redAccent : Colors.cyanAccent,
+                  fontSize: 12,
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-
-              if (showSpeaker && !isError)
-                IconButton(
-                  icon: Icon(Icons.volume_up_rounded, size: isSmallScreen ? 22 : 24),
-                  onPressed: onSpeak,
-                  padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
-                ),
-              if (onFavoriteToggle != null && !isError)
-                IconButton(
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : null,
-                    size: isSmallScreen ? 20 : 22,
-                  ),
-                  onPressed: onFavoriteToggle,
-                  padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
-                ),
-              if (onReport != null && !isError)
-                IconButton(
-                  icon: Icon(Icons.flag_outlined, size: isSmallScreen ? 18 : 20),
-                  onPressed: onReport,
-                  padding: EdgeInsets.all(isSmallScreen ? 4 : 8),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (showSpeaker && !isError)
+                    IconButton(
+                      onPressed: onSpeak,
+                      icon: const Icon(Icons.volume_up_rounded, color: Colors.cyanAccent),
+                      tooltip: "Pronounce",
+                    ),
+                  if (onFavoriteToggle != null && !isError)
+                    IconButton(
+                      onPressed: onFavoriteToggle,
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.redAccent : Colors.white54,
+                      ),
+                    ),
+                  if (onReport != null && !isError)
+                    IconButton(
+                      onPressed: onReport,
+                      icon: const Icon(Icons.flag_outlined, color: Colors.white54),
+                    ),
+                ],
+              ),
             ],
           ),
-
-          if (!isError) ...[
-            SizedBox(height: isSmallScreen ? 6 : 8),
-            Text(
-              "$bottomLabel: $bottomText",
-              style: TextStyle(
-                fontSize: bottomFontSize,
-                color: Colors.black54,
-              ),
-              softWrap: true,
-              overflow: TextOverflow.visible,
+          const SizedBox(height: 15),
+          Text(
+            nicobarese,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              height: 1.2,
             ),
-          ],
+          ),
+          if (!isError && english.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                english,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white70,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+          ]
         ],
       ),
     );

@@ -274,9 +274,6 @@ class DatabaseManager {
       audio_asset TEXT
     )
     ''');
-
-    await db.execute('''
-    ''');
   }
 
   static Future<void> _seedKinship(Database db) async {
