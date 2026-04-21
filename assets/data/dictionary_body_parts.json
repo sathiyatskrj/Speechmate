@@ -1,0 +1,14 @@
+[
+  {"text": "Eye", "nicobarese": "Mötö", "emoji": "👁️", "audio": {"category": "body_parts", "file": "eye.mp3"}, "image": "assets/images/eye.png"},
+  {"text": "Ear", "nicobarese": "Tananga", "emoji": "👂", "audio": {"category": "body_parts", "file": "ear.mp3"}, "image": "assets/images/ear.png"},
+  {"text": "Nose", "nicobarese": "Nöngūm", "emoji": "👃", "audio": {"category": "body_parts", "file": "nose.mp3"}, "image": "assets/images/nose.png"},
+  {"text": "Mouth", "nicobarese": "Chūm", "emoji": "👄", "audio": {"category": "body_parts", "file": "mouth.mp3"}, "image": "assets/images/mouth.png"},
+  {"text": "Hand", "nicobarese": "Kā-öt", "emoji": "✋", "audio": {"category": "body_parts", "file": "hand.mp3"}, "image": "assets/images/hand.png"},
+  {"text": "Foot", "nicobarese": "Hinyūh", "emoji": "🦶", "audio": {"category": "body_parts", "file": "foot.mp3"}, "image": "assets/images/foot.png"},
+  {"text": "Head", "nicobarese": "Chöm", "emoji": "🗣️", "audio": {"category": "body_parts", "file": "head.mp3"}, "image": "assets/images/head.png"},
+  {"text": "Teeth", "nicobarese": "Tī", "emoji": "🦷"},
+  {"text": "Hair", "nicobarese": "Yök", "emoji": "💇", "audio": {"category": "body_parts", "file": "hair.mp3"}, "image": "assets/images/hair.png"},
+  {"text": "Heart", "nicobarese": "Yā", "emoji": "❤️"},
+  {"text": "Stomach", "nicobarese": "Pāk", "emoji": "🫃", "audio": {"category": "body_parts", "file": "stomach.mp3"}, "image": "assets/images/stomach.png"},
+  {"text": "Leg", "nicobarese": "Tö-kūng", "emoji": "🦵", "audio": {"category": "body_parts", "file": "leg.mp3"}, "image": "assets/images/legs.png"}
+]

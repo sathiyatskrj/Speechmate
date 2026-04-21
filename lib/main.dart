@@ -90,6 +90,22 @@ void main() async {
         'great_andamanese': item['great_andamanese']?.toString() ?? '',
         'audio': item['audio']?.toString() ?? '',
       });
+      
+      // Seed ALL category word data from JSON files
+      final categoryJsonFiles = {
+        'animals': 'assets/data/dictionary_animals.json',
+        'family': 'assets/data/dictionary_family.json',
+        'magic': 'assets/data/dictionary_magic.json',
+        'body_parts': 'assets/data/dictionary_body_parts.json',
+        'numbers': 'assets/data/dictionary_numbers.json',
+        'nature': 'assets/data/dictionary_nature.json',
+        'colors': 'assets/data/dictionary_colors.json',
+        'things': 'assets/data/dictionary_things.json',
+        'feelings': 'assets/data/dictionary_feelings.json',
+      };
+      for (final entry in categoryJsonFiles.entries) {
+        await DatabaseManager.instance.seedCategoryFromJson(entry.key, entry.value);
+      }
   } catch (e) {
       debugPrint("Database init failed: $e");
   }

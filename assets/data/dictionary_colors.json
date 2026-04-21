@@ -1,0 +1,12 @@
+[
+  {"text": "Blue", "nicobarese": "Tö lingū", "emoji": "🌊", "audio": {"category": "colors", "file": "blue.mp3"}},
+  {"text": "Green", "nicobarese": "Tö rōy chōn", "emoji": "🥥", "audio": {"category": "colors", "file": "green.mp3"}},
+  {"text": "Orange", "nicobarese": "Föl", "emoji": "🌅"},
+  {"text": "Red", "nicobarese": "Chöī", "emoji": "🔴", "audio": {"category": "colors", "file": "red.mp3"}},
+  {"text": "Yellow", "nicobarese": "Rōy", "emoji": "🌻"},
+  {"text": "White", "nicobarese": "Fūn", "emoji": "⬜", "audio": {"category": "colors", "file": "white.mp3"}},
+  {"text": "Black", "nicobarese": "Talen", "emoji": "⬛", "audio": {"category": "colors", "file": "black.mp3"}},
+  {"text": "Brown", "nicobarese": "Ūm Talen", "emoji": "🤎"},
+  {"text": "Pink", "nicobarese": "Chöī Fūn", "emoji": "🩷"},
+  {"text": "Purple", "nicobarese": "Tö lingū chöī", "emoji": "🟣"}
+]

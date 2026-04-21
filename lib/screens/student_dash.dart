@@ -14,11 +14,8 @@ import 'package:speechmate/screens/voice_vault_screen.dart';
 import 'package:speechmate/screens/dynamic_category_screen.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
-import 'package:speechmate/screens/lessons/lesson_screen.dart';
-import 'package:speechmate/models/lesson_models.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
-import 'package:speechmate/screens/srs_review_screen.dart';
 import 'package:speechmate/screens/great_andamanese_screen.dart';
 import 'package:speechmate/screens/flora_fauna_screen.dart';
 import 'package:speechmate/screens/story_radio_screen.dart';
@@ -48,81 +45,6 @@ class _StudentDashState extends State<StudentDash>
     WidgetsBinding.instance.addObserver(this);
     ttsService.init();
     initSearch();
-    _seedDynamicData();
-  }
-
-  Future<void> _seedDynamicData() async {
-     await DatabaseManager.instance.seedCategoryFromJson('animals', 'assets/data/dictionary_animals.json');
-     await DatabaseManager.instance.seedCategoryFromJson('family', 'assets/data/dictionary_family.json');
-     await DatabaseManager.instance.seedCategoryFromJson('magic', 'assets/data/dictionary_magic.json');
-     await DatabaseManager.instance.seedCategoryFromList('numbers', [
-       {"name": "One", "nicobarese": "Heng", "emoji": "1️⃣"},
-       {"name": "Two", "nicobarese": "Nēk", "emoji": "2️⃣"},
-       {"name": "Three", "nicobarese": "Lūy", "emoji": "3️⃣"},
-       {"name": "Four", "nicobarese": "Fōan", "emoji": "4️⃣"},
-       {"name": "Five", "nicobarese": "Tanēy", "emoji": "5️⃣"},
-     ]);
-     await DatabaseManager.instance.seedCategoryFromList('nature', [
-       {"name": "Sun", "nicobarese": "Tahaēng", "emoji": "☀️"},
-       {"name": "Moon", "nicobarese": "Kahaēng", "emoji": "🌙"},
-       {"name": "Star", "nicobarese": "Tökaēng", "emoji": "⭐"},
-       {"name": "Rain", "nicobarese": "Kūm-yū", "emoji": "🌧️"},
-       {"name": "Wind", "nicobarese": "Tahaē", "emoji": "🌬️"},
-     ]);
-     
-     await DatabaseManager.instance.seedCategoryFromList('colors', [
-       {"name": "Blue", "nicobarese": "tö lingū", "emoji": "🌊"},
-       {"name": "Green", "nicobarese": "tö rōy chōn", "emoji": "🥥"},
-       {"name": "Orange", "nicobarese": "Föl", "emoji": "🌅"},
-       {"name": "Red", "nicobarese": "Chöī", "emoji": "🔴"},
-       {"name": "Yellow", "nicobarese": "Rōy", "emoji": "🌻"},
-       {"name": "White", "nicobarese": "Fūn", "emoji": "⬜"},
-       {"name": "Black", "nicobarese": "Talen", "emoji": "⬛"},
-       {"name": "Brown", "nicobarese": "Ūm Talen", "emoji": "🤎"},
-       {"name": "Pink", "nicobarese": "Chöī Fūn", "emoji": "🩷"},
-       {"name": "Purple", "nicobarese": "Tö lingū chöī", "emoji": "🟣"},
-     ]);
-     
-     await DatabaseManager.instance.seedCategoryFromList('feelings', [
-       {"name": "Happy", "nicobarese": "Vah", "emoji": "😁"},
-       {"name": "Sad", "nicobarese": "Nö-öt", "emoji": "😢"},
-       {"name": "Angry", "nicobarese": "Kaūn", "emoji": "😡"},
-       {"name": "Scared", "nicobarese": "Takat", "emoji": "😨"},
-       {"name": "Tired", "nicobarese": "Löhöt", "emoji": "😴"},
-       {"name": "Hungry", "nicobarese": "Ön-yā", "emoji": "🤤"},
-       {"name": "Thirsty", "nicobarese": "Ön-nūm", "emoji": "💧"},
-       {"name": "Love", "nicobarese": "Maūn", "emoji": "❤️"},
-       {"name": "Surprise", "nicobarese": "Takūn", "emoji": "😲"},
-       {"name": "Shy", "nicobarese": "Mā-öt", "emoji": "🫣"},
-     ]);
-     
-     await DatabaseManager.instance.seedCategoryFromList('things', [
-       {"name": "House", "nicobarese": "Pati", "emoji": "🏠"},
-       {"name": "Boat", "nicobarese": "Hōdi", "emoji": "🚣"},
-       {"name": "Water", "nicobarese": "Dāk", "emoji": "💧"},
-       {"name": "Fire", "nicobarese": "Yūh", "emoji": "🔥"},
-       {"name": "Stone", "nicobarese": "Lūng", "emoji": "🪨"},
-       {"name": "Tree", "nicobarese": "Dāng", "emoji": "🌳"},
-       {"name": "Coconut", "nicobarese": "Tafūl", "emoji": "🥥"},
-       {"name": "Fish", "nicobarese": "Hīchā", "emoji": "🐟"},
-       {"name": "Clothes", "nicobarese": "Nāra", "emoji": "👕"},
-       {"name": "Food", "nicobarese": "Kānā", "emoji": "🍚"},
-     ]);
-     
-     await DatabaseManager.instance.seedCategoryFromList('body_parts', [
-       {"name": "Eye", "nicobarese": "Mötö", "emoji": "👁️"},
-       {"name": "Ear", "nicobarese": "Tananga", "emoji": "👂"},
-       {"name": "Nose", "nicobarese": "Nöngūm", "emoji": "👃"},
-       {"name": "Mouth", "nicobarese": "Chūm", "emoji": "👄"},
-       {"name": "Hand", "nicobarese": "Kā-öt", "emoji": "✋"},
-       {"name": "Foot", "nicobarese": "Hinyūh", "emoji": "🦶"},
-       {"name": "Head", "nicobarese": "Chöm", "emoji": "🗣️"},
-       {"name": "Teeth", "nicobarese": "Tī", "emoji": "🦷"},
-       {"name": "Hair", "nicobarese": "Yök", "emoji": "💇"},
-       {"name": "Heart", "nicobarese": "Yā", "emoji": "❤️"},
-       {"name": "Stomach", "nicobarese": "Pāk", "emoji": "🫃"},
-       {"name": "Back", "nicobarese": "Tö-kūng", "emoji": "🔙"},
-     ]);
   }
 
   @override
@@ -141,9 +63,6 @@ class _StudentDashState extends State<StudentDash>
   void _onClear() => clearMixinSearch(searchController);
 
   List<Map<String, dynamic>> get learningTiles => [
-    {"word": AppStrings.get('dailyReview'), "emoji": "🧠", "colors": [Color(0xFF00C9FF), Color(0xFF92FE9D)], "navigateTo": const SrsReviewScreen(), "icon": Icons.psychology_rounded},
-    {"word": AppStrings.get('jungleAdventure'), "emoji": "🦁", "colors": [Color(0xFFFF9966), Color(0xFFFF5E62)], "navigateTo": LessonScreen(lesson: interactiveLessons[0]), "icon": Icons.terrain_rounded},
-    {"word": AppStrings.get('islandColors'), "emoji": "🏝️", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": LessonScreen(lesson: interactiveLessons[1]), "icon": Icons.beach_access_rounded},
     {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers'), "icon": Icons.format_list_numbered_rounded},
     {"word": AppStrings.get('nature'), "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature'), "icon": Icons.eco_rounded},
     {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings'), "icon": Icons.emoji_emotions_rounded},

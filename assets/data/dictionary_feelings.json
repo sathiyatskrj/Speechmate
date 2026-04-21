@@ -1,0 +1,12 @@
+[
+  {"text": "Happy", "nicobarese": "Vah", "emoji": "😁", "audio": {"category": "feelings", "file": "happy.mp3"}},
+  {"text": "Sad", "nicobarese": "Nö-öt", "emoji": "😢", "audio": {"category": "feelings", "file": "sad.mp3"}},
+  {"text": "Angry", "nicobarese": "Kaūn", "emoji": "😡", "audio": {"category": "feelings", "file": "angry.mp3"}},
+  {"text": "Scared", "nicobarese": "Takat", "emoji": "😨", "audio": {"category": "feelings", "file": "afraid.mp3"}},
+  {"text": "Tired", "nicobarese": "Löhöt", "emoji": "😴"},
+  {"text": "Hungry", "nicobarese": "Ön-yā", "emoji": "🤤"},
+  {"text": "Thirsty", "nicobarese": "Ön-nūm", "emoji": "💧"},
+  {"text": "Love", "nicobarese": "Maūn", "emoji": "❤️"},
+  {"text": "Surprise", "nicobarese": "Takūn", "emoji": "😲"},
+  {"text": "Shy", "nicobarese": "Mā-öt", "emoji": "🫣"}
+]

@@ -1,0 +1,15 @@
+[
+  {"text": "Sun", "nicobarese": "Tahaēng", "emoji": "☀️", "audio": {"category": "nature", "file": "sun.mp3"}},
+  {"text": "Moon", "nicobarese": "Kahaēng", "emoji": "🌙"},
+  {"text": "Star", "nicobarese": "Tökaēng", "emoji": "⭐"},
+  {"text": "Rain", "nicobarese": "Kūm-yū", "emoji": "🌧️", "audio": {"category": "nature", "file": "rain.mp3"}},
+  {"text": "Wind", "nicobarese": "Tahaē", "emoji": "🌬️"},
+  {"text": "Cloud", "nicobarese": "Röm", "emoji": "☁️", "audio": {"category": "nature", "file": "cloud.mp3"}},
+  {"text": "Sea", "nicobarese": "Löm", "emoji": "🌊", "audio": {"category": "nature", "file": "sea.mp3"}},
+  {"text": "River", "nicobarese": "Dāk-hōng", "emoji": "🏞️", "audio": {"category": "nature", "file": "river.mp3"}},
+  {"text": "Fire", "nicobarese": "Yūh", "emoji": "🔥", "audio": {"category": "nature", "file": "fire.mp3"}},
+  {"text": "Tree", "nicobarese": "Dāng", "emoji": "🌳", "audio": {"category": "nature", "file": "tree.mp3"}},
+  {"text": "Flower", "nicobarese": "Fūl", "emoji": "🌺", "audio": {"category": "nature", "file": "flower.mp3"}},
+  {"text": "Mountain", "nicobarese": "Lūng-höng", "emoji": "⛰️", "audio": {"category": "nature", "file": "mountain.mp3"}},
+  {"text": "Soil", "nicobarese": "Pūm", "emoji": "🟤", "audio": {"category": "nature", "file": "soil.mp3"}}
+]

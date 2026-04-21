@@ -96,6 +96,13 @@ flutter:
     - assets/data/dictionary_dialects.json
     - assets/data/dictionary_great_andamanese.json
     - assets/data/phrases_great_andamanese.json
+    - assets/data/dictionary_body_parts.json
+    - assets/data/dictionary_numbers.json
+    - assets/data/dictionary_nature.json
+    - assets/data/dictionary_colors.json
+    - assets/data/dictionary_things.json
+    - assets/data/dictionary_feelings.json
+    - assets/audio/
 
 dependency_overrides:
   record_linux: ^1.2.0

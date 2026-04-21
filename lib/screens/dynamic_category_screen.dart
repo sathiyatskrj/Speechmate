@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/services/linguistics_service.dart';
 import 'package:speechmate/widgets/background.dart';
 import 'package:speechmate/core/app_colors.dart';
 
@@ -24,47 +24,182 @@ class DynamicCategoryScreen extends StatefulWidget {
 
 class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
   final TtsService _ttsService = TtsService();
-  final AudioPlayer _audioPlayer = AudioPlayer();
   List<Map<String, dynamic>> _items = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _ttsService.init();
     _loadData();
+    LinguisticsService.instance.loadCorpus(); // Prepare linguistic engine
   }
 
   Future<void> _loadData() async {
-     final data = await DatabaseManager.instance.getWordsByCategory(widget.categoryId);
-     if (mounted) {
-       setState(() {
-         _items = data;
-         _isLoading = false;
-       });
+     try {
+       final data = await DatabaseManager.instance.getWordsByCategory(widget.categoryId);
+       if (mounted) {
+         setState(() {
+           _items = data;
+           _isLoading = false;
+         });
+       }
+     } catch (e) {
+       debugPrint("Error loading category ${widget.categoryId}: $e");
+       if (mounted) {
+         setState(() => _isLoading = false);
+       }
      }
   }
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
+    _ttsService.dispose();
     super.dispose();
   }
 
-  Future<void> _playAudio(String audioPath, String fallbackWord, String nicobareseWord) async {
-    try {
-        if (audioPath.isNotEmpty) {
-           if (audioPath.startsWith('http') || audioPath.startsWith('/')) {
-              await _audioPlayer.play(DeviceFileSource(audioPath));
-           } else {
-              // Usually the filename in JSON
-              await _audioPlayer.play(AssetSource('audio/${widget.categoryId}/$audioPath'));
-           }
-        } else {
-           _ttsService.speakNicobarese(nicobareseWord.isNotEmpty ? nicobareseWord : fallbackWord); 
+  Future<void> _playAudio(Map<String, dynamic> item) async {
+    final english = item['english']?.toString() ?? '';
+    final nicobarese = item['nicobarese']?.toString() ?? '';
+    final audioField = item['audio']?.toString() ?? '';
+
+    if (audioField.isNotEmpty) {
+      if (audioField.contains('/')) {
+        final parts = audioField.split('/');
+        if (parts.length >= 2) {
+          final success = await _ttsService.playFromCategory(parts[0], parts[1]);
+          if (success) return;
         }
-    } catch (e) {
-        _ttsService.speakNicobarese(nicobareseWord.isNotEmpty ? nicobareseWord : fallbackWord); 
+      } else {
+        final success = await _ttsService.playFromCategory(widget.categoryId, audioField);
+        if (success) return;
+      }
     }
+
+    await _ttsService.speakNicobarese(
+      nicobarese.isNotEmpty ? nicobarese : english,
+      englishWord: english,
+    );
+  }
+
+  void _showLinguisticAnalysis(Map<String, dynamic> item) {
+    _playAudio(item); // Play audio immediately when tapped
+    
+    final english = item['english']?.toString() ?? '';
+    final nicobarese = item['nicobarese']?.toString() ?? '';
+    if (nicobarese.isEmpty) return;
+
+    final analysis = LinguisticsService.instance.analyzeWord(english, nicobarese);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A24),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          boxShadow: [
+            BoxShadow(color: AppColors.studentAccent.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, -5))
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(color: Colors.white30, borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(nicobarese, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+                    Text(english, style: const TextStyle(fontSize: 18, color: Colors.amberAccent, fontStyle: FontStyle.italic)),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.volume_up, color: Colors.cyanAccent, size: 32),
+                  onPressed: () => _playAudio(item),
+                ).animate().scale(delay: 300.ms, duration: 400.ms),
+              ],
+            ),
+            const Divider(color: Colors.white24, height: 30),
+            Expanded(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  _buildAnalysisSection(
+                    '1. Phonology (Sounds)', 
+                    Icons.graphic_eq_rounded,
+                    'Syllables: ${analysis.phonology.syllableCount}\n'
+                    'Breakdown: ${analysis.phonology.syllables.join(" - ")}\n'
+                    'Difficulty: ${List.filled(analysis.phonology.difficulty, "★").join()}${List.filled(5 - analysis.phonology.difficulty, "☆").join()}'
+                  ),
+                  _buildAnalysisSection(
+                    '2. Morphology (Structure)', 
+                    Icons.account_tree_rounded,
+                    'Root: ${analysis.morphology.root}\n'
+                    '${analysis.morphology.isCompound ? "Compound word: ${analysis.morphology.compoundParts.join(' + ')}" : "Simple word structure"}\n'
+                    '${analysis.morphology.prefixes.isNotEmpty ? "Prefixes: ${analysis.morphology.prefixes.join(', ')} (${analysis.morphology.prefixMeanings.join(', ')})" : ""}'
+                  ),
+                  _buildAnalysisSection(
+                    '3. Semantics (Meaning)', 
+                    Icons.bubble_chart_rounded,
+                    'Semantic Field: ${analysis.semanticField ?? "General"}\n'
+                    '${analysis.pragmatics?.note ?? ""}'
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnalysisSection(String title, IconData icon, String content) {
+    if (content.trim().isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white10)
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: AppColors.studentAccent, size: 20),
+                const SizedBox(width: 10),
+                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(content, style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.4)),
+          ],
+        ),
+      ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1),
+    );
+  }
+
+  String? _getImagePath(Map<String, dynamic> item) {
+    final image = item['image']?.toString();
+    if (image != null && image.isNotEmpty && image != 'null') {
+      return image;
+    }
+    return null;
   }
 
   @override
@@ -75,7 +210,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
         title: Text(widget.title),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.black87,
+        foregroundColor: Colors.white,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -90,17 +225,30 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
         ),
         child: SafeArea(
           child: _isLoading 
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator(color: Colors.white))
             : _items.isEmpty
-              ? const Center(child: Text("No items found in this category."))
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.inbox_rounded, size: 64, color: Colors.white30),
+                      const SizedBox(height: 16),
+                      Text(
+                        "No items found in ${widget.title}.\nPlease restart the app.",
+                        style: const TextStyle(color: Colors.white54, fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
               : GridView.builder(
             padding: const EdgeInsets.all(20),
             physics: const BouncingScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
-              childAspectRatio: 0.8,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.75,
             ),
             itemCount: _items.length,
             itemBuilder: (context, index) {
@@ -114,8 +262,14 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
   }
 
   Widget _buildCard(Map<String, dynamic> item, int index) {
+    final english = item['english']?.toString() ?? '';
+    final nicobarese = item['nicobarese']?.toString() ?? '';
+    final emoji = item['emoji']?.toString() ?? '';
+    final imagePath = _getImagePath(item);
+    final hasAudio = (item['audio']?.toString() ?? '').isNotEmpty;
+
     return GestureDetector(
-      onTap: () => _playAudio(item['audio'] ?? '', item['english'], item['nicobarese']),
+      onTap: () => _showLinguisticAnalysis(item),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.1),
@@ -123,7 +277,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
           border: Border.all(color: Colors.white24),
           boxShadow: [
             BoxShadow(
-              color: AppColors.studentAccent.withOpacity(0.2),
+              color: AppColors.studentAccent.withOpacity(0.15),
               blurRadius: 15,
               offset: const Offset(0, 8),
             )
@@ -139,12 +293,28 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
                 ),
                 child: Center(
-                  child: item['emoji'] != null && item['emoji'].toString().isNotEmpty
-                    ? Text(
-                        item['emoji'],
+                  child: imagePath != null
+                    ? ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+                        child: Image.asset(
+                          imagePath,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (_, __, ___) => Text(
+                            emoji.isNotEmpty ? emoji : '📝',
+                            style: const TextStyle(fontSize: 50),
+                          ),
+                        ),
+                      )
+                    : Text(
+                        emoji.isNotEmpty ? emoji : '📝',
                         style: const TextStyle(fontSize: 50),
-                      ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(begin: const Offset(1,1), end: const Offset(1.1, 1.1), duration: 2.seconds)
-                    : Icon(Icons.star_rounded, size: 50, color: AppColors.studentAccent),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
+                        begin: const Offset(1, 1), 
+                        end: const Offset(1.1, 1.1), 
+                        duration: 2.seconds,
+                      ),
                 ),
               ),
             ),
@@ -156,7 +326,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      item['english'],
+                      english,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -166,8 +336,9 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                     Text(
-                      item['nicobarese'],
+                    const SizedBox(height: 2),
+                    Text(
+                      nicobarese,
                       style: const TextStyle(
                         color: Colors.amberAccent,
                         fontWeight: FontWeight.bold,
@@ -178,6 +349,11 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (hasAudio)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: Icon(Icons.volume_up_rounded, color: Colors.cyanAccent, size: 16),
+                      ),
                   ],
                 ),
               ),

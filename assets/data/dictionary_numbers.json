@@ -1,0 +1,12 @@
+[
+  {"text": "One", "nicobarese": "Heng", "emoji": "1️⃣", "audio": {"category": "numbers", "file": "1.mp3"}},
+  {"text": "Two", "nicobarese": "Nēk", "emoji": "2️⃣", "audio": {"category": "numbers", "file": "2.mp3"}},
+  {"text": "Three", "nicobarese": "Lūy", "emoji": "3️⃣", "audio": {"category": "numbers", "file": "3.mp3"}},
+  {"text": "Four", "nicobarese": "Fōan", "emoji": "4️⃣", "audio": {"category": "numbers", "file": "4.mp3"}},
+  {"text": "Five", "nicobarese": "Tanēy", "emoji": "5️⃣", "audio": {"category": "numbers", "file": "5.mp3"}},
+  {"text": "Six", "nicobarese": "Tafūl-heng", "emoji": "6️⃣", "audio": {"category": "numbers", "file": "6.mp3"}},
+  {"text": "Seven", "nicobarese": "Tafūl-nēk", "emoji": "7️⃣", "audio": {"category": "numbers", "file": "7.mp3"}},
+  {"text": "Eight", "nicobarese": "Tafūl-lūy", "emoji": "8️⃣", "audio": {"category": "numbers", "file": "8.mp3"}},
+  {"text": "Nine", "nicobarese": "Tafūl-fōan", "emoji": "9️⃣", "audio": {"category": "numbers", "file": "9.mp3"}},
+  {"text": "Ten", "nicobarese": "Hēt", "emoji": "🔟", "audio": {"category": "numbers", "file": "10.mp3"}}
+]
