@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:speechmate/services/neural_engine_service.dart';
 import 'package:speechmate/services/tts_service.dart';
@@ -15,16 +16,24 @@ class CameraTranslationScreen extends StatefulWidget {
 class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   CameraController? _cameraController;
   final TextRecognizer _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+  late ObjectDetector _objectDetector;
   final NeuralEngineService _neuralEngine = NeuralEngineService();
   final TtsService _ttsService = TtsService();
   
   bool _isProcessing = false;
   String _recognizedText = "";
   String _translatedText = "";
+  String _detectedObject = "";
   
   @override
   void initState() {
     super.initState();
+    final options = ObjectDetectorOptions(
+      mode: DetectionMode.single,
+      classifyObjects: true,
+      multipleObjects: false,
+    );
+    _objectDetector = ObjectDetector(options: options);
     _initializeCamera();
     _ttsService.init();
     _neuralEngine.init();
@@ -53,6 +62,7 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   void dispose() {
     _cameraController?.dispose();
     _textRecognizer.close();
+    _objectDetector.close();
     super.dispose();
   }
 
@@ -65,27 +75,38 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
 
     try {
       final inputImage = InputImage.fromFilePath(path);
-      final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
       
+      // 1. Try Object Detection first
+      final List<DetectedObject> objects = await _objectDetector.processImage(inputImage);
+      String objectName = "";
+      if (objects.isNotEmpty && objects.first.labels.isNotEmpty) {
+          objectName = objects.first.labels.first.text;
+      }
+
+      // 2. Try Text Recognition
+      final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
       String extractedText = recognizedText.text.replaceAll('\n', ' ').trim();
       
-      if (extractedText.isNotEmpty) {
+      String queryText = extractedText.isNotEmpty ? extractedText : objectName;
+      
+      if (queryText.isNotEmpty) {
         // Translate using offline Neural Engine
-        final result = await _neuralEngine.predict(extractedText);
+        final result = await _neuralEngine.predict(queryText);
         setState(() {
-          _recognizedText = extractedText;
+          _detectedObject = objectName.isNotEmpty && extractedText.isEmpty ? "Detected Object: $objectName" : "";
+          _recognizedText = queryText;
           _translatedText = result.text;
         });
         _showResultSheet();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No text recognized. Try again.')),
+            const SnackBar(content: Text('No text or objects recognized. Try again.')),
           );
         }
       }
     } catch (e) {
-       debugPrint("OCR Error: $e");
+       debugPrint("Processing Error: $e");
     } finally {
       if (mounted) {
         setState(() {
@@ -135,7 +156,11 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                     const Text("Original Text", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                     if (_detectedObject.isNotEmpty)
+                        Text(_detectedObject, style: const TextStyle(color: Colors.amberAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                     if (_detectedObject.isNotEmpty)
+                        const SizedBox(height: 8),
+                     const Text("Original", style: TextStyle(color: Colors.white54, fontSize: 12)),
                      const SizedBox(height: 8),
                      Text(_recognizedText, style: const TextStyle(color: Colors.white, fontSize: 16)),
                      const SizedBox(height: 20),

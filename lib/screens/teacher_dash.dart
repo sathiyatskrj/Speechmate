@@ -18,6 +18,8 @@ import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/screens/camera_translation_screen.dart';
+import 'package:speechmate/screens/voice_translator_screen.dart';
+import 'package:speechmate/screens/dictionary_editor_screen.dart';
 import 'package:speechmate/screens/great_andamanese_screen.dart';
 import 'package:speechmate/screens/flora_fauna_screen.dart';
 import 'package:speechmate/screens/story_radio_screen.dart';
@@ -245,7 +247,13 @@ class _TeacherDashState extends State<TeacherDash>
                         ),
                         children: [
                           _buildFeatureCard(context,
-                            title: "Translator",
+                            title: "Voice Translator",
+                            icon: Icons.record_voice_over_rounded,
+                            color: Colors.redAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen())),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Text Translator",
                             icon: Icons.translate,
                             color: Colors.orangeAccent,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
@@ -267,6 +275,12 @@ class _TeacherDashState extends State<TeacherDash>
                             icon: Icons.picture_as_pdf_outlined,
                             color: Colors.deepOrangeAccent,
                             onTap: () async => await ReportGenerator.generateAndPrintReport("Student"),
+                          ),
+                          _buildFeatureCard(context,
+                            title: "Dict Editor",
+                            icon: Icons.edit_note_rounded,
+                            color: Colors.blueAccent,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DictionaryEditorScreen())),
                           ),
                           _buildFeatureCard(context,
                             title: "Import Vocab",

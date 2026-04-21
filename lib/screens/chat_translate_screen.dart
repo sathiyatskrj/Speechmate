@@ -188,9 +188,9 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                 const Text("Chat Translator"),
               ],
             ),
-            backgroundColor: Colors.teal.shade700,
+            backgroundColor: const Color(0xFF1E1E2C),
             foregroundColor: Colors.white,
-            elevation: 2,
+            elevation: 0,
             actions: [
               IconButton(
                 icon: const Icon(Icons.info_outline),
@@ -209,15 +209,8 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
           body: ConfettiOverlay(
             isPlaying: showConfetti,
             child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.teal.shade50,
-                      Colors.white,
-                    ],
-                  ),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF121212),
                 ),
                 child: SafeArea(
                   child: Column(
@@ -265,8 +258,8 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             colors: isUser
-                                                ? [Colors.teal.shade600, Colors.teal.shade700]
-                                                : [Colors.white, Colors.grey.shade50],
+                                                ? [Colors.cyan.shade600, Colors.blue.shade700]
+                                                : [const Color(0xFF1E1E2C), const Color(0xFF2A2A3D)],
                                           ),
                                           borderRadius: BorderRadius.only(
                                             topLeft: const Radius.circular(16),
@@ -285,7 +278,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                         child: Text(
                                           msg['text']!,
                                           style: TextStyle(
-                                            color: isUser ? Colors.white : Colors.black87,
+                                            color: Colors.white,
                                             fontSize: messageFontSize,
                                             height: 1.4,
                                           ),
@@ -295,7 +288,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                       if (!isUser && msg.containsKey('word_data') && msg['word_data'] != null && !msg['word_data'].containsKey('generated')) ...[
                                         const SizedBox(width: 4),
                                         Container(
-                                          decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
+                                          decoration: BoxDecoration(color: const Color(0xFF2A2A3D), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
                                           child: IconButton(
                                             icon: const Icon(Icons.bookmark_add_rounded, size: 20, color: Colors.orangeAccent),
                                             padding: const EdgeInsets.all(6),
@@ -333,14 +326,8 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                           vertical: isSmallScreen ? 8 : 10,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, -2),
-                            ),
-                          ],
+                          color: const Color(0xFF1E1E2C),
+                          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
                         ),
                         child: Row(
                           children: [
@@ -368,7 +355,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                     ),
                                     suffixIcon: controller.text.isNotEmpty
                                         ? IconButton(
-                                            icon: const Icon(Icons.clear, size: 20),
+                                            icon: const Icon(Icons.clear, size: 20, color: Colors.white54),
                                             onPressed: () {
                                               setState(() => controller.clear());
                                             },
@@ -407,7 +394,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                             ),
                             // [NEW] Toggle custom keyboard
                             IconButton(
-                              icon: Icon(_showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, color: Colors.teal.shade700),
+                              icon: Icon(_showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, color: Colors.cyanAccent),
                               onPressed: () {
                                  setState(() {
                                    _showCustomKeyboard = !_showCustomKeyboard;
@@ -449,7 +436,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: const Color(0xFF2A2A3D),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -478,7 +465,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
             width: 8,
             height: 8,
             decoration: BoxDecoration(
-              color: Colors.teal.shade400,
+              color: Colors.cyanAccent,
               shape: BoxShape.circle,
             ),
           ),

@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/languages.dart';
 import 'package:flutter/services.dart';
+import 'dart:ui';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/screens/emotional_splash_screen.dart';
 import 'package:speechmate/core/app_theme.dart';
 
@@ -19,6 +21,40 @@ void main() async {
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
     debugPrint('FlutterError: ${details.exceptionAsString()}');
+  };
+
+  // Catch errors outside the Flutter framework
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('PlatformError: $error');
+    return true;
+  };
+
+  // Global fallback UI for widget build errors
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Material(
+      color: Colors.black87,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
+              const SizedBox(height: 16),
+              const Text("Something went wrong.", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text(
+                details.exceptionAsString(),
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   };
 
   try {
@@ -73,10 +109,12 @@ void main() async {
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  runApp(MyApp(
-    languageSelected: languageSelected, 
-    isTeacher: isTeacher,
-    hasSeenSplash: hasSeenSplash,
+  runApp(ProviderScope(
+    child: MyApp(
+      languageSelected: languageSelected, 
+      isTeacher: isTeacher,
+      hasSeenSplash: hasSeenSplash,
+    ),
   ));
 }
 

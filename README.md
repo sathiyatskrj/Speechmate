@@ -161,15 +161,10 @@ SpeechMate is designed to be language-agnostic. Adding **Onges** or **Sentineles
 ## 🔮 Future Roadmap
 
 ### 🚦 Current Limitations
-*   **Voice Training**: Nicobarese voice input is currently training-dependent for full generative support.
 *   **Hardware requirements**: High-end LLM features require 4GB+ RAM.
 
-### 🌟 Planned Features (v2.0+)
-1.  **Bi-Directional Voice Translation**: 
-    *   Fine-tuning custom **Wav2Vec 2.0** models on collected island audio recordings.
-2.  **AR "Point & Learn"**:
-    *   Using **ML Kit** to allow students to point cameras at physical objects to learn indigenous names.
-3.  **Collaborative Classroom**:
+### 🌟 Planned Features (v2.1+)
+1.  **Collaborative Classroom**:
     *   Peer-to-peer word games and knowledge sharing using **Wifi Direct / P2P Mesh**.
 
 ---
