@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../services/dictionary_service.dart';
 import '../services/tts_service.dart';
 import '../core/app_colors.dart';
@@ -42,16 +41,28 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
 
   Future<void> _playPhrase(Map<String, dynamic> phrase) async {
     try {
+      final audio = phrase['audio'];
       final nicobarese = phrase['nicobarese']?.toString() ?? '';
       final english = phrase['text']?.toString() ?? phrase['english']?.toString() ?? '';
-      
+
+      // If the phrase has embedded audio metadata (category + file), use it
+      if (audio != null && audio is Map) {
+        final category = audio['category']?.toString() ?? 'phrases';
+        final file = audio['file']?.toString() ?? '';
+        if (file.isNotEmpty) {
+          final success = await _ttsService.playFromCategory(category, file);
+          if (success) return; // Audio played successfully
+        }
+      }
+
+      // Fallback: try to find audio by english phrase name
       if (nicobarese.isNotEmpty) {
-        _ttsService.speakNicobarese(nicobarese, englishWord: english);
+        await _ttsService.speakNicobarese(nicobarese, englishWord: english);
       } else if (english.isNotEmpty) {
-        _ttsService.speakEnglish(english);
+        await _ttsService.speakEnglish(english);
       }
     } catch (e) {
-      debugPrint("TTS error: $e");
+      debugPrint("Audio error: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Audio playback not available')),
@@ -88,6 +99,7 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                 itemCount: _phrases.length,
                 itemBuilder: (context, index) {
                   final item = _phrases[index];
+                  final hasAudio = item['audio'] != null && item['audio'] is Map && (item['audio']['file']?.toString().isNotEmpty ?? false);
                   return Card(
                     elevation: 4,
                     margin: const EdgeInsets.only(bottom: 12),
@@ -99,17 +111,33 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                         item['text'] ?? item['english'] ?? '', 
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)
                       ),
-                      subtitle: item['nicobarese'] != null 
-                        ? Text(
-                            item['nicobarese'] ?? '', 
-                            style: const TextStyle(color: Colors.amberAccent, fontSize: 16, fontStyle: FontStyle.italic)
-                          )
-                        : const Text(
-                            'Tap speaker to hear',
-                            style: TextStyle(color: Colors.white54, fontSize: 14, fontStyle: FontStyle.italic)
-                          ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (item['nicobarese'] != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                item['nicobarese'] ?? '', 
+                                style: const TextStyle(color: Colors.amberAccent, fontSize: 16, fontStyle: FontStyle.italic)
+                              ),
+                            ),
+                          if (hasAudio)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 4),
+                              child: Text(
+                                '🔊 Native audio available',
+                                style: TextStyle(color: Colors.cyanAccent, fontSize: 11),
+                              ),
+                            ),
+                        ],
+                      ),
                       trailing: IconButton(
-                        icon: Icon(Icons.volume_up, color: AppColors.studentAccent),
+                        icon: Icon(
+                          Icons.volume_up, 
+                          color: hasAudio ? Colors.cyanAccent : AppColors.studentAccent,
+                          size: hasAudio ? 30 : 24,
+                        ),
                         onPressed: () => _playPhrase(item),
                       ),
                     ),

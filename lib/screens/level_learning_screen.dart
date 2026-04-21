@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/progress_service.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import '../services/tts_service.dart';
 import '../services/dictionary_service.dart';
 import '../widgets/background.dart';
 import 'dart:math';
@@ -19,7 +19,7 @@ enum LearningStep { learn, quiz }
 class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerProviderStateMixin {
   final DictionaryService _dictionaryService = DictionaryService();
   final ProgressService _progressService = ProgressService();
-  final FlutterTts _flutterTts = FlutterTts();
+  final TtsService _ttsService = TtsService();
   
   List<Map<String, dynamic>> _words = [];
   bool _isLoading = true;
@@ -40,14 +40,14 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
     super.initState();
     _shakeController = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
     _shakeAnimation = Tween<double>(begin: 0, end: 10).chain(CurveTween(curve: Curves.elasticIn)).animate(_shakeController);
-    _flutterTts.setLanguage("en-US");
+    _ttsService.init();
     _loadWords();
   }
   
   @override
   void dispose() {
     _shakeController.dispose();
-    _flutterTts.stop();
+    _ttsService.dispose();
     super.dispose();
   }
 
@@ -93,7 +93,8 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
 
   Future<void> _playWordAudio(String word) async {
     try {
-      await _flutterTts.speak(word);
+      // Smart lookup: searches all audio folders for matching file
+      await _ttsService.speakNicobarese(word, englishWord: word);
     } catch (e) {
       debugPrint("TTS error: $e");
     }
