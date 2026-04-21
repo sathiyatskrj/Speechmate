@@ -8,7 +8,7 @@ import 'package:speechmate/models/community_post.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/progress_service.dart';
-import 'package:speechmate/services/season_service.dart';
+import 'package:speechmate/core/app_colors.dart';
 import 'package:crypto/crypto.dart';
 
 class CommunityScreen extends StatefulWidget {
@@ -24,19 +24,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
   // Admin State
   bool _isAdmin = false;
   String? _currentUid;
-  final SeasonService _seasonService = SeasonService();
+
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
+
     _loadUser();
   }
 
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
-  }
+
 
   Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
@@ -90,7 +87,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showPostDialog,
-        backgroundColor: _isAdmin ? Colors.redAccent : _seasonService.themeColor,
+        backgroundColor: _isAdmin ? Colors.redAccent : AppColors.studentAccent,
         icon: Icon(_isAdmin ? Icons.campaign : Icons.edit),
         label: Text(_isAdmin ? "Admin Post" : "Contribute", style: TextStyle(color: Colors.white)),
       ),
@@ -102,7 +99,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             colors: _isAdmin 
                 ? [Colors.black87, Colors.black] 
                 : [
-                    _seasonService.themeColor.withOpacity(0.8),
+                    AppColors.studentAccent.withOpacity(0.8),
                     Colors.black
                   ],
           )
@@ -211,7 +208,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.trending_up, color: _seasonService.themeColor),
+              Icon(Icons.trending_up, color: AppColors.studentAccent),
               const SizedBox(width: 8),
               Text("Trending Topics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             ],
@@ -234,7 +231,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget _buildTag(String text) {
     return Chip(
       label: Text(text),
-      backgroundColor: _seasonService.themeColor.withOpacity(0.2),
+      backgroundColor: AppColors.studentAccent.withOpacity(0.2),
       labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       side: const BorderSide(color: Colors.white24),
     );

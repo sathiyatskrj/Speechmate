@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/dictionary_service.dart';
 import '../services/smart_quiz_service.dart';
 import '../services/logger_service.dart';
-import '../services/season_service.dart';
+import '../core/app_colors.dart';
 import '../widgets/background.dart';
 
 class QuizScreen extends StatefulWidget {
@@ -25,19 +25,16 @@ class _QuizScreenState extends State<QuizScreen> {
   
   List<String> options = [];
   int correctOptionIndex = 0;
-  final SeasonService _seasonService = SeasonService();
+
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
+
     _loadQuiz();
   }
 
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
-  }
+
 
 
   Future<void> _loadQuiz() async {
@@ -196,7 +193,7 @@ class _QuizScreenState extends State<QuizScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               _seasonService.themeColor.withOpacity(0.8),
+               AppColors.studentAccent.withOpacity(0.8),
                Colors.black
             ]
           )
@@ -220,7 +217,7 @@ class _QuizScreenState extends State<QuizScreen> {
                        color: Colors.white.withOpacity(0.1),
                        borderRadius: BorderRadius.circular(20),
                        border: Border.all(color: Colors.white24),
-                       boxShadow: [BoxShadow(blurRadius: 10, color: _seasonService.themeColor.withOpacity(0.2))]
+                       boxShadow: [BoxShadow(blurRadius: 10, color: AppColors.studentAccent.withOpacity(0.2))]
                      ),
                      child: Column(
                        children: [

@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/screens/student_dash.dart';
 import 'package:speechmate/screens/teacher_dash.dart';
 import 'package:speechmate/core/app_strings.dart';
-import 'package:speechmate/services/season_service.dart';
+
 import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/widgets/exit_feedback_dialog.dart';
 
@@ -22,19 +22,16 @@ class LandingPage extends StatefulWidget {
 class _LandingPageState extends State<LandingPage> {
   String selectedRole = ""; // student / teacher
   bool _isCheckingRole = true;
-  final SeasonService _seasonService = SeasonService();
+
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
+
     _checkSavedRole();
   }
 
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
-  }
+
 
   Future<void> _checkSavedRole() async {
     final prefs = await SharedPreferences.getInstance();
@@ -66,7 +63,7 @@ class _LandingPageState extends State<LandingPage> {
       baseColor = Colors.blueAccent;
     } else {
       // Adaptive Season background for neutral
-      baseColor = _seasonService.themeColor;
+      baseColor = AppColors.studentAccent;
     }
     
     final currentGradient = [

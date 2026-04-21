@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../services/dictionary_service.dart';
-import '../services/season_service.dart';
+import '../core/app_colors.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class CommonPhrasesScreen extends StatefulWidget {
@@ -15,19 +15,16 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
   final DictionaryService _dictionaryService = DictionaryService();
   final AudioPlayer _audioPlayer = AudioPlayer();
   List<Map<String, dynamic>> _phrases = [];
-  final SeasonService _seasonService = SeasonService();
+
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
+
     _loadPhrases();
   }
 
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
-  }
+
 
   Future<void> _loadPhrases() async {
     final data = await _dictionaryService.loadDictionary(DictionaryType.phrases);
@@ -79,7 +76,7 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               _seasonService.themeColor.withOpacity(0.8),
+               AppColors.studentAccent.withOpacity(0.8),
                Colors.black
             ]
           )
@@ -112,7 +109,7 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                             style: TextStyle(color: Colors.white54, fontSize: 14, fontStyle: FontStyle.italic)
                           ),
                       trailing: IconButton(
-                        icon: Icon(Icons.volume_up, color: _seasonService.themeColor),
+                        icon: Icon(Icons.volume_up, color: AppColors.studentAccent),
                         onPressed: () => _playAudio(item),
                       ),
                     ),

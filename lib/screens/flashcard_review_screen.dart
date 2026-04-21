@@ -5,7 +5,7 @@ import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
 
 import 'package:speechmate/services/progress_service.dart';
-import 'package:speechmate/services/season_service.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 import 'dart:math' as math;
 
@@ -21,19 +21,16 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
   bool _isLoading = true;
   bool _isFlipped = false;
   int _currentIndex = 0;
-  final SeasonService _seasonService = SeasonService();
+
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
+
     _loadDueCards();
   }
 
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
-  }
+
 
   Future<void> _loadDueCards() async {
     final cards = await DatabaseManager.instance.getDueFlashcards();
@@ -84,7 +81,7 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              _seasonService.themeColor,
+              AppColors.studentAccent,
               Colors.black,
             ],
           ),

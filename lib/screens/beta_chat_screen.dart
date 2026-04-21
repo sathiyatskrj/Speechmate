@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../services/dictionary_service.dart';
-import '../services/season_service.dart';
+import '../core/app_colors.dart';
 
 
 
@@ -21,21 +21,18 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   List<Map<String, dynamic>> _filteredDialects = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
-  final SeasonService _seasonService = SeasonService();
+
 
 
   @override
   void initState() {
     super.initState();
-    _initSeason();
+
     _loadData();
     _initTts();
   }
 
-  Future<void> _initSeason() async {
-    await _seasonService.init();
-    if (mounted) setState(() {});
-  }
+
 
 
   Future<void> _initTts() async {
@@ -94,7 +91,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               _seasonService.themeColor.withOpacity(0.8),
+               AppColors.getThemeAccent(!widget.isStudent).withOpacity(0.8),
                Colors.black
             ]
           )
@@ -166,7 +163,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
           ),
         ),
         leading: CircleAvatar(
-          backgroundColor: _seasonService.themeColor.withOpacity(0.5),
+          backgroundColor: AppColors.getThemeAccent(!widget.isStudent).withOpacity(0.5),
           child: Text(
             (item['english'] ?? "?")[0].toUpperCase(),
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -213,7 +210,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.volume_up_rounded, size: 20, color: _seasonService.themeColor),
+            icon: Icon(Icons.volume_up_rounded, size: 20, color: AppColors.getThemeAccent(!widget.isStudent)),
             onPressed: () => _speak(value),
           ),
         ],
