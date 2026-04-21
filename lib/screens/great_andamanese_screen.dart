@@ -94,7 +94,20 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🏝️ Great Andamanese'),
+        title: Row(
+          children: [
+            const Text('🏝️ Great Andamanese'),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.orangeAccent,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text('BETA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black, letterSpacing: 1)),
+            ),
+          ],
+        ),
         backgroundColor: const Color(0xFF4A148C),
         elevation: 0,
         bottom: TabBar(
@@ -122,9 +135,34 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
     );
   }
 
+  Widget _buildBetaBanner() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.orangeAccent.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.orangeAccent.withOpacity(0.4)),
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.science_rounded, color: Colors.orangeAccent, size: 20),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Beta: Great Andamanese data is under review and may contain inaccuracies. Nicobarese is the verified language module.',
+              style: TextStyle(color: Colors.orangeAccent, fontSize: 12, height: 1.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDictionaryTab() {
     return Column(
       children: [
+        _buildBetaBanner(),
         // Search bar
         Padding(
           padding: const EdgeInsets.all(12),
@@ -265,14 +303,25 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
 
   Widget _buildPhrasesTab() {
     if (phrases.isEmpty) {
-      return const Center(
-        child: Text('No phrases available',
-            style: TextStyle(color: Colors.white54, fontSize: 16)),
+      return Column(
+        children: [
+          _buildBetaBanner(),
+          const Expanded(
+            child: Center(
+              child: Text('No phrases available',
+                  style: TextStyle(color: Colors.white54, fontSize: 16)),
+            ),
+          ),
+        ],
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
+    return Column(
+      children: [
+        _buildBetaBanner(),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
       itemCount: phrases.length,
       itemBuilder: (context, index) {
         final phrase = phrases[index];
@@ -322,6 +371,9 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
           ),
         ).animate(delay: (80 * index).ms).fadeIn(duration: 400.ms).slideX(begin: 0.1);
       },
+          ),
+        ),
+      ],
     );
   }
 }

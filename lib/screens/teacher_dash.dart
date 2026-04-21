@@ -176,7 +176,7 @@ class _TeacherDashState extends State<TeacherDash>
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
                           ),
                           _buildFeatureCard(context,
-                            title: "Great Andamanese",
+                            title: "Andamanese ᴮᴱᵀᴬ",
                             icon: Icons.language_rounded,
                             color: Colors.deepPurpleAccent,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())),

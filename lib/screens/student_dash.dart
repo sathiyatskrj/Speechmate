@@ -158,7 +158,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
     {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
     {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
-    {"word": "Great Andamanese", "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GreatAndamaneseScreen(), "icon": Icons.language_rounded},
+    {"word": "Andamanese ᴮᴱᵀᴬ", "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GreatAndamaneseScreen(), "icon": Icons.language_rounded},
     {"word": "Nature Hub", "emoji": "🌿", "colors": [Color(0xFF1B5E20), Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
     {"word": "Oral History", "emoji": "📻", "colors": [Color(0xFF3E2723), Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
     {"word": "Tuhet (Kinship)", "emoji": "🌳", "colors": [Color(0xFF5D4037), Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
