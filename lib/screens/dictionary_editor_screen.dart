@@ -23,7 +23,7 @@ class _DictionaryEditorScreenState extends State<DictionaryEditorScreen> {
     setState(() => _isLoading = true);
     try {
       final db = await DatabaseManager.instance.database;
-      final result = await db.query('dictionary', orderBy: 'english ASC', limit: 100);
+      final result = await db.query('words', where: 'category_id = ?', whereArgs: ['words'], orderBy: 'english ASC', limit: 100);
       setState(() {
         _words = List.from(result);
         _isLoading = false;
@@ -46,9 +46,9 @@ class _DictionaryEditorScreenState extends State<DictionaryEditorScreen> {
     try {
       final db = await DatabaseManager.instance.database;
       final result = await db.query(
-        'dictionary',
-        where: 'english LIKE ? OR nicobarese LIKE ?',
-        whereArgs: ['%$query%', '%$query%'],
+        'words',
+        where: 'category_id = ? AND (english LIKE ? OR nicobarese LIKE ?)',
+        whereArgs: ['words', '%$query%', '%$query%'],
         limit: 100,
       );
       setState(() {
@@ -63,7 +63,7 @@ class _DictionaryEditorScreenState extends State<DictionaryEditorScreen> {
 
   Future<void> _deleteWord(int id) async {
     final db = await DatabaseManager.instance.database;
-    await db.delete('dictionary', where: 'id = ?', whereArgs: [id]);
+    await db.delete('words', where: 'id = ?', whereArgs: [id]);
     _loadDictionary();
   }
 
@@ -115,16 +115,17 @@ class _DictionaryEditorScreenState extends State<DictionaryEditorScreen> {
                 final db = await DatabaseManager.instance.database;
                 if (existingWord == null) {
                   // Insert
-                  await db.insert('dictionary', {
+                  await db.insert('words', {
+                    'category_id': 'words',
                     'english': eng,
                     'nicobarese': nic,
-                    'pos': pos,
+                    // Note: 'pos' column is not in the 'words' schema, so we omit it or adapt
                   });
                 } else {
                   // Update
                   await db.update(
-                    'dictionary',
-                    {'english': eng, 'nicobarese': nic, 'pos': pos},
+                    'words',
+                    {'english': eng, 'nicobarese': nic},
                     where: 'id = ?',
                     whereArgs: [existingWord['id']],
                   );
