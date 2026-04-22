@@ -62,12 +62,15 @@ dependencies {
     // Firebase products
     implementation 'com.google.firebase:firebase-analytics'
 
-    // ─── ML Kit: bundle models inside APK (fully offline) ───────────────────
+    // ─── ML Kit: bundle models inside APK (fully offline) ────────────────────
     // Image Labeling — bundles the default on-device model (~5MB)
     implementation 'com.google.mlkit:image-labeling:17.0.9'
+
+    // Object Detection — stream-mode live object detection
+    implementation 'com.google.mlkit:object-detection:17.0.2'
 
     // Text Recognition — bundles Latin + Devanagari scripts
     implementation 'com.google.mlkit:text-recognition:16.0.1'
     implementation 'com.google.mlkit:text-recognition-devanagari:16.0.1'
-    // ────────────────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
 }
