@@ -24,6 +24,7 @@ import 'package:speechmate/screens/dialect_heatmap_screen.dart';
 import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
+import 'package:speechmate/screens/ar_translator_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/core/app_colors.dart';
 
@@ -85,6 +86,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": "Memory Palace", "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
     {"word": "Book Scanner", "emoji": "📖", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.document_scanner_rounded},
     {"word": "Voice Translate", "emoji": "🎙️", "colors": [Color(0xFFff0844), Color(0xFFffb199)], "navigateTo": const VoiceTranslatorScreen(), "icon": Icons.record_voice_over_rounded},
+    {"word": "AR Translator 🆕", "emoji": "📷", "colors": [Color(0xFF0F2027), Color(0xFF2C5364)], "navigateTo": const ARTranslatorScreen(), "icon": Icons.view_in_ar_rounded},
   ];
 
   @override
