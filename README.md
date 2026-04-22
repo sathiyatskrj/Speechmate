@@ -2,16 +2,14 @@
   <img src="assets/icons/banner_hero.png" width="100%" alt="SpeechMate Hero Banner">
 </p>
 
-<h1 align="center" style="font-family: 'Outfit', sans-serif; color: #2C3E50; font-size: 3em;">
-  SPEECHMATE
-</h1>
+<h1 align="center">SPEECHMATE</h1>
 
 <p align="center">
-  <strong style="font-size: 1.2em; color: #E74C3C;">"Preserving Heritage, Coding the Future."</strong>
+  <strong>"Preserving Heritage, Coding the Future."</strong>
 </p>
 
 <p align="center">
-  Bridging the gap between tribal heritage and modern education using <strong>Offline Gen-AI</strong> and <strong>Indigenous Sovereignty Hub</strong>.
+  Bridging the gap between tribal heritage and modern education using <strong>Offline Gen-AI</strong> and an <strong>Indigenous Digital Sovereignty Hub</strong>.
 </p>
 
 <p align="center">
@@ -19,20 +17,25 @@
     <img src="https://img.shields.io/badge/Dart-3.2+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="DART" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/Flutter-3.19+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/GenAI-Gemma_2B-8E44AD?style=for-the-badge&logo=google-cloud&logoColor=white" alt="Gemma AI" />
+    <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/STT-Whisper_Pro-4285F4?style=for-the-badge&logo=openai&logoColor=white" alt="Whisper AI" />
   </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/DB-SQLite_Offline-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/State-Riverpod-00BCD4?style=for-the-badge" alt="Riverpod" />
+  </a>
 </p>
 
 <p align="center">
-  <a href="#-demo-video">🎬 Watch Demo</a> • 
-  <a href="#-apk-download">📱 Download APK</a> • 
-  <a href="#-performance--metrics">📊 Benchmarks</a>
+  <a href="#-the-problem">🌍 Problem</a> •
+  <a href="#-core-features">✨ Features</a> •
+  <a href="#-architecture">🏗️ Architecture</a> •
+  <a href="#-language-modules">🗣️ Languages</a> •
+  <a href="#-installation">🚀 Install</a>
 </p>
 
 ---
@@ -40,141 +43,220 @@
 ## 🌍 The Problem: "When a language dies, a world disappears."
 
 **Facts:**
-*   Every **14 days**, an indigenous language dies.
-*   Languages like **Nicobarese** (Austroasiatic) and **Great Andamanese** are fading as younger generations shift to Hindi/English.
+*   Every **14 days**, an indigenous language dies globally.
+*   Languages like **Car Nicobarese** (Austroasiatic) and **Great Andamanese** (language isolate) are critically endangered as younger generations shift to Hindi and English.
 *   **70% of tribal students** face learning gaps due to language barriers in government schools.
+*   The Andaman & Nicobar Islands have **zero dedicated digital tools** for tribal language education.
 
 **The Solution:**
-**SpeechMate** is an indigenous-first **Digital Sovereignty Hub**. It is not just a dictionary; it is a **Universal Education & Preservation Platform** designed to support **any tribal language**. It works **100% Offline** in remote islands, combining native performance with an advanced **Generative AI Assistant** to teach and translate indigenous dialects.
+**SpeechMate** is an indigenous-first **Digital Sovereignty Hub** — not just a dictionary, but a **Universal Education & Preservation Platform**. It operates **100% offline** in remote islands and rainforests, combining a full learning suite with an on-device **Whisper AI speech engine** to teach, translate, and preserve endangered indigenous dialects.
 
 ---
 
-## 📱 Advanced Core Features
+## ✨ Core Features
 
-| Feature | What It Does | Underlying Tech |
-| :--- | :--- | :--- |
-| **🧠 Gemma Gen-AI Core** | Advanced offline conversational AI (Optional download). | **Gemma 2B (On-Device)** |
-| **🎙️ Whisper Pro STT** | High-precision English-to-Tribal speech transcription. | **Whisper Tiny/Base (Native C++)** |
-| **🌿 Indigenous UI** | Glassmorphic, seasonal-adaptive themes (Dry/Rainy). | **BackdropFilter + SeasonService** |
-| **🧠 Spaced Repetition** | SM-2 native scheduling for long-term word retention. | **Native SRS Engine** |
-| **🗣️ Multi-Dialect** | Support for Great Andamanese, Car Nicobarese, & more. | **Relational SQLite + Lexicons** |
-| **📡 P2P Knowledge Hub** | Offline vocabulary sync via ZIP payloads & QR. | **P2PSyncService** |
-| **🏫 Teacher Dashboard** | Professional admin panel with automated PDF reports. | **ReportGenerator Service** |
-| **🌍 Multi-Lingual UI** | Full localization for Hindi, Tamil, Malayalam, Bengali, Telugu. | **Localization Service** |
+### 🎓 Student Dashboard
+| Module | Description |
+| :--- | :--- |
+| **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — all loaded from verified Nicobarese JSON lexicons |
+| **🎙️ Whisper Pro STT** | On-device speech-to-text using the `ggml-tiny.en.bin` model for offline voice search |
+| **🔊 Audio-First Playback** | Native `.mp3` audio asset playback for each word; graceful TTS fallback when audio is unavailable |
+| **🧩 Games Hub** | Interactive vocabulary and spelling games for immersive learning |
+| **💬 AI Chat Translator** | Conversational translation interface powered by the Neural Engine |
+| **🗂️ Voice Vault** | Record, store, and preserve oral history and folklore |
+| **🌍 Community Hub** | Shared learning feed connecting students and educators |
+| **🏝️ Island Explorer (GIS)** | Custom-painted Andaman & Nicobar archipelago map visualizing dialect distribution zones |
+| **📖 Flashcard SRS** | SM-2 spaced repetition system for long-term word retention |
+
+### 👩‍🏫 Teacher Dashboard
+| Module | Description |
+| :--- | :--- |
+| **🎤 Whisper Pro** | Live voice-to-search transcription to look up tribal vocabulary instantly |
+| **📝 Common Phrases** | Pre-built classroom phrase bank with audio |
+| **🏆 Certification Levels** | Structured proficiency levels (1–10) with unlock progression |
+| **🧪 Quiz Mode** | Adaptive vocabulary quiz with missed-word re-injection |
+| **📊 Progress & SRS Analytics** | Class-level progress tracking and spaced repetition dashboards |
+| **📷 Book Scanner (OCR)** | Google ML Kit camera scanner translates printed text to Nicobarese |
+| **🗣️ Voice Translator** | Hold-to-speak real-time English → Nicobarese voice translation |
+| **🌿 Nature Hub** | Interactive flora & fauna database with native names and traditional uses |
+| **📻 Oral History Radio** | Tribal storytelling archive with local recordings |
+| **🗺️ Tuhet Mapper** | Kinship structure visualization for indigenous family trees |
+| **🌐 Dialect Comparison** | Side-by-side comparison across Car, Central, Coast, Teressa & Chowra dialects |
 
 ---
 
-## 🌿 Indigenous-First Design Architecture
+## 🗣️ Language Modules
 
-SpeechMate adapts to the local island environment using a **Kinship & Seasonal Engine**:
+### Mother Tongue Selection (App Start)
+Users choose their **interface language** from:
+- 🌴 **Pū (Car Nicobarese)** — Primary learning language
+- 🏔️ **Aka-Jeru (Great Andamanese)** — Opens the dedicated GA Hub
+- 🇮🇳 English · हिंदी · தமிழ் · മലയാളം · తెలుగు · **বাংলা (Bengali)** *(new)*
 
-*   **Adaptive Seasonal UI**: The app's color palette and featured content change based on the local seasons (*Dry Cho* vs *Rainy Hwa*).
-*   **Kinship Mapper**: Tools dedicated to visualizing and preserving complex tribal "Tuhet" (family) structures.
-*   **Oral History Radio**: A dedicated hub for preserving folklore via local voice recordings (Voice Vault).
+### Heritage Language Selection (Learning Mode)
+Users then select which language to **explore and learn**:
+- **Car Nicobarese** → Full Student/Teacher ecosystem
+- **Aka-Jeru (Great Andamanese)** → Dedicated standalone hub *(new)*
+- **Onges** → Coming soon placeholder
 
----
-
-## 📸 Functionality Showcase
-
-### 1. Student Experience ("Fairyland Theme")
-<p align="center">
-  <img src="assets/screenshots/student_home.png" width="30%" alt="Student Home">
-  <img src="assets/screenshots/learning_tiles.png" width="30%" alt="Learning Modules">
-  <img src="assets/screenshots/progress_screen.png" width="30%" alt="Interactive Progress">
-</p>
-
-### 2. Teacher Admin Panel
-<p align="center">
-  <img src="assets/screenshots/teacher_dash.png" width="30%" alt="Teacher Dashboard">
-  <img src="assets/screenshots/voice_vault.png" width="30%" alt="Voice Vault">
-  <img src="assets/screenshots/common_phrases.png" width="30%" alt="Common Phrases">
-</p>
+### 🏝️ Great Andamanese Standalone Hub *(new in v2.0)*
+A fully self-contained module with **4 tabs**:
+| Tab | Feature |
+| :--- | :--- |
+| **📖 Dictionary** | Full searchable GA lexicon with POS filters (Noun/Verb/Adjective…) + TTS |
+| **🔤 Translator** | English → Great Andamanese with exact match + word-by-word fallback |
+| **🎙️ Voice (STT→Translate)** | Whisper transcription + auto-translation to Great Andamanese |
+| **📷 OCR Scanner** | Scan any printed English text and translate it to Great Andamanese |
 
 ---
 
 ## 🏗️ Technical Architecture
 
-SpeechMate uses a **Hybrid Architecture** combining Flutter for UI and Native Intelligence for offline inference.
+SpeechMate uses a **layered offline-first architecture** combining Flutter for UI, SQLite for data sovereignty, and native C++ for AI inference.
 
 ```mermaid
 graph TD
-    User([User Voice/Text]) --> UI[Flutter Premium UI]
-    UI --> Service[Service Framework]
-    
-    subgraph "Generative Intelligence"
-        Service --> |LlmManager| Gemma[Gemma 2B Offline Core]
-        Service --> |WhisperService| Whisper[Whisper Native C++ Engine]
+    User([User: Voice / Text / Camera]) --> UI[Flutter Premium UI\nRiverpod State Management]
+    UI --> Service[Service Layer]
+
+    subgraph "AI Intelligence Layer"
+        Service --> |WhisperService| Whisper[Whisper Tiny\nNative C++ via NDK 27]
+        Service --> |NeuralEngineService| Neural[Neural Translation\nDictionary-Backed Engine]
     end
-    
-    subgraph "Data Sovereignty"
-        Service --> DB[Database Manager]
-        DB --> SQLite[(SQLite / JSON Archives)]
-        SQLite --> D1[Great Andamanese Lexicon]
-        SQLite --> D2[Nicobarese Phrases]
-        SQLite --> D3[Oral Recordings Vault]
-        SQLite --> D4[Spaced Repetition Maps]
+
+    subgraph "Data Sovereignty Layer"
+        Service --> DB[DatabaseManager\nSQLite / sqflite]
+        DB --> W[words table\nAll categories]
+        DB --> P[phrases table]
+        DB --> D[dialects table\nCar / Central / Coast...]
+        DB --> GA[ga_dictionary table\nGreat Andamanese]
+        DB --> FC[flashcards table\nSM-2 SRS]
     end
-    
-    Gemma --> |Conversational Response| UI
-    Whisper --> |Assembled Transcript| UI
-    DB --> |Cultural Metadata| UI
+
+    subgraph "Asset Layer"
+        DB --> |Seeded at boot| JSON[12x JSON Lexicons\ndictionary*.json]
+        Service --> |rootBundle check| Audio[assets/audio/\nNative MP3 Playback]
+    end
+
+    Whisper --> |Transcript| Neural
+    Neural --> |Translation| UI
+    DB --> |Vocabulary| UI
 ```
 
-### 🧠 Why Edge AI?
-*   **Zero Latency:** No server round-trip.
-*   **Privacy:** Voice data never leaves the child's device.
-*   **Accessibility:** Works in "Dead Zones" (Zero Signal Areas).
+### 🧠 Why Fully Offline?
+- **Zero Latency** — No server round-trip; responses are instantaneous
+- **Privacy** — Voice recordings never leave the child's device
+- **Accessibility** — Works in complete signal dead zones across remote islands
+- **Sovereignty** — Indigenous data is owned and stored locally, not by a cloud provider
 
 ---
 
-## 📊 Performance & Metrics (v1.4)
+## 📊 Performance & Metrics (v2.0)
 
 | Metric | Result | Notes |
 | :--- | :--- | :--- |
-| **LLM Inference** | **~2-4 tokens/sec** | On-device Gemma 2B (Mid-high range phones) |
-| **STT Latency** | **< 600ms** | Optimized Whisper C++ via NDK 27 |
-| **App Size** | **~85 MB** | Base app (Excluding optional 1.5GB LLM core) |
+| **STT Latency** | **< 600ms** | Whisper Tiny via NDK 27 C++ |
+| **Translation Speed** | **< 100ms** | Local SQLite with indexed queries |
+| **Dictionary Size** | **2,400+ entries** | `dictionary.json` (core Nicobarese) |
+| **GA Lexicon Size** | **277KB+** | `dictionary_great_andamanese.json` |
 | **Offline Capability** | **100%** | Zero API calls required |
+| **App Base Size** | **~85 MB** | Excluding optional AI model |
+| **Min Android SDK** | **API 24** | Android 7.0+ |
+| **Target SDK** | **API 33** | Android 13 |
+
+---
+
+## 📂 Data Architecture
+
+All linguistic data is managed in `assets/data/` and seeded into SQLite at first launch:
+
+| File | Category | Words |
+| :--- | :--- | :--- |
+| `dictionary.json` | Core Nicobarese (verbs, nouns, pronouns) | 2,400+ |
+| `dictionary_numbers.json` | Numbers | ~20 |
+| `dictionary_nature.json` | Nature & environment | ~30 |
+| `dictionary_colors.json` | Colors | ~15 |
+| `dictionary_feelings.json` | Emotions & feelings | ~20 |
+| `dictionary_things.json` | Everyday objects | ~40 |
+| `dictionary_body_parts.json` | Human anatomy | ~30 |
+| `dictionary_animals.json` | Fauna | ~20 |
+| `dictionary_magic.json` | Greetings & magic words | ~25 |
+| `dictionary_family.json` | Kinship & family | ~20 |
+| `dictionary_phrases.json` | Common classroom phrases | ~30 |
+| `dictionary_dialects.json` | 5-dialect comparison table | large |
+| `dictionary_great_andamanese.json` | Great Andamanese lexicon | 1,000+ |
 
 ---
 
 ## 🚀 Scalability: Adding New Languages
 
-SpeechMate is designed to be language-agnostic. Adding **Onges** or **Sentinelese** framework is modular:
+SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requires only:
 
-1.  **Config**: Create a new `dictionary_onges.json`.
-2.  **Asset**: Upload audio samples to `assets/audio/onges/`.
-3.  **Theme**: update `SeasonService` for localized seasonal adjustments.
+1. **Lexicon**: Create `assets/data/dictionary_<lang>.json`
+2. **Audio**: Add audio samples to `assets/audio/<lang>/`
+3. **Seed**: Register the file in `main.dart` → `seedCategoryFromJson()`
+4. **UI**: Add a tile in `languages.dart` or `app_language_select.dart`
 
 ```json
-// Example: Scalable JSON Structure
+// Scalable JSON structure (shared across all languages)
 {
-  "eng": "Water",
-  "trans": "mak",
-  "lang_code": "nic_car", 
-  "audio": "water_car.wav"
+  "english": "Water",
+  "nicobarese": "Mak",
+  "emoji": "💧",
+  "audio": "water.mp3"
 }
 ```
 
 ---
 
-## 🔮 Future Roadmap
+## 🔮 Roadmap
 
-### 🚦 Current Limitations
-*   **Hardware requirements**: High-end LLM features require 4GB+ RAM.
+### ✅ Completed (v2.0)
+- [x] Full 12-category student learning system
+- [x] Standalone Great Andamanese Hub (Dictionary + Translator + Voice + OCR)
+- [x] Bengali language support in UI
+- [x] Whisper Pro enabled in Teacher Dashboard
+- [x] Community Hub with mock tribal community feed
+- [x] Island Explorer with custom-painted Andaman archipelago map
+- [x] Voice Translator hang fix (unique file paths + state guards)
+- [x] Cross-category search engine (exact + fuzzy across all 12 categories)
+- [x] Audio-first playback with graceful TTS fallback
 
-### 🌟 Planned Features (v2.1+)
-1.  **Collaborative Classroom**:
-    *   Peer-to-peer word games and knowledge sharing using **Wifi Direct / P2P Mesh**.
+### 🔜 Planned (v2.1+)
+- [ ] **P2P Mesh Sync** — Share vocabulary packs via Wi-Fi Direct / QR code
+- [ ] **Onges Module** — Third tribal language integration
+- [ ] **Gamified Certification** — Printable tribal language certificates
+- [ ] **Collaborative Classroom** — Peer vocabulary games
+- [ ] **Cloud Sync** — Optional Firebase backup for community posts
 
 ---
 
 ## 🛠️ Installation
 
-1.  **Environment**: Flutter 3.20+, Android NDK 27.0.12077973.
-2.  **Dependencies**: `flutter pub get`
-3.  **Native Assets**: Ensure `ggml-tiny.en.bin` is placed in `assets/models/`.
-4.  **Build Release APK**: `flutter build apk --release`
+```bash
+# 1. Clone the repository
+git clone https://github.com/sathiyatskrj/Speechmate.git
+cd Speechmate
+
+# 2. Install Flutter dependencies
+flutter pub get
+
+# 3. Place the Whisper model
+# Download ggml-tiny.en.bin and place it at:
+# assets/models/ggml-tiny.en.bin
+
+# 4. Run in development
+flutter run
+
+# 5. Build release APK
+flutter build apk --release
+```
+
+**Requirements:**
+- Flutter 3.29+ / Dart 3.2+
+- Android NDK 27.0.12077973
+- Android SDK Platform 33
+- Firebase project configured (for community features)
 
 ---
 
@@ -190,4 +272,8 @@ SpeechMate is designed to be language-agnostic. Adding **Onges** or **Sentineles
 
 <p align="center">
   <i>"Where Language Barriers End, Digital Sovereignty Begins."</i>
+</p>
+
+<p align="center">
+  Built with ❤️ for the tribal communities of the Andaman & Nicobar Islands
 </p>
