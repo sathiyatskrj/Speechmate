@@ -15,7 +15,7 @@ class CameraTranslationScreen extends StatefulWidget {
 
 class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   CameraController? _cameraController;
-  final TextRecognizer _textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+  late TextRecognizer _textRecognizer;
   late ObjectDetector _objectDetector;
   final NeuralEngineService _neuralEngine = NeuralEngineService();
   final TtsService _ttsService = TtsService();
@@ -23,10 +23,33 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   bool _isProcessing = false;
   List<Map<String, String>> _translationResults = [];
   String _detectedObject = "";
+
+  // Multi-language OCR Support
+  final Map<String, TextRecognitionScript> _supportedLanguages = {
+    "English": TextRecognitionScript.latin,
+    "Hindi": TextRecognitionScript.devanagiri,
+    "Bengali (Beta)": TextRecognitionScript.devanagiri,
+    "Tamil (Beta)": TextRecognitionScript.latin,
+    "Telugu (Beta)": TextRecognitionScript.latin,
+    "Chinese": TextRecognitionScript.chinese,
+    "Japanese": TextRecognitionScript.japanese,
+    "Korean": TextRecognitionScript.korean,
+  };
+  String _selectedLanguage = "English";
+
+  void _onLanguageChanged(String? newLang) {
+    if (newLang == null || newLang == _selectedLanguage) return;
+    setState(() {
+      _selectedLanguage = newLang;
+      _textRecognizer.close();
+      _textRecognizer = TextRecognizer(script: _supportedLanguages[_selectedLanguage]!);
+    });
+  }
   
   @override
   void initState() {
     super.initState();
+    _textRecognizer = TextRecognizer(script: _supportedLanguages[_selectedLanguage]!);
     final options = ObjectDetectorOptions(
       mode: DetectionMode.single,
       classifyObjects: true,
@@ -274,9 +297,41 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
             Positioned(
                top: 40,
                left: 10,
-               child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white, shadows: [Shadow(color: Colors.black, blurRadius: 4)]),
-                  onPressed: () => Navigator.pop(context),
+               right: 10,
+               child: Row(
+                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                 children: [
+                   IconButton(
+                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white, shadows: [Shadow(color: Colors.black, blurRadius: 4)]),
+                      onPressed: () => Navigator.pop(context),
+                   ),
+                   Container(
+                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                     decoration: BoxDecoration(
+                       color: Colors.black54,
+                       borderRadius: BorderRadius.circular(20),
+                       border: Border.all(color: Colors.cyanAccent.withOpacity(0.5)),
+                     ),
+                     child: DropdownButtonHideUnderline(
+                       child: DropdownButton<String>(
+                         value: _selectedLanguage,
+                         dropdownColor: Colors.black87,
+                         icon: const Icon(Icons.language, color: Colors.cyanAccent, size: 20),
+                         style: const TextStyle(color: Colors.white, fontSize: 14),
+                         onChanged: _onLanguageChanged,
+                         items: _supportedLanguages.keys.map((lang) {
+                           return DropdownMenuItem<String>(
+                             value: lang,
+                             child: Padding(
+                               padding: const EdgeInsets.only(right: 8.0),
+                               child: Text(lang),
+                             ),
+                           );
+                         }).toList(),
+                       ),
+                     ),
+                   ),
+                 ],
                )
             ),
             // Scanner overlay guide

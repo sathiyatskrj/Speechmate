@@ -386,7 +386,7 @@ class DatabaseManager {
              'nicobarese': item['nicobarese'] ?? '',
              'emoji': item['emoji'] ?? '',
              'image': item['image'] ?? '',
-             'audio': item['audio']?['file'] ?? item['audio'] ?? '',
+             'audio': item['audio'] is Map ? item['audio']['file'] : item['audio'] ?? '',
           });
         }
         await batch.commit(noResult: true);
@@ -408,7 +408,7 @@ class DatabaseManager {
              'nicobarese': item['nicobarese'] ?? '',
              'emoji': item['emoji'] ?? '',
              'image': item['image'] ?? '',
-             'audio': item['audio']?['file'] ?? item['audio'] ?? '',
+             'audio': item['audio'] is Map ? item['audio']['file'] : item['audio'] ?? '',
           });
      }
      await batch.commit(noResult: true);
