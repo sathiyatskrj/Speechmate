@@ -38,6 +38,18 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
+
+        <!--
+            ML Kit: Force bundle all required models inside the APK.
+            "ica"  = Image Classification / Labeling model
+            "ocr"  = Text Recognition (Latin)
+            "ocr_dn" = Text Recognition (Devanagari — Hindi, Bengali, Sanskrit)
+            This prevents any runtime model download and makes the app
+            100% offline from first launch.
+        -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="ica,ocr,ocr_dn"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

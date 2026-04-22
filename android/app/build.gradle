@@ -59,7 +59,15 @@ dependencies {
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:34.7.0')
 
-    // Add the dependencies for Firebase products you want to use
-    // When using the BoM, don't specify versions in Firebase dependencies
+    // Firebase products
     implementation 'com.google.firebase:firebase-analytics'
+
+    // ─── ML Kit: bundle models inside APK (fully offline) ───────────────────
+    // Image Labeling — bundles the default on-device model (~5MB)
+    implementation 'com.google.mlkit:image-labeling:17.0.9'
+
+    // Text Recognition — bundles Latin + Devanagari scripts
+    implementation 'com.google.mlkit:text-recognition:16.0.1'
+    implementation 'com.google.mlkit:text-recognition-devanagari:16.0.1'
+    // ────────────────────────────────────────────────────────────────────────
 }
