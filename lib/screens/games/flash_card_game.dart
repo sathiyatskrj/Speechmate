@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../services/dictionary_service.dart';
+import '../../services/progress_service.dart';
 import 'games_hub_screen.dart';
 
 class FlashCardGame extends StatefulWidget {
@@ -56,7 +57,7 @@ class _FlashCardGameState extends State<FlashCardGame> with SingleTickerProvider
     setState(() => _showTranslation = !_showTranslation);
   }
 
-  void _nextCard() {
+  void _nextCard() async {
     if (_currentIndex < _words.length - 1) {
       setState(() {
         _currentIndex++;
@@ -65,6 +66,7 @@ class _FlashCardGameState extends State<FlashCardGame> with SingleTickerProvider
       });
     } else {
       setState(() => _isWon = true);
+      await ProgressService().recordQuizTaken(); // Award XP for completion
     }
   }
 

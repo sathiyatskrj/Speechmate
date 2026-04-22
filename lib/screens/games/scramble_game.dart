@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/dictionary_service.dart';
+import '../../services/progress_service.dart';
+import '../../widgets/tap_scale.dart';
 import 'games_hub_screen.dart';
 
 class ScrambleGame extends StatefulWidget {
@@ -75,6 +77,7 @@ class _ScrambleGameState extends State<ScrambleGame> {
     
     if (attempted == target) {
       setState(() => _isCorrect = true);
+      ProgressService().markWordAsLearned(); // Award XP for word
     }
   }
 
@@ -103,7 +106,7 @@ class _ScrambleGameState extends State<ScrambleGame> {
               Wrap(
                 spacing: 8,
                 children: _userAnswer.asMap().entries.map((e) {
-                  return GestureDetector(
+                  return TapScale(
                     onTap: () => _onAnswerTap(e.value, e.key),
                     child: Chip(
                       label: Text(e.value, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -127,7 +130,7 @@ class _ScrambleGameState extends State<ScrambleGame> {
                 runSpacing: 12,
                 alignment: WrapAlignment.center,
                 children: _shuffledLetters.asMap().entries.map((e) {
-                  return GestureDetector(
+                  return TapScale(
                     onTap: () => _onLetterTap(e.value, e.key),
                     child: Container(
                       width: 50, height: 50,

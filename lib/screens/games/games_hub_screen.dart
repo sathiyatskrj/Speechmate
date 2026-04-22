@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speechmate/widgets/tap_scale.dart';
+import 'package:speechmate/widgets/gamification_header.dart';
+import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'word_match_game.dart';
 import 'flash_card_game.dart';
 import 'scramble_game.dart';
 import 'word_runner_game.dart'; // [NEW] Added Import
+import 'dart:ui';
 
 class GamesHubScreen extends StatefulWidget {
   const GamesHubScreen({super.key});
@@ -13,143 +18,198 @@ class GamesHubScreen extends StatefulWidget {
 }
 
 class _GamesHubScreenState extends State<GamesHubScreen> {
+  final List<Map<String, dynamic>> _games = [
+    {
+      "title": "Word Match",
+      "subtitle": "Connect English & Nicobarese",
+      "icon": Icons.schema_rounded,
+      "colors": [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)],
+      "page": const WordMatchGame(),
+    },
+    {
+      "title": "Flash Cards",
+      "subtitle": "Master vocabulary quickly",
+      "icon": Icons.style,
+      "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
+      "page": const FlashCardGame(),
+    },
+    {
+      "title": "Word Scramble",
+      "subtitle": "Unjumble the letters",
+      "icon": Icons.spellcheck,
+      "colors": [const Color(0xFF84fab0), const Color(0xFF8fd3f4)],
+      "page": const ScrambleGame(),
+    },
+    {
+      "title": "Word Runner",
+      "subtitle": "Run, Jump & Collect Words!",
+      "icon": Icons.directions_run,
+      "colors": [const Color(0xFFff9966), const Color(0xFFff5e62)],
+      "page": const WordRunnerGame(),
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshGamification();
+  }
+
+  Future<void> _refreshGamification() async {
+    await GamificationService.refresh();
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Learning Games", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text("Learning Games", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1.2)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [const Color(0xFF6A11CB).withValues(alpha: 0.8), const Color(0xFF2575FC).withValues(alpha: 0.8)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
             ),
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const Text(
-              "Play & Learn!",
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              "Choose a game to start your adventure",
-              style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
-            ),
-            const SizedBox(height: 30),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 1, // Single column for big cards
-                childAspectRatio: 2.2,
-                mainAxisSpacing: 20,
-                children: [
-                  _buildGameCard(
-                    context,
-                    "Word Match",
-                    "Connect English & Nicobarese",
-                    Icons.schema_rounded,
-                    [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)],
-                    const WordMatchGame(),
-                  ),
-                  _buildGameCard(
-                    context,
-                    "Flash Cards",
-                    "Master vocabulary quickly",
-                    Icons.style,
-                    [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
-                    const FlashCardGame(),
-                  ),
-                  _buildGameCard(
-                    context,
-                    "Word Scramble",
-                    "Unjumble the letters",
-                    Icons.spellcheck,
-                    [const Color(0xFF84fab0), const Color(0xFF8fd3f4)],
-                    const ScrambleGame(),
-                  ),
-                  // [NEW] Word Runner Game
-                  _buildGameCard(
-                    context,
-                    "Word Runner",
-                    "Run, Jump & Collect Words!",
-                    Icons.directions_run,
-                    [const Color(0xFFff9966), const Color(0xFFff5e62)],
-                    const WordRunnerGame(),
-                  ),
-                ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const GamificationHeader().animate().fadeIn(duration: 600.ms).slideY(begin: 0.1),
+              const SizedBox(height: 20),
+              const Text(
+                "Play & Learn! 🎮",
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+              ).animate().fadeIn().slideX(begin: -0.1),
+              const SizedBox(height: 8),
+              const Text(
+                "Choose a game to start your adventure.",
+                style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
+              ).animate().fadeIn().slideX(begin: -0.1, delay: 100.ms),
+              const SizedBox(height: 30),
+              Expanded(
+                child: ListView.separated(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: _games.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 20),
+                  itemBuilder: (context, index) {
+                    final game = _games[index];
+                    return _buildGameCard(
+                      context,
+                      index,
+                      game['title'],
+                      game['subtitle'],
+                      game['icon'],
+                      game['colors'],
+                      game['page'],
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildGameCard(BuildContext context, String title, String subtitle, IconData icon, List<Color> colors, Widget page) {
-    return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => page)),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: colors, begin: Alignment.topLeft, end: Alignment.bottomRight),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: colors.last.withOpacity(0.4),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -20,
-              bottom: -20,
-              child: Icon(icon, size: 120, color: Colors.white.withOpacity(0.2)),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.3), shape: BoxShape.circle),
-                    child: Icon(icon, size: 40, color: Colors.white),
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          style: const TextStyle(fontSize: 14, color: Colors.white70),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.arrow_forward_ios, color: Colors.white70),
-                ],
+  Widget _buildGameCard(BuildContext context, int index, String title, String subtitle, IconData icon, List<Color> colors, Widget page) {
+    return TapScale(
+      onTap: () async {
+        await Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+        // Refresh gamification when returning from a game to show new XP
+        _refreshGamification();
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(
+            padding: const EdgeInsets.all(24.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [colors.first.withValues(alpha: 0.9), colors.last.withValues(alpha: 0.7)], 
+                begin: Alignment.topLeft, 
+                end: Alignment.bottomRight
               ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.last.withValues(alpha: 0.4),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ],
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  right: -30,
+                  bottom: -30,
+                  child: Icon(icon, size: 140, color: Colors.white.withValues(alpha: 0.15)),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.25), 
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.5))
+                      ),
+                      child: Icon(icon, size: 40, color: Colors.white),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 0.5),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            subtitle,
+                            style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 20),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-    );
+    ).animate().fadeIn(delay: (index * 150).ms, duration: 400.ms).slideY(begin: 0.2, curve: Curves.easeOutBack);
   }
 }
 

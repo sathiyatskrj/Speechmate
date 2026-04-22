@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../services/dictionary_service.dart';
+import '../../services/progress_service.dart';
 
 class WordRunnerGame extends StatefulWidget {
   const WordRunnerGame({super.key});
@@ -224,6 +225,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
       if (_foundWords.length >= 10 && _gameState != GameState.victory) {
         _gameState = GameState.victory;
         _createExplosion(_playerX, _playerY - 100, Colors.amber);
+        ProgressService().recordQuizTaken(); // Award XP for completing the run
       }
     });
   }
@@ -267,6 +269,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
         _score += bonus;
         _level++;
         _createExplosion(item.x, item.y, Colors.greenAccent);
+        ProgressService().markWordAsLearned(); // Award XP for learning the word
       } 
       else if (_targetWords.contains(item.value) && !_foundWords.contains(item.value)) {
         // GOOD BUT OUT OF ORDER

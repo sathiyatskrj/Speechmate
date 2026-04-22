@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/dictionary_service.dart';
+import '../../services/progress_service.dart';
+import '../../widgets/tap_scale.dart';
 import 'games_hub_screen.dart';
 
 class WordMatchGame extends StatefulWidget {
@@ -74,6 +76,7 @@ class _WordMatchGameState extends State<WordMatchGame> {
         
         if (_matchedItems.length == _items.length) {
           setState(() => _isWon = true);
+          ProgressService().recordQuizTaken(); // Award XP
         }
       } else {
         // Mismatch
@@ -115,14 +118,14 @@ class _WordMatchGameState extends State<WordMatchGame> {
                     final isSelected = _selectedItem == item;
                     final isMatched = _matchedItems.contains(item);
                     
-                    return GestureDetector(
+                    return TapScale(
                       onTap: () => _onItemTap(item),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         decoration: BoxDecoration(
                           color: isMatched 
-                              ? Colors.green.withOpacity(0.2) 
-                              : isSelected ? Colors.blue.withOpacity(0.3) : Colors.white,
+                              ? Colors.green.withValues(alpha: 0.2) 
+                              : isSelected ? Colors.blue.withValues(alpha: 0.3) : Colors.white,
                           border: Border.all(
                             color: isMatched ? Colors.green : isSelected ? Colors.blue : Colors.grey.shade300,
                             width: 2,

@@ -30,6 +30,8 @@ import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/screens/dialect_comparison_screen.dart';
 import 'package:speechmate/screens/srs_dashboard_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:speechmate/core/app_colors.dart';
 
 class TeacherDash extends StatefulWidget {
@@ -84,7 +86,6 @@ class _TeacherDashState extends State<TeacherDash>
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -104,7 +105,7 @@ class _TeacherDashState extends State<TeacherDash>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      Colors.blueAccent.withOpacity(0.1),
+                      Colors.blueAccent.withValues(alpha: 0.1),
                       Colors.transparent,
                     ],
                   ),
@@ -121,7 +122,7 @@ class _TeacherDashState extends State<TeacherDash>
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      Colors.purpleAccent.withOpacity(0.08),
+                      Colors.purpleAccent.withValues(alpha: 0.08),
                       Colors.transparent,
                     ],
                   ),
@@ -172,215 +173,96 @@ class _TeacherDashState extends State<TeacherDash>
                                             );
                                         }
                                     },
-                                 ),
+                                 ).animate().fadeIn().scale(curve: Curves.easeOutBack),
                                ),
 
-                      // ────── LEARNING TOOLS SECTION ──────
-                      _buildSectionHeader("LEARNING TOOLS", Icons.school_rounded, Colors.purpleAccent),
-                      const SizedBox(height: 12),
-                      GridView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 15,
-                          mainAxisExtent: 110,
-                        ),
-                        children: [
-                          _buildFeatureCard(context,
-                            title: "Certification",
-                            icon: Icons.verified,
-                            color: Colors.amberAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Quiz Mode",
-                            icon: Icons.quiz,
-                            color: Colors.purpleAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Progress",
-                            icon: Icons.bar_chart,
-                            color: Colors.greenAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Common Phrases",
-                            icon: Icons.chat_bubble_outline,
-                            color: Colors.pinkAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Andamanese ᴮᴱᵀᴬ",
-                            icon: Icons.language_rounded,
-                            color: Colors.deepPurpleAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Nature Hub",
-                            icon: Icons.eco_rounded,
-                            color: Colors.green,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FloraFaunaScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Oral History",
-                            icon: Icons.radio_rounded,
-                            color: Colors.brown,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoryRadioScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Tuhet Mapper",
-                            icon: Icons.account_tree_rounded,
-                            color: Colors.deepOrange,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KinshipMapperScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Island GIS",
-                            icon: Icons.explore_rounded,
-                            color: Colors.blueGrey,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectHeatmapScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Village Hub",
-                            icon: Icons.map_rounded,
-                            color: Colors.teal,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoryPalaceScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Whisper Pro",
-                            icon: Icons.auto_awesome_rounded,
-                            color: Colors.cyan,
-                            onTap: () async {
-                               final result = await VoiceAssistantDialog.show(context);
-                               if (result != null && result.isNotEmpty) {
-                                   _searchController.text = result;
-                                   _onSearch(result);
-                               }
-                            },
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Dialect Comparison",
-                            icon: Icons.compare_arrows_rounded,
-                            color: Colors.green,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "SRS Analytics",
-                            icon: Icons.bar_chart_rounded,
-                            color: Colors.deepPurple,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SRSDashboardScreen())),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // ────── CLASSROOM TOOLS SECTION ──────
+                      // ────── CLASSROOM TOOLS SECTION (Bento Grid) ──────
                       _buildSectionHeader("CLASSROOM TOOLS", Icons.class_rounded, Colors.orangeAccent),
                       const SizedBox(height: 12),
-                      GridView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 15,
-                          mainAxisExtent: 110,
-                        ),
+                      StaggeredGrid.count(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
                         children: [
-                          _buildFeatureCard(context,
-                            title: "Voice Translator",
-                            icon: Icons.record_voice_over_rounded,
-                            color: Colors.redAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen())),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 4, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 0, title: "Generate Report", icon: Icons.picture_as_pdf_outlined, color: Colors.deepOrangeAccent, onTap: () async => await ReportGenerator.generateAndPrintReport("Student")),
                           ),
-                          _buildFeatureCard(context,
-                            title: "Book Scanner",
-                            icon: Icons.document_scanner_rounded,
-                            color: Colors.cyanAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraTranslationScreen())),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 3,
+                            child: _buildFeatureCard(context, 1, title: "Book Scanner", icon: Icons.document_scanner_rounded, color: Colors.cyanAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraTranslationScreen()))),
                           ),
-                          _buildFeatureCard(context,
-                            title: "Text Translator",
-                            icon: Icons.translate,
-                            color: Colors.orangeAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 2, title: "Dict Editor", icon: Icons.edit_note_rounded, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DictionaryEditorScreen()))),
                           ),
-                          _buildFeatureCard(context,
-                            title: "Voice Vault",
-                            icon: Icons.mic,
-                            color: Colors.redAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 1,
+                            child: _buildFeatureCard(context, 3, title: "Import Vocab", icon: Icons.download_rounded, color: Colors.cyan, onTap: () => _showImportDialog()),
                           ),
-                          _buildFeatureCard(context,
-                            title: "Culture",
-                            icon: Icons.account_balance,
-                            color: Colors.tealAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 4, title: "Voice Translator", icon: Icons.record_voice_over_rounded, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen()))),
                           ),
-                          _buildFeatureCard(context,
-                            title: "Generate Report",
-                            icon: Icons.picture_as_pdf_outlined,
-                            color: Colors.deepOrangeAccent,
-                            onTap: () async => await ReportGenerator.generateAndPrintReport("Student"),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 5, title: "Text Translator", icon: Icons.translate, color: Colors.orangeAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen()))),
                           ),
-                          _buildFeatureCard(context,
-                            title: "Dict Editor",
-                            icon: Icons.edit_note_rounded,
-                            color: Colors.blueAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DictionaryEditorScreen())),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 6, title: "Voice Vault", icon: Icons.mic, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen()))),
                           ),
-                          _buildFeatureCard(context,
-                            title: "Import Vocab",
-                            icon: Icons.download_rounded,
-                            color: Colors.cyan,
-                            onTap: () => _showImportDialog(),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 7, title: "Culture", icon: Icons.account_balance, color: Colors.tealAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen()))),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
 
-                      // ────── COMMUNITY & SETTINGS SECTION ──────
+                      // ────── LEARNING TOOLS SECTION (Bento Grid) ──────
+                      _buildSectionHeader("LEARNING TOOLS", Icons.school_rounded, Colors.purpleAccent),
+                      const SizedBox(height: 12),
+                      StaggeredGrid.count(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
+                        children: [
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: "Certification", icon: Icons.verified, color: Colors.amberAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: "Quiz Mode", icon: Icons.quiz, color: Colors.purpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: "SRS Analytics", icon: Icons.bar_chart_rounded, color: Colors.deepPurple, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SRSDashboardScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: "Progress", icon: Icons.bar_chart, color: Colors.greenAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: "Common Phrases", icon: Icons.chat_bubble_outline, color: Colors.pinkAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 5, title: "Andamanese ᴮᴱᵀᴬ", icon: Icons.language_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 6, title: "Nature Hub", icon: Icons.eco_rounded, color: Colors.green, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FloraFaunaScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 7, title: "Oral History", icon: Icons.radio_rounded, color: Colors.brown, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoryRadioScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 8, title: "Dialect Comparison", icon: Icons.compare_arrows_rounded, color: Colors.green, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 9, title: "Island GIS", icon: Icons.explore_rounded, color: Colors.blueGrey, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectHeatmapScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 10, title: "Tuhet Mapper", icon: Icons.account_tree_rounded, color: Colors.deepOrange, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KinshipMapperScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 11, title: "Village Hub", icon: Icons.map_rounded, color: Colors.teal, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoryPalaceScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 12, title: "Whisper Pro", icon: Icons.auto_awesome_rounded, color: Colors.cyan, onTap: () async {
+                              final result = await VoiceAssistantDialog.show(context);
+                              if (result != null && result.isNotEmpty) {
+                                  _searchController.text = result;
+                                  _onSearch(result);
+                              }
+                          })),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      // ────── COMMUNITY & SETTINGS SECTION (Bento Grid) ──────
                       _buildSectionHeader("COMMUNITY & SETTINGS", Icons.people_alt_rounded, Colors.blueAccent),
                       const SizedBox(height: 12),
-                      GridView(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 15,
-                          mainAxisExtent: 110,
-                        ),
+                      StaggeredGrid.count(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
                         children: [
-                          _buildFeatureCard(context,
-                            title: "Community",
-                            icon: Icons.public,
-                            color: Colors.blueAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Beta Chat",
-                            icon: Icons.forum,
-                            color: Colors.indigoAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Export Vocab",
-                            icon: Icons.share_rounded,
-                            color: Colors.lightGreenAccent,
-                            onTap: () async {
-                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...')));
-                               await P2PSyncService.exportAndShare();
-                            },
-                          ),
-                          _buildFeatureCard(context,
-                            title: "Feedback",
-                            icon: Icons.rate_review,
-                            color: Colors.pinkAccent,
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())),
-                          ),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: "Community", icon: Icons.public, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: "Beta Chat", icon: Icons.forum, color: Colors.indigoAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: "Export Vocab", icon: Icons.share_rounded, color: Colors.lightGreenAccent, onTap: () async { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...'))); await P2PSyncService.exportAndShare(); })),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: "Feedback", icon: Icons.rate_review, color: Colors.pinkAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())))),
                         ],
                       ),
                       const SizedBox(height: 40),
@@ -397,14 +279,13 @@ class _TeacherDashState extends State<TeacherDash>
     );
   }
 
-
   Widget _buildSectionHeader(String title, IconData icon, Color color) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color, size: 16),
@@ -445,21 +326,21 @@ class _TeacherDashState extends State<TeacherDash>
     );
   }
 
-  Widget _buildFeatureCard(BuildContext context, {required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
-    return GestureDetector(
+  Widget _buildFeatureCard(BuildContext context, int index, {required String title, required IconData icon, required Color color, required VoidCallback onTap}) {
+    return TapScale(
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.6), // Frosty white glass
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.8), width: 1.5),
+              color: Colors.white.withValues(alpha: 0.6), // Frosty white glass
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   blurRadius: 15,
                   spreadRadius: 2,
                 )
@@ -471,7 +352,7 @@ class _TeacherDashState extends State<TeacherDash>
                 Positioned(
                   right: -15,
                   bottom: -15,
-                  child: Icon(icon, size: 80, color: color.withOpacity(0.05)),
+                  child: Icon(icon, size: 80, color: color.withValues(alpha: 0.08)),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -482,7 +363,7 @@ class _TeacherDashState extends State<TeacherDash>
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.15),
+                          color: color.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(icon, color: color, size: 24),
@@ -490,7 +371,7 @@ class _TeacherDashState extends State<TeacherDash>
                       const Spacer(),
                       Text(
                         title, 
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black87, // Dark text for light mode
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -507,7 +388,7 @@ class _TeacherDashState extends State<TeacherDash>
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
+    ).animate().fadeIn(duration: 400.ms, delay: (index * 40).ms).scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOutBack);
   }
 
   void _showImportDialog() {
