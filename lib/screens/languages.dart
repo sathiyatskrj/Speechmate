@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/screens/landing_page.dart';
+import 'package:speechmate/screens/ga_hub_screen.dart';
 import 'package:speechmate/screens/mock_language_screen.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:speechmate/core/app_strings.dart';
@@ -78,7 +79,7 @@ class _LanguagesState extends State<Languages> {
                           langCode: "gn", 
                           colors: [const Color(0xFF43A047), const Color(0xFFFDD835)], 
                           icon: Icons.terrain,
-                          onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LandingPage())),
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GAHubScreen())),
                         ),
                         const SizedBox(height: 20),
                         _buildLanguageButton(

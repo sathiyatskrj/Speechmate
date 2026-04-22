@@ -17,11 +17,9 @@ class DictionaryService {
       return await _db.queryAll('phrases');
     } else if (type == DictionaryType.dialects) {
       return await _db.queryAll('dialects');
-    } else if (type == DictionaryType.words || type == DictionaryType.nature || type == DictionaryType.numbers) {
-      // For general words
-      return await _db.getWordsByCategory('words'); 
     } else {
-      // animals, magic, family
+      // All word-type categories: words, nature, numbers, animals, magic, family
+      // Each has its own category_id in the words table, seeded from its own JSON file
       return await _db.getWordsByCategory(category);
     }
   }
@@ -52,17 +50,43 @@ class DictionaryService {
 
   Future<Map<String, dynamic>?> searchEverywhere(String query) async {
     final q = query.trim().toLowerCase();
+    if (q.isEmpty) return null;
 
-    final wordResult = await searchWord(query);
-    if (wordResult != null) {
-      final isNicobarese = wordResult['nicobarese']?.toString().toLowerCase() == q;
+    // 1. Search ALL words in the database (covers words, numbers, nature, colors, feelings, things, body_parts, animals, magic, family)
+    final db = await _db.database;
+    final wordResults = await db.query(
+      'words',
+      where: 'LOWER(english) = ? OR LOWER(nicobarese) = ?',
+      whereArgs: [q, q],
+      limit: 1,
+    );
+    if (wordResults.isNotEmpty) {
+      final w = wordResults.first;
+      final isNicobarese = w['nicobarese']?.toString().toLowerCase() == q;
       return {
-        ...wordResult,
-        '_type': 'words',
+        ...w,
+        '_type': w['category_id'] ?? 'words',
         '_searchedNicobarese': isNicobarese,
       };
     }
 
+    // 2. Fuzzy search words (LIKE match)
+    final fuzzyResults = await db.query(
+      'words',
+      where: 'LOWER(english) LIKE ? OR LOWER(nicobarese) LIKE ?',
+      whereArgs: ['%$q%', '%$q%'],
+      limit: 1,
+    );
+    if (fuzzyResults.isNotEmpty) {
+      final w = fuzzyResults.first;
+      return {
+        ...w,
+        '_type': w['category_id'] ?? 'words',
+        '_searchedNicobarese': false,
+      };
+    }
+
+    // 3. Search phrases
     final phraseResult = await searchPhrase(query);
     if (phraseResult != null) {
       return {
@@ -71,23 +95,8 @@ class DictionaryService {
         '_searchedNicobarese': false,
       };
     }
-    
-    // Also search in Animals
-    final animals = await getAnimalsItems();
-    try {
-      final animal = animals.firstWhere(
-        (e) => (e['text'] ?? e['english']).toString().toLowerCase() == q,
-      );
-      return {
-        ...animal,
-        '_type': 'animals',
-        'english': animal['text'] ?? animal['english'] ?? '',
-        'nicobarese': animal['nicobarese'] ?? '',
-        '_searchedNicobarese': false,
-      };
-    } catch (_) {}
 
-    // Also search Great Andamanese dictionary
+    // 4. Search Great Andamanese dictionary
     final gaResults = await _db.searchGADictionary(query);
     if (gaResults.isNotEmpty) {
       final ga = gaResults.first;

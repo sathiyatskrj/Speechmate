@@ -44,39 +44,59 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> {
   }
 
   Future<void> _startRecording() async {
-    if (await _audioRecorder.hasPermission()) {
-      final Directory tempDir = await getTemporaryDirectory();
-      _audioPath = '${tempDir.path}/translation_input.wav';
+    if (_isProcessing) return; // Block re-entry while processing
+    
+    try {
+      if (await _audioRecorder.hasPermission()) {
+        final Directory tempDir = await getTemporaryDirectory();
+        _audioPath = '${tempDir.path}/translation_${DateTime.now().millisecondsSinceEpoch}.wav';
 
-      await _audioRecorder.start(
-        const RecordConfig(
-          encoder: AudioEncoder.wav,
-          sampleRate: 16000,
-          numChannels: 1,
-        ),
-        path: _audioPath,
-      );
-
-      setState(() {
-        _isRecording = true;
-        _englishText = "Listening...";
-      });
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Microphone permission required')),
+        await _audioRecorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.wav,
+            sampleRate: 16000,
+            numChannels: 1,
+          ),
+          path: _audioPath,
         );
+
+        if (mounted) {
+          setState(() {
+            _isRecording = true;
+            _englishText = "Listening...";
+            _nicobareseText = "Translation will appear here";
+          });
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Microphone permission required')),
+          );
+        }
       }
+    } catch (e) {
+      debugPrint('[VoiceTranslator] Start recording error: $e');
+      if (mounted) setState(() => _isRecording = false);
     }
   }
 
   Future<void> _stopRecordingAndTranslate() async {
-    final String? path = await _audioRecorder.stop();
-    setState(() {
-      _isRecording = false;
-      _isProcessing = true;
-      _englishText = "Processing audio...";
-    });
+    if (!_isRecording) return; // Guard against double-tap
+    
+    String? path;
+    try {
+      path = await _audioRecorder.stop();
+    } catch (e) {
+      debugPrint('[VoiceTranslator] Stop recording error: $e');
+    }
+    
+    if (mounted) {
+      setState(() {
+        _isRecording = false;
+        _isProcessing = true;
+        _englishText = "Processing audio...";
+      });
+    }
 
     if (path != null && File(path).existsSync()) {
       try {
@@ -84,39 +104,52 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> {
         final String transcription = await _whisperService.transcribe(path);
         
         if (transcription.trim().isEmpty) {
-          setState(() {
-            _englishText = "Could not understand audio. Try again.";
-            _isProcessing = false;
-          });
+          if (mounted) {
+            setState(() {
+              _englishText = "Could not understand audio. Try again.";
+              _isProcessing = false;
+            });
+          }
           return;
         }
 
-        setState(() {
-          _englishText = transcription;
-          _nicobareseText = "Translating...";
-        });
+        if (mounted) {
+          setState(() {
+            _englishText = transcription;
+            _nicobareseText = "Translating...";
+          });
+        }
 
         // 2. Translate with Neural Engine (Offline)
         final result = await _neuralEngine.predict(transcription);
         
-        setState(() {
-          _nicobareseText = result.text;
-          _isProcessing = false;
-        });
+        if (mounted) {
+          setState(() {
+            _nicobareseText = result.text;
+            _isProcessing = false;
+          });
+        }
 
         // 3. Auto-play translation
         _ttsService.speakNicobarese(result.text, englishWord: transcription);
 
       } catch (e) {
+        debugPrint('[VoiceTranslator] Processing error: $e');
+        if (mounted) {
+          setState(() {
+            _englishText = "Error processing audio. Try again.";
+            _nicobareseText = "Translation will appear here";
+            _isProcessing = false;
+          });
+        }
+      }
+    } else {
+      if (mounted) {
         setState(() {
-          _englishText = "Error processing audio";
+          _englishText = "Hold the microphone to speak...";
           _isProcessing = false;
         });
       }
-    } else {
-      setState(() {
-        _isProcessing = false;
-      });
     }
   }
 
