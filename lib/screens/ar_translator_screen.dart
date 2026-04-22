@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
+import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/tts_service.dart';
 
-/// Offline AR Translator
-/// Real-time camera stream → ML Kit Object Detection (on-device, 100% offline)
-/// → Nicobarese dictionary lookup → live bounding box overlay + TTS
+/// Next-Gen AR Translator HUD
+/// Uses Google ML Kit Image Labeling for robust object recognition
 class ARTranslatorScreen extends StatefulWidget {
   const ARTranslatorScreen({super.key});
 
@@ -19,55 +19,71 @@ class ARTranslatorScreen extends StatefulWidget {
 }
 
 class _ARTranslatorScreenState extends State<ARTranslatorScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   CameraController? _cameraController;
   CameraDescription? _camera;
-  late ObjectDetector _objectDetector;
+  late ImageLabeler _imageLabeler;
   final TtsService _ttsService = TtsService();
 
   bool _isDetecting = false;
   bool _isCameraReady = false;
   bool _isLive = true;
 
-  List<_ARObject> _detectedObjects = [];
+  List<_ARLabel> _detectedLabels = [];
   String _lastSpoken = '';
   Timer? _ttsTimer;
 
-  // Throttle: process one frame every 500ms
   DateTime _lastProcessed = DateTime.now();
-  static const _throttleMs = 500;
+  static const _throttleMs = 600; // slightly longer to save battery, labeling is heavy
+
+  late AnimationController _scannerController;
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
+    _scannerController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
     _ttsService.init();
-    _initDetector();
+    _initLabeler();
     _initCamera();
   }
 
-  void _initDetector() {
-    final options = ObjectDetectorOptions(
-      mode: DetectionMode.stream,
-      classifyObjects: true,
-      multipleObjects: true,
-    );
-    _objectDetector = ObjectDetector(options: options);
+  void _initLabeler() {
+    final options = ImageLabelerOptions(confidenceThreshold: 0.6); // Only high confidence
+    _imageLabeler = ImageLabeler(options: options);
   }
 
   Future<void> _initCamera() async {
     try {
       final cameras = await availableCameras();
       if (cameras.isEmpty) return;
-      _camera = cameras.first;
+      
+      // Prefer back camera
+      _camera = cameras.firstWhere(
+        (c) => c.lensDirection == CameraLensDirection.back,
+        orElse: () => cameras.first,
+      );
+
       _cameraController = CameraController(
         _camera!,
-        ResolutionPreset.medium,
+        ResolutionPreset.high,
         enableAudio: false,
         imageFormatGroup: Platform.isAndroid
             ? ImageFormatGroup.nv21
             : ImageFormatGroup.bgra8888,
       );
+      
       await _cameraController!.initialize();
       if (!mounted) return;
       setState(() => _isCameraReady = true);
@@ -78,7 +94,6 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
   }
 
   Future<void> _processCameraImage(CameraImage image) async {
-    // Throttle
     final now = DateTime.now();
     if (now.difference(_lastProcessed).inMilliseconds < _throttleMs) return;
     if (_isDetecting || !_isLive) return;
@@ -89,47 +104,53 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
       final inputImage = _toInputImage(image);
       if (inputImage == null) { _isDetecting = false; return; }
 
-      final detectedList = await _objectDetector.processImage(inputImage);
-      final arObjects = <_ARObject>[];
+      final labels = await _imageLabeler.processImage(inputImage);
+      final arLabels = <_ARLabel>[];
 
-      for (final obj in detectedList) {
-        if (obj.labels.isEmpty) continue;
-        final label = obj.labels.first.text.toLowerCase();
-        final confidence = obj.labels.first.confidence;
-        if (confidence < 0.4) continue;
+      for (final label in labels) {
+        final text = label.label.toLowerCase();
+        final confidence = label.confidence;
+        
+        // Filter out very generic labels that don't translate well
+        if (text == 'product' || text == 'room') continue;
 
-        // Look up Nicobarese translation from offline dictionary
-        final translation = await _lookupNicobarese(label);
+        final translation = await _lookupNicobarese(text);
 
-        arObjects.add(_ARObject(
-          englishLabel: _capitalize(label),
+        arLabels.add(_ARLabel(
+          englishLabel: _capitalize(text),
           nicobareseLabel: translation,
-          boundingBox: obj.boundingBox,
           confidence: confidence,
         ));
       }
 
+      // Sort by confidence
+      arLabels.sort((a, b) => b.confidence.compareTo(a.confidence));
+      // Keep top 4
+      final topLabels = arLabels.take(4).toList();
+
       if (mounted) {
-        setState(() => _detectedObjects = arObjects);
-        // Auto-speak first detected object (debounced)
-        if (arObjects.isNotEmpty) {
-          final word = arObjects.first.nicobareseLabel;
-          if (word != _lastSpoken && word != _capitalize(arObjects.first.englishLabel)) {
-            _lastSpoken = word;
+        setState(() => _detectedLabels = topLabels);
+        
+        // Auto-speak top label
+        if (topLabels.isNotEmpty) {
+          final top = topLabels.first;
+          if (top.nicobareseLabel != _lastSpoken && top.nicobareseLabel != top.englishLabel) {
+            _lastSpoken = top.nicobareseLabel;
             _ttsTimer?.cancel();
-            _ttsTimer = Timer(const Duration(milliseconds: 800), () {
-              _ttsService.speakNicobarese(word, englishWord: arObjects.first.englishLabel);
+            _ttsTimer = Timer(const Duration(milliseconds: 1000), () {
+              if (_isLive) {
+                _ttsService.speakNicobarese(top.nicobareseLabel, englishWord: top.englishLabel);
+              }
             });
           }
         }
       }
     } catch (e) {
-      debugPrint('[ARTranslator] Detection error: $e');
+      debugPrint('[ARTranslator] Labeling error: $e');
     }
     _isDetecting = false;
   }
 
-  /// Convert CameraImage to InputImage for ML Kit
   InputImage? _toInputImage(CameraImage image) {
     if (_camera == null) return null;
 
@@ -139,7 +160,6 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
     final format = InputImageFormatValue.fromRawValue(image.format.raw);
     if (format == null) return null;
 
-    // Android: NV21 = single-plane or we concat Y + UV
     if (Platform.isAndroid) {
       final WriteBuffer allBytes = WriteBuffer();
       for (final plane in image.planes) {
@@ -157,7 +177,6 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
       );
     }
 
-    // iOS: BGRA8888 = single plane
     if (image.planes.length != 1) return null;
     return InputImage.fromBytes(
       bytes: image.planes.first.bytes,
@@ -173,30 +192,44 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
   Future<String> _lookupNicobarese(String englishLabel) async {
     try {
       final db = await DatabaseManager.instance.database;
-      // Try exact match first
+      final term = englishLabel.toLowerCase();
+      
       final exact = await db.query(
         'words',
         where: 'LOWER(english) = ?',
-        whereArgs: [englishLabel.toLowerCase()],
+        whereArgs: [term],
         limit: 1,
       );
       if (exact.isNotEmpty && (exact.first['nicobarese'] ?? '').toString().isNotEmpty) {
         return exact.first['nicobarese'].toString();
       }
-      // Try fuzzy LIKE match
+      
       final fuzzy = await db.query(
         'words',
         where: 'LOWER(english) LIKE ?',
-        whereArgs: ['%${englishLabel.toLowerCase()}%'],
+        whereArgs: ['%$term%'],
         limit: 1,
       );
       if (fuzzy.isNotEmpty && (fuzzy.first['nicobarese'] ?? '').toString().isNotEmpty) {
         return fuzzy.first['nicobarese'].toString();
       }
+
+      if (term.contains(' ')) {
+        final lastWord = term.split(' ').last;
+        final splitFuzzy = await db.query(
+          'words',
+          where: 'LOWER(english) LIKE ?',
+          whereArgs: ['%$lastWord%'],
+          limit: 1,
+        );
+        if (splitFuzzy.isNotEmpty && (splitFuzzy.first['nicobarese'] ?? '').toString().isNotEmpty) {
+            return splitFuzzy.first['nicobarese'].toString();
+        }
+      }
     } catch (e) {
       debugPrint('[ARTranslator] Lookup error: $e');
     }
-    return _capitalize(englishLabel); // Return English if no translation found
+    return _capitalize(englishLabel);
   }
 
   String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
@@ -204,7 +237,12 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
   void _toggleLive() {
     setState(() {
       _isLive = !_isLive;
-      _detectedObjects = [];
+      if (!_isLive) {
+        _detectedLabels = [];
+        _scannerController.stop();
+      } else {
+        _scannerController.repeat(reverse: true);
+      }
     });
   }
 
@@ -214,17 +252,19 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
     if (state == AppLifecycleState.inactive) {
       _cameraController?.stopImageStream();
     } else if (state == AppLifecycleState.resumed) {
-      _initCamera();
+      if (_isLive) _initCamera();
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _scannerController.dispose();
+    _pulseController.dispose();
     _ttsTimer?.cancel();
     _cameraController?.stopImageStream();
     _cameraController?.dispose();
-    _objectDetector.close();
+    _imageLabeler.close();
     _ttsService.dispose();
     super.dispose();
   }
@@ -236,89 +276,137 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // ── 1. CAMERA PREVIEW ──
+          // Camera Preview
           if (_isCameraReady && _cameraController != null)
             _buildCameraPreview()
           else
             _buildLoadingView(),
 
-          // ── 2. AR OVERLAY (bounding boxes + labels) ──
-          if (_isCameraReady && _detectedObjects.isNotEmpty)
-            _buildAROverlay(),
+          // AR Overlay Effects
+          if (_isCameraReady && _isLive) ...[
+            _buildScanGrid(),
+            _buildHUDScanner(),
+          ],
 
-          // ── 3. TOP BAR ──
-          Positioned(
-            top: 0, left: 0, right: 0,
-            child: _buildTopBar(),
-          ),
+          // Labels Float
+          if (_isCameraReady && _detectedLabels.isNotEmpty)
+            _buildFloatingLabels(),
 
-          // ── 4. BOTTOM PANEL (detected objects list) ──
-          Positioned(
-            bottom: 0, left: 0, right: 0,
-            child: _buildBottomPanel(),
-          ),
+          // Top Navigation
+          Positioned(top: 0, left: 0, right: 0, child: _buildTopBar()),
 
-          // ── 5. PAUSE INDICATOR ──
-          if (!_isLive)
-            Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(30)),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.pause_circle, color: Colors.amberAccent, size: 20),
-                    SizedBox(width: 8),
-                    Text('Paused', style: TextStyle(color: Colors.white, fontSize: 16)),
-                  ],
-                ),
-              ),
-            ),
+          // Bottom Control Panel
+          Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomPanel()),
         ],
       ),
     );
   }
 
   Widget _buildCameraPreview() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SizedBox(
-          width: constraints.maxWidth,
-          height: constraints.maxHeight,
-          child: CameraPreview(_cameraController!),
-        );
-      },
-    );
-  }
-
-  Widget _buildLoadingView() {
-    return Container(
-      color: Colors.black,
-      child: const Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(color: Colors.cyanAccent),
-            SizedBox(height: 16),
-            Text('Initializing AR Camera...', style: TextStyle(color: Colors.white54, fontSize: 16)),
-          ],
-        ),
+    return Transform.scale(
+      scale: 1.05, // Slight zoom to avoid borders
+      child: Center(
+        child: CameraPreview(_cameraController!),
       ),
     );
   }
 
-  Widget _buildAROverlay() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
+  Widget _buildLoadingView() {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(color: Colors.cyanAccent),
+          SizedBox(height: 16),
+          Text('INITIALIZING OPTICS...', style: TextStyle(color: Colors.cyanAccent, fontFamily: 'monospace', letterSpacing: 2)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScanGrid() {
+    return CustomPaint(
+      painter: _GridPainter(pulseAnimation: _pulseController),
+      size: Size.infinite,
+    );
+  }
+
+  Widget _buildHUDScanner() {
+    return AnimatedBuilder(
+      animation: _scannerController,
+      builder: (context, child) {
         return CustomPaint(
-          size: Size(constraints.maxWidth, constraints.maxHeight),
-          painter: _ARBoxPainter(
-            objects: _detectedObjects,
-            previewSize: _cameraController!.value.previewSize ?? const Size(480, 640),
-            screenSize: Size(constraints.maxWidth, constraints.maxHeight),
-          ),
+          painter: _ScannerPainter(scanProgress: _scannerController.value),
+          size: Size.infinite,
         );
       },
+    );
+  }
+
+  Widget _buildFloatingLabels() {
+    // Top label is the focus, others are context
+    final top = _detectedLabels.first;
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Main Target Box
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 40),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.cyanAccent.withOpacity(0.8), width: 2),
+              boxShadow: [
+                BoxShadow(color: Colors.cyanAccent.withOpacity(0.3), blurRadius: 20, spreadRadius: 5),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.center_focus_weak, color: Colors.cyanAccent, size: 32),
+                const SizedBox(height: 12),
+                Text(
+                  top.nicobareseLabel,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    shadows: [Shadow(color: Colors.cyanAccent, blurRadius: 10)],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.cyanAccent.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    top.englishLabel.toUpperCase(),
+                    style: const TextStyle(color: Colors.cyanAccent, fontSize: 14, letterSpacing: 2, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.radar, color: Colors.white54, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      'MATCH: ${(top.confidence * 100).toStringAsFixed(1)}%',
+                      style: const TextStyle(color: Colors.white54, fontSize: 12, fontFamily: 'monospace'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -333,38 +421,29 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
       ),
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 8, left: 16, right: 16, bottom: 20),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.cyanAccent),
+            style: IconButton.styleFrom(backgroundColor: Colors.black45),
           ),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text('🏝️ AR Translator', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                Text('Point camera at objects to translate', style: TextStyle(color: Colors.white54, fontSize: 12)),
-              ],
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black45,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.cyanAccent.withOpacity(0.5)),
+            ),
+            child: const Text(
+              'A.R. TRANSLATOR',
+              style: TextStyle(color: Colors.cyanAccent, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 2),
             ),
           ),
-          GestureDetector(
-            onTap: _toggleLive,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: _isLive ? Colors.cyanAccent.withOpacity(0.2) : Colors.redAccent.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: _isLive ? Colors.cyanAccent : Colors.redAccent),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(_isLive ? Icons.fiber_manual_record : Icons.pause, color: _isLive ? Colors.cyanAccent : Colors.redAccent, size: 14),
-                  const SizedBox(width: 5),
-                  Text(_isLive ? 'LIVE' : 'PAUSED', style: TextStyle(color: _isLive ? Colors.cyanAccent : Colors.redAccent, fontSize: 13, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
+          IconButton(
+            onPressed: _toggleLive,
+            icon: Icon(_isLive ? Icons.pause : Icons.play_arrow, color: _isLive ? Colors.white : Colors.cyanAccent),
+            style: IconButton.styleFrom(backgroundColor: _isLive ? Colors.redAccent.withOpacity(0.8) : Colors.black45),
           ),
         ],
       ),
@@ -372,193 +451,169 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
   }
 
   Widget _buildBottomPanel() {
+    if (_detectedLabels.length <= 1) return const SizedBox.shrink();
+    
     return Container(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 16, left: 16, right: 16, top: 24),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
-          colors: [Colors.black, Colors.transparent],
+          colors: [Colors.black, Colors.black87, Colors.transparent],
         ),
       ),
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 16, left: 16, right: 16, top: 24),
-      child: _detectedObjects.isEmpty
-          ? const Center(
-              child: Text('🔍 Scanning for objects...', style: TextStyle(color: Colors.white38, fontSize: 14)),
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('DETECTED', style: TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 2)),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 80,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _detectedObjects.length,
-                    itemBuilder: (context, index) {
-                      final obj = _detectedObjects[index];
-                      return GestureDetector(
-                        onTap: () => _ttsService.speakNicobarese(obj.nicobareseLabel, englishWord: obj.englishLabel),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.cyanAccent.withOpacity(0.5)),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                obj.nicobareseLabel,
-                                style: const TextStyle(color: Colors.cyanAccent, fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                obj.englishLabel,
-                                style: const TextStyle(color: Colors.white54, fontSize: 11),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.volume_up, color: Colors.white24, size: 11),
-                                  const SizedBox(width: 3),
-                                  Text('${(obj.confidence * 100).toInt()}%', style: const TextStyle(color: Colors.white24, fontSize: 10)),
-                                ],
-                              ),
-                            ],
-                          ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8, bottom: 12),
+            child: Text('ENVIRONMENT ANALYSIS', style: TextStyle(color: Colors.cyanAccent, fontSize: 10, letterSpacing: 3, fontWeight: FontWeight.bold)),
+          ),
+          SizedBox(
+            height: 60,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _detectedLabels.length - 1,
+              itemBuilder: (context, index) {
+                final label = _detectedLabels[index + 1];
+                return GestureDetector(
+                  onTap: () => _ttsService.speakNicobarese(label.nicobareseLabel, englishWord: label.englishLabel),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          label.nicobareseLabel,
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                         ),
-                      );
-                    },
+                        Text(
+                          label.englishLabel,
+                          style: const TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 1),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ═══════════════════════════════════════════════
-// DATA MODEL
-// ═══════════════════════════════════════════════
-class _ARObject {
+class _ARLabel {
   final String englishLabel;
   final String nicobareseLabel;
-  final Rect boundingBox;
   final double confidence;
 
-  const _ARObject({
+  const _ARLabel({
     required this.englishLabel,
     required this.nicobareseLabel,
-    required this.boundingBox,
     required this.confidence,
   });
 }
 
 // ═══════════════════════════════════════════════
-// CUSTOM PAINTER: AR Bounding Boxes + Labels
+// UI EFFECTS: HUD SCANNERS & GRIDS
 // ═══════════════════════════════════════════════
-class _ARBoxPainter extends CustomPainter {
-  final List<_ARObject> objects;
-  final Size previewSize;
-  final Size screenSize;
+class _GridPainter extends CustomPainter {
+  final Animation<double> pulseAnimation;
 
-  const _ARBoxPainter({
-    required this.objects,
-    required this.previewSize,
-    required this.screenSize,
-  });
+  _GridPainter({required this.pulseAnimation}) : super(repaint: pulseAnimation);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final scaleX = screenSize.width / previewSize.height;
-    final scaleY = screenSize.height / previewSize.width;
+    final paint = Paint()
+      ..color = Colors.cyanAccent.withOpacity(0.05 + (pulseAnimation.value * 0.05))
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
 
-    for (final obj in objects) {
-      final rect = Rect.fromLTRB(
-        obj.boundingBox.left * scaleX,
-        obj.boundingBox.top * scaleY,
-        obj.boundingBox.right * scaleX,
-        obj.boundingBox.bottom * scaleY,
-      );
-
-      // Glow border
-      final glowPaint = Paint()
-        ..color = Colors.cyanAccent.withOpacity(0.3)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 6
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-      canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(10)), glowPaint);
-
-      // Solid border
-      final borderPaint = Paint()
-        ..color = Colors.cyanAccent
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5;
-      canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(10)), borderPaint);
-
-      // Corner accents
-      _drawCorners(canvas, rect);
-
-      // Label background
-      final labelText = '${obj.nicobareseLabel}  •  ${obj.englishLabel}';
-      final textPainter = TextPainter(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: '${obj.nicobareseLabel}  ',
-              style: const TextStyle(color: Colors.cyanAccent, fontSize: 13, fontWeight: FontWeight.bold),
-            ),
-            TextSpan(
-              text: obj.englishLabel,
-              style: const TextStyle(color: Colors.white70, fontSize: 11),
-            ),
-          ],
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout(maxWidth: screenSize.width * 0.7);
-
-      final labelBgRect = Rect.fromLTWH(
-        rect.left,
-        rect.top - 28,
-        textPainter.width + 20,
-        26,
-      );
-
-      final bgPaint = Paint()..color = const Color(0xCC000000);
-      canvas.drawRRect(RRect.fromRectAndRadius(labelBgRect, const Radius.circular(6)), bgPaint);
-
-      textPainter.paint(canvas, Offset(rect.left + 10, rect.top - 24));
+    const spacing = 40.0;
+    
+    // Vertical lines
+    for (double x = 0; x <= size.width; x += spacing) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    // Horizontal lines
+    for (double y = 0; y <= size.height; y += spacing) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
 
-  void _drawCorners(Canvas canvas, Rect rect) {
-    const len = 14.0;
-    const strokeWidth = 3.0;
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
+  @override
+  bool shouldRepaint(_GridPainter oldDelegate) => true;
+}
 
-    // Top-left
-    canvas.drawLine(rect.topLeft, rect.topLeft.translate(len, 0), paint);
-    canvas.drawLine(rect.topLeft, rect.topLeft.translate(0, len), paint);
-    // Top-right
-    canvas.drawLine(rect.topRight, rect.topRight.translate(-len, 0), paint);
-    canvas.drawLine(rect.topRight, rect.topRight.translate(0, len), paint);
-    // Bottom-left
-    canvas.drawLine(rect.bottomLeft, rect.bottomLeft.translate(len, 0), paint);
-    canvas.drawLine(rect.bottomLeft, rect.bottomLeft.translate(0, -len), paint);
-    // Bottom-right
-    canvas.drawLine(rect.bottomRight, rect.bottomRight.translate(-len, 0), paint);
-    canvas.drawLine(rect.bottomRight, rect.bottomRight.translate(0, -len), paint);
+class _ScannerPainter extends CustomPainter {
+  final double scanProgress;
+
+  _ScannerPainter({required this.scanProgress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final boxSize = size.width * 0.7;
+    final rect = Rect.fromCenter(center: center, width: boxSize, height: boxSize);
+
+    // Draw Corner Brackets
+    final bracketPaint = Paint()
+      ..color = Colors.cyanAccent
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.square;
+
+    const cornerLength = 30.0;
+    
+    // Top Left
+    canvas.drawLine(rect.topLeft, rect.topLeft.translate(cornerLength, 0), bracketPaint);
+    canvas.drawLine(rect.topLeft, rect.topLeft.translate(0, cornerLength), bracketPaint);
+    // Top Right
+    canvas.drawLine(rect.topRight, rect.topRight.translate(-cornerLength, 0), bracketPaint);
+    canvas.drawLine(rect.topRight, rect.topRight.translate(0, cornerLength), bracketPaint);
+    // Bottom Left
+    canvas.drawLine(rect.bottomLeft, rect.bottomLeft.translate(cornerLength, 0), bracketPaint);
+    canvas.drawLine(rect.bottomLeft, rect.bottomLeft.translate(0, -cornerLength), bracketPaint);
+    // Bottom Right
+    canvas.drawLine(rect.bottomRight, rect.bottomRight.translate(-cornerLength, 0), bracketPaint);
+    canvas.drawLine(rect.bottomRight, rect.bottomRight.translate(0, -cornerLength), bracketPaint);
+
+    // Scan Line
+    final scanLineY = rect.top + (rect.height * scanProgress);
+    
+    final scanLinePaint = Paint()
+      ..color = Colors.cyanAccent.withOpacity(0.8)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 4);
+
+    canvas.drawLine(
+      Offset(rect.left, scanLineY),
+      Offset(rect.right, scanLineY),
+      scanLinePaint,
+    );
+
+    // Scan gradient
+    final gradientRect = Rect.fromLTRB(rect.left, scanLineY - 40, rect.right, scanLineY);
+    final gradientPaint = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(0, gradientRect.top),
+        Offset(0, gradientRect.bottom),
+        [Colors.cyanAccent.withOpacity(0.0), Colors.cyanAccent.withOpacity(0.3)],
+      );
+    
+    canvas.drawRect(gradientRect, gradientPaint);
   }
 
   @override
-  bool shouldRepaint(_ARBoxPainter oldDelegate) =>
-      oldDelegate.objects != objects;
+  bool shouldRepaint(_ScannerPainter oldDelegate) => oldDelegate.scanProgress != scanProgress;
 }
