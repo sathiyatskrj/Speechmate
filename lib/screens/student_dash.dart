@@ -27,6 +27,7 @@ import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/screens/ar_translator_screen.dart';
+import 'package:speechmate/screens/body_parts_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/core/app_colors.dart';
 
@@ -80,7 +81,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings'), "icon": Icons.emoji_emotions_rounded},
     {"word": AppStrings.get('colors'), "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors'), "icon": Icons.palette_rounded},
     {"word": AppStrings.get('things'), "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things'), "icon": Icons.chair_rounded},
-    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const DynamicCategoryScreen(categoryId: 'body_parts', title: 'Body Parts'), "icon": Icons.accessibility_new_rounded},
+    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const BodyPartsScreen(), "icon": Icons.accessibility_new_rounded},
     {"word": AppStrings.get('animals'), "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals'), "icon": Icons.pets_rounded},
     {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words'), "icon": Icons.auto_fix_high_rounded},
     {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
