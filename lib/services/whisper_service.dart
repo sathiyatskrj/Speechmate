@@ -111,6 +111,8 @@ class WhisperService {
         audio: audioFilePath,
         language: "auto", // Upgrade: Auto-detect language (supports Multilingual models)
         isTranslate: false,
+        speedUp: true, // Upgrade: Utilize GPU delegation (Metal/NNAPI) for reduced latency
+        threads: !Platform.isIOS ? 4 : 2, // Optimize thread count based on platform
       );
 
       final response = await _whisper!.transcribe(transcribeRequest: request);

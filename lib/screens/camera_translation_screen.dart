@@ -9,22 +9,26 @@ import 'package:image_picker/image_picker.dart';
 import 'package:speechmate/services/neural_engine_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'dart:ui' as ui;
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:speechmate/providers/service_providers.dart';
+import 'package:speechmate/widgets/ar_overlay_controller.dart';
 
-class CameraTranslationScreen extends StatefulWidget {
+class CameraTranslationScreen extends ConsumerStatefulWidget {
   const CameraTranslationScreen({super.key});
 
   @override
-  State<CameraTranslationScreen> createState() => _CameraTranslationScreenState();
+  ConsumerState<CameraTranslationScreen> createState() => _CameraTranslationScreenState();
 }
 
-class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
+class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScreen> {
   CameraController? _cameraController;
   CameraDescription? _camera;
   
   late TextRecognizer _textRecognizer;
   late ObjectDetector _objectDetector;
-  final NeuralEngineService _neuralEngine = NeuralEngineService();
-  final TtsService _ttsService = TtsService();
+  // Services will be obtained via Riverpod in build/process methods where needed
+  // using ref.read(...) instead of direct instantiation.
   
   bool _isProcessing = false;
   List<Map<String, String>> _translationResults = [];
@@ -69,8 +73,7 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
       multipleObjects: false,
     );
     _objectDetector = ObjectDetector(options: options);
-    _ttsService.init();
-    _neuralEngine.init();
+    _objectDetector = ObjectDetector(options: options);
     _initializeCamera();
   }
 
@@ -87,6 +90,13 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
         imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.nv21 : ImageFormatGroup.bgra8888,
       );
       await _cameraController!.initialize();
+      
+      try {
+        await _cameraController!.setFocusMode(FocusMode.auto);
+      } catch (e) {
+        debugPrint("Focus mode not supported: $e");
+      }
+      
       if (mounted) setState(() {});
       
       _cameraController!.startImageStream(_processCameraImage);
@@ -123,7 +133,7 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
       for (TextBlock block in recognizedText.blocks) {
         String blockText = block.text.replaceAll('\n', ' ').trim();
         if (blockText.isNotEmpty && blockText.length > 2) {
-          final result = await _neuralEngine.predict(blockText);
+          final result = await ref.read(neuralEngineProvider).predict(blockText);
           if (result.text.isNotEmpty) {
              newBlocks.add(TranslatedTextBlock(
                rect: block.boundingBox,
@@ -146,10 +156,29 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   }
 
   InputImage? _toInputImage(CameraImage image) {
-    if (_camera == null) return null;
-    final rotation = InputImageRotationValue.fromRawValue(_camera!.sensorOrientation) ?? InputImageRotation.rotation0deg;
-    final format = InputImageFormatValue.fromRawValue(image.format.raw);
-    if (format == null) return null;
+    if (_camera == null || _cameraController == null) return null;
+
+    final sensorOrientation = _camera!.sensorOrientation;
+    InputImageRotation? rotation;
+    if (Platform.isIOS) {
+      rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+    } else if (Platform.isAndroid) {
+      final orientations = {
+        DeviceOrientation.portraitUp: 0,
+        DeviceOrientation.landscapeLeft: 90,
+        DeviceOrientation.portraitDown: 180,
+        DeviceOrientation.landscapeRight: 270,
+      };
+      var deviceOrientation = orientations[_cameraController!.value.deviceOrientation] ?? 0;
+      var rotationCompensation = (sensorOrientation + deviceOrientation) % 360;
+      rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
+    }
+
+    if (rotation == null) return null;
+
+    // Use nv21 as fallback on Android if raw value parsing fails
+    final format = InputImageFormatValue.fromRawValue(image.format.raw) ?? 
+                  (Platform.isAndroid ? InputImageFormat.nv21 : InputImageFormat.bgra8888);
 
     if (Platform.isAndroid) {
       final WriteBuffer allBytes = WriteBuffer();
@@ -206,7 +235,7 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
           for (TextLine line in block.lines) {
             String originalText = line.text.trim();
             if (originalText.isNotEmpty) {
-               final result = await _neuralEngine.predict(originalText);
+               final result = await ref.read(neuralEngineProvider).predict(originalText);
                results.add({
                  "original": originalText,
                  "translation": result.text.isNotEmpty ? result.text : "Translation unavailable",
@@ -220,7 +249,7 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
         });
         _showResultSheet();
       } else if (objectName.isNotEmpty) {
-         final result = await _neuralEngine.predict(objectName);
+         final result = await ref.read(neuralEngineProvider).predict(objectName);
          setState(() {
            _detectedObject = "Detected Object: $objectName";
            _translationResults = [{
@@ -326,7 +355,7 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
                                        ),
                                        IconButton(
                                          icon: const Icon(Icons.volume_up, color: Colors.cyanAccent),
-                                         onPressed: () => _ttsService.speakNicobarese(item['translation'] ?? '', englishWord: item['original']),
+                                         onPressed: () => ref.read(ttsServiceProvider).speakNicobarese(item['translation'] ?? '', englishWord: item['original']),
                                        )
                                      ],
                                    ),
@@ -388,14 +417,10 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
             
             // Live Text Overlay Layer
             if (_isLiveMode && _liveBlocks.isNotEmpty)
-              Positioned.fill(
-                 child: CustomPaint(
-                    painter: LiveTextOverlayPainter(
-                       blocks: _liveBlocks,
-                       imageSize: Size(_cameraController!.value.previewSize!.height, _cameraController!.value.previewSize!.width), // Swap due to portrait
-                       screenSize: screenSize,
-                    ),
-                 ),
+              AROverlayController(
+                liveBlocks: _liveBlocks,
+                imageSize: Size(_cameraController!.value.previewSize!.height, _cameraController!.value.previewSize!.width),
+                screenSize: screenSize,
               ),
 
             // Top Bar
@@ -554,66 +579,3 @@ class _CameraTranslationScreenState extends State<CameraTranslationScreen> {
   }
 }
 
-class TranslatedTextBlock {
-  final Rect rect;
-  final String original;
-  final String translation;
-
-  TranslatedTextBlock({required this.rect, required this.original, required this.translation});
-}
-
-class LiveTextOverlayPainter extends CustomPainter {
-  final List<TranslatedTextBlock> blocks;
-  final Size imageSize;
-  final Size screenSize;
-
-  LiveTextOverlayPainter({required this.blocks, required this.imageSize, required this.screenSize});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double scaleX = screenSize.width / imageSize.width;
-    final double scaleY = screenSize.height / imageSize.height;
-
-    for (var block in blocks) {
-      // Scale bounding box to screen dimensions
-      final double left = block.rect.left * scaleX;
-      final double top = block.rect.top * scaleY;
-      final double width = block.rect.width * scaleX;
-      final double height = block.rect.height * scaleY;
-      
-      final Rect scaledRect = Rect.fromLTWH(left, top, width, height);
-
-      // Draw background box
-      final Paint bgPaint = Paint()
-        ..color = Colors.black.withOpacity(0.7)
-        ..style = PaintingStyle.fill;
-      canvas.drawRRect(RRect.fromRectAndRadius(scaledRect, const Radius.circular(8)), bgPaint);
-
-      // Draw border
-      final Paint borderPaint = Paint()
-        ..color = Colors.cyanAccent
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
-      canvas.drawRRect(RRect.fromRectAndRadius(scaledRect, const Radius.circular(8)), borderPaint);
-
-      // Draw Text
-      final TextSpan span = TextSpan(
-        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-        text: block.translation,
-      );
-      final TextPainter tp = TextPainter(
-        text: span,
-        textAlign: TextAlign.center,
-        textDirection: TextDirection.ltr,
-      );
-      tp.layout(minWidth: width, maxWidth: width);
-      
-      // Center vertically within the block
-      final double textY = top + (height - tp.height) / 2;
-      tp.paint(canvas, Offset(left, textY));
-    }
-  }
-
-  @override
-  bool shouldRepaint(LiveTextOverlayPainter oldDelegate) => true;
-}

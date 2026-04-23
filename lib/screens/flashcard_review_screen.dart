@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:appinio_swiper/appinio_swiper.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
+import 'package:speechmate/screens/progress_screen.dart';
 
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/core/app_colors.dart';
@@ -134,9 +136,10 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                                    await GamificationService.refresh();
                                    
                                    if (mounted) {
-                                      setState(() {
-                                        _dueCards.clear();
-                                      });
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const ProgressScreen()),
+                                      );
                                    }
                                 },
                                 cardBuilder: (context, index) {
@@ -203,46 +206,58 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
   Widget _buildCardFront(int index) {
     if (index >= _dueCards.length) return const SizedBox();
     final card = _dueCards[index];
-    return Container(
-      width: double.infinity,
-      height: 300,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0,10))]
+    return Hero(
+      tag: 'flashcard_hero',
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          height: 300,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0,10))]
+          ),
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+               const Text("Translate Context:", style: TextStyle(color: Colors.grey, fontSize: 16)),
+               const SizedBox(height: 20),
+               Text(card['english'] as String, style: const TextStyle(color: Colors.black87, fontSize: 32, fontWeight: FontWeight.bold)),
+            ],
+          )
+        ),
       ),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-           const Text("Translate Context:", style: TextStyle(color: Colors.grey, fontSize: 16)),
-           const SizedBox(height: 20),
-           Text(card['english'] as String, style: const TextStyle(color: Colors.black87, fontSize: 32, fontWeight: FontWeight.bold)),
-        ],
-      )
     );
   }
 
   Widget _buildCardBack(int index) {
     if (index >= _dueCards.length) return const SizedBox();
     final card = _dueCards[index];
-    return Container(
-      width: double.infinity,
-      height: 300,
-      decoration: BoxDecoration(
-        color: Colors.teal.shade50,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0,10))]
+    return Hero(
+      tag: 'flashcard_hero_back',
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          height: 300,
+          decoration: BoxDecoration(
+            color: Colors.teal.shade50,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0,10))]
+          ),
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+               const Text("Indigenous Translation:", style: TextStyle(color: Colors.teal, fontSize: 16)),
+               const SizedBox(height: 20),
+               Text(card['nicobarese'] as String, style: const TextStyle(color: Colors.teal, fontSize: 36, fontWeight: FontWeight.bold)),
+            ],
+          )
+        ),
       ),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-           const Text("Indigenous Translation:", style: TextStyle(color: Colors.teal, fontSize: 16)),
-           const SizedBox(height: 20),
-           Text(card['nicobarese'] as String, style: const TextStyle(color: Colors.teal, fontSize: 36, fontWeight: FontWeight.bold)),
-        ],
-      )
     );
   }
 

@@ -28,6 +28,7 @@ import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/screens/ar_translator_screen.dart';
 import 'package:speechmate/screens/body_parts_screen.dart';
+import 'package:speechmate/screens/ai_setup_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/core/app_colors.dart';
 
@@ -94,6 +95,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('islandExplorer'), "emoji": "🧭", "colors": [Color(0xFF0277BD), Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
     {"word": AppStrings.get('memoryPalace'), "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
     {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
+    {"word": "AI Setup", "emoji": "🧠", "colors": [Color(0xFF3b8d99), Color(0xFF6b6b83)], "navigateTo": const AISetupScreen(), "icon": Icons.psychology_rounded},
     {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
   ];
 

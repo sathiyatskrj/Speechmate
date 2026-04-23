@@ -74,11 +74,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ),
                   const SizedBox(height: 16),
                   
-                  _buildStatCard(
-                    icon: Icons.school,
-                    title: AppStrings.get('wordsLearned'),
-                    value: wordsLearned.toString(),
-                    color: Colors.green,
+                  Hero(
+                    tag: 'flashcard_hero',
+                    child: Material(
+                      color: Colors.transparent,
+                      child: _buildStatCard(
+                        icon: Icons.school,
+                        title: AppStrings.get('wordsLearned'),
+                        value: wordsLearned.toString(),
+                        color: Colors.green,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 32),
                   

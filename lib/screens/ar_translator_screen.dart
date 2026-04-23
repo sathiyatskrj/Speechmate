@@ -8,20 +8,21 @@ import 'package:flutter/material.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/services/database_manager.dart';
-import 'package:speechmate/services/tts_service.dart';
+import 'package:speechmate/providers/service_providers.dart';
 
 /// Live AR Translator
 /// Primary: ML Kit Object Detection (stream mode) — detects objects with bounding boxes live
 /// Fallback: Text Recognition — reads printed text from the scene
-class ARTranslatorScreen extends StatefulWidget {
+class ARTranslatorScreen extends ConsumerStatefulWidget {
   const ARTranslatorScreen({super.key});
 
   @override
-  State<ARTranslatorScreen> createState() => _ARTranslatorScreenState();
+  ConsumerState<ARTranslatorScreen> createState() => _ARTranslatorScreenState();
 }
 
-class _ARTranslatorScreenState extends State<ARTranslatorScreen>
+class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
     with WidgetsBindingObserver, TickerProviderStateMixin {
 
   // Camera
@@ -33,7 +34,6 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
   late ObjectDetector _objectDetector;
   late TextRecognizer _textRecognizer;
   late ImageLabeler _imageLabeler;
-  final TtsService _ttsService = TtsService();
 
   // Processing state
   bool _isDetecting = false;
@@ -68,7 +68,6 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
     _initDetector();
     _initTextRecognizer();
     _initImageLabeler();
-    _ttsService.init();
     _initCamera();
   }
 
@@ -234,7 +233,7 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
           _speakTimer?.cancel();
           _speakTimer = Timer(const Duration(milliseconds: 1500), () {
             if (!_isPaused && mounted) {
-              _ttsService.speakNicobarese(top.nicobarese,
+              ref.read(ttsServiceProvider).speakNicobarese(top.nicobarese,
                   englishWord: top.english);
             }
           });
@@ -357,7 +356,6 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
     _objectDetector.close();
     _textRecognizer.close();
     _imageLabeler.close();
-    _ttsService.dispose();
     super.dispose();
   }
 
@@ -540,7 +538,7 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
         final i = e.key;
         final item = e.value;
         return GestureDetector(
-          onTap: () => _ttsService.speakNicobarese(item.nicobarese,
+          onTap: () => ref.read(ttsServiceProvider).speakNicobarese(item.nicobarese,
               englishWord: item.english),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -697,7 +695,7 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
             label: 'Replay',
             onTap: _items.isEmpty
                 ? null
-                : () => _ttsService.speakNicobarese(
+                : () => ref.read(ttsServiceProvider).speakNicobarese(
                     _items.first.nicobarese,
                     englishWord: _items.first.english),
           ),

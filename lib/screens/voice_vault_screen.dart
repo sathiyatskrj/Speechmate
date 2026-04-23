@@ -25,11 +25,11 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
   List<String> _contributions = [];
   bool _isElderMode = false;
   
-  // Dummy pending recordings for Elder Verification
-  final List<String> _pendingReviews = [
-    "Recording: Tōt (Jungle)",
-    "Recording: Pū-cö (Island)",
-    "Recording: Kunö (Student)"
+  // Community Verification items
+  final List<Map<String, dynamic>> _pendingReviews = [
+    {"title": "Recording: Tōt (Jungle)", "upvotes": 12, "downvotes": 2},
+    {"title": "Recording: Pū-cö (Island)", "upvotes": 4, "downvotes": 1},
+    {"title": "Recording: Kunö (Student)", "upvotes": 45, "downvotes": 0}
   ];
 
   @override
@@ -281,6 +281,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
     return ListView.builder(
       itemCount: _pendingReviews.length,
       itemBuilder: (context, index) {
+        final review = _pendingReviews[index];
         return Card(
           color: Colors.white.withOpacity(0.1),
           margin: const EdgeInsets.only(bottom: 15),
@@ -290,9 +291,21 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_pendingReviews[index], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(review['title'], style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        const Icon(Icons.thumb_up, size: 14, color: Colors.greenAccent),
+                        const SizedBox(width: 4),
+                        Text("${review['upvotes']}", style: const TextStyle(color: Colors.greenAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                      ],
+                    )
+                  ],
+                ),
                 const SizedBox(height: 5),
-                const Text("Pending Elder Verification", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                const Text("Pending Community Validation (P2P)", style: TextStyle(color: Colors.white54, fontSize: 12)),
                 const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -300,25 +313,31 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
                     IconButton(
                         icon: const Icon(Icons.play_circle_fill, size: 40, color: Colors.cyanAccent),
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Playing audio preview...")));
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Playing P2P audio preview...")));
                         },
                     ),
                     IconButton(
-                        icon: const Icon(Icons.cancel, size: 40, color: Colors.redAccent),
+                        icon: const Icon(Icons.thumb_down, size: 35, color: Colors.redAccent),
                         onPressed: () {
                            setState(() {
-                             _pendingReviews.removeAt(index);
+                             _pendingReviews[index]['downvotes']++;
                            });
-                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recording rejected.")));
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You downvoted this pronunciation.")));
                         },
                     ),
                     IconButton(
-                        icon: const Icon(Icons.check_circle, size: 40, color: Colors.greenAccent),
+                        icon: const Icon(Icons.thumb_up, size: 35, color: Colors.greenAccent),
                         onPressed: () {
                            setState(() {
-                             _pendingReviews.removeAt(index);
+                             _pendingReviews[index]['upvotes']++;
+                             if (_pendingReviews[index]['upvotes'] >= 50) {
+                               // Simulate auto-verify
+                               _pendingReviews.removeAt(index);
+                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recording reached 50 upvotes and is verified!")));
+                               return;
+                             }
                            });
-                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recording verified and added to Dictionary!")));
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You upvoted this pronunciation!")));
                         },
                     ),
                   ],
@@ -345,7 +364,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
          ),
          const SizedBox(width: 15),
          ChoiceChip(
-           label: const Text("Elder Verification"),
+           label: const Text("Community Validation"),
            selected: _isElderMode,
            onSelected: (val) => setState(() => _isElderMode = true),
            selectedColor: Colors.purpleAccent,
@@ -374,7 +393,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
               children: [
                 Text(_isElderMode ? "Verify Contributions 🛡️" : "Help Us Grow! 🌱", style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
-                Text(_isElderMode ? "Listen to community recordings and verify them for accuracy." : "Record words to train our AI and preserve the Nicobarese language forever.", style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text(_isElderMode ? "Listen to community P2P recordings and UPVOTE them for accuracy." : "Record words to train our AI and preserve the Nicobarese language forever.", style: const TextStyle(color: Colors.white70, fontSize: 12)),
               ],
             ),
           )

@@ -19,7 +19,7 @@ dependencies:
   speech_to_text: ^7.3.0
   record: 5.0.0
   permission_handler: ^11.3.0
-  path_provider: ^2.1.2
+  path_provider: ^2.1.5
   google_fonts: ^6.1.0
   firebase_core: ^3.10.1
   cloud_firestore: ^5.6.2
@@ -41,6 +41,7 @@ dependencies:
   google_mlkit_object_detection: ^0.14.0
   google_mlkit_image_labeling: ^0.13.0
   flutter_staggered_grid_view: ^0.7.0
+  dio: ^5.9.2
 
 
 dev_dependencies:

@@ -50,26 +50,30 @@ class _KinshipMapperScreenState extends State<KinshipMapperScreen> {
           SafeArea(
             child: _isLoading 
               ? const Center(child: CircularProgressIndicator(color: Colors.amberAccent))
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                    child: Column(
+              : InteractiveViewer(
+                  constrained: false,
+                  boundaryMargin: const EdgeInsets.all(double.infinity),
+                  minScale: 0.5,
+                  maxScale: 3.0,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 2,
+                    height: MediaQuery.of(context).size.height * 1.5,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        _buildNode('Elder (Mem)', 'Grandparents / Older Siblings', 'mem'),
-                        _buildLine(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildNode('Parent (Yom)', 'Father / Mother', 'parent'),
-                            _buildNode('Spouse (Piha)', 'Partner', 'spouse'),
-                          ],
+                        // Background connecting lines
+                        CustomPaint(
+                          size: const Size(double.infinity, double.infinity),
+                          painter: KinshipTreePainter(),
                         ),
-                        _buildLine(),
-                        _buildNode('Self', 'You', null, isSelf: true),
-                        _buildLine(),
-                        _buildNode('Younger (Kahem)', 'Siblings / Cousins', 'younger_sibling'),
-                        _buildLine(),
-                        _buildNode('Child (Kun)', 'The Next Generation', 'child'),
+                        
+                        // Interactive Nodes positioned in a tree
+                        Positioned(top: 100, child: _buildNode('Elder (Mem)', 'Grandparents', 'mem')),
+                        Positioned(top: 250, left: MediaQuery.of(context).size.width * 0.5, child: _buildNode('Parent (Yom)', 'Father/Mother', 'parent')),
+                        Positioned(top: 250, right: MediaQuery.of(context).size.width * 0.5, child: _buildNode('Spouse (Piha)', 'Partner', 'spouse')),
+                        Positioned(top: 400, child: _buildNode('Self', 'You', null, isSelf: true)),
+                        Positioned(top: 550, left: MediaQuery.of(context).size.width * 0.4, child: _buildNode('Younger (Kahem)', 'Siblings', 'younger_sibling')),
+                        Positioned(top: 550, right: MediaQuery.of(context).size.width * 0.4, child: _buildNode('Child (Kun)', 'Next Gen', 'child')),
                       ],
                     ),
                   ),
@@ -134,11 +138,7 @@ class _KinshipMapperScreenState extends State<KinshipMapperScreen> {
   }
 
   Widget _buildLine() {
-    return Container(
-      width: 2,
-      height: 40,
-      color: Colors.white24,
-    );
+    return const SizedBox.shrink(); // Replaced by CustomPainter
   }
 
   void _showTermDetail(Map<String, dynamic> term) {
@@ -169,4 +169,36 @@ class _KinshipMapperScreenState extends State<KinshipMapperScreen> {
       ),
     );
   }
+}
+
+/// Custom Canvas Painter to draw dynamic, glowing connection lines between kinship nodes
+class KinshipTreePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.amberAccent.withOpacity(0.4)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+
+    final centerX = size.width / 2;
+    
+    // Elder to Self
+    canvas.drawLine(Offset(centerX, 150), Offset(centerX, 400), paint);
+    
+    // Parent to Self
+    canvas.drawLine(Offset(centerX - 100, 300), Offset(centerX, 400), paint);
+    
+    // Spouse to Self
+    canvas.drawLine(Offset(centerX + 100, 300), Offset(centerX, 400), paint);
+    
+    // Self to Younger
+    canvas.drawLine(Offset(centerX, 450), Offset(centerX - 80, 550), paint);
+    
+    // Self to Child
+    canvas.drawLine(Offset(centerX, 450), Offset(centerX + 80, 550), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

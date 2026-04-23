@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:speechmate/services/dictionary_service.dart';
 import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/services/local_llm_service.dart';
 
 // The "Offline Brain" of SpeechMate
 // Uses Symbolic AI + Fuzzy Logic instead of huge neural networks
@@ -10,6 +11,7 @@ class NeuralEngineService {
   NeuralEngineService._internal();
 
   final DictionaryService _dictionaryService = DictionaryService();
+  final LocalLlmService _llmService = LocalLlmService();
   bool _isInit = false;
 
   // Simple "Stop Words" that we might want to ignore if not found
@@ -106,6 +108,21 @@ class NeuralEngineService {
 
     double finalConfidence = wordsProcessed == 0 ? 0.0 : (confidenceAccumulator / wordsProcessed);
     if (finalConfidence > 1.0) finalConfidence = 1.0;
+
+    // 6. LLM Contextual Fallback
+    // If the word-by-word fuzzy logic yields a very low confidence translation,
+    // we use SmolLM2 for a constrained contextual translation.
+    if (finalConfidence < 0.5 && wordsProcessed > 2) {
+       debugPrint("🧠 NeuralEngine: Word-for-word confidence too low. Engaging constrained LLM translation.");
+       final llmTranslation = await _llmService.translateSentence(sentence);
+       if (llmTranslation != null && llmTranslation.isNotEmpty) {
+          return NeuralResult(
+            text: llmTranslation,
+            confidence: 0.85, // LLM confidence
+            isAiGenerated: true,
+          );
+       }
+    }
 
     String resultText = translatedTokens.join(" ");
 

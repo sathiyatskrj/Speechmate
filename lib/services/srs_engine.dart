@@ -1,5 +1,5 @@
 import 'package:speechmate/services/database_manager.dart';
-
+import 'package:speechmate/services/local_llm_service.dart';
 class SRSEngine {
   static const double DEFAULT_EASE = 2.5;
   static const int MIN_EASE = 1300; // 1.3 * 1000 to avoid float precision drops if needed, but we'll stick to double
@@ -51,5 +51,21 @@ class SRSEngine {
       easeFactor, 
       nextReview.millisecondsSinceEpoch
     );
+  }
+
+  /// AI Tutor: Adaptive Learning Path
+  /// Analyzes the student's recent performance to dynamically generate
+  /// the next set of recommended lesson topics using SmolLM2.
+  static Future<List<String>> analyzeStudentPerformance() async {
+    // In a real scenario, you would fetch recent session grades from the database
+    // For now, we mock some aggregate stats for the LLM
+    final Map<String, int> recentScores = {
+      "auditory_recognition": 30, // Student is struggling with listening
+      "visual_matching": 90,      // Student is excelling at reading
+      "pronunciation": 50,
+    };
+
+    final llmService = LocalLlmService();
+    return await llmService.generateAdaptivePath(recentScores);
   }
 }
