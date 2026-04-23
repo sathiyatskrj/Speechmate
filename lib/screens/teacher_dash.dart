@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/screens/community_screen.dart';
 import 'package:speechmate/screens/quiz_screen.dart';
 import 'package:speechmate/screens/progress_screen.dart';

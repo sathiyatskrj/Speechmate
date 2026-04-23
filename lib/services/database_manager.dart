@@ -419,6 +419,11 @@ class DatabaseManager {
      return await db.query('words', where: 'category_id = ?', whereArgs: [categoryId]);
   }
 
+  Future<void> saveToVault(String english, String nicobarese) async {
+    // Treat saving to vault from AR as saving a flashcard for long-term retention
+    await saveFlashcard(english, nicobarese);
+  }
+
   Future<void> saveFlashcard(String english, String nicobarese) async {
     final db = await instance.database;
     final wordId = english.toLowerCase().replaceAll(' ', '_');
