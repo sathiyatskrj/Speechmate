@@ -68,12 +68,12 @@ class _StudentDashState extends State<StudentDash>
 
   List<Map<String, dynamic>> get learningTiles => [
     // --- Premium Interactive Features (Moved to Top) ---
-    {"word": "AR Translator 🆕", "emoji": "📷", "colors": [Color(0xFF0F2027), Color(0xFF2C5364)], "navigateTo": const ARTranslatorScreen(), "icon": Icons.view_in_ar_rounded},
+    {"word": AppStrings.get('arTranslator'), "emoji": "📷", "colors": [Color(0xFF0F2027), Color(0xFF2C5364)], "navigateTo": const ARTranslatorScreen(), "icon": Icons.view_in_ar_rounded},
     {"word": AppStrings.get('voiceVault'), "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
-    {"word": "Book Scanner", "emoji": "📖", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.document_scanner_rounded},
+    {"word": AppStrings.get('bookScanner'), "emoji": "📖", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.document_scanner_rounded},
     {"word": AppStrings.get('games'), "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
     {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
-    {"word": "Voice Translate", "emoji": "🎙️", "colors": [Color(0xFFff0844), Color(0xFFffb199)], "navigateTo": const VoiceTranslatorScreen(), "icon": Icons.record_voice_over_rounded},
+    {"word": AppStrings.get('voiceTranslate'), "emoji": "🎙️", "colors": [Color(0xFFff0844), Color(0xFFffb199)], "navigateTo": const VoiceTranslatorScreen(), "icon": Icons.record_voice_over_rounded},
     
     // --- Core Learning Categories ---
     {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers'), "icon": Icons.format_list_numbered_rounded},
@@ -87,12 +87,12 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
     
     // --- Advanced / Discovery ---
-    {"word": "Andamanese ᴮᴱᵀᴬ", "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GAHubScreen(), "icon": Icons.language_rounded},
-    {"word": "Nature Hub", "emoji": "🌿", "colors": [Color(0xFF1B5E20), Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
-    {"word": "Oral History", "emoji": "📻", "colors": [Color(0xFF3E2723), Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
-    {"word": "Tuhet (Kinship)", "emoji": "🌳", "colors": [Color(0xFF5D4037), Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
-    {"word": "Island Explorer", "emoji": "🧭", "colors": [Color(0xFF0277BD), Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
-    {"word": "Memory Palace", "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
+    {"word": AppStrings.get('andamaneseBeta'), "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GAHubScreen(), "icon": Icons.language_rounded},
+    {"word": AppStrings.get('natureHub'), "emoji": "🌿", "colors": [Color(0xFF1B5E20), Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
+    {"word": AppStrings.get('oralHistory'), "emoji": "📻", "colors": [Color(0xFF3E2723), Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
+    {"word": AppStrings.get('tuhetKinship'), "emoji": "🌳", "colors": [Color(0xFF5D4037), Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
+    {"word": AppStrings.get('islandExplorer'), "emoji": "🧭", "colors": [Color(0xFF0277BD), Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
+    {"word": AppStrings.get('memoryPalace'), "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
     {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
     {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
   ];
@@ -342,11 +342,11 @@ class _StudentDashState extends State<StudentDash>
               children: [
                 const Text("🔒", style: TextStyle(fontSize: 40)),
                 const SizedBox(height: 12),
-                const Text("Senior Student Access",
-                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(AppStrings.get('seniorStudentAccess'),
+                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                const Text("Solve this to enter:\n12 + 15 = ?",
-                    style: TextStyle(color: Colors.white70, fontSize: 15),
+                Text(AppStrings.get('solveToEnter'),
+                    style: const TextStyle(color: Colors.white70, fontSize: 15),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 16),
                 TextField(
@@ -376,7 +376,7 @@ class _StudentDashState extends State<StudentDash>
                       child: TextButton(
                         onPressed: () => Navigator.pop(context),
                         style: TextButton.styleFrom(foregroundColor: Colors.white54),
-                        child: const Text("Cancel"),
+                        child: Text(AppStrings.get('cancel')),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -389,7 +389,7 @@ class _StudentDashState extends State<StudentDash>
                           } else {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Incorrect. Access Denied 🚫")));
+                              SnackBar(content: Text(AppStrings.get('incorrectAccessDenied'))));
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -397,7 +397,7 @@ class _StudentDashState extends State<StudentDash>
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: const Text("Enter", style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: Text(AppStrings.get('enter'), style: const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],

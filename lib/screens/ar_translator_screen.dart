@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/tts_service.dart';
 
@@ -31,6 +32,7 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
   // ML Engines
   late ObjectDetector _objectDetector;
   late TextRecognizer _textRecognizer;
+  late ImageLabeler _imageLabeler;
   final TtsService _ttsService = TtsService();
 
   // Processing state
@@ -45,6 +47,7 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
 
   // UI mode: 'live' or 'paused'
   bool _isPaused = false;
+  int _lensMode = 0; // 0: Auto, 1: Objects, 2: Text
 
   // Animations
   late AnimationController _scanAnim;
@@ -64,8 +67,14 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
 
     _initDetector();
     _initTextRecognizer();
+    _initImageLabeler();
     _ttsService.init();
     _initCamera();
+  }
+
+  void _initImageLabeler() {
+    final options = ImageLabelerOptions(confidenceThreshold: 0.65);
+    _imageLabeler = ImageLabeler(options: options);
   }
 
   void _initDetector() {
@@ -128,34 +137,67 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
 
       final items = <_DetectedItem>[];
 
-      // ── Engine 1: Object Detection ──────────────────────────────────────
-      try {
-        final detected = await _objectDetector.processImage(inputImage);
-        for (final obj in detected) {
-          if (obj.labels.isEmpty) continue;
-          final label = obj.labels.reduce(
-              (a, b) => a.confidence > b.confidence ? a : b);
-          if (label.confidence < 0.45) continue;
+      // ── Engine 1: Object Detection & Precise Labeling ───────────────────
+      if (_lensMode == 0 || _lensMode == 1) {
+        try {
+          final detectedObjects = await _objectDetector.processImage(inputImage);
+          final detectedLabels = await _imageLabeler.processImage(inputImage);
 
-          // Clean up label text: "Home good" → "home", "Fashion good" → skip
-          final rawText = label.text.toLowerCase();
-          if (_isUselessLabel(rawText)) continue;
+          String? bestPreciseLabel;
+          double bestConf = 0.0;
+          for (final lbl in detectedLabels) {
+            final raw = lbl.label.toLowerCase();
+            if (_isUselessLabel(raw)) continue;
+            if (lbl.confidence > bestConf) {
+              bestConf = lbl.confidence;
+              bestPreciseLabel = raw;
+            }
+          }
 
-          final nic = await _lookupNicobarese(rawText);
-          items.add(_DetectedItem(
-            english: _cap(rawText),
-            nicobarese: nic ?? _cap(rawText),
-            confidence: label.confidence,
-            hasTranslation: nic != null,
-            boundingBox: obj.boundingBox,
-          ));
+          for (final obj in detectedObjects) {
+            String finalLabel = bestPreciseLabel ?? '';
+            double finalConfidence = bestConf;
+
+            // Fallback to object detector's broad label if it's somehow specific
+            if (obj.labels.isNotEmpty) {
+              final broadLabel = obj.labels.reduce((a, b) => a.confidence > b.confidence ? a : b);
+              final rawBroad = broadLabel.text.toLowerCase();
+              if (!_isUselessLabel(rawBroad) && bestPreciseLabel == null) {
+                finalLabel = rawBroad;
+                finalConfidence = broadLabel.confidence;
+              }
+            }
+
+            if (finalLabel.isEmpty) continue;
+
+            final nic = await _lookupNicobarese(finalLabel);
+            items.add(_DetectedItem(
+              english: _cap(finalLabel),
+              nicobarese: nic ?? _cap(finalLabel),
+              confidence: finalConfidence,
+              hasTranslation: nic != null,
+              boundingBox: obj.boundingBox,
+            ));
+          }
+
+          // If no bounding boxes but we found a precise label, show it without box
+          if (items.isEmpty && bestPreciseLabel != null) {
+            final nic = await _lookupNicobarese(bestPreciseLabel);
+            items.add(_DetectedItem(
+              english: _cap(bestPreciseLabel),
+              nicobarese: nic ?? _cap(bestPreciseLabel),
+              confidence: bestConf,
+              hasTranslation: nic != null,
+              boundingBox: null,
+            ));
+          }
+        } catch (e) {
+          debugPrint('[AR] Vision Engine error: $e');
         }
-      } catch (e) {
-        debugPrint('[AR] ObjectDetector error: $e');
       }
 
       // ── Engine 2: Text Recognition (if object detection found nothing) ──
-      if (items.isEmpty) {
+      if ((items.isEmpty && _lensMode == 0) || _lensMode == 2) {
         try {
           final recognized = await _textRecognizer.processImage(inputImage);
           for (final block in recognized.blocks) {
@@ -210,8 +252,8 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
         InputImageRotationValue.fromRawValue(_camera!.sensorOrientation) ??
             InputImageRotation.rotation0deg;
 
-    final format = InputImageFormatValue.fromRawValue(image.format.raw);
-    if (format == null) return null;
+    final format = InputImageFormatValue.fromRawValue(image.format.raw) ?? 
+                   (Platform.isAndroid ? InputImageFormat.nv21 : InputImageFormat.bgra8888);
 
     if (Platform.isAndroid) {
       // NV21: concatenate all planes into a single byte array
@@ -314,6 +356,7 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
     _cameraController?.dispose();
     _objectDetector.close();
     _textRecognizer.close();
+    _imageLabeler.close();
     _ttsService.dispose();
     super.dispose();
   }
@@ -365,24 +408,23 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
             child: _buildCards(),
           ),
 
-        // 6. Status hint when empty
         if (_isCameraReady && _items.isEmpty && !_isPaused)
           Positioned(
-            bottom: 140,
+            bottom: 150,
             left: 0, right: 0,
             child: Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                      color: Colors.cyanAccent.withValues(alpha: 0.3)),
+                      color: (_lensMode == 1 ? Colors.orangeAccent : (_lensMode == 2 ? Colors.purpleAccent : Colors.cyanAccent)).withValues(alpha: 0.3)),
                 ),
-                child: const Text(
-                  '🔍  Point camera at objects or text',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                child: Text(
+                  _lensMode == 1 ? '📦  Point camera at objects' : (_lensMode == 2 ? '📝  Point camera at text' : '🔍  Point camera at objects or text'),
+                  style: const TextStyle(color: Colors.white70, fontSize: 13),
                 ),
               ),
             ),
@@ -543,14 +585,39 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
                 ),
               ),
               if (item.hasTranslation)
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.cyanAccent.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.volume_up_rounded,
-                      color: Colors.cyanAccent, size: 18),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        await DatabaseManager.instance.saveToVault(item.english, item.nicobarese);
+                        if (context.mounted) {
+                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                               content: Text('Saved "${item.english}" to Vault', style: const TextStyle(color: Colors.black)),
+                               backgroundColor: Colors.cyanAccent,
+                               behavior: SnackBarBehavior.floating,
+                           ));
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.bookmark_add_rounded, color: Colors.white70, size: 20),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.cyanAccent.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.volume_up_rounded, color: Colors.cyanAccent, size: 20),
+                    ),
+                  ],
                 ),
             ]),
           ),
@@ -583,6 +650,16 @@ class _ARTranslatorScreenState extends State<ARTranslatorScreen>
               _items = [];
               _lastSpoken = '';
             }),
+          ),
+          _BottomBtn(
+            icon: Icons.lens_blur_rounded,
+            label: _lensMode == 0 ? 'Auto' : (_lensMode == 1 ? 'Objects' : 'Text'),
+            onTap: () => setState(() {
+              _lensMode = (_lensMode + 1) % 3;
+              _items = [];
+              _lastSpoken = '';
+            }),
+            color: _lensMode == 0 ? Colors.cyanAccent : (_lensMode == 1 ? Colors.orangeAccent : Colors.purpleAccent),
           ),
           // Live indicator dot
           Column(children: [
@@ -638,14 +715,14 @@ class _CameraView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: FittedBox(
-        fit: BoxFit.cover,
-        child: SizedBox(
-          width: controller.value.previewSize!.height,
-          height: controller.value.previewSize!.width,
-          child: CameraPreview(controller),
-        ),
+    if (!controller.value.isInitialized) return const SizedBox.shrink();
+    final size = MediaQuery.of(context).size;
+    var scale = size.aspectRatio * controller.value.aspectRatio;
+    if (scale < 1) scale = 1 / scale;
+    return Transform.scale(
+      scale: scale,
+      child: Center(
+        child: CameraPreview(controller),
       ),
     );
   }
@@ -655,7 +732,8 @@ class _BottomBtn extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
-  const _BottomBtn({required this.icon, required this.label, this.onTap});
+  final Color? color;
+  const _BottomBtn({required this.icon, required this.label, this.onTap, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -667,11 +745,11 @@ class _BottomBtn extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: color != null ? color!.withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.08),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white24),
+              border: Border.all(color: color?.withValues(alpha: 0.5) ?? Colors.white24),
             ),
-            child: Icon(icon, color: Colors.white70, size: 20),
+            child: Icon(icon, color: color ?? Colors.white70, size: 24),
           ),
           const SizedBox(height: 4),
           Text(label,
