@@ -59,6 +59,7 @@
 | Module | Description |
 | :--- | :--- |
 | **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — all loaded from verified Nicobarese JSON lexicons |
+| **🔍 AR Translator** | Live Augmented Reality translator using Google ML Kit Image Labeler to detect 400+ specific objects, featuring 3 Lens Modes (Auto/Objects/Text) and direct Vault saving |
 | **🎙️ Whisper Pro STT** | On-device speech-to-text using the `ggml-tiny.en.bin` model for offline voice search |
 | **🔊 Audio-First Playback** | Native `.mp3` audio asset playback for each word; graceful TTS fallback when audio is unavailable |
 | **🧩 Games Hub** | Interactive vocabulary and spelling games for immersive learning |
@@ -67,6 +68,7 @@
 | **🌍 Community Hub** | Shared learning feed connecting students and educators |
 | **🏝️ Island Explorer (GIS)** | Custom-painted Andaman & Nicobar archipelago map visualizing dialect distribution zones |
 | **📖 Flashcard SRS** | SM-2 spaced repetition system for long-term word retention |
+| **🌐 Dynamic Localization** | 100% localized interface supporting 8 languages seamlessly across the entire dashboard |
 
 ### 👩‍🏫 Teacher Dashboard
 | Module | Description |
@@ -221,6 +223,8 @@ SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requi
 - [x] Voice Translator hang fix (unique file paths + state guards)
 - [x] Cross-category search engine (exact + fuzzy across all 12 categories)
 - [x] Audio-first playback with graceful TTS fallback
+- [x] **Full Dashboard Localization** across 8 languages (English, Hindi, Tamil, Malayalam, Bengali, Telugu, Great Andamanese, Nicobarese)
+- [x] **AR Translator Upgrade**: 400+ specific objects detection, Lens Modes, and Voice Vault integration
 
 ### 🔜 Planned (v2.1+)
 - [ ] **P2P Mesh Sync** — Share vocabulary packs via Wi-Fi Direct / QR code
@@ -270,6 +274,16 @@ flutter build apk --release
 
 ---
 
+## 📜 License & Indigenous Data Sovereignty
+
+This project is licensed under an **Apache License 2.0 with a Custom Cultural Non-Commercial Restriction**.
+
+While the software architecture is open-source (providing standard Apache 2.0 patent protections and modification rights), the **linguistic datasets, dictionaries, audio files, and cultural artifacts** belonging to the Great Andamanese, Nicobarese, and other tribal groups are strictly restricted from commercialization. 
+
+You may not use, sell, monetize, or profit from these specific cultural and linguistic assets without explicit, prior written consent from the appropriate tribal councils or governmental bodies representing these indigenous groups.
+
+---
+
 <p align="center">
   <i>"Where Language Barriers End, Digital Sovereignty Begins."</i>
 </p>
@@ -277,3 +291,4 @@ flutter build apk --release
 <p align="center">
   Built with ❤️ for the tribal communities of the Andaman & Nicobar Islands
 </p>
+
