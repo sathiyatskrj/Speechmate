@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:speechmate/services/model_downloader_service.dart';
-import 'package:speechmate/services/local_llm_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/providers/service_providers.dart';
 import 'package:speechmate/core/app_colors.dart';
@@ -48,7 +47,7 @@ class _AISetupScreenState extends ConsumerState<AISetupScreen> {
       });
       
       // Re-initialize the LLM service now that the model exists
-      await ref.read(localLlmProvider).initialize();
+      await ref.read(llmServiceProvider).initialize();
       
       if (mounted) {
         setState(() {
