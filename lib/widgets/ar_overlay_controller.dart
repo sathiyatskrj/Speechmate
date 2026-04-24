@@ -1,11 +1,18 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class TranslatedTextBlock {
   final Rect rect;
   final String original;
   final String translation;
+  final double confidence;
 
-  TranslatedTextBlock({required this.rect, required this.original, required this.translation});
+  TranslatedTextBlock({
+    required this.rect,
+    required this.original,
+    required this.translation,
+    this.confidence = 1.0,
+  });
 }
 
 class LiveTextOverlayPainter extends CustomPainter {
@@ -20,35 +27,47 @@ class LiveTextOverlayPainter extends CustomPainter {
     final double scaleX = screenSize.width / imageSize.width;
     final double scaleY = screenSize.height / imageSize.height;
 
-    for (var block in blocks) {
+    for (int i = 0; i < blocks.length; i++) {
+      final block = blocks[i];
       // Scale bounding box to screen dimensions
       final double left = block.rect.left * scaleX;
       final double top = block.rect.top * scaleY;
-      final double width = block.rect.width * scaleX;
-      final double height = block.rect.height * scaleY;
+      final double width = max(block.rect.width * scaleX, 60);
+      final double height = max(block.rect.height * scaleY, 30);
       
       final Rect scaledRect = Rect.fromLTWH(left, top, width, height);
 
-      // Draw background box
+      // Confidence-based color
+      final Color accentColor = block.confidence >= 0.8
+          ? Colors.cyanAccent
+          : block.confidence >= 0.5
+              ? Colors.amberAccent
+              : Colors.orangeAccent;
+
+      // Draw background box with rounded corners
       final Paint bgPaint = Paint()
-        ..color = Colors.black.withOpacity(0.7)
+        ..color = Colors.black.withOpacity(0.75)
         ..style = PaintingStyle.fill;
       canvas.drawRRect(RRect.fromRectAndRadius(scaledRect, const Radius.circular(8)), bgPaint);
 
-      // Draw border
+      // Draw border with confidence-based color
       final Paint borderPaint = Paint()
-        ..color = Colors.cyanAccent
+        ..color = accentColor
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2;
+        ..strokeWidth = i == 0 ? 2.5 : 1.5;
       canvas.drawRRect(RRect.fromRectAndRadius(scaledRect, const Radius.circular(8)), borderPaint);
 
-      // Draw Text
-      final TextSpan span = TextSpan(
-        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+      // Draw translated text
+      final TextSpan translationSpan = TextSpan(
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: i == 0 ? 15 : 13,
+          fontWeight: FontWeight.bold,
+        ),
         text: block.translation,
       );
       final TextPainter tp = TextPainter(
-        text: span,
+        text: translationSpan,
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
       );
@@ -57,6 +76,23 @@ class LiveTextOverlayPainter extends CustomPainter {
       // Center vertically within the block
       final double textY = top + (height - tp.height) / 2;
       tp.paint(canvas, Offset(left, textY));
+
+      // Draw small original text label above box
+      final TextSpan origSpan = TextSpan(
+        style: TextStyle(
+          color: accentColor.withOpacity(0.8),
+          fontSize: 9,
+          fontWeight: FontWeight.w500,
+        ),
+        text: block.original,
+      );
+      final TextPainter origTp = TextPainter(
+        text: origSpan,
+        textDirection: TextDirection.ltr,
+      );
+      origTp.layout(maxWidth: width);
+      final double origY = (top - origTp.height - 3).clamp(0, size.height);
+      origTp.paint(canvas, Offset(left + 4, origY));
     }
   }
 

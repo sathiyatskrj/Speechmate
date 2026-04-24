@@ -38,8 +38,10 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
   bool _isLiveMode = false;
   bool _isDetecting = false;
   DateTime _lastProcessed = DateTime.now();
-  static const _throttleMs = 800;
+  static const _throttleMs = 500;
   List<TranslatedTextBlock> _liveBlocks = [];
+  bool _flashlightOn = false;
+  String _allRecognizedText = '';
 
   // Multi-language OCR Support
   final Map<String, TextRecognitionScript> _supportedLanguages = {
@@ -70,9 +72,8 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
     final options = ObjectDetectorOptions(
       mode: DetectionMode.single,
       classifyObjects: true,
-      multipleObjects: false,
+      multipleObjects: true,
     );
-    _objectDetector = ObjectDetector(options: options);
     _objectDetector = ObjectDetector(options: options);
     _initializeCamera();
   }
@@ -96,6 +97,11 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       } catch (e) {
         debugPrint("Focus mode not supported: $e");
       }
+
+      // Enable auto-exposure for better OCR in varying light
+      try {
+        await _cameraController!.setExposureMode(ExposureMode.auto);
+      } catch (_) {}
       
       if (mounted) setState(() {});
       
@@ -129,10 +135,12 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
 
       final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
       List<TranslatedTextBlock> newBlocks = [];
+      final StringBuffer allText = StringBuffer();
       
       for (TextBlock block in recognizedText.blocks) {
-        String blockText = block.text.replaceAll('\n', ' ').trim();
-        if (blockText.isNotEmpty && blockText.length > 2) {
+        String blockText = _cleanOcrText(block.text);
+        allText.writeln(blockText);
+        if (blockText.isNotEmpty && blockText.length > 1) {
           final result = await ref.read(neuralEngineProvider).predict(blockText);
           if (result.text.isNotEmpty) {
              newBlocks.add(TranslatedTextBlock(
@@ -147,12 +155,26 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       if (mounted && _isLiveMode) {
         setState(() {
            _liveBlocks = newBlocks;
+           _allRecognizedText = allText.toString().trim();
         });
       }
     } catch (e) {
       debugPrint("Live OCR error: $e");
     }
     _isDetecting = false;
+  }
+
+  /// Clean OCR output for better translation accuracy
+  String _cleanOcrText(String raw) {
+    String text = raw.replaceAll('\n', ' ').trim();
+    // Normalize common OCR misreads
+    text = text.replaceAll(RegExp(r'[|]'), 'I');
+    text = text.replaceAll(RegExp(r'[`´]'), "'");
+    // Remove stray special characters but keep basic punctuation
+    text = text.replaceAll(RegExp(r"[^\w\s.,!?'-]"), '');
+    // Collapse multiple spaces
+    text = text.replaceAll(RegExp(r'\s{2,}'), ' ').trim();
+    return text;
   }
 
   InputImage? _toInputImage(CameraImage image) {
@@ -222,18 +244,26 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       // Try Object Detection
       final List<DetectedObject> objects = await _objectDetector.processImage(inputImage);
       String objectName = "";
-      if (objects.isNotEmpty && objects.first.labels.isNotEmpty) {
-          objectName = objects.first.labels.first.text;
+      double objectConfidence = 0;
+      for (final obj in objects) {
+        for (final lbl in obj.labels) {
+          if (lbl.confidence > objectConfidence) {
+            objectConfidence = lbl.confidence;
+            objectName = lbl.text;
+          }
+        }
       }
 
       // Try Text Recognition
       final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
+      final StringBuffer allRaw = StringBuffer();
       
       if (recognizedText.text.trim().isNotEmpty) {
         List<Map<String, String>> results = [];
         for (TextBlock block in recognizedText.blocks) {
           for (TextLine line in block.lines) {
-            String originalText = line.text.trim();
+            String originalText = _cleanOcrText(line.text);
+            allRaw.writeln(originalText);
             if (originalText.isNotEmpty) {
                final result = await ref.read(neuralEngineProvider).predict(originalText);
                results.add({
@@ -244,18 +274,20 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
           }
         }
         setState(() {
-          _detectedObject = "";
+          _detectedObject = objectName.isNotEmpty ? "Also detected: $objectName" : "";
           _translationResults = results;
+          _allRecognizedText = allRaw.toString().trim();
         });
         _showResultSheet();
       } else if (objectName.isNotEmpty) {
          final result = await ref.read(neuralEngineProvider).predict(objectName);
          setState(() {
-           _detectedObject = "Detected Object: $objectName";
+           _detectedObject = "Detected Object: $objectName (${(objectConfidence * 100).toStringAsFixed(0)}%)";
            _translationResults = [{
               "original": objectName,
               "translation": result.text.isNotEmpty ? result.text : "Translation unavailable",
            }];
+           _allRecognizedText = objectName;
          });
          _showResultSheet();
       } else {
@@ -299,8 +331,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
        debugPrint("Picker error: $e");
      }
   }
-
-  void _showResultSheet() {
+   void _showResultSheet() {
       showModalBottomSheet(
          context: context,
          backgroundColor: Colors.transparent,
@@ -313,7 +344,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
               builder: (_, controller) {
                 return Container(
                    decoration: const BoxDecoration(
-                      color: Color(0xFF1E1E2C), // Premium surface color
+                      color: Color(0xFF1E1E2C),
                       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                    ),
                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -327,6 +358,22 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                              decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
                            ),
                          ),
+                         // Copy All Raw Text button
+                         if (_allRecognizedText.isNotEmpty)
+                           Padding(
+                             padding: const EdgeInsets.only(bottom: 12),
+                             child: OutlinedButton.icon(
+                               icon: const Icon(Icons.copy_rounded, size: 16, color: Colors.cyanAccent),
+                               label: const Text('Copy All Recognized Text', style: TextStyle(color: Colors.cyanAccent, fontSize: 12)),
+                               style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.cyanAccent)),
+                               onPressed: () {
+                                 Clipboard.setData(ClipboardData(text: _allRecognizedText));
+                                 ScaffoldMessenger.of(context).showSnackBar(
+                                   const SnackBar(content: Text('Text copied to clipboard'), backgroundColor: Colors.cyanAccent),
+                                 );
+                               },
+                             ),
+                           ),
                          if (_detectedObject.isNotEmpty) ...[
                             Text(_detectedObject, style: const TextStyle(color: Colors.amberAccent, fontSize: 14, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 16),
@@ -341,7 +388,20 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                                return Column(
                                  crossAxisAlignment: CrossAxisAlignment.start,
                                  children: [
-                                   const Text("Original Text", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                                   Row(
+                                     children: [
+                                       const Expanded(child: Text("Original Text", style: TextStyle(color: Colors.white54, fontSize: 12))),
+                                       GestureDetector(
+                                         onTap: () {
+                                           Clipboard.setData(ClipboardData(text: item['original'] ?? ''));
+                                           ScaffoldMessenger.of(context).showSnackBar(
+                                             const SnackBar(content: Text('Copied'), duration: Duration(seconds: 1)),
+                                           );
+                                         },
+                                         child: const Icon(Icons.copy, color: Colors.white38, size: 16),
+                                       ),
+                                     ],
+                                   ),
                                    const SizedBox(height: 4),
                                    Text(item['original'] ?? '', style: const TextStyle(color: Colors.white, fontSize: 16)),
                                    const SizedBox(height: 12),
@@ -550,8 +610,26 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                            icon: const Icon(Icons.photo_library, color: Colors.white, size: 30),
                            onPressed: _pickFromGallery,
                         ),
+                        // Flashlight toggle
+                        IconButton(
+                           icon: Icon(
+                             _flashlightOn ? Icons.flashlight_off_rounded : Icons.flashlight_on_rounded,
+                             color: _flashlightOn ? Colors.amberAccent : Colors.white,
+                             size: 28,
+                           ),
+                           onPressed: () async {
+                             if (_cameraController == null) return;
+                             try {
+                               _flashlightOn = !_flashlightOn;
+                               await _cameraController!.setFlashMode(
+                                 _flashlightOn ? FlashMode.torch : FlashMode.off,
+                               );
+                               setState(() {});
+                             } catch (_) {}
+                           },
+                        ),
                         GestureDetector(
-                           onTap: _isLiveMode ? null : _captureAndTranslate, // Disabled in live mode
+                           onTap: _isLiveMode ? null : _captureAndTranslate,
                            child: Container(
                               height: 80,
                               width: 80,

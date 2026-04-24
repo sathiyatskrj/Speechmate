@@ -38,7 +38,10 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   // Processing state
   bool _isDetecting = false;
   DateTime _lastFrame = DateTime.now();
-  static const int _throttleMs = 700;
+  static const int _throttleMs = 350;
+
+  // Extra features
+  bool _flashlightOn = false;
 
   // Results
   List<_DetectedItem> _items = [];
@@ -72,7 +75,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   }
 
   void _initImageLabeler() {
-    final options = ImageLabelerOptions(confidenceThreshold: 0.65);
+    final options = ImageLabelerOptions(confidenceThreshold: 0.35);
     _imageLabeler = ImageLabeler(options: options);
   }
 
@@ -142,28 +145,32 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
           final detectedObjects = await _objectDetector.processImage(inputImage);
           final detectedLabels = await _imageLabeler.processImage(inputImage);
 
-          String? bestPreciseLabel;
-          double bestConf = 0.0;
+          // Collect ALL usable labels from image labeler (top 5)
+          final List<MapEntry<String, double>> preciseLabels = [];
           for (final lbl in detectedLabels) {
             final raw = lbl.label.toLowerCase();
             if (_isUselessLabel(raw)) continue;
-            if (lbl.confidence > bestConf) {
-              bestConf = lbl.confidence;
-              bestPreciseLabel = raw;
-            }
+            preciseLabels.add(MapEntry(_resolveLabel(raw), lbl.confidence));
           }
+          preciseLabels.sort((a, b) => b.value.compareTo(a.value));
+
+          String? bestPreciseLabel = preciseLabels.isNotEmpty ? preciseLabels.first.key : null;
+          double bestConf = preciseLabels.isNotEmpty ? preciseLabels.first.value : 0.0;
 
           for (final obj in detectedObjects) {
             String finalLabel = bestPreciseLabel ?? '';
             double finalConfidence = bestConf;
 
-            // Fallback to object detector's broad label if it's somehow specific
+            // Also check object detector's own labels
             if (obj.labels.isNotEmpty) {
               final broadLabel = obj.labels.reduce((a, b) => a.confidence > b.confidence ? a : b);
-              final rawBroad = broadLabel.text.toLowerCase();
-              if (!_isUselessLabel(rawBroad) && bestPreciseLabel == null) {
-                finalLabel = rawBroad;
-                finalConfidence = broadLabel.confidence;
+              final rawBroad = _resolveLabel(broadLabel.text.toLowerCase());
+              if (!_isUselessLabel(rawBroad)) {
+                // Prefer object detector label if labeler gave nothing useful
+                if (bestPreciseLabel == null || broadLabel.confidence > bestConf) {
+                  finalLabel = rawBroad;
+                  finalConfidence = broadLabel.confidence;
+                }
               }
             }
 
@@ -287,32 +294,87 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   // ─────────────────── Helpers ───────────────────────────────────────────────
 
   bool _isUselessLabel(String label) {
-    const skip = {
-      'product', 'room', 'indoor', 'outdoor', 'home good',
-      'fashion good', 'place', 'unknown', 'other',
-    };
-    return skip.any((s) => label.contains(s));
+    const skip = {'unknown', 'other'};
+    return skip.any((s) => label == s);
   }
 
+  // Maps ML Kit generic labels to real-world object names for better lookup
+  static const Map<String, String> _labelSynonyms = {
+    'home good': 'cup', 'fashion good': 'cloth', 'packaged good': 'box',
+    'food': 'food', 'drink': 'water', 'plant': 'tree', 'animal': 'animal',
+    'furniture': 'chair', 'kitchenware': 'plate', 'tableware': 'plate',
+    'toy': 'toy', 'shoe': 'shoe', 'hat': 'hat', 'bottle': 'bottle',
+    'cup': 'cup', 'bowl': 'bowl', 'knife': 'knife', 'spoon': 'spoon',
+    'fork': 'fork', 'laptop': 'computer', 'mobile phone': 'phone',
+    'cell phone': 'phone', 'book': 'book', 'clock': 'clock',
+    'scissors': 'scissors', 'umbrella': 'umbrella', 'bag': 'bag',
+    'backpack': 'bag', 'handbag': 'bag', 'suitcase': 'bag',
+    'ball': 'ball', 'bat': 'bat', 'flower pot': 'flower',
+    'vase': 'flower', 'candle': 'fire', 'lamp': 'light',
+    'person': 'person', 'man': 'man', 'woman': 'woman', 'child': 'child',
+    'baby': 'child', 'bird': 'bird', 'cat': 'cat', 'dog': 'dog',
+    'fish': 'fish', 'insect': 'insect', 'butterfly': 'butterfly',
+    'tree': 'tree', 'flower': 'flower', 'fruit': 'fruit', 'vegetable': 'vegetable',
+    'car': 'car', 'bicycle': 'bicycle', 'motorcycle': 'bicycle',
+    'boat': 'boat', 'ship': 'boat', 'airplane': 'airplane',
+    'door': 'door', 'window': 'window', 'bed': 'bed', 'table': 'table',
+    'chair': 'chair', 'couch': 'chair', 'pen': 'pen', 'pencil': 'pen',
+    'paper': 'paper', 'key': 'key', 'watch': 'clock', 'ring': 'ring',
+    'necklace': 'necklace', 'glasses': 'eye', 'sun': 'sun', 'moon': 'moon',
+    'star': 'star', 'rain': 'rain', 'cloud': 'cloud', 'rock': 'stone',
+    'mountain': 'mountain', 'river': 'river', 'ocean': 'sea',
+    'beach': 'sand', 'jungle': 'forest', 'indoor': 'house', 'outdoor': 'land',
+    'room': 'house', 'product': 'thing', 'place': 'land',
+  };
+
+  String _resolveLabel(String raw) {
+    return _labelSynonyms[raw] ?? raw;
+  }
+
+  // Cached lookups for performance
+  final Map<String, String?> _lookupCache = {};
+
   Future<String?> _lookupNicobarese(String word) async {
+    final term = word.toLowerCase().trim();
+    if (term.isEmpty) return null;
+
+    // Check cache first
+    if (_lookupCache.containsKey(term)) return _lookupCache[term];
+
+    // Also try synonym-resolved version
+    final resolved = _resolveLabel(term);
+
     try {
       final db = await DatabaseManager.instance.database;
-      final term = word.toLowerCase().trim();
 
-      var rows = await db.query('words',
-          where: 'LOWER(english) = ?', whereArgs: [term], limit: 1);
-      if (rows.isNotEmpty) {
-        final v = rows.first['nicobarese']?.toString() ?? '';
-        if (v.isNotEmpty) return v;
+      // 1. Exact match across ALL word categories
+      for (final t in {term, resolved}) {
+        var rows = await db.query('words',
+            where: 'LOWER(english) = ?', whereArgs: [t], limit: 1);
+        if (rows.isNotEmpty) {
+          final v = rows.first['nicobarese']?.toString() ?? '';
+          if (v.isNotEmpty) { _lookupCache[term] = v; return v; }
+        }
       }
 
-      rows = await db.query('words',
-          where: 'LOWER(english) LIKE ?', whereArgs: ['%$term%'], limit: 1);
-      if (rows.isNotEmpty) {
-        final v = rows.first['nicobarese']?.toString() ?? '';
-        if (v.isNotEmpty) return v;
+      // 2. Partial/fuzzy match
+      for (final t in {term, resolved}) {
+        var rows = await db.query('words',
+            where: 'LOWER(english) LIKE ?', whereArgs: ['%$t%'], limit: 1);
+        if (rows.isNotEmpty) {
+          final v = rows.first['nicobarese']?.toString() ?? '';
+          if (v.isNotEmpty) { _lookupCache[term] = v; return v; }
+        }
+      }
+
+      // 3. Great Andamanese fallback
+      final gaRows = await DatabaseManager.instance.searchGADictionary(term);
+      if (gaRows.isNotEmpty) {
+        final v = gaRows.first['great_andamanese']?.toString() ?? '';
+        if (v.isNotEmpty) { _lookupCache[term] = v; return v; }
       }
     } catch (_) {}
+    _lookupCache[term] = null;
     return null;
   }
 
@@ -365,7 +427,9 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(fit: StackFit.expand, children: [
+      body: GestureDetector(
+        onTapDown: _onTapToFocus,
+        child: Stack(fit: StackFit.expand, children: [
         // 1. Camera feed
         if (_isCameraReady && _cameraController != null)
           _CameraView(controller: _cameraController!)
@@ -431,6 +495,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
         // 7. Bottom bar
         Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
       ]),
+      ),
     );
   }
 
@@ -624,6 +689,30 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
     );
   }
 
+  void _toggleFlashlight() async {
+    if (_cameraController == null) return;
+    try {
+      _flashlightOn = !_flashlightOn;
+      await _cameraController!.setFlashMode(
+        _flashlightOn ? FlashMode.torch : FlashMode.off,
+      );
+      setState(() {});
+    } catch (e) {
+      debugPrint('[AR] Flashlight error: $e');
+    }
+  }
+
+  void _onTapToFocus(TapDownDetails details) async {
+    if (_cameraController == null || !_isCameraReady) return;
+    try {
+      final size = MediaQuery.of(context).size;
+      final x = details.localPosition.dx / size.width;
+      final y = details.localPosition.dy / size.height;
+      await _cameraController!.setFocusPoint(Offset(x, y));
+      await _cameraController!.setExposurePoint(Offset(x, y));
+    } catch (_) {}
+  }
+
   Widget _buildBottomBar() {
     return Container(
       padding: EdgeInsets.only(
@@ -648,6 +737,12 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
               _items = [];
               _lastSpoken = '';
             }),
+          ),
+          _BottomBtn(
+            icon: _flashlightOn ? Icons.flashlight_off_rounded : Icons.flashlight_on_rounded,
+            label: _flashlightOn ? 'Light Off' : 'Light',
+            onTap: _toggleFlashlight,
+            color: _flashlightOn ? Colors.amberAccent : null,
           ),
           _BottomBtn(
             icon: Icons.lens_blur_rounded,
