@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/providers/service_providers.dart';
 import 'package:speechmate/widgets/ar_overlay_controller.dart';
+import 'package:speechmate/data/ar_mock_data.dart';
 
 class CameraTranslationScreen extends ConsumerStatefulWidget {
   const CameraTranslationScreen({super.key});
@@ -43,6 +44,11 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
   bool _flashlightOn = false;
   String _allRecognizedText = '';
 
+  // Static/Capture Mode
+  String? _capturedImagePath;
+  Size? _staticImageSize;
+  List<TranslatedTextBlock> _staticBlocks = [];
+
   // Multi-language OCR Support
   final Map<String, TextRecognitionScript> _supportedLanguages = {
     "English": TextRecognitionScript.latin,
@@ -70,7 +76,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
     super.initState();
     _textRecognizer = TextRecognizer(script: _supportedLanguages[_selectedLanguage]!);
     final options = ObjectDetectorOptions(
-      mode: DetectionMode.single,
+      mode: DetectionMode.stream,
       classifyObjects: true,
       multipleObjects: true,
     );
@@ -134,9 +140,38 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       if (inputImage == null) { _isDetecting = false; return; }
 
       final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
+      final List<DetectedObject> objects = await _objectDetector.processImage(inputImage);
+
       List<TranslatedTextBlock> newBlocks = [];
       final StringBuffer allText = StringBuffer();
+
+      // Process Objects
+      for (DetectedObject obj in objects) {
+        String objectName = "";
+        double objectConfidence = 0;
+        for (final lbl in obj.labels) {
+          if (lbl.confidence > objectConfidence) {
+            objectConfidence = lbl.confidence;
+            objectName = lbl.text;
+          }
+        }
+        
+        if (objectName.isNotEmpty && objectConfidence > 0.5) {
+           final result = await ref.read(neuralEngineProvider).predict(objectName);
+           final info = ARMockData.getObjectInfo(objectName);
+           newBlocks.add(TranslatedTextBlock(
+             rect: obj.boundingBox,
+             original: objectName,
+             translation: result.text.isNotEmpty ? result.text : "Translation unavailable",
+             confidence: objectConfidence,
+             isObject: true,
+             info: info,
+           ));
+           allText.writeln(objectName);
+        }
+      }
       
+      // Process Text
       for (TextBlock block in recognizedText.blocks) {
         String blockText = _cleanOcrText(block.text);
         allText.writeln(blockText);
@@ -236,10 +271,16 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       _isProcessing = true;
       _translationResults.clear();
       _detectedObject = "";
+      _staticBlocks.clear();
     });
 
     try {
       final inputImage = InputImage.fromFilePath(path);
+      
+      // Decode image to get size for AR overlay
+      final bytes = await File(path).readAsBytes();
+      final decodedImage = await decodeImageFromList(bytes);
+      _staticImageSize = Size(decodedImage.width.toDouble(), decodedImage.height.toDouble());
       
       // Try Object Detection
       final List<DetectedObject> objects = await _objectDetector.processImage(inputImage);
@@ -251,6 +292,18 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
             objectConfidence = lbl.confidence;
             objectName = lbl.text;
           }
+        }
+        if (objectName.isNotEmpty && objectConfidence > 0.5) {
+           final result = await ref.read(neuralEngineProvider).predict(objectName);
+           final info = ARMockData.getObjectInfo(objectName);
+           _staticBlocks.add(TranslatedTextBlock(
+             rect: obj.boundingBox,
+             original: objectName,
+             translation: result.text.isNotEmpty ? result.text : "Translation unavailable",
+             confidence: objectConfidence,
+             isObject: true,
+             info: info,
+           ));
         }
       }
 
@@ -270,6 +323,13 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                  "original": originalText,
                  "translation": result.text.isNotEmpty ? result.text : "Translation unavailable",
                });
+               if (result.text.isNotEmpty) {
+                 _staticBlocks.add(TranslatedTextBlock(
+                   rect: line.boundingBox,
+                   original: originalText,
+                   translation: result.text,
+                 ));
+               }
             }
           }
         }
@@ -278,7 +338,6 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
           _translationResults = results;
           _allRecognizedText = allRaw.toString().trim();
         });
-        _showResultSheet();
       } else if (objectName.isNotEmpty) {
          final result = await ref.read(neuralEngineProvider).predict(objectName);
          setState(() {
@@ -289,13 +348,19 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
            }];
            _allRecognizedText = objectName;
          });
-         _showResultSheet();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('No text or objects recognized. Try again.')),
           );
         }
+      }
+      
+      // Simulate scanning delay for better UX
+      await Future.delayed(const Duration(milliseconds: 1500));
+      
+      if (_staticBlocks.isNotEmpty && mounted) {
+        _showResultSheet();
       }
     } catch (e) {
        debugPrint("Processing Error: $e");
@@ -314,6 +379,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
 
      try {
        final XFile image = await _cameraController!.takePicture();
+       setState(() { _capturedImagePath = image.path; });
        await _processStaticImage(image.path);
      } catch (e) {
        debugPrint("Capture error: $e");
@@ -325,6 +391,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
        final ImagePicker picker = ImagePicker();
        final XFile? image = await picker.pickImage(source: ImageSource.gallery);
        if (image != null) {
+          setState(() { _capturedImagePath = image.path; });
           await _processStaticImage(image.path);
        }
      } catch (e) {
@@ -472,7 +539,9 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       body: Stack(
          children: [
             Positioned.fill(
-               child: CameraPreview(_cameraController!),
+               child: _capturedImagePath != null && !_isLiveMode
+                   ? Image.file(File(_capturedImagePath!), fit: BoxFit.contain)
+                   : CameraPreview(_cameraController!),
             ),
             
             // Live Text Overlay Layer
@@ -481,6 +550,34 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                 liveBlocks: _liveBlocks,
                 imageSize: Size(_cameraController!.value.previewSize!.height, _cameraController!.value.previewSize!.width),
                 screenSize: screenSize,
+              ),
+
+            // Static/Captured Image Overlay Layer
+            if (!_isLiveMode && _staticBlocks.isNotEmpty && !_isProcessing && _staticImageSize != null)
+              AROverlayController(
+                liveBlocks: _staticBlocks,
+                imageSize: _staticImageSize!,
+                screenSize: screenSize,
+              ),
+
+            // Scanning Effect Overlay
+            if (_isProcessing)
+              Positioned.fill(
+                 child: Stack(
+                   children: [
+                      Container(color: Colors.black54),
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CircularProgressIndicator(color: Colors.cyanAccent),
+                            const SizedBox(height: 16),
+                            const Text("SCANNING AND DETECTING...", style: TextStyle(color: Colors.cyanAccent, letterSpacing: 2.0, fontWeight: FontWeight.bold, fontFamily: 'Courier')),
+                          ],
+                        ),
+                      )
+                   ]
+                 ),
               ),
 
             // Top Bar
@@ -493,7 +590,13 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                  children: [
                    IconButton(
                       icon: const Icon(Icons.arrow_back_ios, color: Colors.white, shadows: [Shadow(color: Colors.black, blurRadius: 4)]),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                         if (_capturedImagePath != null && !_isLiveMode) {
+                            setState(() { _capturedImagePath = null; _staticBlocks.clear(); });
+                         } else {
+                            Navigator.pop(context);
+                         }
+                      },
                    ),
                    Container(
                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -553,7 +656,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                     ),
                     GestureDetector(
                       onTap: () {
-                         setState(() { _isLiveMode = true; });
+                         setState(() { _isLiveMode = true; _capturedImagePath = null; _staticBlocks.clear(); });
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -570,7 +673,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
             ),
             
             // Scanner overlay guide (Capture Mode)
-            if (!_isLiveMode)
+            if (!_isLiveMode && _capturedImagePath == null)
               Center(
                  child: Container(
                     width: 300,
@@ -582,7 +685,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                     ),
                  ),
               ),
-            if (!_isLiveMode)
+            if (!_isLiveMode && _capturedImagePath == null)
               Positioned(
                  top: MediaQuery.of(context).size.height / 2 - 120,
                  left: 0, right: 0,
@@ -590,11 +693,12 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
               ),
             
             // Bottom Controls
-            Positioned(
-               bottom: 0,
-               left: 0,
-               right: 0,
-               child: Container(
+            if (_capturedImagePath == null)
+              Positioned(
+                 bottom: 0,
+                 left: 0,
+                 right: 0,
+                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
                   decoration: BoxDecoration(
                      gradient: LinearGradient(
@@ -643,17 +747,46 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                                 : Center(child: Icon(Icons.camera_alt, color: _isLiveMode ? Colors.grey : Colors.white, size: 40)),
                            ),
                         ),
-                        IconButton(
-                           icon: const Icon(Icons.history, color: Colors.white, size: 30),
-                           onPressed: () {}, 
-                        ),
-                     ],
-                  ),
-               )
-            )
+                         IconButton(
+                            icon: const Icon(Icons.history, color: Colors.white, size: 30),
+                            onPressed: () {}, 
+                         ),
+                      ],
+                   ),
+                )
+             )
+            else
+              // Actions for captured image
+              Positioned(
+                 bottom: 30,
+                 left: 0,
+                 right: 0,
+                 child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                       ElevatedButton.icon(
+                          icon: const Icon(Icons.refresh, color: Colors.black),
+                          label: const Text("Retake", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                          onPressed: () {
+                             setState(() {
+                               _capturedImagePath = null;
+                               _staticBlocks.clear();
+                             });
+                          },
+                       ),
+                       const SizedBox(width: 20),
+                       ElevatedButton.icon(
+                          icon: const Icon(Icons.list, color: Colors.black),
+                          label: const Text("View Details", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.cyanAccent, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                          onPressed: _showResultSheet,
+                       ),
+                    ],
+                 )
+              )
          ],
       )
     );
   }
 }
-
