@@ -130,6 +130,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'SpeechMate - Nicobarese Language Learning',
       theme: AppTheme.studentTheme,
+      builder: (context, child) {
+        // Prevent system text scaling from breaking UI layout on various phones
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
+          child: child!,
+        );
+      },
       home: const EmotionalSplashScreen(nextScreen: LanguageSelectionScreen()),
     );
   }
