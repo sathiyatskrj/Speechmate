@@ -25,10 +25,12 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
 
   bool _isRecording = false;
   bool _isProcessing = false;
+  bool _isModelReady = false;
+  String? _modelError;
   String _englishText = "Hold the glowing orb to speak...";
   String _nicobareseText = "Translation will appear here";
   String _audioPath = '';
-  
+
   late AnimationController _pulseController;
 
   @override
@@ -42,9 +44,24 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
   }
 
   Future<void> _initServices() async {
-    await _whisperService.initialize();
-    _neuralEngine.init();
-    _ttsService.init();
+    try {
+      final ok = await _whisperService.initialize();
+      await _neuralEngine.init();
+      _ttsService.init();
+      if (mounted) {
+        setState(() {
+          _isModelReady = ok;
+          _modelError = ok ? null : 'Speech model not found.\nPlease ensure the app was built correctly with the Whisper model.';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isModelReady = false;
+          _modelError = 'Failed to initialize speech engine: $e';
+        });
+      }
+    }
   }
 
   @override
@@ -55,8 +72,8 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
   }
 
   Future<void> _startRecording() async {
-    if (_isProcessing) return; 
-    
+    if (_isProcessing || !_isModelReady) return;
+
     try {
       await _ttsService.stop();
       if (await _audioRecorder.hasPermission()) {
@@ -78,7 +95,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
             _englishText = "Listening...";
             _nicobareseText = "Translation will appear here";
           });
-          _pulseController.duration = const Duration(milliseconds: 500); // Faster pulse while recording
+          _pulseController.duration = const Duration(milliseconds: 500);
           _pulseController.repeat(reverse: true);
         }
       } else {
@@ -95,33 +112,34 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
   }
 
   Future<void> _stopRecordingAndTranslate() async {
-    if (!_isRecording) return; 
-    
+    if (!_isRecording) return;
+
     String? path;
     try {
       path = await _audioRecorder.stop();
     } catch (e) {
       debugPrint('[VoiceTranslator] Stop recording error: $e');
     }
-    
+
     if (mounted) {
       setState(() {
         _isRecording = false;
         _isProcessing = true;
-        _englishText = "Processing neural networks...";
+        _englishText = "Processing speech...";
       });
-      _pulseController.duration = const Duration(seconds: 2); // Return to slow pulse
+      _pulseController.duration = const Duration(seconds: 2);
       _pulseController.repeat(reverse: true);
     }
 
     if (path != null && File(path).existsSync()) {
       try {
-        final String transcription = await _whisperService.transcribe(path).timeout(const Duration(seconds: 15));
-        
+        final String transcription = await _whisperService.transcribe(path).timeout(const Duration(seconds: 20));
+
         if (transcription.trim().isEmpty) {
           if (mounted) {
             setState(() {
               _englishText = "Could not understand audio. Try again.";
+              _isProcessing = false;
             });
           }
           return;
@@ -130,12 +148,12 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
         if (mounted) {
           setState(() {
             _englishText = transcription;
-            _nicobareseText = "Translating context...";
+            _nicobareseText = "Translating...";
           });
         }
 
         final result = await _neuralEngine.predict(transcription).timeout(const Duration(seconds: 10));
-        
+
         if (mounted) {
           setState(() {
             _nicobareseText = result.text;
@@ -168,7 +186,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Slate Dark
+      backgroundColor: const Color(0xFF0F172A),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Voice Translator', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
@@ -177,171 +195,236 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
         foregroundColor: Colors.white,
       ),
       body: VoiceReactiveAurora(
-        isDark: true, // Use deep oceanic colors
+        isDark: true,
         child: SafeArea(
-          child: Column(
-            children: [
-              // Top Panel - English Input (Glassmorphism)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(32.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(40),
-                          border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.2), width: 1),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "English Transcription",
-                              style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 12),
-                            ),
-                            const SizedBox(height: 20),
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 300),
-                              child: Text(
-                                _englishText,
-                                key: ValueKey<String>(_englishText),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: _isRecording ? 22 : 26,
-                                  color: _isRecording ? Colors.white.withValues(alpha: 0.8) : Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Middle - Siri-Style Orb Record Button
-              Container(
-                height: 160,
-                alignment: Alignment.center,
-                child: TapScale(
-                  onTap: () {}, // Handled by gesture detector below for hold
-                  scaleFactor: 0.85,
-                  child: GestureDetector(
-                    onTapDown: (_) => _startRecording(),
-                    onTapUp: (_) => _stopRecordingAndTranslate(),
-                    onTapCancel: () => _stopRecordingAndTranslate(),
-                    child: AnimatedBuilder(
-                      animation: _pulseController,
-                      builder: (context, child) {
-                        return Container(
-                          width: _isRecording ? 120 : 100,
-                          height: _isRecording ? 120 : 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: _isRecording 
-                                ? [Colors.redAccent, Colors.deepOrangeAccent] 
-                                : [Colors.cyanAccent, Colors.blueAccent],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: (_isRecording ? Colors.redAccent : Colors.cyanAccent).withValues(alpha: 0.4 + (_pulseController.value * 0.4)),
-                                blurRadius: _isRecording ? 50 : 30 + (_pulseController.value * 20),
-                                spreadRadius: _isRecording ? 20 : 10 + (_pulseController.value * 10),
-                              ),
-                              BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                blurRadius: 10,
-                                spreadRadius: -5,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            _isRecording ? Icons.mic : Icons.mic_none,
-                            color: Colors.white,
-                            size: _isRecording ? 50 : 40,
-                          ).animate(target: _isRecording ? 1 : 0).shimmer(duration: 1200.ms, color: Colors.white),
-                        );
-                      }
-                    ),
-                  ),
-                ),
-              ),
-
-              // Bottom Panel - Translation Output
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(32.0),
-                        decoration: BoxDecoration(
-                          color: Colors.tealAccent.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(40),
-                          border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.3), width: 1.5),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Nicobarese Translation",
-                              style: TextStyle(color: Colors.tealAccent, fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 12),
-                            ),
-                            const SizedBox(height: 20),
-                            if (_isProcessing)
-                              const CircularProgressIndicator(color: Colors.tealAccent)
-                            else
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                child: Text(
-                                  _nicobareseText,
-                                  key: ValueKey<String>(_nicobareseText),
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            const SizedBox(height: 20),
-                            if (!_isProcessing && _nicobareseText != "Translation will appear here")
-                              TapScale(
-                                onTap: () {
-                                  _ttsService.speakNicobarese(_nicobareseText, englishWord: _englishText);
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.tealAccent.withValues(alpha: 0.2),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.5)),
-                                  ),
-                                  child: const Icon(Icons.volume_up_rounded, color: Colors.tealAccent, size: 28),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          child: _modelError != null
+              ? _buildErrorState()
+              : !_isModelReady
+                  ? _buildLoadingState()
+                  : _buildMainUI(),
         ),
       ),
+    );
+  }
+
+  // ── Loading State ──────────────────────────────────────────────────────────
+  Widget _buildLoadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Colors.cyanAccent),
+          SizedBox(height: 24),
+          Text('Loading speech model...', style: TextStyle(color: Colors.white70, fontSize: 16)),
+          SizedBox(height: 8),
+          Text('This may take a moment on first launch', style: TextStyle(color: Colors.white38, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  // ── Error State with Retry ─────────────────────────────────────────────────
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.mic_off_rounded, color: Colors.redAccent, size: 64),
+            const SizedBox(height: 24),
+            const Text(
+              'Speech Model Unavailable',
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _modelError ?? 'Unknown error',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white54, fontSize: 14),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () {
+                setState(() => _modelError = null);
+                _initServices();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.cyanAccent,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Main UI ────────────────────────────────────────────────────────────────
+  Widget _buildMainUI() {
+    return Column(
+      children: [
+        // Top Panel - English transcription
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(32.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(40),
+                    border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.2), width: 1),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Speech Input",
+                        style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 12),
+                      ),
+                      const SizedBox(height: 20),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: Text(
+                          _englishText,
+                          key: ValueKey<String>(_englishText),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: _isRecording ? 22 : 26,
+                            color: _isRecording ? Colors.white.withValues(alpha: 0.8) : Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // Middle - Siri-Style Orb
+        Container(
+          height: 160,
+          alignment: Alignment.center,
+          child: TapScale(
+            onTap: () {},
+            scaleFactor: 0.85,
+            child: GestureDetector(
+              onTapDown: (_) => _startRecording(),
+              onTapUp: (_) => _stopRecordingAndTranslate(),
+              onTapCancel: () => _stopRecordingAndTranslate(),
+              child: AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return Container(
+                    width: _isRecording ? 120 : 100,
+                    height: _isRecording ? 120 : 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: _isRecording
+                            ? [Colors.redAccent, Colors.deepOrangeAccent]
+                            : [Colors.cyanAccent, Colors.blueAccent],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (_isRecording ? Colors.redAccent : Colors.cyanAccent).withValues(alpha: 0.4 + (_pulseController.value * 0.4)),
+                          blurRadius: _isRecording ? 50 : 30 + (_pulseController.value * 20),
+                          spreadRadius: _isRecording ? 20 : 10 + (_pulseController.value * 10),
+                        ),
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          spreadRadius: -5,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      _isRecording ? Icons.mic : Icons.mic_none,
+                      color: Colors.white,
+                      size: _isRecording ? 50 : 40,
+                    ).animate(target: _isRecording ? 1 : 0).shimmer(duration: 1200.ms, color: Colors.white),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+
+        // Bottom Panel - Translation output
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(32.0),
+                  decoration: BoxDecoration(
+                    color: Colors.tealAccent.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(40),
+                    border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.3), width: 1.5),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Nicobarese Translation",
+                        style: TextStyle(color: Colors.tealAccent, fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 12),
+                      ),
+                      const SizedBox(height: 20),
+                      if (_isProcessing)
+                        const CircularProgressIndicator(color: Colors.tealAccent)
+                      else
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: Text(
+                            _nicobareseText,
+                            key: ValueKey<String>(_nicobareseText),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 20),
+                      if (!_isProcessing && _nicobareseText != "Translation will appear here")
+                        TapScale(
+                          onTap: () {
+                            _ttsService.speakNicobarese(_nicobareseText, englishWord: _englishText);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.tealAccent.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.5)),
+                            ),
+                            child: const Icon(Icons.volume_up_rounded, color: Colors.tealAccent, size: 28),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
