@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/core/app_strings.dart';
+import 'package:translator/translator.dart';
 
 enum DictionaryType { words, phrases, nature, numbers, animals, magic, family, dialects }
 
@@ -28,12 +30,29 @@ class DictionaryService {
     // No-op for SQLite, memory is handled by the DB engine
   }
 
+  final _onlineTranslator = GoogleTranslator();
+
+  Future<String> _ensureEnglish(String query) async {
+    final lang = AppStrings.currentLanguage;
+    if (lang != 'en' && lang != 'nc' && lang != 'gn') {
+      try {
+        final translation = await _onlineTranslator.translate(query, from: lang, to: 'en');
+        return translation.text.toLowerCase();
+      } catch (e) {
+        return query.toLowerCase();
+      }
+    }
+    return query.toLowerCase();
+  }
+
   Future<Map<String, dynamic>?> searchWord(String query) async {
-    return await _db.searchExact(query, 'words', ['english', 'nicobarese']);
+    final enQuery = await _ensureEnglish(query);
+    return await _db.searchExact(enQuery, 'words', ['english', 'nicobarese']);
   }
 
   Future<Map<String, dynamic>?> searchPhrase(String query) async {
-    return await _db.searchExact(query, 'phrases', ['text', 'english']);
+    final enQuery = await _ensureEnglish(query);
+    return await _db.searchExact(enQuery, 'phrases', ['text', 'english']);
   }
 
   Future<List<Map<String, dynamic>>> getAnimalsItems() async {
@@ -49,8 +68,8 @@ class DictionaryService {
   }
 
   Future<Map<String, dynamic>?> searchEverywhere(String query) async {
-    final q = query.trim().toLowerCase();
-    if (q.isEmpty) return null;
+    if (query.trim().isEmpty) return null;
+    final q = await _ensureEnglish(query.trim());
 
     // 1. Search ALL words in the database (covers words, numbers, nature, colors, feelings, things, body_parts, animals, magic, family)
     final db = await _db.database;
@@ -161,8 +180,7 @@ class DictionaryService {
 
   Future<Map<String, dynamic>?> translateSentence(String input) async {
     if (input.trim().isEmpty) return null;
-
-    final String query = input.trim().toLowerCase();
+    final String query = await _ensureEnglish(input.trim());
     
     final phraseMatch = await searchPhrase(query);
     if (phraseMatch != null) {
