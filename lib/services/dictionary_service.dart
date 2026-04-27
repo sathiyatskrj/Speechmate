@@ -170,12 +170,12 @@ class DictionaryService {
     return loadDictionary(DictionaryType.dialects);
   }
 
+  /// Direct English lookup — bypasses regional translation (for Neural Engine use)
   Future<String?> lookupExact(String word) async {
-    final result = await searchWord(word);
-    if (result != null) {
-      return result['nicobarese'];
-    }
-    return null;
+    final q = word.trim().toLowerCase();
+    if (q.isEmpty) return null;
+    final result = await _db.searchExact(q, 'words', ['english', 'nicobarese']);
+    return result?['nicobarese']?.toString();
   }
 
   Future<Map<String, dynamic>?> translateSentence(String input) async {
