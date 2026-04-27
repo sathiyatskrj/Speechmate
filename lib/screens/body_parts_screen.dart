@@ -303,10 +303,13 @@ class _BodyPartsScreenState extends State<BodyPartsScreen>
                   ],
                 ),
                 child: Center(
-                  child: Icon(
-                    Icons.add,
-                    size: 14,
-                    color: isSelected ? Colors.black : Colors.white,
+                  child: Container(
+                    width: isSelected ? 10 : 7,
+                    height: isSelected ? 10 : 7,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected ? Colors.black : Colors.white,
+                    ),
                   ),
                 ),
               ),
