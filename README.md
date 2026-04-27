@@ -28,6 +28,12 @@
   <a href="#">
     <img src="https://img.shields.io/badge/State-Riverpod-00BCD4?style=for-the-badge" alt="Riverpod" />
   </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/ML_Kit-Translation-EA4335?style=for-the-badge&logo=google&logoColor=white" alt="ML Kit" />
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/NeuralEngine-v2.0-FF6F00?style=for-the-badge" alt="Neural Engine" />
+  </a>
 </p>
 
 <p align="center">
@@ -59,16 +65,18 @@
 | Module | Description |
 | :--- | :--- |
 | **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — all loaded from verified Nicobarese JSON lexicons |
-| **🔍 AR Translator** | Live Augmented Reality translator using Google ML Kit Image Labeler to detect 400+ specific objects, featuring 3 Lens Modes (Auto/Objects/Text) and direct Vault saving |
+| **🔍 AR Translator** | Live Augmented Reality translator using Google ML Kit Image Labeler to detect 400+ specific objects, featuring 3 Lens Modes (Auto/Objects/Text), direct Vault saving, and **dynamic FPS-aware throttling** that auto-adjusts processing speed (300–1000ms) based on device performance |
 | **🎙️ Whisper Pro STT** | On-device speech-to-text using the `ggml-tiny.en.bin` model for offline voice search |
 | **🔊 Audio-First Playback** | Native `.mp3` audio asset playback for each word; graceful TTS fallback when audio is unavailable |
-| **🧩 Games Hub** | Interactive vocabulary and spelling games for immersive learning |
-| **💬 AI Chat Translator** | Conversational translation interface powered by the Neural Engine |
+| **🧩 Games Hub** | Word Match, Flash Cards, Word Scramble, and Word Runner — gamified vocabulary learning with XP **diminishing returns** to prevent farming |
+| **💬 AI Chat Translator** | Conversational translation interface powered by **Neural Engine v2.0** |
 | **🗂️ Voice Vault** | Record, store, and preserve oral history and folklore |
 | **🌍 Community Hub** | Shared learning feed connecting students and educators |
 | **🏝️ Island Explorer (GIS)** | Custom-painted Andaman & Nicobar archipelago map visualizing dialect distribution zones |
 | **📖 Flashcard SRS** | SM-2 spaced repetition system for long-term word retention |
 | **🌐 Dynamic Localization** | 100% localized interface supporting 8 languages seamlessly across the entire dashboard |
+| **🇮🇳 Regional Translators** | Bidirectional translation between Nicobarese and **Hindi, Tamil, Bengali, Telugu** (offline via ML Kit) and **Malayalam** (online cloud fallback) |
+| **🔎 Multilingual Search** | Type in any regional language script — the search engine auto-translates to English before looking up the Nicobarese equivalent |
 
 ### 👩‍🏫 Teacher Dashboard
 | Module | Description |
@@ -93,15 +101,27 @@
 Users choose their **interface language** from:
 - 🌴 **Pū (Car Nicobarese)** — Primary learning language
 - 🏔️ **Aka-Jeru (Great Andamanese)** — Opens the dedicated GA Hub
-- 🇮🇳 English · हिंदी · தமிழ் · മലയാളം · తెలుగు · **বাংলা (Bengali)** *(new)*
+- 🇮🇳 English · हिंदी · தமிழ் · മലയാളം · తెలుగు · বাংলা
 
 ### Heritage Language Selection (Learning Mode)
 Users then select which language to **explore and learn**:
 - **Car Nicobarese** → Full Student/Teacher ecosystem
-- **Aka-Jeru (Great Andamanese)** → Dedicated standalone hub *(new)*
+- **Aka-Jeru (Great Andamanese)** → Dedicated standalone hub
 - **Onges** → Coming soon placeholder
 
-### 🏝️ Great Andamanese Standalone Hub *(new in v2.0)*
+### 🇮🇳 Regional Language Translators *(new in v2.5)*
+Bidirectional translation tiles on the Student Dashboard:
+| Language | Engine | Mode |
+| :--- | :--- | :--- |
+| **Hindi** 🇮🇳 | Google ML Kit `TranslateLanguage.hindi` | ✅ Offline |
+| **Tamil** 🛕 | Google ML Kit `TranslateLanguage.tamil` | ✅ Offline |
+| **Bengali** 🐅 | Google ML Kit `TranslateLanguage.bengali` | ✅ Offline |
+| **Telugu** 🌶️ | Google ML Kit `TranslateLanguage.telugu` | ✅ Offline |
+| **Malayalam** 🥥 | `translator` package (Google Cloud fallback) | 🌐 Online |
+
+**Translation Pipeline:** Regional Text → English (ML Kit / Cloud) → Nicobarese (Offline Dictionary + Neural Engine)
+
+### 🏝️ Great Andamanese Standalone Hub
 A fully self-contained module with **4 tabs**:
 | Tab | Feature |
 | :--- | :--- |
@@ -114,7 +134,7 @@ A fully self-contained module with **4 tabs**:
 
 ## 🏗️ Technical Architecture
 
-SpeechMate uses a **layered offline-first architecture** combining Flutter for UI, SQLite for data sovereignty, and native C++ for AI inference.
+SpeechMate uses a **layered offline-first architecture** combining Flutter for UI, SQLite for data sovereignty, native C++ for AI inference, and ML Kit for regional translation.
 
 ```mermaid
 graph TD
@@ -123,7 +143,9 @@ graph TD
 
     subgraph "AI Intelligence Layer"
         Service --> |WhisperService| Whisper[Whisper Tiny\nNative C++ via NDK 27]
-        Service --> |NeuralEngineService| Neural[Neural Translation\nDictionary-Backed Engine]
+        Service --> |NeuralEngineService v2.0| Neural[Neural Translation\nSoundex + Stemming + Fuzzy + Compound]
+        Service --> |RegionalTranslationService| Regional[ML Kit Translation\nHindi / Tamil / Bengali / Telugu]
+        Service --> |DictionaryService| AutoTranslate[Multilingual Search\nAuto-translate queries to English]
     end
 
     subgraph "Data Sovereignty Layer"
@@ -141,9 +163,21 @@ graph TD
     end
 
     Whisper --> |Transcript| Neural
+    Regional --> |English| Neural
     Neural --> |Translation| UI
     DB --> |Vocabulary| UI
 ```
+
+### 🧠 Neural Engine v2.0
+The offline translation brain uses an **8-stage pipeline**:
+1. **N-Gram Phrase Match** — Full sentence lookup in phrase database
+2. **Exact Dictionary Lookup** — O(1) indexed SQLite match
+3. **Advanced Stemming** — 15+ English suffix rules (ing, ed, tion, ment, ness, ly, ful, etc.)
+4. **Synonym Expansion** — 200+ curated synonym mappings
+5. **Soundex Phonetic Match** — Catches misspellings by sound similarity
+6. **Compound Word Decomposition** — Splits "rainforest" → "rain" + "forest"
+7. **Levenshtein Fuzzy Search** — Cached edit-distance matching (max dist: 2)
+8. **LLM Contextual Fallback** — Reserved for future SmolLM2 GGUF integration
 
 ### 🧠 Why Fully Offline?
 - **Zero Latency** — No server round-trip; responses are instantaneous
@@ -153,15 +187,19 @@ graph TD
 
 ---
 
-## 📊 Performance & Metrics (v2.0)
+## 📊 Performance & Metrics (v2.5)
 
 | Metric | Result | Notes |
 | :--- | :--- | :--- |
 | **STT Latency** | **< 600ms** | Whisper Tiny via NDK 27 C++ |
 | **Translation Speed** | **< 100ms** | Local SQLite with indexed queries |
+| **Neural Engine Pipeline** | **8-stage** | Soundex + Stemming + Fuzzy + Compound |
 | **Dictionary Size** | **2,400+ entries** | `dictionary.json` (core Nicobarese) |
 | **GA Lexicon Size** | **277KB+** | `dictionary_great_andamanese.json` |
-| **Offline Capability** | **100%** | Zero API calls required |
+| **Regional Languages** | **5 supported** | Hindi, Tamil, Bengali, Telugu (offline), Malayalam (online) |
+| **Synonym Mappings** | **200+** | Expanded NLP synonym database |
+| **Offline Capability** | **100%** | Zero API calls for core features (Malayalam requires internet) |
+| **AR FPS Throttling** | **Dynamic** | Auto-adjusts 300–1000ms based on device FPS |
 | **App Base Size** | **~85 MB** | Excluding optional AI model |
 | **Min Android SDK** | **API 24** | Android 7.0+ |
 | **Target SDK** | **API 33** | Android 13 |
@@ -213,25 +251,28 @@ SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requi
 
 ## 🔮 Roadmap
 
-### ✅ Completed (v2.0)
+### ✅ Completed (v2.5)
 - [x] Full 12-category student learning system
 - [x] Standalone Great Andamanese Hub (Dictionary + Translator + Voice + OCR)
-- [x] Bengali language support in UI
-- [x] Whisper Pro enabled in Teacher Dashboard
-- [x] Community Hub with mock tribal community feed
-- [x] Island Explorer with custom-painted Andaman archipelago map
-- [x] Voice Translator hang fix (unique file paths + state guards)
+- [x] Full Dashboard Localization across 8 languages
+- [x] AR Translator: 400+ objects, 3 Lens Modes, Voice Vault, **dynamic FPS throttling**
+- [x] Whisper Pro STT in both Student & Teacher Dashboards
 - [x] Cross-category search engine (exact + fuzzy across all 12 categories)
-- [x] Audio-first playback with graceful TTS fallback
-- [x] **Full Dashboard Localization** across 8 languages (English, Hindi, Tamil, Malayalam, Bengali, Telugu, Great Andamanese, Nicobarese)
-- [x] **AR Translator Upgrade**: 400+ specific objects detection, Lens Modes, and Voice Vault integration
+- [x] **Regional Language Translators**: Hindi, Tamil, Bengali, Telugu (offline ML Kit) + Malayalam (online fallback)
+- [x] **Multilingual Search**: Type in any regional script → auto-translate → Nicobarese lookup
+- [x] **Neural Engine v2.0**: Soundex phonetic matching, 200+ synonyms, compound decomposition, advanced stemming, fuzzy caching
+- [x] **XP Diminishing Returns**: Tiered gamification to prevent XP farming
+- [x] **Codebase Modernization**: Fixed 384 deprecation warnings, upgraded 14 dependencies, removed 13 orphaned files
+- [x] **Global Layout Lock**: `textScaler: 1.0` override for cross-device UI consistency
 
-### 🔜 Planned (v2.1+)
+### 🔜 Planned (v3.0+)
+- [ ] **SmolLM2 On-Device LLM** — Replace mock LLM with quantized GGUF model for true offline AI chat
 - [ ] **P2P Mesh Sync** — Share vocabulary packs via Wi-Fi Direct / QR code
 - [ ] **Onges Module** — Third tribal language integration
 - [ ] **Gamified Certification** — Printable tribal language certificates
 - [ ] **Collaborative Classroom** — Peer vocabulary games
 - [ ] **Cloud Sync** — Optional Firebase backup for community posts
+- [ ] **Major Dependency Audit** — Upgrade 32 constrained major-version packages
 
 ---
 
