@@ -90,10 +90,11 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
     
     // --- Regional Translations ---
-    {"word": "Hindi\nTranslator", "emoji": "🇮🇳", "colors": [Color(0xFFD84315), Color(0xFFFF7043)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Hindi', TranslateLanguage.hindi, 'hi-IN', 'नमस्ते')), "icon": Icons.g_translate_rounded},
-    {"word": "Tamil\nTranslator", "emoji": "🛕", "colors": [Color(0xFF2E7D32), Color(0xFF66BB6A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta-IN', 'வணக்கம்')), "icon": Icons.g_translate_rounded},
-    {"word": "Bengali\nTranslator", "emoji": "🐅", "colors": [Color(0xFFC62828), Color(0xFFEF5350)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn-IN', 'নমস্কার')), "icon": Icons.g_translate_rounded},
-    {"word": "Telugu\nTranslator", "emoji": "🌶️", "colors": [Color(0xFF283593), Color(0xFF5C6BC0)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu, 'te-IN', 'నమస్కారం')), "icon": Icons.g_translate_rounded},
+    {"word": "Hindi\nTranslator", "emoji": "🇮🇳", "colors": [Color(0xFFD84315), Color(0xFFFF7043)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Hindi', TranslateLanguage.hindi, 'hi', 'hi-IN', 'नमस्ते')), "icon": Icons.g_translate_rounded},
+    {"word": "Tamil\nTranslator", "emoji": "🛕", "colors": [Color(0xFF2E7D32), Color(0xFF66BB6A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', 'வணக்கம்')), "icon": Icons.g_translate_rounded},
+    {"word": "Bengali\nTranslator", "emoji": "🐅", "colors": [Color(0xFFC62828), Color(0xFFEF5350)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn', 'bn-IN', 'নমস্কার')), "icon": Icons.g_translate_rounded},
+    {"word": "Telugu\nTranslator", "emoji": "🌶️", "colors": [Color(0xFF283593), Color(0xFF5C6BC0)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu, 'te', 'te-IN', 'నమస్కారం')), "icon": Icons.g_translate_rounded},
+    {"word": "Malayalam\nTranslator", "emoji": "🥥", "colors": [Color(0xFF00695C), Color(0xFF26A69A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Malayalam', null, 'ml', 'ml-IN', 'നമസ്കാരം')), "icon": Icons.g_translate_rounded},
 
     // --- Advanced / Discovery ---
     {"word": AppStrings.get('andamaneseBeta'), "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GAHubScreen(), "icon": Icons.language_rounded},

@@ -1,14 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:translator/translator.dart';
 
 class RegionalTranslationService {
   OnDeviceTranslator? _translator;
   final _modelManager = OnDeviceTranslatorModelManager();
   TranslateLanguage? _currentSource;
+  final _onlineTranslator = GoogleTranslator();
 
   /// Initializes the ML Kit Translator for a specific regional language
-  Future<bool> initialize(TranslateLanguage source) async {
+  Future<bool> initialize(TranslateLanguage? source) async {
     try {
+      if (source == null) return true; // Online fallback mode only
+
       if (_currentSource == source && _translator != null) return true;
 
       _currentSource = source;
@@ -40,15 +44,27 @@ class RegionalTranslationService {
     }
   }
 
-  /// Translates regional text to English text offline
-  Future<String> translateToEnglish(String text) async {
-    if (_translator == null) return text;
-    try {
-      return await _translator!.translateText(text);
-    } catch (e) {
-      debugPrint("[Regional] Translation error: $e");
-      return text; // Return original text on failure
+  /// Translates regional text to English text offline or via online fallback
+  Future<String> translateToEnglish(String text, {String? fallbackLangCode}) async {
+    if (_translator != null) {
+      try {
+        return await _translator!.translateText(text);
+      } catch (e) {
+        debugPrint("[Regional] Translation error: $e");
+      }
     }
+
+    if (fallbackLangCode != null) {
+      try {
+        debugPrint("[Regional] Using online fallback for $fallbackLangCode...");
+        final translation = await _onlineTranslator.translate(text, from: fallbackLangCode, to: 'en');
+        return translation.text;
+      } catch (e) {
+        debugPrint("[Regional] Online translation error: $e");
+      }
+    }
+
+    return text; // Return original text on complete failure
   }
 
   void dispose() {

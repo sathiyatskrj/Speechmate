@@ -9,11 +9,12 @@ import 'dart:math';
 
 class RegionalLanguageConfig {
   final String name;
-  final TranslateLanguage mlKitLanguage;
+  final TranslateLanguage? mlKitLanguage;
+  final String fallbackLanguageCode;
   final String localeId;
   final String sampleWord;
 
-  RegionalLanguageConfig(this.name, this.mlKitLanguage, this.localeId, this.sampleWord);
+  RegionalLanguageConfig(this.name, this.mlKitLanguage, this.fallbackLanguageCode, this.localeId, this.sampleWord);
 }
 
 class RegionalTranslatorScreen extends StatefulWidget {
@@ -78,8 +79,8 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
     _scrollToBottom();
     _textController.clear();
 
-    // 1. Regional -> English (Offline ML Kit)
-    final englishTranslation = await _regionalTranslation.translateToEnglish(regionalText);
+    // 1. Regional -> English (Offline ML Kit or Online Fallback)
+    final englishTranslation = await _regionalTranslation.translateToEnglish(regionalText, fallbackLangCode: widget.config.fallbackLanguageCode);
 
     // 2. English -> Nicobarese (Offline Dictionary / Neural Engine)
     var dictResult = await _dictionaryService.searchWord(englishTranslation);
