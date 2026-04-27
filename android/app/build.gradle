@@ -40,8 +40,8 @@ android {
         abi {
             enable true
             reset()
-            include 'arm64-v8a'  // Only modern 64-bit ARM; covers 95%+ of Android devices
-            universalApk false   // No fat APK; per-ABI splits keep size minimal
+            include 'armeabi-v7a', 'arm64-v8a'
+            universalApk true   // Produces both per-ABI splits AND a universal APK
         }
     }
 
