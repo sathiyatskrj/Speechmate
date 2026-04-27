@@ -38,7 +38,10 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   // Processing state
   bool _isDetecting = false;
   DateTime _lastFrame = DateTime.now();
-  static const int _throttleMs = 500; // Increased to reduce UI thread lag
+  int _throttleMs = 500; // Dynamic: auto-adjusts based on device performance
+  int _frameCount = 0;
+  DateTime _fpsCheckpoint = DateTime.now();
+  double _currentFps = 0;
 
   // Extra features
   bool _flashlightOn = false;
@@ -145,6 +148,22 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
     final now = DateTime.now();
     if (now.difference(_lastFrame).inMilliseconds < _throttleMs) return;
     if (_isDetecting) return;
+
+    // Dynamic FPS tracking & auto-throttle
+    _frameCount++;
+    final elapsed = now.difference(_fpsCheckpoint).inMilliseconds;
+    if (elapsed > 2000) {
+      _currentFps = (_frameCount / elapsed) * 1000;
+      _frameCount = 0;
+      _fpsCheckpoint = now;
+      // Auto-adjust: if FPS drops below 20, increase throttle; if smooth, decrease
+      if (_currentFps < 15 && _throttleMs < 1000) {
+        _throttleMs = (_throttleMs + 100).clamp(300, 1000);
+        debugPrint('[AR] FPS low (${_currentFps.toStringAsFixed(1)}), throttle -> ${_throttleMs}ms');
+      } else if (_currentFps > 25 && _throttleMs > 300) {
+        _throttleMs = (_throttleMs - 50).clamp(300, 1000);
+      }
+    }
 
     _lastFrame = now;
     _isDetecting = true;

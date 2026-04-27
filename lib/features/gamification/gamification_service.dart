@@ -45,7 +45,22 @@ class GamificationService {
     return _levelThresholds[level]; // next threshold
   }
 
-  /// Get total XP from real progress data
+  /// Diminishing returns XP calculator for a given count and tier thresholds
+  int _tieredXP(int count, List<List<int>> tiers) {
+    int xpTotal = 0;
+    int remaining = count;
+    for (final tier in tiers) {
+      final cap = tier[0]; // max items at this rate
+      final rate = tier[1]; // XP per item
+      if (remaining <= 0) break;
+      final used = remaining > cap ? cap : remaining;
+      xpTotal += used * rate;
+      remaining -= used;
+    }
+    return xpTotal;
+  }
+
+  /// Get total XP from real progress data with diminishing returns
   Future<int> getXP() async {
     try {
       final stats = await _progressService.getProgressStats();
@@ -54,8 +69,15 @@ class GamificationService {
       final dayStreak = stats['dayStreak'] ?? 0;
       final communityPosts = stats['communityPosts'] ?? 0;
       
-      // XP formula: 10pts per word + 25pts per quiz + 5pts per streak day + 15pts per community post
-      return (wordsLearned * 10) + (quizzesTaken * 25) + (dayStreak * 5) + (communityPosts * 15);
+      // Words: 1-50 = 10xp, 51-100 = 7xp, 101-200 = 4xp, 200+ = 2xp
+      final wordXP = _tieredXP(wordsLearned, [[50, 10], [50, 7], [100, 4], [99999, 2]]);
+      // Quizzes: 1-10 = 25xp, 11-30 = 15xp, 30+ = 8xp
+      final quizXP = _tieredXP(quizzesTaken, [[10, 25], [20, 15], [99999, 8]]);
+      // Streak & community stay linear (hard to farm)
+      final streakXP = dayStreak * 5;
+      final communityXP = communityPosts * 15;
+      
+      return wordXP + quizXP + streakXP + communityXP;
     } catch (_) {
       return 0;
     }
