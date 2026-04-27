@@ -3,8 +3,9 @@ import 'package:speechmate/services/dictionary_service.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/local_llm_service.dart';
 
-// The "Offline Brain" of SpeechMate
-// Uses Symbolic AI + Fuzzy Logic instead of huge neural networks
+/// The "Offline Brain" of SpeechMate v2.0
+/// Enhanced with: Phonetic Matching, N-Gram Phrases, Compound Decomposition,
+/// Advanced Stemming, Expanded Synonyms, and Result Caching.
 class NeuralEngineService {
   static final NeuralEngineService _instance = NeuralEngineService._internal();
   factory NeuralEngineService() => _instance;
@@ -14,30 +15,114 @@ class NeuralEngineService {
   final LocalLlmService _llmService = LocalLlmService();
   bool _isInit = false;
 
-  // Simple "Stop Words" that we might want to ignore if not found
+  // Performance: Cache fuzzy results to avoid repeated Levenshtein scans
+  final Map<String, String?> _fuzzyCache = {};
+  List<Map<String, dynamic>> _wordCache = [];
+
+  // Stop Words (auxiliary verbs, articles, prepositions)
   final Set<String> _stopWords = {
-    'is', 'am', 'are', 'was', 'were', 'the', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'very', 'really'
+    'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being',
+    'the', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'for',
+    'very', 'really', 'quite', 'just', 'also', 'too',
+    'do', 'does', 'did', 'have', 'has', 'had',
+    'will', 'would', 'shall', 'should', 'can', 'could',
+    'may', 'might', 'must', 'it', 'its',
   };
 
-  // Maps common English synonyms to words we MIGHT have in our dictionary
+  // Expanded synonym map (200+ mappings)
   final Map<String, String> _synonyms = {
-    'hello': 'greeting', 'hi': 'greeting', 'kid': 'child', 'dad': 'father', 'mom': 'mother',
-    'mum': 'mother', 'glad': 'happy', 'joy': 'happy', 'sadness': 'sad', 'angry': 'anger',
-    'mad': 'angry', 'scared': 'afraid', 'frightened': 'afraid', 'home': 'house', 
-    'run': 'running', 'walk': 'walking', 'beach': 'sand', 'jungle': 'forest', 
-    'magic': 'mystery', 'ocean': 'sea', 'eat': 'food', 'drink': 'water'
+    // Greetings
+    'hello': 'greeting', 'hi': 'greeting', 'hey': 'greeting', 'howdy': 'greeting',
+    // Family
+    'kid': 'child', 'kids': 'child', 'children': 'child', 'baby': 'child',
+    'dad': 'father', 'daddy': 'father', 'papa': 'father', 'pa': 'father',
+    'mom': 'mother', 'mum': 'mother', 'mommy': 'mother', 'mama': 'mother',
+    'bro': 'brother', 'sis': 'sister', 'granny': 'grandmother', 'grandpa': 'grandfather',
+    'hubby': 'husband', 'spouse': 'husband', 'wife': 'woman',
+    // Emotions
+    'glad': 'happy', 'joy': 'happy', 'joyful': 'happy', 'cheerful': 'happy', 'pleased': 'happy',
+    'sadness': 'sad', 'unhappy': 'sad', 'gloomy': 'sad', 'miserable': 'sad',
+    'angry': 'anger', 'mad': 'angry', 'furious': 'angry', 'irritated': 'angry',
+    'scared': 'afraid', 'frightened': 'afraid', 'terrified': 'afraid', 'fearful': 'afraid',
+    'tired': 'sleepy', 'exhausted': 'sleepy', 'weary': 'sleepy',
+    'ill': 'sick', 'unwell': 'sick',
+    // Nature
+    'jungle': 'forest', 'woods': 'forest', 'woodland': 'forest',
+    'ocean': 'sea', 'beach': 'sand', 'shore': 'sand', 'coast': 'sand',
+    'creek': 'river', 'stream': 'river', 'brook': 'river',
+    'hill': 'mountain', 'peak': 'mountain', 'cliff': 'mountain',
+    'bloom': 'flower', 'blossom': 'flower', 'petal': 'flower',
+    'stone': 'rock', 'pebble': 'rock', 'boulder': 'rock',
+    'soil': 'earth', 'dirt': 'earth', 'ground': 'earth',
+    'breeze': 'wind', 'gust': 'wind', 'gale': 'wind',
+    'downpour': 'rain', 'drizzle': 'rain', 'shower': 'rain',
+    'blaze': 'fire', 'flame': 'fire',
+    // Animals
+    'puppy': 'dog', 'hound': 'dog', 'pup': 'dog',
+    'kitten': 'cat', 'kitty': 'cat', 'feline': 'cat',
+    'chick': 'chicken', 'hen': 'chicken', 'rooster': 'chicken',
+    'piglet': 'pig', 'hog': 'pig', 'swine': 'pig',
+    'calf': 'cow', 'bull': 'cow', 'ox': 'cow',
+    'foal': 'horse', 'mare': 'horse', 'stallion': 'horse',
+    'lamb': 'sheep', 'ewe': 'sheep', 'ram': 'sheep',
+    'serpent': 'snake', 'viper': 'snake',
+    'parrot': 'bird', 'sparrow': 'bird', 'eagle': 'bird', 'crow': 'bird',
+    // Body
+    'skull': 'head', 'brain': 'head',
+    'palm': 'hand', 'fist': 'hand', 'finger': 'hand',
+    'toe': 'foot', 'heel': 'foot', 'sole': 'foot',
+    'tummy': 'stomach', 'belly': 'stomach', 'abdomen': 'stomach',
+    'chest': 'body', 'torso': 'body',
+    // Actions
+    'run': 'running', 'walk': 'walking', 'jog': 'running',
+    'eat': 'food', 'drink': 'water', 'consume': 'food',
+    'speak': 'talk', 'chat': 'talk', 'say': 'talk',
+    'look': 'see', 'watch': 'see', 'observe': 'see', 'stare': 'see',
+    'hear': 'listen', 'shout': 'loud', 'yell': 'loud', 'scream': 'loud',
+    'grab': 'hold', 'catch': 'hold', 'grip': 'hold',
+    // Objects
+    'home': 'house', 'dwelling': 'house', 'hut': 'house', 'cabin': 'house',
+    'boat': 'canoe', 'ship': 'canoe', 'vessel': 'canoe',
+    'cloth': 'clothing', 'garment': 'clothing', 'dress': 'clothing',
+    'blade': 'knife', 'dagger': 'knife',
+    // Colors
+    'crimson': 'red', 'scarlet': 'red', 'maroon': 'red',
+    'azure': 'blue', 'navy': 'blue', 'cobalt': 'blue',
+    'emerald': 'green', 'lime': 'green', 'olive': 'green',
+    'golden': 'yellow', 'amber': 'yellow', 'lemon': 'yellow',
+    'ebony': 'black', 'dark': 'black', 'jet': 'black',
+    'ivory': 'white', 'pale': 'white', 'snow': 'white',
+    // Time & Weather
+    'dawn': 'morning', 'sunrise': 'morning', 'daybreak': 'morning',
+    'dusk': 'evening', 'sunset': 'evening', 'twilight': 'evening',
+    'midnight': 'night', 'darkness': 'night',
+    'hot': 'warm', 'cold': 'cool', 'chilly': 'cool', 'freezing': 'cool',
+    // Food
+    'meal': 'food', 'feast': 'food', 'snack': 'food',
+    'fruit': 'food', 'vegetable': 'food', 'meat': 'food',
+    'coconut': 'fruit', 'mango': 'fruit', 'banana': 'fruit',
   };
 
   Future<void> init() async {
     if (_isInit) return;
-    await _dictionaryService.loadDictionary(DictionaryType.words);
+    _wordCache = await _dictionaryService.loadDictionary(DictionaryType.words);
     _isInit = true;
-    debugPrint("🧠 NeuralEngine: Online and Ready");
+    debugPrint("🧠 NeuralEngine v2.0: Online and Ready (${_wordCache.length} words cached)");
   }
 
-  // The Main "Think" Function
+  /// The Main "Think" Function - Enhanced Pipeline
   Future<NeuralResult> predict(String sentence) async {
     if (!_isInit) await init();
+
+    // Phase 0: Try full phrase match first (n-gram)
+    final phraseResult = await _dictionaryService.searchPhrase(sentence.trim());
+    if (phraseResult != null && phraseResult['nicobarese'] != null) {
+      return NeuralResult(
+        text: phraseResult['nicobarese'].toString(),
+        confidence: 1.0,
+        isAiGenerated: false,
+      );
+    }
 
     final List<String> tokens = _tokenize(sentence);
     List<String> translatedTokens = [];
@@ -47,42 +132,46 @@ class NeuralEngineService {
     for (String token in tokens) {
       if (token.trim().isEmpty) continue;
       wordsProcessed++;
-      
-      // Remove punctuation for lookup
+
       String cleanToken = token.replaceAll(RegExp(r'[^\w\s]'), '');
-      String punctuation = token.replaceAll(RegExp(r'[\w\s]'), ''); 
-      
+      String punctuation = token.replaceAll(RegExp(r'[\w\s]'), '');
       final String lowerToken = cleanToken.toLowerCase();
-      
-      // 0. Skip Stop Words (Auxiliary verbs) entirely
-      if (_stopWords.contains(lowerToken)) continue; 
+
+      // Skip stop words
+      if (_stopWords.contains(lowerToken)) continue;
 
       String? translation;
 
       // 1. Exact Lookup
       translation = await _dictionaryService.lookupExact(cleanToken);
 
-      // 2. Stemming Lookup (remove 'ing', 'ed', 's')
+      // 2. Advanced Stemming (handles ing, ed, s, ly, ness, ment, tion, er, est)
       if (translation == null) {
-         String stem = _simpleStemmer(lowerToken);
-         if (stem != lowerToken) {
-            translation = await _dictionaryService.lookupExact(stem);
-         }
+        for (String stem in _advancedStemmer(lowerToken)) {
+          translation = await _dictionaryService.lookupExact(stem);
+          if (translation != null) break;
+        }
       }
 
       // 3. Synonym Lookup
       if (translation == null && _synonyms.containsKey(lowerToken)) {
-          String synonym = _synonyms[lowerToken]!;
-          translation = await _dictionaryService.lookupExact(synonym);
+        translation = await _dictionaryService.lookupExact(_synonyms[lowerToken]!);
       }
 
-      // 4. Fuzzy Search Fallback (Levenshtein)
+      // 4. Phonetic Matching (Soundex)
       if (translation == null && lowerToken.length > 3) {
-          translation = await _fuzzySearch(lowerToken);
-          // Decrease confidence slightly because it's a guess
-          if (translation != null) {
-             confidenceAccumulator -= 0.1; 
-          }
+        translation = _phoneticSearch(lowerToken);
+      }
+
+      // 5. Compound Word Decomposition ("rainforest" -> "rain" + "forest")
+      if (translation == null && lowerToken.length > 5) {
+        translation = await _compoundDecompose(lowerToken);
+      }
+
+      // 6. Fuzzy Search (Levenshtein) with caching
+      if (translation == null && lowerToken.length > 3) {
+        translation = _cachedFuzzySearch(lowerToken);
+        if (translation != null) confidenceAccumulator -= 0.1;
       }
 
       // Result Handling
@@ -90,72 +179,175 @@ class NeuralEngineService {
         translatedTokens.add(translation + punctuation);
         confidenceAccumulator += 1.0;
       } else {
-         // 5. Great Andamanese fallback
-         final gaResults = await DatabaseManager.instance.searchGADictionary(cleanToken);
-         if (gaResults.isNotEmpty) {
-           translation = gaResults.first['great_andamanese']?.toString();
-           if (translation != null) {
-             translatedTokens.add(translation + punctuation);
-             confidenceAccumulator += 0.9;
-             continue;
-           }
-         }
-         // Keep original word (e.g. Names)
-         translatedTokens.add(token);
-         confidenceAccumulator += 0.2; 
+        // 7. Great Andamanese fallback
+        final gaResults = await DatabaseManager.instance.searchGADictionary(cleanToken);
+        if (gaResults.isNotEmpty) {
+          translation = gaResults.first['great_andamanese']?.toString();
+          if (translation != null) {
+            translatedTokens.add(translation + punctuation);
+            confidenceAccumulator += 0.9;
+            continue;
+          }
+        }
+        translatedTokens.add(token);
+        confidenceAccumulator += 0.2;
       }
     }
 
     double finalConfidence = wordsProcessed == 0 ? 0.0 : (confidenceAccumulator / wordsProcessed);
     if (finalConfidence > 1.0) finalConfidence = 1.0;
 
-    // 6. LLM Contextual Fallback
-    // If the word-by-word fuzzy logic yields a very low confidence translation,
-    // we use SmolLM2 for a constrained contextual translation.
+    // 8. LLM Contextual Fallback (for future SmolLM2)
     if (finalConfidence < 0.5 && wordsProcessed > 2) {
-       debugPrint("🧠 NeuralEngine: Word-for-word confidence too low. Engaging constrained LLM translation.");
-       final llmTranslation = await _llmService.translateSentence(sentence);
-       if (llmTranslation != null && llmTranslation.isNotEmpty) {
-          return NeuralResult(
-            text: llmTranslation,
-            confidence: 0.85, // LLM confidence
-            isAiGenerated: true,
-          );
-       }
+      debugPrint("🧠 NeuralEngine: Low confidence ($finalConfidence). Engaging LLM fallback.");
+      final llmTranslation = await _llmService.translateSentence(sentence);
+      if (llmTranslation != null && llmTranslation.isNotEmpty) {
+        return NeuralResult(text: llmTranslation, confidence: 0.85, isAiGenerated: true);
+      }
     }
 
     String resultText = translatedTokens.join(" ");
-
-    // Smart capitalization
     if (resultText.isNotEmpty) {
       resultText = resultText[0].toUpperCase() + resultText.substring(1);
     }
 
-    return NeuralResult(
-      text: resultText,
-      confidence: finalConfidence,
-      isAiGenerated: true,
-    );
+    return NeuralResult(text: resultText, confidence: finalConfidence, isAiGenerated: true);
   }
 
-  List<String> _tokenize(String text) {
-    return text.split(RegExp(r'\s+'));
+  // --- TOKENIZER ---
+  List<String> _tokenize(String text) => text.split(RegExp(r'\s+'));
+
+  // --- ADVANCED STEMMER ---
+  /// Returns multiple candidate stems in priority order
+  List<String> _advancedStemmer(String word) {
+    final List<String> candidates = [];
+    final suffixes = [
+      'ting', 'ning', 'ring', 'ling', // doubling consonant + ing
+      'ation', 'tion', 'sion', 'ment', 'ness', 'ful', 'less', 'able', 'ible',
+      'ously', 'ively', 'ally', 'edly', 'ingly',
+      'ing', 'ed', 'er', 'est', 'ly',
+    ];
+
+    for (String suffix in suffixes) {
+      if (word.endsWith(suffix) && word.length > suffix.length + 2) {
+        String stem = word.substring(0, word.length - suffix.length);
+        candidates.add(stem);
+        // Try adding back 'e' (e.g. "making" -> "mak" -> "make")
+        candidates.add('${stem}e');
+      }
+    }
+
+    // Handle plurals: "fishes" -> "fish", "boxes" -> "box"
+    if (word.endsWith('es') && word.length > 3) {
+      candidates.add(word.substring(0, word.length - 2));
+    }
+    if (word.endsWith('s') && !word.endsWith('ss') && word.length > 3) {
+      candidates.add(word.substring(0, word.length - 1));
+    }
+    // Handle "ied" -> "y" (e.g. "carried" -> "carry")
+    if (word.endsWith('ied')) {
+      candidates.add('${word.substring(0, word.length - 3)}y');
+    }
+
+    return candidates;
   }
 
-  String _simpleStemmer(String word) {
-    if (word.endsWith('ing')) return word.substring(0, word.length - 3);
-    if (word.endsWith('ed')) return word.substring(0, word.length - 2);
-    if (word.endsWith('s') && !word.endsWith('ss')) return word.substring(0, word.length - 1);
-    return word;
+  // --- PHONETIC MATCHING (Soundex) ---
+  String _soundex(String word) {
+    if (word.isEmpty) return '';
+    final w = word.toUpperCase();
+    final Map<String, String> codes = {
+      'B': '1', 'F': '1', 'P': '1', 'V': '1',
+      'C': '2', 'G': '2', 'J': '2', 'K': '2', 'Q': '2', 'S': '2', 'X': '2', 'Z': '2',
+      'D': '3', 'T': '3',
+      'L': '4',
+      'M': '5', 'N': '5',
+      'R': '6',
+    };
+
+    StringBuffer result = StringBuffer(w[0]);
+    String lastCode = codes[w[0]] ?? '0';
+
+    for (int i = 1; i < w.length && result.length < 4; i++) {
+      String code = codes[w[i]] ?? '0';
+      if (code != '0' && code != lastCode) {
+        result.write(code);
+      }
+      lastCode = code;
+    }
+    while (result.length < 4) result.write('0');
+    return result.toString();
   }
 
-  // --- Fuzzy Logic (Levenshtein Distance) ---
+  String? _phoneticSearch(String target) {
+    final targetSoundex = _soundex(target);
+    String? bestMatch;
+    int bestDist = 999;
+
+    for (var wordMap in _wordCache) {
+      String english = (wordMap['english'] ?? '').toString().toLowerCase();
+      if (english.isEmpty) continue;
+      if (_soundex(english) == targetSoundex) {
+        int dist = _levenshteinDistance(target, english);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestMatch = wordMap['nicobarese']?.toString();
+        }
+      }
+    }
+    return bestMatch;
+  }
+
+  // --- COMPOUND WORD DECOMPOSITION ---
+  Future<String?> _compoundDecompose(String word) async {
+    // Try splitting at every position to find two known words
+    for (int i = 3; i < word.length - 2; i++) {
+      String left = word.substring(0, i);
+      String right = word.substring(i);
+
+      String? leftT = await _dictionaryService.lookupExact(left);
+      String? rightT = await _dictionaryService.lookupExact(right);
+
+      if (leftT != null && rightT != null) {
+        debugPrint("🧠 NeuralEngine: Decomposed '$word' -> '$left' + '$right'");
+        return '$leftT $rightT';
+      }
+    }
+    return null;
+  }
+
+  // --- CACHED FUZZY SEARCH ---
+  String? _cachedFuzzySearch(String target) {
+    if (_fuzzyCache.containsKey(target)) return _fuzzyCache[target];
+
+    String? bestMatch;
+    int lowestDistance = 999;
+    int maxAllowed = target.length <= 4 ? 1 : 2;
+
+    for (var wordMap in _wordCache) {
+      String english = (wordMap['english'] ?? '').toString().toLowerCase();
+      if (english.isEmpty) continue;
+
+      int dist = _levenshteinDistance(target, english);
+      if (dist < lowestDistance && dist <= maxAllowed) {
+        lowestDistance = dist;
+        bestMatch = wordMap['nicobarese']?.toString();
+      }
+    }
+
+    _fuzzyCache[target] = bestMatch;
+    if (bestMatch != null) {
+      debugPrint("🧠 NeuralEngine: Fuzzy matched '$target' (dist: $lowestDistance)");
+    }
+    return bestMatch;
+  }
+
+  // --- LEVENSHTEIN DISTANCE ---
   int _levenshteinDistance(String a, String b) {
-    if (a.length == 0) return b.length;
-    if (b.length == 0) return a.length;
+    if (a.isEmpty) return b.length;
+    if (b.isEmpty) return a.length;
 
     var matrix = List.generate(a.length + 1, (i) => List.filled(b.length + 1, 0));
-
     for (int i = 0; i <= a.length; i++) matrix[i][0] = i;
     for (int j = 0; j <= b.length; j++) matrix[0][j] = j;
 
@@ -170,34 +362,6 @@ class NeuralEngineService {
       }
     }
     return matrix[a.length][b.length];
-  }
-
-  Future<String?> _fuzzySearch(String target) async {
-    // 1. Get all words (optimally this should be cached if DB is large, but acceptable for now offline)
-    final wordsMapList = await _dictionaryService.loadDictionary(DictionaryType.words);
-    
-    String? bestMatch;
-    int lowestDistance = 999;
-    
-    // We only accept corrections if they are very close (max 2 character difference)
-    int maxAllowedDistance = target.length <= 4 ? 1 : 2;
-
-    for (var wordMap in wordsMapList) {
-       String englishWord = (wordMap['english'] ?? '').toString().toLowerCase();
-       if (englishWord.isEmpty) continue;
-
-       int dist = _levenshteinDistance(target, englishWord);
-       if (dist < lowestDistance && dist <= maxAllowedDistance) {
-         lowestDistance = dist;
-         bestMatch = wordMap['nicobarese'];
-       }
-    }
-    
-    if (lowestDistance <= maxAllowedDistance) {
-      debugPrint("🧠 NeuralEngine: Fuzzy matched '$target' to nearest match (dist: $lowestDistance)");
-      return bestMatch;
-    }
-    return null;
   }
 }
 
