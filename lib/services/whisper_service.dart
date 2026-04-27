@@ -15,9 +15,9 @@ class WhisperService {
   bool _isProcessing = false;
   bool _isAvailable = false;
   Whisper? _whisper;
-  WhisperModelSize _currentSize = WhisperModelSize.tiny;
+  WhisperModelSize _currentSize = WhisperModelSize.base; // Upgraded: base multilingual
   
-  // Model mapping
+  // Model file mapping — multilingual variants (no .en suffix)
   static const Map<WhisperModelSize, String> _modelFiles = {
     WhisperModelSize.tiny: 'ggml-tiny.bin',
     WhisperModelSize.base: 'ggml-base.bin',
@@ -41,11 +41,8 @@ class WhisperService {
 
         // Extract from assets if it doesn't exist
         if (!modelFile.existsSync()) {
-          final String assetPath = 'assets/models/ggml-${_currentSize.name}.bin';
-          // Note: .en.bin for tiny as per current project spec
-          final String actualAsset = _currentSize == WhisperModelSize.tiny ? 'assets/models/ggml-tiny.en.bin' : assetPath;
-          
-          debugPrint('[WhisperService] Extracting bundled $modelName from $actualAsset...');
+          final String actualAsset = 'assets/models/${_modelFiles[_currentSize]!}';
+          debugPrint('[WhisperService] Extracting bundled $modelName from $actualAsset (multilingual)...');
           try {
             final ByteData data = await rootBundle.load(actualAsset);
             final List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
