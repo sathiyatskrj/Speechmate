@@ -30,8 +30,9 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.debug
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -39,8 +40,8 @@ android {
         abi {
             enable true
             reset()
-            include 'armeabi-v7a', 'arm64-v8a'
-            universalApk true
+            include 'arm64-v8a'  // Only modern 64-bit ARM; covers 95%+ of Android devices
+            universalApk false   // No fat APK; per-ABI splits keep size minimal
         }
     }
 
