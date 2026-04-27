@@ -38,7 +38,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   // Processing state
   bool _isDetecting = false;
   DateTime _lastFrame = DateTime.now();
-  static const int _throttleMs = 350;
+  static const int _throttleMs = 500; // Increased to reduce UI thread lag
 
   // Extra features
   bool _flashlightOn = false;
@@ -112,7 +112,23 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
             : ImageFormatGroup.bgra8888,
       );
 
-      await _cameraController!.initialize();
+      try {
+        await _cameraController!.initialize();
+      } catch (e) {
+        if (Platform.isAndroid) {
+          debugPrint('[AR] Retrying camera init with YUV420...');
+          _cameraController = CameraController(
+            _camera!,
+            ResolutionPreset.medium,
+            enableAudio: false,
+            imageFormatGroup: ImageFormatGroup.yuv420,
+          );
+          await _cameraController!.initialize();
+        } else {
+          rethrow;
+        }
+      }
+      
       if (!mounted) return;
 
       setState(() => _isCameraReady = true);
@@ -430,23 +446,33 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       body: GestureDetector(
         onTapDown: _onTapToFocus,
         child: Stack(fit: StackFit.expand, children: [
-        // 1. Camera feed
+        // 1. Camera feed and Box Overlay grouped in FittedBox
         if (_isCameraReady && _cameraController != null)
-          _CameraView(controller: _cameraController!)
-        else
-          _buildBootScreen(),
-
-        // 2. Bounding box overlay
-        if (_isCameraReady && _items.isNotEmpty && _cameraController != null)
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _BoxOverlayPainter(
-                items: _items,
-                previewSize: _cameraController!.value.previewSize!,
-                screenSize: MediaQuery.of(context).size,
+          SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: _cameraController!.value.previewSize!.height,
+                height: _cameraController!.value.previewSize!.width,
+                child: Stack(
+                  children: [
+                    CameraPreview(_cameraController!),
+                    if (_items.isNotEmpty)
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _BoxOverlayPainter(
+                            items: _items,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
+          )
+        else
+          _buildBootScreen(),
 
         // 3. HUD scan frame
         if (_isCameraReady && !_isPaused)
@@ -802,25 +828,6 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
 
 // ─────────────────────────── WIDGETS ─────────────────────────────────────────
 
-class _CameraView extends StatelessWidget {
-  final CameraController controller;
-  const _CameraView({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) return const SizedBox.shrink();
-    final size = MediaQuery.of(context).size;
-    var scale = size.aspectRatio * controller.value.aspectRatio;
-    if (scale < 1) scale = 1 / scale;
-    return Transform.scale(
-      scale: scale,
-      child: Center(
-        child: CameraPreview(controller),
-      ),
-    );
-  }
-}
-
 class _BottomBtn extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -875,32 +882,18 @@ class _DetectedItem {
 
 class _BoxOverlayPainter extends CustomPainter {
   final List<_DetectedItem> items;
-  final Size previewSize;
-  final Size screenSize;
 
   const _BoxOverlayPainter({
     required this.items,
-    required this.previewSize,
-    required this.screenSize,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Scale factors: preview is landscape, screen is portrait
-    final scaleX = screenSize.width / previewSize.height;
-    final scaleY = screenSize.height / previewSize.width;
-
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
       if (item.boundingBox == null) continue;
 
-      final box = item.boundingBox!;
-      final scaled = Rect.fromLTRB(
-        box.left * scaleX,
-        box.top * scaleY,
-        box.right * scaleX,
-        box.bottom * scaleY,
-      );
+      final scaled = item.boundingBox!;
 
       final color = i == 0 ? Colors.cyanAccent : Colors.white54;
 

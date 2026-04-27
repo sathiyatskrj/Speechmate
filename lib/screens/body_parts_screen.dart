@@ -174,25 +174,34 @@ class _BodyPartsScreenState extends State<BodyPartsScreen>
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final imgW = constraints.maxWidth;
-                        final imgH = constraints.maxHeight;
-                        return Stack(
-                          children: [
-                            // Body image
-                            Positioned.fill(
-                              child: Image.asset(
-                                'assets/images/body_parts.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                        return Center(
+                          child: AspectRatio(
+                            aspectRatio: 1920 / 2208,
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final imgW = constraints.maxWidth;
+                                final imgH = constraints.maxHeight;
+                                return Stack(
+                                  children: [
+                                    // Body image
+                                    Positioned.fill(
+                                      child: Image.asset(
+                                        'assets/images/body_parts.png',
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
 
-                            // Hotspot buttons
-                            ..._hotspots.map((hotspot) {
-                              final isSelected = _selected != null &&
-                                  (_selected!['english'] ?? _selected!['text'] ?? '').toString().toLowerCase() == hotspot.name.toLowerCase();
-                              return _buildHotspot(hotspot, imgW, imgH, isSelected);
-                            }),
-                          ],
+                                    // Hotspot buttons
+                                    ..._hotspots.map((hotspot) {
+                                      final isSelected = _selected != null &&
+                                          (_selected!['english'] ?? _selected!['text'] ?? '').toString().toLowerCase() == hotspot.name.toLowerCase();
+                                      return _buildHotspot(hotspot, imgW, imgH, isSelected);
+                                    }),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
                         );
                       },
                     ),

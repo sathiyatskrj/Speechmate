@@ -31,6 +31,8 @@ import 'package:speechmate/screens/body_parts_screen.dart';
 import 'package:speechmate/screens/ai_setup_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/core/app_colors.dart';
+import 'package:speechmate/screens/regional_translator_screen.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
 class StudentDash extends StatefulWidget {
   const StudentDash({super.key});
@@ -87,6 +89,13 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words'), "icon": Icons.auto_fix_high_rounded},
     {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
     
+    // --- Regional Translations ---
+    {"word": "Hindi\nTranslator", "emoji": "🇮🇳", "colors": [Color(0xFFD84315), Color(0xFFFF7043)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Hindi', TranslateLanguage.hindi, 'hi-IN', 'नमस्ते')), "icon": Icons.g_translate_rounded},
+    {"word": "Tamil\nTranslator", "emoji": "🛕", "colors": [Color(0xFF2E7D32), Color(0xFF66BB6A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta-IN', 'வணக்கம்')), "icon": Icons.g_translate_rounded},
+    {"word": "Bengali\nTranslator", "emoji": "🐅", "colors": [Color(0xFFC62828), Color(0xFFEF5350)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn-IN', 'নমস্কার')), "icon": Icons.g_translate_rounded},
+    {"word": "Telugu\nTranslator", "emoji": "🌶️", "colors": [Color(0xFF283593), Color(0xFF5C6BC0)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu, 'te-IN', 'నమస్కారం')), "icon": Icons.g_translate_rounded},
+    {"word": "Malayalam\nTranslator", "emoji": "🥥", "colors": [Color(0xFF00695C), Color(0xFF26A69A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Malayalam', TranslateLanguage.malayalam, 'ml-IN', 'നമസ്കാരം')), "icon": Icons.g_translate_rounded},
+
     // --- Advanced / Discovery ---
     {"word": AppStrings.get('andamaneseBeta'), "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GAHubScreen(), "icon": Icons.language_rounded},
     {"word": AppStrings.get('natureHub'), "emoji": "🌿", "colors": [Color(0xFF1B5E20), Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},

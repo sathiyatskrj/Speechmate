@@ -58,6 +58,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
     if (_isProcessing) return; 
     
     try {
+      await _ttsService.stop();
       if (await _audioRecorder.hasPermission()) {
         final Directory tempDir = await getTemporaryDirectory();
         _audioPath = '${tempDir.path}/translation_${DateTime.now().millisecondsSinceEpoch}.wav';
@@ -115,13 +116,12 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
 
     if (path != null && File(path).existsSync()) {
       try {
-        final String transcription = await _whisperService.transcribe(path);
+        final String transcription = await _whisperService.transcribe(path).timeout(const Duration(seconds: 15));
         
         if (transcription.trim().isEmpty) {
           if (mounted) {
             setState(() {
               _englishText = "Could not understand audio. Try again.";
-              _isProcessing = false;
             });
           }
           return;
@@ -134,12 +134,11 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
           });
         }
 
-        final result = await _neuralEngine.predict(transcription);
+        final result = await _neuralEngine.predict(transcription).timeout(const Duration(seconds: 10));
         
         if (mounted) {
           setState(() {
             _nicobareseText = result.text;
-            _isProcessing = false;
           });
         }
 
@@ -151,9 +150,10 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
           setState(() {
             _englishText = "Error processing audio. Try again.";
             _nicobareseText = "Translation will appear here";
-            _isProcessing = false;
           });
         }
+      } finally {
+        if (mounted) setState(() => _isProcessing = false);
       }
     } else {
       if (mounted) {
