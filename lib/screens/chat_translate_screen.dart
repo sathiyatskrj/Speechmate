@@ -269,7 +269,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withOpacity(0.1),
+                                              color: Colors.black.withValues(alpha: 0.1),
                                               blurRadius: 8,
                                               offset: const Offset(0, 2),
                                             ),
@@ -327,7 +327,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                         ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF1E1E2C),
-                          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+                          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
                         ),
                         child: Row(
                           children: [
@@ -379,7 +379,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.teal.withOpacity(0.3),
+                                    color: Colors.teal.withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),

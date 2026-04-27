@@ -294,12 +294,12 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
               margin: const EdgeInsets.all(24),
               padding: const EdgeInsets.all(30),
               decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 30, offset: const Offset(0, 15))
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 30, offset: const Offset(0, 15))
                   ],
-                  border: Border.all(color: Colors.white.withOpacity(0.2))
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2))
               ),
               child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -323,7 +323,7 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
                               decoration: BoxDecoration(
                                   gradient: const LinearGradient(colors: [Colors.blue, Colors.cyan]), 
                                   shape: BoxShape.circle,
-                                  boxShadow: [BoxShadow(color: Colors.cyan.withOpacity(0.4), blurRadius: 15, spreadRadius: 2)]
+                                  boxShadow: [BoxShadow(color: Colors.cyan.withValues(alpha: 0.4), blurRadius: 15, spreadRadius: 2)]
                               ),
                               child: const Icon(Icons.volume_up_rounded, size: 40, color: Colors.white),
                           ),
@@ -374,7 +374,7 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
                         width: double.infinity,
                         padding: const EdgeInsets.all(30),
                         decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.95),
+                            color: Colors.white.withValues(alpha: 0.95),
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0,10))],
                         ),

@@ -103,7 +103,7 @@ class _AuroraPainter extends CustomPainter {
   }
 
   void _drawRibbon(Canvas canvas, Size size, Paint paint, Color color, int index, double direction, double intensity) {
-    paint.color = color.withOpacity(0.15 + (intensity * 0.1));
+    paint.color = color.withValues(alpha: 0.15 + (intensity * 0.1));
     
     final path = Path();
     final double yOffset = size.height * 0.3 * index;

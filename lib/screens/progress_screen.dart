@@ -185,7 +185,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                         backDrawRodData: BackgroundBarChartRodData(
                                           show: true,
                                           toY: 1.0,
-                                          color: Colors.blue.withOpacity(0.1),
+                                          color: Colors.blue.withValues(alpha: 0.1),
                                         ),
                                       ),
                                     ],
@@ -222,7 +222,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 32),

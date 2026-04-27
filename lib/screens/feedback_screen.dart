@@ -69,7 +69,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.white.withOpacity(0.9),
+        backgroundColor: Colors.white.withValues(alpha: 0.9),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Column(
           children: [
@@ -157,7 +157,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -174,7 +174,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.white24),
                   ),
@@ -213,7 +213,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     hintText: "Share your thoughts...",
                     hintStyle: const TextStyle(color: Colors.white30),
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
+                    fillColor: Colors.white.withValues(alpha: 0.1),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,
@@ -237,7 +237,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       backgroundColor: Colors.pinkAccent,
                       foregroundColor: Colors.white,
                       elevation: 8,
-                      shadowColor: Colors.pinkAccent.withOpacity(0.5),
+                      shadowColor: Colors.pinkAccent.withValues(alpha: 0.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),

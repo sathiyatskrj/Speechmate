@@ -300,7 +300,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
         x: x, y: y,
         vx: cos(angle) * speed,
         vy: sin(angle) * speed,
-        color: color.withOpacity(0.8),
+        color: color.withValues(alpha: 0.8),
         size: _rnd.nextDouble() * 8 + 2
       ));
     }
@@ -381,7 +381,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
           x: _playerX + 25, y: 5, 
           vx: (_rnd.nextDouble() - 0.5) * 5, 
           vy: 0, 
-          color: Colors.white.withOpacity(0.5)
+          color: Colors.white.withValues(alpha: 0.5)
         ));
       }
     }
@@ -417,8 +417,8 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
             child: Stack(
               children: [
                 // 1. Parallax Layers
-                _buildParallaxLayer(speed: 0.2, color: Colors.white.withOpacity(0.2), icon: Icons.cloud, size: 100, y: 100),
-                _buildParallaxLayer(speed: 0.5, color: Colors.white.withOpacity(0.1), icon: Icons.cloud, size: 60, y: 200),
+                _buildParallaxLayer(speed: 0.2, color: Colors.white.withValues(alpha: 0.2), icon: Icons.cloud, size: 100, y: 100),
+                _buildParallaxLayer(speed: 0.5, color: Colors.white.withValues(alpha: 0.1), icon: Icons.cloud, size: 60, y: 200),
                 _buildParallaxLayer(speed: 0.8, color: Colors.black12, icon: Icons.landscape, size: 200, y: MediaQuery.of(context).size.height - 150),
                 
                 // 2. Game View (Custom Painter for performance with particles)
@@ -510,7 +510,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
     return Column(
       children: [
         Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
-        Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.w900, shadows: [Shadow(color: color.withOpacity(0.5), blurRadius: 10)])),
+        Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.w900, shadows: [Shadow(color: color.withValues(alpha: 0.5), blurRadius: 10)])),
       ],
     );
   }
@@ -663,7 +663,7 @@ class GamePainter extends CustomPainter {
     for (var p in particles) {
       double pY = size.height - groundHeight - p.y;
       particlePaint.color = p.color;
-      if (p.life < 0.3) particlePaint.color = p.color.withOpacity(p.life * 3);
+      if (p.life < 0.3) particlePaint.color = p.color.withValues(alpha: p.life * 3);
       
       canvas.drawCircle(Offset(p.x, pY), p.size, particlePaint);
     }

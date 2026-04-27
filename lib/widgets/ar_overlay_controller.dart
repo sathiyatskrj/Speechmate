@@ -72,7 +72,7 @@ class LiveTextOverlayPainter extends CustomPainter {
      // 2. Center Crosshair
      final Offset center = rect.center;
      final Paint crosshairPaint = Paint()
-       ..color = hudColor.withOpacity(0.5)
+       ..color = hudColor.withValues(alpha: 0.5)
        ..style = PaintingStyle.stroke
        ..strokeWidth = 1.0;
      canvas.drawLine(Offset(center.dx - 10, center.dy), Offset(center.dx + 10, center.dy), crosshairPaint);
@@ -84,7 +84,7 @@ class LiveTextOverlayPainter extends CustomPainter {
      final double lineEndY = rect.top - 20;
      
      final Paint linePaint = Paint()
-       ..color = hudColor.withOpacity(0.7)
+       ..color = hudColor.withValues(alpha: 0.7)
        ..style = PaintingStyle.stroke
        ..strokeWidth = 1.5;
        
@@ -99,7 +99,7 @@ class LiveTextOverlayPainter extends CustomPainter {
      canvas.drawRect(infoRect, bgPaint);
      
      final Paint infoBorderPaint = Paint()
-       ..color = hudColor.withOpacity(0.5)
+       ..color = hudColor.withValues(alpha: 0.5)
        ..style = PaintingStyle.stroke
        ..strokeWidth = 1.0;
      canvas.drawRect(infoRect, infoBorderPaint);
@@ -117,7 +117,7 @@ class LiveTextOverlayPainter extends CustomPainter {
           if (currentY > infoRect.bottom - 15) break;
           String text = "${entry.key.toUpperCase()}: ${entry.value}";
           if (text.length > 20) text = "${text.substring(0, 18)}...";
-          _drawText(canvas, text, lineEndX + 5, currentY, hudColor.withOpacity(0.8), 9, false);
+          _drawText(canvas, text, lineEndX + 5, currentY, hudColor.withValues(alpha: 0.8), 9, false);
           currentY += 12;
        }
      }
@@ -148,7 +148,7 @@ class LiveTextOverlayPainter extends CustomPainter {
 
       // Draw background box with rounded corners
       final Paint bgPaint = Paint()
-        ..color = Colors.black.withOpacity(0.75)
+        ..color = Colors.black.withValues(alpha: 0.75)
         ..style = PaintingStyle.fill;
       canvas.drawRRect(RRect.fromRectAndRadius(scaledRect, const Radius.circular(8)), bgPaint);
 
@@ -182,7 +182,7 @@ class LiveTextOverlayPainter extends CustomPainter {
       // Draw small original text label above box
       final TextSpan origSpan = TextSpan(
         style: TextStyle(
-          color: accentColor.withOpacity(0.8),
+          color: accentColor.withValues(alpha: 0.8),
           fontSize: 9,
           fontWeight: FontWeight.w500,
         ),

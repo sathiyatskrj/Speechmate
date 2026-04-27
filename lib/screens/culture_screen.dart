@@ -175,9 +175,9 @@ class _CultureScreenState extends State<CultureScreen> with SingleTickerProvider
           Container(
              padding: const EdgeInsets.all(20),
              decoration: BoxDecoration(
-               color: Colors.white.withOpacity(0.05),
+               color: Colors.white.withValues(alpha: 0.05),
                borderRadius: BorderRadius.circular(20),
-               border: Border.all(color: Colors.white.withOpacity(0.1)),
+               border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
              ),
              child: const Column(
                children: [
@@ -202,9 +202,9 @@ class _CultureScreenState extends State<CultureScreen> with SingleTickerProvider
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [color.withOpacity(0.2), color.withOpacity(0.05)]),
+        gradient: LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.05)]),
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -230,9 +230,9 @@ class _CultureScreenState extends State<CultureScreen> with SingleTickerProvider
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,7 +253,7 @@ class _CultureScreenState extends State<CultureScreen> with SingleTickerProvider
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(color: Colors.cyanAccent.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: Colors.cyanAccent.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
             child: Text(year, style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 15),
@@ -274,7 +274,7 @@ class _CultureScreenState extends State<CultureScreen> with SingleTickerProvider
 
   Widget _buildInteractiveCard({required String title, required String content}) {
     return Card(
-      color: Colors.white.withOpacity(0.05),
+      color: Colors.white.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       margin: const EdgeInsets.only(bottom: 15),
       child: ExpansionTile(
@@ -295,9 +295,9 @@ class _CultureScreenState extends State<CultureScreen> with SingleTickerProvider
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.1)),
+        border: Border.all(color: color.withValues(alpha: 0.1)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

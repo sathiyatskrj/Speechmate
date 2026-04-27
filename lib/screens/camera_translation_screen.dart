@@ -603,7 +603,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                      decoration: BoxDecoration(
                        color: Colors.black54,
                        borderRadius: BorderRadius.circular(20),
-                       border: Border.all(color: Colors.cyanAccent.withOpacity(0.5)),
+                       border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.5)),
                      ),
                      child: DropdownButtonHideUnderline(
                        child: DropdownButton<String>(
@@ -679,9 +679,9 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                     width: 300,
                     height: 150,
                     decoration: BoxDecoration(
-                       border: Border.all(color: Colors.cyanAccent.withOpacity(0.5), width: 2),
+                       border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.5), width: 2),
                        borderRadius: BorderRadius.circular(12),
-                       color: Colors.cyanAccent.withOpacity(0.05),
+                       color: Colors.cyanAccent.withValues(alpha: 0.05),
                     ),
                  ),
               ),
@@ -704,7 +704,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                      gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [Colors.black.withOpacity(0.8), Colors.black.withOpacity(0.0)],
+                        colors: [Colors.black.withValues(alpha: 0.8), Colors.black.withValues(alpha: 0.0)],
                      )
                   ),
                   child: Row(
@@ -740,7 +740,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                               decoration: BoxDecoration(
                                  shape: BoxShape.circle,
                                  border: Border.all(color: _isLiveMode ? Colors.grey : Colors.cyanAccent, width: 4),
-                                 color: Colors.white.withOpacity(0.3),
+                                 color: Colors.white.withValues(alpha: 0.3),
                               ),
                               child: _isProcessing 
                                 ? const Center(child: CircularProgressIndicator(color: Colors.cyanAccent))

@@ -34,11 +34,11 @@ class TranslationCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isError ? Colors.redAccent.withOpacity(0.1) : Colors.white.withOpacity(0.1),
+        color: isError ? Colors.redAccent.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: isError ? Colors.redAccent.withOpacity(0.3) : Colors.white.withOpacity(0.2)),
+        border: Border.all(color: isError ? Colors.redAccent.withValues(alpha: 0.3) : Colors.white.withValues(alpha: 0.2)),
         boxShadow: [
-             BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 15, offset: const Offset(0, 5))
+             BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 5))
         ]
       ),
       child: Column(

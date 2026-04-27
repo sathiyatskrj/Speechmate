@@ -259,7 +259,7 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E2C),
-                border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1))),
+                border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
               ),
               child: Row(
                 children: [
@@ -268,7 +268,7 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: _isListening ? Colors.redAccent : Colors.grey.withOpacity(0.2),
+                        color: _isListening ? Colors.redAccent : Colors.grey.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(_isListening ? Icons.mic : Icons.mic_none, color: Colors.white, size: 24),

@@ -47,10 +47,10 @@ class _SmartDashboardHeaderState extends State<SmartDashboardHeader> {
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.white.withOpacity(0.1), Colors.white.withOpacity(0.05)]
+          colors: [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.05)]
         ),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
-        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.1))),
+        border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

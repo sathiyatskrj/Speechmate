@@ -90,11 +90,11 @@ class _MemoryPalaceScreenState extends State<MemoryPalaceScreen> {
                                Container(
                                  padding: const EdgeInsets.all(12),
                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.1),
+                                    color: Colors.white.withValues(alpha: 0.1),
                                     shape: BoxShape.circle,
                                     border: Border.all(color: node['color'], width: 2),
                                     boxShadow: [
-                                      BoxShadow(color: node['color'].withOpacity(0.2), blurRadius: 10)
+                                      BoxShadow(color: node['color'].withValues(alpha: 0.2), blurRadius: 10)
                                     ]
                                  ),
                                  child: Icon(node['icon'], color: node['color'], size: 30),

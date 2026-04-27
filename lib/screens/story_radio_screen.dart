@@ -165,7 +165,7 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
                       padding: EdgeInsets.all(_isRecording ? 30 : 20),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _isRecording ? Colors.redAccent : Colors.cyan.withOpacity(0.2),
+                        color: _isRecording ? Colors.redAccent : Colors.cyan.withValues(alpha: 0.2),
                         border: Border.all(color: Colors.cyan, width: 2),
                       ),
                       child: Icon(_isRecording ? Icons.stop : Icons.mic, size: 40, color: _isRecording ? Colors.white : Colors.cyan),
@@ -234,7 +234,7 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
                           final isPlaying = _playingStoryId == story['id'];
                           
                           return Card(
-                            color: Colors.white.withOpacity(isPlaying ? 0.2 : 0.1),
+                            color: Colors.white.withValues(alpha: isPlaying ? 0.2 : 0.1),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                               side: BorderSide(color: isPlaying ? Colors.amberAccent : Colors.transparent, width: 2),

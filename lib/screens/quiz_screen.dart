@@ -217,7 +217,7 @@ class _QuizScreenState extends State<QuizScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               AppColors.studentAccent.withOpacity(0.8),
+               AppColors.studentAccent.withValues(alpha: 0.8),
                Colors.black
             ]
           )
@@ -238,10 +238,10 @@ class _QuizScreenState extends State<QuizScreen> {
                    Container(
                      padding: const EdgeInsets.all(30),
                      decoration: BoxDecoration(
-                       color: Colors.white.withOpacity(0.1),
+                       color: Colors.white.withValues(alpha: 0.1),
                        borderRadius: BorderRadius.circular(20),
                        border: Border.all(color: Colors.white24),
-                       boxShadow: [BoxShadow(blurRadius: 10, color: AppColors.studentAccent.withOpacity(0.2))]
+                       boxShadow: [BoxShadow(blurRadius: 10, color: AppColors.studentAccent.withValues(alpha: 0.2))]
                      ),
                      child: Column(
                        children: [
@@ -272,7 +272,7 @@ class _QuizScreenState extends State<QuizScreen> {
                        padding: const EdgeInsets.only(bottom: 12),
                        child: ElevatedButton(
                          style: ElevatedButton.styleFrom(
-                           backgroundColor: color == Colors.white ? Colors.white.withOpacity(0.2) : color,
+                           backgroundColor: color == Colors.white ? Colors.white.withValues(alpha: 0.2) : color,
                            padding: const EdgeInsets.symmetric(vertical: 16),
                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: color == Colors.white ? Colors.white24 : color)),
                          ),

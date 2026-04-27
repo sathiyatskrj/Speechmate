@@ -308,7 +308,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white24),
             ),
@@ -340,7 +340,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
                   label: Text(pos, style: TextStyle(color: isSelected ? Colors.white : Colors.white70, fontSize: 12)),
                   selected: isSelected,
                   onSelected: (_) => _filterByPOS(pos),
-                  backgroundColor: Colors.white.withOpacity(0.08),
+                  backgroundColor: Colors.white.withValues(alpha: 0.08),
                   selectedColor: Colors.deepPurpleAccent,
                   checkmarkColor: Colors.white,
                 ),
@@ -364,7 +364,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: Colors.white10),
                       ),
@@ -382,7 +382,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
                                     padding: const EdgeInsets.only(top: 4),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(color: Colors.deepPurple.withOpacity(0.3), borderRadius: BorderRadius.circular(8)),
+                                      decoration: BoxDecoration(color: Colors.deepPurple.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(8)),
                                       child: Text(pos, style: const TextStyle(color: Colors.white54, fontSize: 11)),
                                     ),
                                   ),
@@ -425,7 +425,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white24),
             ),
@@ -457,9 +457,9 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.deepPurple.withOpacity(0.3), Colors.indigo.withOpacity(0.2)]),
+                gradient: LinearGradient(colors: [Colors.deepPurple.withValues(alpha: 0.3), Colors.indigo.withValues(alpha: 0.2)]),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.amberAccent.withOpacity(0.3)),
+                border: Border.all(color: Colors.amberAccent.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,9 +508,9 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
                 height: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _isProcessingVoice ? Colors.grey.withOpacity(0.3) : _isRecording ? Colors.pinkAccent : Colors.deepPurpleAccent,
+                  color: _isProcessingVoice ? Colors.grey.withValues(alpha: 0.3) : _isRecording ? Colors.pinkAccent : Colors.deepPurpleAccent,
                   boxShadow: [
-                    if (_isRecording) BoxShadow(color: Colors.pinkAccent.withOpacity(0.5), blurRadius: 25, spreadRadius: 8),
+                    if (_isRecording) BoxShadow(color: Colors.pinkAccent.withValues(alpha: 0.5), blurRadius: 25, spreadRadius: 8),
                   ],
                 ),
                 child: _isProcessingVoice
@@ -530,7 +530,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.white24),
                 ),
@@ -570,7 +570,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
           Container(
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
+              color: Colors.white.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(25),
               border: Border.all(color: Colors.white24),
             ),
@@ -604,7 +604,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.white24),
               ),
@@ -624,9 +624,9 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.deepPurple.withOpacity(0.3), Colors.indigo.withOpacity(0.2)]),
+                gradient: LinearGradient(colors: [Colors.deepPurple.withValues(alpha: 0.3), Colors.indigo.withValues(alpha: 0.2)]),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.amberAccent.withOpacity(0.3)),
+                border: Border.all(color: Colors.amberAccent.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,9 +648,9 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orangeAccent.withOpacity(0.15),
+        color: Colors.orangeAccent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orangeAccent.withOpacity(0.4)),
+        border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.4)),
       ),
       child: const Row(
         children: [

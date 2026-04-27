@@ -140,9 +140,9 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.orangeAccent.withOpacity(0.15),
+        color: Colors.orangeAccent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orangeAccent.withOpacity(0.4)),
+        border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.4)),
       ),
       child: const Row(
         children: [
@@ -169,7 +169,7 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.white24),
             ),
@@ -206,7 +206,7 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
                   )),
                   selected: isSelected,
                   onSelected: (_) => _filterByPOS(pos),
-                  backgroundColor: Colors.white.withOpacity(0.08),
+                  backgroundColor: Colors.white.withValues(alpha: 0.08),
                   selectedColor: Colors.deepPurpleAccent,
                   checkmarkColor: Colors.white,
                 ),
@@ -245,7 +245,7 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white10),
       ),
@@ -276,7 +276,7 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple.withOpacity(0.3),
+                        color: Colors.deepPurple.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(pos,
@@ -334,8 +334,8 @@ class _GreatAndamaneseScreenState extends State<GreatAndamaneseScreen>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.deepPurple.withOpacity(0.3),
-                Colors.indigo.withOpacity(0.2),
+                Colors.deepPurple.withValues(alpha: 0.3),
+                Colors.indigo.withValues(alpha: 0.2),
               ],
             ),
             borderRadius: BorderRadius.circular(18),

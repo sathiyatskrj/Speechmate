@@ -28,7 +28,7 @@ class GamificationHeader extends StatelessWidget {
               ),
               CircleAvatar(
                 radius: 24,
-                backgroundColor: Colors.white.withOpacity(0.2),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
                 child: Text(
                   "${GamificationService.currentLevel}",
                   style: const TextStyle(
@@ -65,12 +65,12 @@ class GamificationHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.2),
+              color: Colors.orange.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.orange.withOpacity(0.5)),
+              border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
               boxShadow: [
                 BoxShadow(
-                   color: Colors.orange.withOpacity(0.1),
+                   color: Colors.orange.withValues(alpha: 0.1),
                    blurRadius: 10,
                    spreadRadius: 2
                 )

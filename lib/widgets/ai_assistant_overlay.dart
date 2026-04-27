@@ -121,7 +121,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> {
         if (!_isRecording && !_isProcessing) widget.onClose();
       },
       child: Container(
-        color: Colors.black.withOpacity(0.6),
+        color: Colors.black.withValues(alpha: 0.6),
         child: Center(
           child: GestureDetector(
             onTap: () {}, // Prevent tap from closing
@@ -131,7 +131,7 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> {
                 color: const Color(0xFF1E1E2C),
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
-                  BoxShadow(color: AppColors.studentAccent.withOpacity(0.3), blurRadius: 20)
+                  BoxShadow(color: AppColors.studentAccent.withValues(alpha: 0.3), blurRadius: 20)
                 ],
               ),
               width: 320,
@@ -171,13 +171,13 @@ class _AiAssistantOverlayState extends State<AiAssistantOverlay> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _isProcessing 
-                            ? Colors.grey.withOpacity(0.3) 
+                            ? Colors.grey.withValues(alpha: 0.3) 
                             : _isRecording 
                                 ? Colors.pinkAccent 
                                 : AppColors.studentAccent,
                         boxShadow: [
                           if (_isRecording)
-                            BoxShadow(color: Colors.pinkAccent.withOpacity(0.5), blurRadius: 20, spreadRadius: 5)
+                            BoxShadow(color: Colors.pinkAccent.withValues(alpha: 0.5), blurRadius: 20, spreadRadius: 5)
                         ],
                       ),
                       child: _isProcessing 

@@ -103,7 +103,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
           color: const Color(0xFF1A1A24),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
           boxShadow: [
-            BoxShadow(color: AppColors.studentAccent.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, -5))
+            BoxShadow(color: AppColors.studentAccent.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, -5))
           ],
         ),
         child: Column(
@@ -173,7 +173,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.white10)
         ),
@@ -219,7 +219,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.studentAccent.withOpacity(0.8),
+              AppColors.studentAccent.withValues(alpha: 0.8),
               Colors.black,
             ],
           ),
@@ -273,12 +273,12 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
       onTap: () => _showLinguisticAnalysis(item),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(25),
           border: Border.all(color: Colors.white24),
           boxShadow: [
             BoxShadow(
-              color: AppColors.studentAccent.withOpacity(0.15),
+              color: AppColors.studentAccent.withValues(alpha: 0.15),
               blurRadius: 15,
               offset: const Offset(0, 8),
             )
@@ -290,7 +290,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
                 ),
                 child: Center(

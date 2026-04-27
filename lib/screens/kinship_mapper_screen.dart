@@ -100,11 +100,11 @@ class _KinshipMapperScreenState extends State<KinshipMapperScreen> {
         width: 150,
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: isSelf ? Colors.amberAccent : Colors.white.withOpacity(0.1),
+          color: isSelf ? Colors.amberAccent : Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: isSelf ? Colors.orange : Colors.white24, width: 2),
           boxShadow: [
-            if (isSelf) BoxShadow(color: Colors.orange.withOpacity(0.5), blurRadius: 15)
+            if (isSelf) BoxShadow(color: Colors.orange.withValues(alpha: 0.5), blurRadius: 15)
           ],
         ),
         child: Column(
@@ -176,7 +176,7 @@ class KinshipTreePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.amberAccent.withOpacity(0.4)
+      ..color = Colors.amberAccent.withValues(alpha: 0.4)
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);

@@ -99,7 +99,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             colors: _isAdmin 
                 ? [Colors.black87, Colors.black] 
                 : [
-                    AppColors.studentAccent.withOpacity(0.8),
+                    AppColors.studentAccent.withValues(alpha: 0.8),
                     Colors.black
                   ],
           )
@@ -193,7 +193,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget _buildSyncBanner() {
       return Container(
           width: double.infinity,
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -211,10 +211,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
       margin: const EdgeInsets.only(bottom: 20, top: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         border: Border.all(color: Colors.white24),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10)]
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10)]
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,7 +244,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   Widget _buildTag(String text) {
     return Chip(
       label: Text(text),
-      backgroundColor: AppColors.studentAccent.withOpacity(0.2),
+      backgroundColor: AppColors.studentAccent.withValues(alpha: 0.2),
       labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       side: const BorderSide(color: Colors.white24),
     );
@@ -257,12 +257,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: _isAdmin && post.isVerified ? Border.all(color: Colors.green, width: 2) : Border.all(color: Colors.white24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

@@ -174,7 +174,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
                       itemCount: _contributions.length,
                       itemBuilder: (context, index) {
                         return Card(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           margin: const EdgeInsets.only(bottom: 8),
                           child: ListTile(
                             leading: const Icon(Icons.check_circle, color: Colors.greenAccent, size: 16),
@@ -206,11 +206,11 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
                 padding: EdgeInsets.all(_isRecording ? 40 : 30),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _isRecording ? Colors.redAccent : Colors.cyanAccent.withOpacity(0.2),
+                  color: _isRecording ? Colors.redAccent : Colors.cyanAccent.withValues(alpha: 0.2),
                   border: Border.all(color: Colors.cyanAccent, width: 2),
                   boxShadow: [
                     if (_isRecording)
-                      BoxShadow(color: Colors.redAccent.withOpacity(0.5), blurRadius: 20, spreadRadius: 5)
+                      BoxShadow(color: Colors.redAccent.withValues(alpha: 0.5), blurRadius: 20, spreadRadius: 5)
                   ]
                 ),
                 child: Icon(
@@ -230,7 +230,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -283,7 +283,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
       itemBuilder: (context, index) {
         final review = _pendingReviews[index];
         return Card(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withValues(alpha: 0.1),
           margin: const EdgeInsets.only(bottom: 15),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           child: Padding(
@@ -360,7 +360,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
            onSelected: (val) => setState(() => _isElderMode = false),
            selectedColor: Colors.cyanAccent,
            labelStyle: TextStyle(color: !_isElderMode ? Colors.black : Colors.white),
-           backgroundColor: Colors.white.withOpacity(0.1),
+           backgroundColor: Colors.white.withValues(alpha: 0.1),
          ),
          const SizedBox(width: 15),
          ChoiceChip(
@@ -369,7 +369,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
            onSelected: (val) => setState(() => _isElderMode = true),
            selectedColor: Colors.purpleAccent,
            labelStyle: TextStyle(color: _isElderMode ? Colors.white : Colors.white),
-           backgroundColor: Colors.white.withOpacity(0.1),
+           backgroundColor: Colors.white.withValues(alpha: 0.1),
          ),
        ],
     );

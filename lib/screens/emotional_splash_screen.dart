@@ -192,7 +192,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                                ),
                                boxShadow: [
                                  BoxShadow(
-                                   color: Colors.cyanAccent.withOpacity(0.5),
+                                   color: Colors.cyanAccent.withValues(alpha: 0.5),
                                    blurRadius: 60 * _logoScale.value,
                                    spreadRadius: 10,
                                  )
@@ -241,7 +241,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                                       letterSpacing: 8.0,
                                       height: 1.0,
                                       shadows: [
-                                        Shadow(color: Colors.cyan.withOpacity(0.5), blurRadius: 30, offset: const Offset(0,10))
+                                        Shadow(color: Colors.cyan.withValues(alpha: 0.5), blurRadius: 30, offset: const Offset(0,10))
                                       ]
                                     ),
                                   ),
@@ -256,7 +256,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.white.withOpacity(0.6 + (0.4 * _pulseController.value)),
+                                        color: Colors.white.withValues(alpha: 0.6 + (0.4 * _pulseController.value)),
                                         letterSpacing: 2.0,
                                       ),
                                     );
@@ -298,7 +298,7 @@ class Particle {
        vy = (r.nextDouble() - 0.5) * 0.0015,
        radius = r.nextDouble() * 10 + 10, // Size for text
        char = _getRandomChar(r),
-       color = Colors.white.withOpacity(0.3 + r.nextDouble() * 0.4);
+       color = Colors.white.withValues(alpha: 0.3 + r.nextDouble() * 0.4);
 
   static String _getRandomChar(math.Random r) {
     // User Provided Tribal Scripts
@@ -355,10 +355,10 @@ class ConstellationPainter extends CustomPainter {
        final textSpan = TextSpan(
          text: p1.char,
          style: TextStyle(
-           color: p1.color.withOpacity(0.5 + (0.3 * math.sin(pulse * math.pi))),
+           color: p1.color.withValues(alpha: 0.5 + (0.3 * math.sin(pulse * math.pi))),
            fontSize: p1.radius,
            fontWeight: FontWeight.bold,
-           shadows: [Shadow(color: Colors.cyanAccent.withOpacity(0.5), blurRadius: 4)]
+           shadows: [Shadow(color: Colors.cyanAccent.withValues(alpha: 0.5), blurRadius: 4)]
          ),
        );
        final textPainter = TextPainter(
@@ -377,7 +377,7 @@ class ConstellationPainter extends CustomPainter {
          
          if (dist < 90) { // Connection threshold
             final double opacity = (1.0 - (dist / 90)) * 0.4;
-            paint.color = Colors.cyan.withOpacity(opacity);
+            paint.color = Colors.cyan.withValues(alpha: opacity);
             paint.strokeWidth = 1.0;
             canvas.drawLine(pos1, pos2, paint);
          }

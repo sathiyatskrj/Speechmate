@@ -32,10 +32,10 @@ class GlassContainer extends StatelessWidget {
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(opacity),
+              color: Colors.white.withValues(alpha: opacity),
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 1.5,
               ),
               gradient: gradientColors != null 
@@ -46,15 +46,15 @@ class GlassContainer extends StatelessWidget {
                     )
                   : LinearGradient(
                       colors: [
-                        Colors.white.withOpacity(opacity + 0.1),
-                        Colors.white.withOpacity(opacity),
+                        Colors.white.withValues(alpha: opacity + 0.1),
+                        Colors.white.withValues(alpha: opacity),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 15,
                   spreadRadius: 2,
                   offset: const Offset(0, 8),

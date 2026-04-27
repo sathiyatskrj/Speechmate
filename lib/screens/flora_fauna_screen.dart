@@ -111,7 +111,7 @@ class _FloraFaunaScreenState extends State<FloraFaunaScreen> {
 
   Widget _buildNatureCard(Map<String, dynamic> item) {
     return Card(
-      color: Colors.white.withOpacity(0.1),
+      color: Colors.white.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 0,
       child: InkWell(
@@ -129,7 +129,7 @@ class _FloraFaunaScreenState extends State<FloraFaunaScreen> {
                 width: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                 ),
                 child: const Icon(Icons.eco, size: 40, color: Colors.greenAccent)
                     .animate(onPlay: (controller) => controller.repeat(reverse: true))

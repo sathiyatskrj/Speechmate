@@ -136,12 +136,12 @@ class _PronunciationWaveformVisualizerState extends State<PronunciationWaveformV
             height: widget.isRecording ? _heights[index] : 10,
             decoration: BoxDecoration(
               color: widget.isRecording 
-                  ? widget.activeColor.withOpacity(_random.nextDouble() * 0.5 + 0.5) 
+                  ? widget.activeColor.withValues(alpha: _random.nextDouble() * 0.5 + 0.5) 
                   : widget.inactiveColor,
               borderRadius: BorderRadius.circular(2),
               boxShadow: widget.isRecording ? [
                 BoxShadow(
-                  color: widget.activeColor.withOpacity(0.4),
+                  color: widget.activeColor.withValues(alpha: 0.4),
                   blurRadius: 4,
                   spreadRadius: 1,
                 )

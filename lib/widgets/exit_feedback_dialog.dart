@@ -17,10 +17,10 @@ class ExitFeedbackDialog extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 20,
                 offset: const Offset(0, 10))
           ],
@@ -32,7 +32,7 @@ class ExitFeedbackDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.pinkAccent.withOpacity(0.2),
+                color: Colors.pinkAccent.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.favorite_rounded,
@@ -62,7 +62,7 @@ class ExitFeedbackDialog extends StatelessWidget {
                       SystemNavigator.pop(); // Exit app
                     },
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.white.withOpacity(0.3)),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
@@ -86,7 +86,7 @@ class ExitFeedbackDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
-                      shadowColor: Colors.pinkAccent.withOpacity(0.4),
+                      shadowColor: Colors.pinkAccent.withValues(alpha: 0.4),
                       elevation: 8,
                     ),
                     child: const Text("Rate Us",

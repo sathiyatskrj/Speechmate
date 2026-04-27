@@ -41,7 +41,7 @@ class _LanguagesState extends State<Languages> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppColors.studentAccent.withOpacity(0.4), Colors.black],
+                colors: [AppColors.studentAccent.withValues(alpha: 0.4), Colors.black],
               ),
             ),
           ),
@@ -120,7 +120,7 @@ class _LanguagesState extends State<Languages> {
             decoration: BoxDecoration(
               gradient: LinearGradient(colors: colors),
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: colors.first.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5))],
+              boxShadow: [BoxShadow(color: colors.first.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 5))],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -87,7 +87,7 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               AppColors.studentAccent.withOpacity(0.8),
+               AppColors.studentAccent.withValues(alpha: 0.8),
                Colors.black
             ]
           )
@@ -103,7 +103,7 @@ class _CommonPhrasesScreenState extends State<CommonPhrasesScreen> {
                   return Card(
                     elevation: 4,
                     margin: const EdgeInsets.only(bottom: 12),
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: const BorderSide(color: Colors.white24)),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),

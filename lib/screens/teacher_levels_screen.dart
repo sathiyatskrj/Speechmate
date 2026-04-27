@@ -120,13 +120,13 @@ class _TeacherLevelsScreenState extends State<TeacherLevelsScreen> {
                   boxShadow: [
                     if (!isLocked)
                       BoxShadow(
-                        color: (isCurrent ? Colors.cyan : Colors.green).withOpacity(0.6),
+                        color: (isCurrent ? Colors.cyan : Colors.green).withValues(alpha: 0.6),
                         blurRadius: 20,
                         spreadRadius: 5,
                       )
                   ],
                   border: Border.all(
-                      color: Colors.white.withOpacity(isLocked ? 0.2 : 0.8),
+                      color: Colors.white.withValues(alpha: isLocked ? 0.2 : 0.8),
                       width: isCurrent ? 3 : 1
                   ),
                 ),
@@ -173,7 +173,7 @@ class NeuralPathPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.cyanAccent.withOpacity(0.3)
+      ..color = Colors.cyanAccent.withValues(alpha: 0.3)
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

@@ -101,7 +101,7 @@ class _LandingPageState extends State<LandingPage> {
                                     color: Colors.white,
                                     letterSpacing: 1.0,
                                     shadows: [
-                                      Shadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                                      Shadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))
                                     ]
                                   ),
                                 ),
@@ -111,7 +111,7 @@ class _LandingPageState extends State<LandingPage> {
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                     letterSpacing: 0.5,
                                   ),
                                 ),
@@ -120,7 +120,7 @@ class _LandingPageState extends State<LandingPage> {
                             // Restored Info Button
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
                               child: const InfoButton(),
@@ -209,13 +209,13 @@ class _LandingPageState extends State<LandingPage> {
               decoration: BoxDecoration(
                   color: isSelected 
                       ? Colors.white 
-                      : Colors.white.withOpacity(0.2), // Glass effect
+                      : Colors.white.withValues(alpha: 0.2), // Glass effect
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: isSelected 
                       ? [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: 2, offset: const Offset(0, 8))]
                       : [],
                   border: Border.all(
-                      color: Colors.white.withOpacity(isSelected ? 0.8 : 0.4),
+                      color: Colors.white.withValues(alpha: isSelected ? 0.8 : 0.4),
                       width: 2
                   )
               ),
@@ -227,7 +227,7 @@ class _LandingPageState extends State<LandingPage> {
                           duration: 300.ms,
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                              color: isSelected ? color.withOpacity(0.1) : Colors.white.withOpacity(0.2),
+                              color: isSelected ? color.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                           ),
                           child: Text(

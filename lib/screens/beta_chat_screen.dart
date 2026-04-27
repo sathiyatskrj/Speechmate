@@ -91,7 +91,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-               AppColors.getThemeAccent(!widget.isStudent).withOpacity(0.8),
+               AppColors.getThemeAccent(!widget.isStudent).withValues(alpha: 0.8),
                Colors.black
             ]
           )
@@ -148,7 +148,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   Widget _buildStudentCard(Map<String, dynamic> item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      color: Colors.white.withOpacity(0.1),
+      color: Colors.white.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Colors.white24)),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -163,7 +163,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
           ),
         ),
         leading: CircleAvatar(
-          backgroundColor: AppColors.getThemeAccent(!widget.isStudent).withOpacity(0.5),
+          backgroundColor: AppColors.getThemeAccent(!widget.isStudent).withValues(alpha: 0.5),
           child: Text(
             (item['english'] ?? "?")[0].toUpperCase(),
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -190,7 +190,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(

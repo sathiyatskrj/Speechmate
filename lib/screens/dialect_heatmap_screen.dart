@@ -188,7 +188,7 @@ class _PulseNodeState extends State<_PulseNode> with SingleTickerProviderStateMi
               height: 30 * _controller.value + 10,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: widget.color.withOpacity(1 - _controller.value),
+                color: widget.color.withValues(alpha: 1 - _controller.value),
               ),
             ),
             Container(
@@ -198,7 +198,7 @@ class _PulseNodeState extends State<_PulseNode> with SingleTickerProviderStateMi
                 shape: BoxShape.circle,
                 color: widget.color,
                 boxShadow: [
-                  BoxShadow(color: widget.color.withOpacity(0.5), blurRadius: 10, spreadRadius: 2)
+                  BoxShadow(color: widget.color.withValues(alpha: 0.5), blurRadius: 10, spreadRadius: 2)
                 ],
               ),
             ),
@@ -218,7 +218,7 @@ class _MapPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     final fillPaint = Paint()
-      ..color = Colors.cyan.withOpacity(0.1)
+      ..color = Colors.cyan.withValues(alpha: 0.1)
       ..style = PaintingStyle.fill;
 
     // A stylized representation of the Andaman and Nicobar Islands
@@ -258,7 +258,7 @@ class _MapPainter extends CustomPainter {
 
     // Connective dashed lines for shipping routes or cultural ties
     final dashPaint = Paint()
-      ..color = Colors.cyanAccent.withOpacity(0.3)
+      ..color = Colors.cyanAccent.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
     
