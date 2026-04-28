@@ -14,7 +14,7 @@ class WordRunnerGame extends StatefulWidget {
 }
 
 enum GameState { loading, menu, playing, gameOver, victory }
-enum ItemType { obstacle, word, surprise }
+enum ItemType { obstacle, word, surprise, shield }
 
 // --- DATA CLASSES ---
 
@@ -66,24 +66,29 @@ class Particle {
 
 class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStateMixin {
   // Game Config
-  static const double gravity = -0.8; // Gravity pulls DOWN (negative)
-  static const double jumpForce = 22.0; // Jump pushes UP (positive)
+  static const double gravity = -0.8;
+  static const double jumpForce = 22.0;
   static const double groundHeight = 100.0;
   
   // Services & Controllers
   final DictionaryService _dictionaryService = DictionaryService();
-  late AnimationController _gameTicker; // High performance game loop
+  late AnimationController _gameTicker;
   
   // Game State
   GameState _gameState = GameState.loading;
   int _score = 0;
+  int _highScore = 0;
   int _level = 1;
-  int _combo = 0; // Combo counter
-  double _screenShake = 0.0; // Screen shake magnitude
+  int _combo = 0;
+  int _lives = 3;
+  double _screenShake = 0.0;
+  String _lastCollectedNic = ''; // Show Nicobarese translation on collect
+  double _nicDisplayTimer = 0;
   
   // Data
   List<String> _targetWords = [];
   List<String> _foundWords = [];
+  Map<String, String> _wordToNic = {}; // English -> Nicobarese mapping
   final List<GameItem> _items = [];
   final List<Particle> _particles = [];
   
@@ -91,13 +96,16 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   double _playerY = 0;
   double _playerVy = 0;
   bool _isGrounded = true;
+  int _jumpCount = 0; // For double jump
+  static const int _maxJumps = 2;
   final double _playerX = 80;
   bool _isGoldMode = false;
+  bool _hasShield = false;
   
   // World
   double _scrollSpeed = 6.0;
   double _distance = 0;
-  double _time = 0; // For sine waves
+  double _time = 0;
   
   // Visuals
   final Random _rnd = Random();
@@ -124,11 +132,17 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
 
   Future<void> _setupGame() async {
     final allWords = await _dictionaryService.getDictionary(DictionaryType.words);
+    _wordToNic.clear();
     if (allWords.isEmpty) {
-      _targetWords = ["CODE", "DEUS", "HACK", "WIN", "FAST", "EPIC", "COOL", "JAVA", "DART", "WEB"];
+      _targetWords = ["WATER", "SUN", "MOON", "FISH", "TREE", "FIRE", "RAIN", "WIND", "STAR", "EARTH"];
+      _wordToNic = {'WATER': 'Mak', 'SUN': 'Nyöt', 'MOON': 'Talay', 'FISH': 'Hā', 'TREE': 'Tōt', 'FIRE': 'Chö', 'RAIN': 'Öt', 'WIND': 'Tāh', 'STAR': 'An-ān', 'EARTH': 'Chu-ah'};
     } else {
       final shuffled = List<Map<String, dynamic>>.from(allWords)..shuffle();
-      _targetWords = shuffled.take(10).map((e) => e['english'].toString().toUpperCase()).toList();
+      final picked = shuffled.take(10).toList();
+      _targetWords = picked.map((e) => e['english'].toString().toUpperCase()).toList();
+      for (var w in picked) {
+        _wordToNic[w['english'].toString().toUpperCase()] = w['nicobarese']?.toString() ?? '';
+      }
     }
     
     _resetState();
@@ -137,10 +151,15 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   void _resetState() {
     if (!mounted) return;
     setState(() {
-      _gameState = GameState.menu; // Return to menu
+      _gameState = GameState.menu;
       _score = 0;
       _level = 1;
       _combo = 0;
+      _lives = 3;
+      _hasShield = false;
+      _jumpCount = 0;
+      _lastCollectedNic = '';
+      _nicDisplayTimer = 0;
       _foundWords.clear();
       _items.clear();
       _particles.clear();
@@ -179,11 +198,15 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
       _playerY += _playerVy;
       
       // Ground Collision
-      if (_playerY <= 0) { // Clamp when falling below ground
+      if (_playerY <= 0) {
         _playerY = 0;
         _playerVy = 0;
         _isGrounded = true;
+        _jumpCount = 0;
       }
+      
+      // Nicobarese display timer
+      if (_nicDisplayTimer > 0) _nicDisplayTimer -= 0.05;
 
       // 3. Spawning
       _handleSpawning();
@@ -224,8 +247,9 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
       // 7. Win Check
       if (_foundWords.length >= 10 && _gameState != GameState.victory) {
         _gameState = GameState.victory;
+        if (_score > _highScore) _highScore = _score;
         _createExplosion(_playerX, _playerY - 100, Colors.amber);
-        ProgressService().recordQuizTaken(); // Award XP for completing the run
+        ProgressService().recordQuizTaken();
       }
     });
   }
@@ -252,34 +276,43 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
         _score += 500;
         _createExplosion(item.x, item.y, Colors.red);
         _screenShake = 5.0;
+      } else if (_hasShield) {
+        _hasShield = false;
+        _screenShake = 8.0;
+        _createExplosion(item.x, item.y, Colors.cyan);
       } else {
-        _gameState = GameState.gameOver;
+        _lives--;
         _screenShake = 20.0;
         _createExplosion(_playerX, _playerY, Colors.red);
+        if (_lives <= 0) {
+          _gameState = GameState.gameOver;
+          if (_score > _highScore) _highScore = _score;
+        }
       }
     } 
     else if (item.type == ItemType.word) {
       String target = _targetWords[_foundWords.length];
       
       if (item.value == target) {
-        // CORRECT
         _foundWords.add(item.value!);
         _combo++;
         int bonus = 100 * (1 + _combo);
         _score += bonus;
         _level++;
+        _lastCollectedNic = _wordToNic[item.value] ?? '';
+        _nicDisplayTimer = 2.0;
         _createExplosion(item.x, item.y, Colors.greenAccent);
-        ProgressService().markWordAsLearned(); // Award XP for learning the word
+        ProgressService().markWordAsLearned();
       } 
       else if (_targetWords.contains(item.value) && !_foundWords.contains(item.value)) {
-        // GOOD BUT OUT OF ORDER
         _foundWords.add(item.value!);
         _score += 100;
-        _combo = 0; // Break combo
+        _combo = 0;
+        _lastCollectedNic = _wordToNic[item.value] ?? '';
+        _nicDisplayTimer = 2.0;
         _createExplosion(item.x, item.y, Colors.cyan);
       } 
       else {
-        // WRONG
         _score = max(0, _score - 50);
         _combo = 0;
         _screenShake = 5.0;
@@ -289,6 +322,10 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
     else if (item.type == ItemType.surprise) {
       _activateGoldMode();
       _createExplosion(item.x, item.y, Colors.yellow);
+    }
+    else if (item.type == ItemType.shield) {
+      _hasShield = true;
+      _createExplosion(item.x, item.y, Colors.cyanAccent);
     }
   }
 
@@ -339,13 +376,22 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
           width: 100, height: 40,
           color: Colors.blue
         ));
-      } else {
+      } else if (roll < 0.92) {
         // Surprise
         _items.add(GameItem(
           x: spawnX,
           y: 200,
           type: ItemType.surprise,
           width: 40, height: 40
+        ));
+      } else {
+        // Shield
+        _items.add(GameItem(
+          x: spawnX,
+          y: 120 + _rnd.nextDouble() * 100,
+          type: ItemType.shield,
+          width: 40, height: 40,
+          color: Colors.cyan,
         ));
       }
     }
@@ -371,9 +417,10 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   }
 
   void _jump() {
-    if (_isGrounded) {
-      _playerVy = jumpForce;
+    if (_jumpCount < _maxJumps) {
+      _playerVy = jumpForce * (_jumpCount == 1 ? 0.8 : 1.0); // Weaker 2nd jump
       _isGrounded = false;
+      _jumpCount++;
       
       // Jump Particles
       for(int i=0; i<5; i++) {
@@ -381,7 +428,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
           x: _playerX + 25, y: 5, 
           vx: (_rnd.nextDouble() - 0.5) * 5, 
           vy: 0, 
-          color: Colors.white.withValues(alpha: 0.5)
+          color: _jumpCount == 2 ? Colors.amber.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5)
         ));
       }
     }
@@ -448,9 +495,29 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
                             _buildHUD("SCORE", "$_score", Colors.amber),
                             if (_combo > 1) 
                               _buildHUD("COMBO", "${_combo}x", Colors.redAccent),
+                            _buildHUD("❤️", "$_lives", Colors.pinkAccent),
+                            if (_hasShield)
+                              _buildHUD("🛡️", "ON", Colors.cyanAccent),
                             _buildHUD("GOAL", "${_foundWords.length}/${_targetWords.length}", Colors.cyan),
                           ],
                         ),
+                        // Nicobarese translation popup
+                        if (_nicDisplayTimer > 0 && _lastCollectedNic.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: AnimatedOpacity(
+                              opacity: _nicDisplayTimer > 0.5 ? 1.0 : _nicDisplayTimer * 2,
+                              duration: const Duration(milliseconds: 200),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withValues(alpha: 0.8),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text('= $_lastCollectedNic', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic)),
+                              ),
+                            ),
+                          ),
                         // Target Bar
                         const SizedBox(height: 20),
                         if (_gameState == GameState.playing)
@@ -521,6 +588,15 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text("WORD\nRUNNER", textAlign: TextAlign.center, style: TextStyle(fontSize: 60, height: 0.9, fontWeight: FontWeight.w900, color: Colors.white, shadows: [Shadow(color: Colors.purple, offset: Offset(4,4))])),
+          const SizedBox(height: 10),
+          const Text("Tap to jump • Double-tap for double jump!", style: TextStyle(color: Colors.white70, fontSize: 13)),
+          const SizedBox(height: 6),
+          const Text("Collect 🛡️ for shield • ⭐ for gold mode", style: TextStyle(color: Colors.white54, fontSize: 12)),
+          if (_highScore > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text("🏆 High Score: $_highScore", style: const TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: _startGame,
@@ -542,6 +618,9 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
           children: [
             const Text("CRASHED!", style: TextStyle(color: Colors.red, fontSize: 40, fontWeight: FontWeight.bold)),
             Text("Score: $_score", style: const TextStyle(color: Colors.white, fontSize: 20)),
+            Text("Words Found: ${_foundWords.length}/${_targetWords.length}", style: const TextStyle(color: Colors.white54, fontSize: 14)),
+            if (_score >= _highScore && _score > 0)
+              const Text("🏆 NEW HIGH SCORE!", style: TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             ElevatedButton(onPressed: _setupGame, child: const Text("RETRY"))
           ],
@@ -649,10 +728,19 @@ class GamePainter extends CustomPainter {
         TextPainter tp = TextPainter(text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
         tp.layout(minWidth: item.width);
         tp.paint(canvas, Offset(item.x, itemY + 10)); // Approximate center
-      } else {
+      } else if (item.type == ItemType.surprise) {
         // Draw Star
         canvas.drawCircle(Offset(item.x + 20, itemY + 20), 15, Paint()..color = Colors.yellowAccent ..maskFilter = MaskFilter.blur(BlurStyle.normal, 5));
         canvas.drawCircle(Offset(item.x + 20, itemY + 20), 8, Paint()..color = Colors.white);
+      } else if (item.type == ItemType.shield) {
+        // Draw Shield
+        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 15, Paint()..color = Colors.cyanAccent ..maskFilter = MaskFilter.blur(BlurStyle.normal, 5));
+        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 10, Paint()..color = Colors.white.withValues(alpha: 0.8));
+        // Shield icon approximation
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(item.x + 20, itemY + 20), width: 12, height: 14), const Radius.circular(3)),
+          Paint()..color = Colors.cyan.shade700,
+        );
       }
       
       canvas.restore();

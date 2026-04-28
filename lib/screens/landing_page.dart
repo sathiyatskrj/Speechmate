@@ -146,23 +146,25 @@ class _LandingPageState extends State<LandingPage> {
                             
                             const SizedBox(height: 40),
 
-                            // Profile Cards
-                            Wrap(
-                                alignment: WrapAlignment.center,
-                                spacing: 20,
-                                runSpacing: 20,
+                            // Profile Cards — always side-by-side
+                            Row(
                                 children: [
-                                     _buildRoleCard(
-                                         title: AppStrings.get('student'),
-                                         emoji: "🙋🏻‍♂️",
-                                         id: "student",
-                                         color: Colors.pinkAccent,
+                                     Expanded(
+                                       child: _buildRoleCard(
+                                           title: AppStrings.get('student'),
+                                           emoji: "🙋🏻‍♂️",
+                                           id: "student",
+                                           color: Colors.pinkAccent,
+                                       ),
                                      ),
-                                     _buildRoleCard(
-                                         title: AppStrings.get('teacher'),
-                                         emoji: "👨🏻‍🏫",
-                                         id: "teacher",
-                                         color: Colors.blueAccent,
+                                     const SizedBox(width: 16),
+                                     Expanded(
+                                       child: _buildRoleCard(
+                                           title: AppStrings.get('teacher'),
+                                           emoji: "👨🏻‍🏫",
+                                           id: "teacher",
+                                           color: Colors.blueAccent,
+                                       ),
                                      ),
                                 ],
                             ),
@@ -203,9 +205,8 @@ class _LandingPageState extends State<LandingPage> {
           },
           child: AnimatedContainer(
               duration: 300.ms,
-              width: 150, // Slightly wider for comfort
-              height: 190,
-              padding: const EdgeInsets.all(20),
+              height: MediaQuery.of(context).size.height * 0.22,
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                   color: isSelected 
                       ? Colors.white 
