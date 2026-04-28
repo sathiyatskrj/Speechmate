@@ -66,7 +66,7 @@
 | :--- | :--- |
 | **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — all loaded from verified Nicobarese JSON lexicons |
 | **🔍 AR Translator** | Live Augmented Reality translator using Google ML Kit Image Labeler to detect 400+ specific objects, featuring 3 Lens Modes (Auto/Objects/Text), direct Vault saving, and **dynamic FPS-aware throttling** that auto-adjusts processing speed (300–1000ms) based on device performance |
-| **🎙️ Whisper Pro STT** | On-device speech-to-text using the `ggml-tiny.en.bin` model for offline voice search |
+| **🎙️ Whisper Base** | On-device multilingual speech-to-text using `ggml-base.bin` (141MB) for offline voice translation with auto-language detection |
 | **🔊 Audio-First Playback** | Native `.mp3` audio asset playback for each word; graceful TTS fallback when audio is unavailable |
 | **🧩 Games Hub** | Word Match, Flash Cards, Word Scramble, and Word Runner — gamified vocabulary learning with XP **diminishing returns** to prevent farming |
 | **💬 AI Chat Translator** | Conversational translation interface powered by **Neural Engine v2.0** |
@@ -87,7 +87,7 @@
 | **🧪 Quiz Mode** | Adaptive vocabulary quiz with missed-word re-injection |
 | **📊 Progress & SRS Analytics** | Class-level progress tracking and spaced repetition dashboards |
 | **📷 Book Scanner (OCR)** | Google ML Kit camera scanner translates printed text to Nicobarese |
-| **🗣️ Voice Translator** | Hold-to-speak real-time English → Nicobarese voice translation |
+| **🗣️ Voice Translator** | Premium glassmorphism UI with tap-to-toggle real-time multilingual voice translation and animated audio visualizer |
 | **🌿 Nature Hub** | Interactive flora & fauna database with native names and traditional uses |
 | **📻 Oral History Radio** | Tribal storytelling archive with local recordings |
 | **🗺️ Tuhet Mapper** | Kinship structure visualization for indigenous family trees |
@@ -142,7 +142,7 @@ graph TD
     UI --> Service[Service Layer]
 
     subgraph "AI Intelligence Layer"
-        Service --> |WhisperService| Whisper[Whisper Tiny\nNative C++ via NDK 27]
+        Service --> |WhisperService| Whisper[Whisper Base Multilingual\nNative C++ via NDK 27]
         Service --> |NeuralEngineService v2.0| Neural[Neural Translation\nSoundex + Stemming + Fuzzy + Compound]
         Service --> |RegionalTranslationService| Regional[ML Kit Translation\nHindi / Tamil / Bengali / Telugu]
         Service --> |DictionaryService| AutoTranslate[Multilingual Search\nAuto-translate queries to English]
@@ -200,7 +200,7 @@ The offline translation brain uses an **8-stage pipeline**:
 | **Synonym Mappings** | **200+** | Expanded NLP synonym database |
 | **Offline Capability** | **100%** | Zero API calls for core features (Malayalam requires internet) |
 | **AR FPS Throttling** | **Dynamic** | Auto-adjusts 300–1000ms based on device FPS |
-| **App Base Size** | **~85 MB** | Excluding optional AI model |
+| **App Base Size** | **~250 MB** | Includes 141MB Whisper Multilingual Base Model |
 | **Min Android SDK** | **API 24** | Android 7.0+ |
 | **Target SDK** | **API 33** | Android 13 |
 
@@ -251,6 +251,15 @@ SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requi
 
 ## 🔮 Roadmap
 
+### ✅ Completed (v3.0 Production Candidate)
+- [x] **Whisper Multilingual Upgrade**: Transitioned from `tiny.en` to `base` (141MB) for high-accuracy auto-language detection
+- [x] **100% Offline Architecture**: Firebase completely removed. Community feeds now use local SharedPreferences seed data
+- [x] **Premium Voice Translator**: Re-engineered with tap-to-toggle, glassmorphism UI, animated waveforms, and confidence badges
+- [x] **Memory Hardening**: Patched critical StreamSubscription leaks, `TtsService` un-disposed engines, and unbounded caches
+- [x] **Database Concurrency**: Resolved SQLite race conditions using `Completer` atomic locks
+- [x] **P2P Sync Hardening**: Added rigorous schema validation for local ZIP dictionary imports
+- [x] **Automated CI/CD Pipeline**: GitHub Actions workflows for Universal APK, Compact ARM64, AAB, and iOS IPA generation with Git LFS support
+
 ### ✅ Completed (v2.5)
 - [x] Full 12-category student learning system
 - [x] Standalone Great Andamanese Hub (Dictionary + Translator + Voice + OCR)
@@ -286,9 +295,9 @@ cd Speechmate
 # 2. Install Flutter dependencies
 flutter pub get
 
-# 3. Place the Whisper model
-# Download ggml-tiny.en.bin and place it at:
-# assets/models/ggml-tiny.en.bin
+# 3. Pull the ML models via Git LFS
+git lfs pull
+# (Ensures assets/models/ggml-base.bin is downloaded)
 
 # 4. Run in development
 flutter run
@@ -300,8 +309,7 @@ flutter build apk --release
 **Requirements:**
 - Flutter 3.29+ / Dart 3.2+
 - Android NDK 27.0.12077973
-- Android SDK Platform 33
-- Firebase project configured (for community features)
+- Android SDK Platform 34
 
 ---
 
