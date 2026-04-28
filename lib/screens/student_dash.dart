@@ -19,6 +19,8 @@ import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
 import 'package:speechmate/screens/flora_fauna_screen.dart';
+import 'package:speechmate/screens/omni_translator_screen.dart';
+
 import 'package:speechmate/screens/story_radio_screen.dart';
 import 'package:speechmate/screens/kinship_mapper_screen.dart';
 import 'package:speechmate/screens/dialect_heatmap_screen.dart';
@@ -89,6 +91,7 @@ class _StudentDashState extends State<StudentDash>
     {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
     
     // --- Regional Translations ---
+    {"word": "Omni Broadcast", "emoji": "📡", "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)], "navigateTo": const OmniTranslatorScreen(), "icon": Icons.cell_tower_rounded},
     {"word": "Hindi\nTranslator", "emoji": "🇮🇳", "colors": [const Color(0xFFD84315), const Color(0xFFFF7043)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Hindi', TranslateLanguage.hindi, 'hi', 'hi-IN', 'नमस्ते')), "icon": Icons.g_translate_rounded},
     {"word": "Tamil\nTranslator", "emoji": "🛕", "colors": [const Color(0xFF2E7D32), const Color(0xFF66BB6A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', 'வணக்கம்')), "icon": Icons.g_translate_rounded},
     {"word": "Bengali\nTranslator", "emoji": "🐅", "colors": [const Color(0xFFC62828), const Color(0xFFEF5350)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn', 'bn-IN', 'নমস্কার')), "icon": Icons.g_translate_rounded},
