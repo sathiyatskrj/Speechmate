@@ -303,9 +303,10 @@ class _StudentDashState extends State<StudentDash>
                               bottom: -15, 
                               child: Icon(tile['icon'], size: 100, color: Colors.white.withValues(alpha: 0.15))
                           ),
-                          Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
+                          Positioned.fill(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -318,10 +319,20 @@ class _StudentDashState extends State<StudentDash>
                                           ),
                                           child: Icon(tile['icon'], color: Colors.white, size: 24),
                                       ),
-                                      Text(tile['word'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.5)),
+                                      Expanded(
+                                          child: Align(
+                                              alignment: Alignment.bottomLeft,
+                                              child: Text(
+                                                  tile['word'], 
+                                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.5),
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                              ),
+                                          ),
+                                      ),
                                   ],
                               ),
-                          )
+                          ),
                       ],
                   ),
               ),

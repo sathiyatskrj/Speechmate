@@ -81,7 +81,7 @@ class _TeacherDashState extends State<TeacherDash>
     return Theme(
       data: AppTheme.teacherTheme,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA), // Lighter, clean background
+        backgroundColor: const Color(0xFFE2E8F0), // Cool gray background for sharp contrast
         body: Stack(
           children: [
             // Elegant Light Background Gradients
@@ -325,14 +325,15 @@ class _TeacherDashState extends State<TeacherDash>
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.6), // Frosty white glass
+              color: Colors.white.withValues(alpha: 0.9), // Frosty white glass with higher opacity
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
+              border: Border.all(color: Colors.white, width: 2.0),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.15),
-                  blurRadius: 15,
-                  spreadRadius: 2,
+                  color: color.withValues(alpha: 0.35),
+                  blurRadius: 20,
+                  spreadRadius: 4,
+                  offset: const Offset(0, 4),
                 )
               ]
             ),
@@ -344,9 +345,10 @@ class _TeacherDashState extends State<TeacherDash>
                   bottom: -15,
                   child: Icon(icon, size: 80, color: color.withValues(alpha: 0.08)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -372,6 +374,7 @@ class _TeacherDashState extends State<TeacherDash>
                       ),
                     ],
                   ),
+                ),
                 ),
               ],
             ),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:speechmate/services/progress_service.dart';
 
 class GamificationService {
