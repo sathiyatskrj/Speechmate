@@ -251,29 +251,6 @@ SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requi
 
 ## 🔮 Roadmap
 
-### ✅ Completed (v3.0 Production Candidate)
-- [x] **Whisper Multilingual Upgrade**: Transitioned from `tiny.en` to `base` (141MB) for high-accuracy auto-language detection
-- [x] **100% Offline Architecture**: Firebase completely removed. Community feeds now use local SharedPreferences seed data
-- [x] **Premium Voice Translator**: Re-engineered with tap-to-toggle, glassmorphism UI, animated waveforms, and confidence badges
-- [x] **Memory Hardening**: Patched critical StreamSubscription leaks, `TtsService` un-disposed engines, and unbounded caches
-- [x] **Database Concurrency**: Resolved SQLite race conditions using `Completer` atomic locks
-- [x] **P2P Sync Hardening**: Added rigorous schema validation for local ZIP dictionary imports
-- [x] **Automated CI/CD Pipeline**: GitHub Actions workflows for Universal APK, Compact ARM64, AAB, and iOS IPA generation with Git LFS support
-
-### ✅ Completed (v2.5)
-- [x] Full 12-category student learning system
-- [x] Standalone Great Andamanese Hub (Dictionary + Translator + Voice + OCR)
-- [x] Full Dashboard Localization across 8 languages
-- [x] AR Translator: 400+ objects, 3 Lens Modes, Voice Vault, **dynamic FPS throttling**
-- [x] Whisper Pro STT in both Student & Teacher Dashboards
-- [x] Cross-category search engine (exact + fuzzy across all 12 categories)
-- [x] **Regional Language Translators**: Hindi, Tamil, Bengali, Telugu (offline ML Kit) + Malayalam (online fallback)
-- [x] **Multilingual Search**: Type in any regional script → auto-translate → Nicobarese lookup
-- [x] **Neural Engine v2.0**: Soundex phonetic matching, 200+ synonyms, compound decomposition, advanced stemming, fuzzy caching
-- [x] **XP Diminishing Returns**: Tiered gamification to prevent XP farming
-- [x] **Codebase Modernization**: Fixed 384 deprecation warnings, upgraded 14 dependencies, removed 13 orphaned files
-- [x] **Global Layout Lock**: `textScaler: 1.0` override for cross-device UI consistency
-
 ### 🔜 Planned (v3.0+)
 - [ ] **SmolLM2 On-Device LLM** — Replace mock LLM with quantized GGUF model for true offline AI chat
 - [ ] **P2P Mesh Sync** — Share vocabulary packs via Wi-Fi Direct / QR code
