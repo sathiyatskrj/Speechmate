@@ -29,6 +29,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   CameraController? _cameraController;
   CameraDescription? _camera;
   bool _isCameraReady = false;
+  bool _isInitializingCamera = false;
 
   // ML Engines
   late ObjectDetector _objectDetector;
@@ -97,7 +98,19 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   }
 
   Future<void> _initCamera() async {
+    if (_isInitializingCamera) return; // Prevent concurrent init
+    _isInitializingCamera = true;
+    
     try {
+      // Dispose any existing controller first
+      if (_cameraController != null) {
+        try {
+          await _cameraController!.stopImageStream();
+        } catch (_) {}
+        await _cameraController!.dispose();
+        _cameraController = null;
+      }
+      
       final cameras = await availableCameras();
       if (cameras.isEmpty) return;
 
@@ -108,7 +121,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
 
       _cameraController = CameraController(
         _camera!,
-        ResolutionPreset.medium, // medium = best balance for ML processing
+        ResolutionPreset.medium,
         enableAudio: false,
         imageFormatGroup: Platform.isAndroid
             ? ImageFormatGroup.nv21
@@ -120,6 +133,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       } catch (e) {
         if (Platform.isAndroid) {
           debugPrint('[AR] Retrying camera init with YUV420...');
+          _cameraController?.dispose();
           _cameraController = CameraController(
             _camera!,
             ResolutionPreset.medium,
@@ -138,6 +152,8 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       _cameraController!.startImageStream(_onFrame);
     } catch (e) {
       debugPrint('[AR] Camera error: $e');
+    } finally {
+      _isInitializingCamera = false;
     }
   }
 
@@ -435,8 +451,14 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_cameraController == null ||
         !(_cameraController!.value.isInitialized)) return;
-    if (state == AppLifecycleState.inactive) {
-      _cameraController?.stopImageStream();
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      // Fully dispose camera when going to background to free native resources
+      _isCameraReady = false;
+      try {
+        _cameraController?.stopImageStream();
+      } catch (_) {}
+      _cameraController?.dispose();
+      _cameraController = null;
     } else if (state == AppLifecycleState.resumed && !_isPaused) {
       _initCamera();
     }

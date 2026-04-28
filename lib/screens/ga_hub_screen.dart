@@ -22,7 +22,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
   late TabController _tabController;
   final TtsService _ttsService = TtsService();
   final WhisperService _whisperService = WhisperService();
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  AudioRecorder? _audioRecorder;
   final TextEditingController _translateController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
@@ -63,7 +63,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
   void dispose() {
     _tabController.dispose();
     _ttsService.dispose();
-    _audioRecorder.dispose();
+    _audioRecorder?.dispose();
     _translateController.dispose();
     _searchController.dispose();
     super.dispose();
@@ -154,7 +154,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
       // Stop
       setState(() { _isRecording = false; _isProcessingVoice = true; _voiceStatus = 'Processing...'; });
       try {
-        final path = await _audioRecorder.stop();
+        final path = await _audioRecorder?.stop();
         if (path != null) {
           final text = await _whisperService.transcribe(path);
           if (text.trim().isNotEmpty) {
@@ -176,11 +176,13 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
         setState(() { _isProcessingVoice = false; _voiceStatus = 'Error: $e'; });
       }
     } else {
-      // Start
-      if (await _audioRecorder.hasPermission()) {
+      // Start — always create a fresh recorder
+      _audioRecorder?.dispose();
+      _audioRecorder = AudioRecorder();
+      if (await _audioRecorder!.hasPermission()) {
         final dir = await getTemporaryDirectory();
         final path = '${dir.path}/ga_voice_${DateTime.now().millisecondsSinceEpoch}.wav';
-        await _audioRecorder.start(
+        await _audioRecorder!.start(
           const RecordConfig(encoder: AudioEncoder.wav, numChannels: 1, sampleRate: 16000),
           path: path,
         );

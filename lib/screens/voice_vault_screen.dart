@@ -14,7 +14,7 @@ class VoiceVaultScreen extends StatefulWidget {
 }
 
 class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  AudioRecorder? _audioRecorder;
   final AudioPlayer _audioPlayer = AudioPlayer();
   
   bool _isRecording = false;
@@ -54,11 +54,14 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
 
   Future<void> _startRecording() async {
     try {
-      if (await _audioRecorder.hasPermission()) {
+      // Recreate recorder for fresh state
+      _audioRecorder?.dispose();
+      _audioRecorder = AudioRecorder();
+      if (await _audioRecorder!.hasPermission()) {
         final Directory appDocDir = await getApplicationDocumentsDirectory();
         final String filePath = '${appDocDir.path}/temp_vault_recording.wav';
         
-        await _audioRecorder.start(
+        await _audioRecorder!.start(
           const RecordConfig(encoder: AudioEncoder.wav), 
           path: filePath
         );
@@ -75,7 +78,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
 
   Future<void> _stopRecording() async {
     try {
-      final path = await _audioRecorder.stop();
+      final path = await _audioRecorder?.stop();
       setState(() {
         _isRecording = false;
         _recordedPath = path;
@@ -131,7 +134,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
 
   @override
   void dispose() {
-    _audioRecorder.dispose();
+    _audioRecorder?.dispose();
     _audioPlayer.dispose();
     super.dispose();
   }

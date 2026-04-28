@@ -22,7 +22,8 @@ class CameraTranslationScreen extends ConsumerStatefulWidget {
   ConsumerState<CameraTranslationScreen> createState() => _CameraTranslationScreenState();
 }
 
-class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScreen> {
+class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScreen>
+    with WidgetsBindingObserver {
   CameraController? _cameraController;
   CameraDescription? _camera;
   
@@ -74,6 +75,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _textRecognizer = TextRecognizer(script: _supportedLanguages[_selectedLanguage]!);
     final options = ObjectDetectorOptions(
       mode: DetectionMode.stream,
@@ -111,15 +113,36 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       
       if (mounted) setState(() {});
       
-      _cameraController!.startImageStream(_processCameraImage);
+      // Only start stream if already in live mode
+      if (_isLiveMode) {
+        _cameraController!.startImageStream(_processCameraImage);
+      }
     } catch (e) {
       debugPrint("Camera initialization error: $e");
     }
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_cameraController == null ||
+        !(_cameraController!.value.isInitialized)) return;
+    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+      if (_isLiveMode) {
+        try { _cameraController?.stopImageStream(); } catch (_) {}
+      }
+      _cameraController?.dispose();
+      _cameraController = null;
+    } else if (state == AppLifecycleState.resumed) {
+      _initializeCamera();
+    }
+  }
+
+  @override
   void dispose() {
-    _cameraController?.stopImageStream();
+    WidgetsBinding.instance.removeObserver(this);
+    if (_isLiveMode) {
+      try { _cameraController?.stopImageStream(); } catch (_) {}
+    }
     _cameraController?.dispose();
     _textRecognizer.close();
     _objectDetector.close();
@@ -643,6 +666,9 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                   children: [
                     GestureDetector(
                       onTap: () {
+                         if (_isLiveMode && _cameraController != null && _cameraController!.value.isStreamingImages) {
+                           try { _cameraController!.stopImageStream(); } catch (_) {}
+                         }
                          setState(() { _isLiveMode = false; _liveBlocks.clear(); });
                       },
                       child: Container(
@@ -657,6 +683,10 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                     GestureDetector(
                       onTap: () {
                          setState(() { _isLiveMode = true; _capturedImagePath = null; _staticBlocks.clear(); });
+                         // Start image stream when entering live mode
+                         if (_cameraController != null && _cameraController!.value.isInitialized && !_cameraController!.value.isStreamingImages) {
+                           _cameraController!.startImageStream(_processCameraImage);
+                         }
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

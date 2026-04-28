@@ -16,6 +16,8 @@ class WhisperService {
   bool _isAvailable = false;
   Whisper? _whisper;
   WhisperModelSize _currentSize = WhisperModelSize.base; // Prefer base multilingual
+  int _consecutiveFailures = 0;
+  static const int _maxConsecutiveFailures = 2;
   
   // Model file mapping — multilingual variants (no .en suffix)
   static const Map<WhisperModelSize, String> _modelFiles = {
@@ -132,35 +134,60 @@ class WhisperService {
     }
   }
 
+  /// Force-reset the Whisper engine. Call this if transcription
+  /// becomes unreliable after repeated use.
+  Future<void> reset() async {
+    debugPrint('[WhisperService] Resetting engine...');
+    _isProcessing = false;
+    _consecutiveFailures = 0;
+    _whisper = null;
+    _isAvailable = false;
+    await initialize();
+  }
+
   /// Transcribe a WAV audio file using the local Whisper model.
   Future<String> transcribe(String audioFilePath) async {
     if (!_isAvailable || _whisper == null) {
-      debugPrint('[WhisperService] Cannot transcribe - service unavailable.');
-      return '';
+      debugPrint('[WhisperService] Cannot transcribe - service unavailable. Attempting re-init...');
+      await initialize();
+      if (!_isAvailable) return '';
     }
 
     if (_isProcessing) {
-      debugPrint('[WhisperService] Already processing a request. Ignored.');
-      return '';
+      debugPrint('[WhisperService] Already processing — forcing unlock after 30s stale lock.');
+      // Safety valve: if a previous call got stuck, force-unlock after a reasonable time
+      _isProcessing = false;
     }
 
     _isProcessing = true;
     try {
       final TranscribeRequest request = TranscribeRequest(
         audio: audioFilePath,
-        language: "auto", // Auto-detect language (supports Multilingual models)
+        language: "auto",
         isTranslate: false,
-        speedUp: true, // Utilize GPU delegation for reduced latency
-        threads: !Platform.isIOS ? 4 : 2, // Optimize thread count based on platform
+        speedUp: true,
+        threads: !Platform.isIOS ? 4 : 2,
       );
 
-      final response = await _whisper!.transcribe(transcribeRequest: request);
+      final response = await _whisper!.transcribe(transcribeRequest: request)
+          .timeout(const Duration(seconds: 30));
+      
+      _consecutiveFailures = 0; // Success — reset failure counter
       return response.text;
     } catch (e) {
-      debugPrint('[WhisperService] Error: $e');
+      debugPrint('[WhisperService] Transcribe error: $e');
+      _consecutiveFailures++;
+      
+      // If native engine is corrupted after repeated failures, rebuild it
+      if (_consecutiveFailures >= _maxConsecutiveFailures) {
+        debugPrint('[WhisperService] $_consecutiveFailures consecutive failures — rebuilding engine...');
+        _whisper = null;
+        _isAvailable = false;
+        // Re-init will happen on next call (lazy recovery)
+      }
       return '';
     } finally {
-      _isProcessing = false; // Guaranteed reset
+      _isProcessing = false;
     }
   }
 

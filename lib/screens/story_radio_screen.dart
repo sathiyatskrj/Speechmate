@@ -18,7 +18,7 @@ class StoryRadioScreen extends StatefulWidget {
 class _StoryRadioScreenState extends State<StoryRadioScreen> {
   final DatabaseManager _db = DatabaseManager.instance;
   final AudioPlayer _audioPlayer = AudioPlayer();
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  AudioRecorder? _audioRecorder;
 
   // Store subscriptions so we can cancel them in dispose()
   final List<StreamSubscription> _subscriptions = [];
@@ -75,7 +75,7 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
       sub.cancel();
     }
     _audioPlayer.dispose();
-    _audioRecorder.dispose();
+    _audioRecorder?.dispose();
     super.dispose();
   }
 
@@ -145,7 +145,7 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
                   GestureDetector(
                     onTap: () async {
                       if (_isRecording) {
-                        final path = await _audioRecorder.stop();
+                        final path = await _audioRecorder?.stop();
                         setDialogState(() => _isRecording = false);
                         
                         if (path != null && titleController.text.isNotEmpty) {
@@ -167,10 +167,13 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
                           }
                         }
                       } else {
-                        if (await _audioRecorder.hasPermission()) {
+                        // Recreate recorder for fresh state
+                        _audioRecorder?.dispose();
+                        _audioRecorder = AudioRecorder();
+                        if (await _audioRecorder!.hasPermission()) {
                           final dir = await getApplicationDocumentsDirectory();
                           final path = '${dir.path}/story_${DateTime.now().millisecondsSinceEpoch}.wav';
-                          await _audioRecorder.start(const RecordConfig(encoder: AudioEncoder.wav), path: path);
+                          await _audioRecorder!.start(const RecordConfig(encoder: AudioEncoder.wav), path: path);
                           setDialogState(() => _isRecording = true);
                         }
                       }
