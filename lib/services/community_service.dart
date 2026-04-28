@@ -1,20 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
+/// Offline Community Service — stores posts locally using SharedPreferences.
+/// Will be upgraded to Firebase Firestore + Auth post-proposal/demo.
 class CommunityService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String _collection = 'community_posts';
+  static const String _postsKey = 'community_posts_v2';
+  static const String _likesKey = 'liked_community_posts';
 
-  /// Stream of posts ordered by time (newest first)
-  Stream<QuerySnapshot> getPostsStream() {
-    return _firestore
-        .collection(_collection)
-        .orderBy('timestamp', descending: true)
-        .snapshots();
+  /// Get all posts from local storage (newest first)
+  Future<List<Map<String, dynamic>>> getPosts() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getStringList(_postsKey) ?? [];
+    final posts = raw.map((s) {
+      try {
+        return jsonDecode(s) as Map<String, dynamic>;
+      } catch (_) {
+        return <String, dynamic>{};
+      }
+    }).where((m) => m.isNotEmpty).toList();
+    // Sort newest first
+    posts.sort((a, b) => (b['timestamp'] ?? 0).compareTo(a['timestamp'] ?? 0));
+    return posts;
   }
 
-  /// Add a new post
+  /// Add a new post (locally)
   Future<void> addPost({
     required String author,
     required String role,
@@ -23,92 +33,105 @@ class CommunityService {
     required int color,
   }) async {
     try {
-      await _firestore.collection(_collection).add({
+      final prefs = await SharedPreferences.getInstance();
+      final existing = prefs.getStringList(_postsKey) ?? [];
+      
+      final post = {
+        'id': 'local_${DateTime.now().millisecondsSinceEpoch}',
         'author': author,
         'role': role,
         'content': content,
         'avatar': avatar,
         'color': color,
         'likes': 0,
-        'likedBy': [],
+        'likedBy': <String>[],
         'comments': 0,
-        'isVerified': false, // New users are not verified by default
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+        'isVerified': false,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
+      };
+      
+      existing.add(jsonEncode(post));
+      await prefs.setStringList(_postsKey, existing);
     } catch (e) {
       debugPrint("Error adding post: $e");
       rethrow;
     }
   }
 
-
   /// Get the set of liked post IDs from local storage
   Future<Set<String>> getLikedPosts() async {
     final prefs = await SharedPreferences.getInstance();
-    final likedList = prefs.getStringList('liked_community_posts') ?? [];
+    final likedList = prefs.getStringList(_likesKey) ?? [];
     return likedList.toSet();
   }
 
-  /// Toggle like status and persist securely
+  /// Toggle like status locally
   Future<void> toggleLike(String postId, bool currentLikeStatus) async {
-    final docRef = _firestore.collection(_collection).doc(postId);
     final prefs = await SharedPreferences.getInstance();
-    final String uid = prefs.getString('local_device_id') ?? 'anonymous_device';
-
-    try {
-      await _firestore.runTransaction((transaction) async {
-        final snapshot = await transaction.get(docRef);
-        if (!snapshot.exists) return;
-
-        List<dynamic> likedBy = [];
-        if (snapshot.data()!.containsKey('likedBy')) {
-            likedBy = snapshot.get('likedBy');
-        }
-
-        if (likedBy.contains(uid)) {
-          // Already liked, so unlike
-          transaction.update(docRef, {
-            'likedBy': FieldValue.arrayRemove([uid]),
-            'likes': FieldValue.increment(-1),
-          });
-        } else {
-          // Not liked, so like
-          transaction.update(docRef, {
-            'likedBy': FieldValue.arrayUnion([uid]),
-            'likes': FieldValue.increment(1),
-          });
-        }
-      });
-    } catch (e) {
-      debugPrint('Error toggling like: $e');
-    }
     
-    // Update local prefs for backward compatibility with UI assuming quick updates
+    // Update like count in post data
+    final existing = prefs.getStringList(_postsKey) ?? [];
+    final updated = existing.map((s) {
+      try {
+        final post = jsonDecode(s) as Map<String, dynamic>;
+        if (post['id'] == postId) {
+          final likes = (post['likes'] ?? 0) as int;
+          post['likes'] = currentLikeStatus ? (likes - 1).clamp(0, 99999) : likes + 1;
+        }
+        return jsonEncode(post);
+      } catch (_) {
+        return s;
+      }
+    }).toList();
+    await prefs.setStringList(_postsKey, updated);
+    
+    // Update local likes set
     final likedPosts = await getLikedPosts();
     if (currentLikeStatus) {
        likedPosts.remove(postId);
     } else {
        likedPosts.add(postId);
     }
-    await prefs.setStringList('liked_community_posts', likedPosts.toList());
+    await prefs.setStringList(_likesKey, likedPosts.toList());
   }
 
-  /// [ADMIN] Delete a post
+  /// [ADMIN] Delete a post locally
   Future<void> deletePost(String postId) async {
     try {
-      await _firestore.collection(_collection).doc(postId).delete();
+      final prefs = await SharedPreferences.getInstance();
+      final existing = prefs.getStringList(_postsKey) ?? [];
+      final filtered = existing.where((s) {
+        try {
+          final post = jsonDecode(s) as Map<String, dynamic>;
+          return post['id'] != postId;
+        } catch (_) {
+          return true;
+        }
+      }).toList();
+      await prefs.setStringList(_postsKey, filtered);
     } catch (e) {
       debugPrint("Error deleting post: $e");
       rethrow;
     }
   }
 
-  /// [ADMIN] Verify a post (Gold Badge)
+  /// [ADMIN] Verify a post (Gold Badge) — locally
   Future<void> toggleVerification(String postId, bool currentStatus) async {
     try {
-      await _firestore.collection(_collection).doc(postId).update({
-        'isVerified': !currentStatus
-      });
+      final prefs = await SharedPreferences.getInstance();
+      final existing = prefs.getStringList(_postsKey) ?? [];
+      final updated = existing.map((s) {
+        try {
+          final post = jsonDecode(s) as Map<String, dynamic>;
+          if (post['id'] == postId) {
+            post['isVerified'] = !currentStatus;
+          }
+          return jsonEncode(post);
+        } catch (_) {
+          return s;
+        }
+      }).toList();
+      await prefs.setStringList(_postsKey, updated);
     } catch (e) {
       debugPrint("Error verifying post: $e");
       rethrow;

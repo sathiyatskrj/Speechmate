@@ -89,7 +89,8 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
     if (_recordedPath != null) {
       setState(() => _isPlaying = true);
       await _audioPlayer.play(DeviceFileSource(_recordedPath!));
-      _audioPlayer.onPlayerComplete.listen((event) {
+      // Use .first to get a one-shot listener (no leak)
+      _audioPlayer.onPlayerComplete.first.then((_) {
         if (mounted) setState(() => _isPlaying = false);
       });
     }

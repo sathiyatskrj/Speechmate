@@ -16,8 +16,20 @@ class NeuralEngineService {
   bool _isInit = false;
 
   // Performance: Cache fuzzy results to avoid repeated Levenshtein scans
+  // LRU-style eviction: remove oldest entries when exceeding limit
+  static const int _maxCacheSize = 500;
   final Map<String, String?> _fuzzyCache = {};
   List<Map<String, dynamic>> _wordCache = [];
+
+  /// Evict oldest cache entries if cache exceeds limit
+  void _evictCacheIfNeeded() {
+    if (_fuzzyCache.length > _maxCacheSize) {
+      final keysToRemove = _fuzzyCache.keys.take(_fuzzyCache.length - _maxCacheSize + 50).toList();
+      for (final key in keysToRemove) {
+        _fuzzyCache.remove(key);
+      }
+    }
+  }
 
   // Stop Words (auxiliary verbs, articles, prepositions)
   final Set<String> _stopWords = {
@@ -211,7 +223,8 @@ class NeuralEngineService {
       resultText = resultText[0].toUpperCase() + resultText.substring(1);
     }
 
-    return NeuralResult(text: resultText, confidence: finalConfidence, isAiGenerated: true);
+    // isAiGenerated=false because this came from dictionary lookups, not LLM
+    return NeuralResult(text: resultText, confidence: finalConfidence, isAiGenerated: false);
   }
 
   // --- TOKENIZER ---
@@ -328,7 +341,7 @@ class NeuralEngineService {
       String english = (wordMap['english'] ?? '').toString().toLowerCase();
       if (english.isEmpty) continue;
 
-      int dist = _levenshteinDistance(target, english);
+      int dist = _levenshteinDistance(target, english, maxAllowed);
       if (dist < lowestDistance && dist <= maxAllowed) {
         lowestDistance = dist;
         bestMatch = wordMap['nicobarese']?.toString();
@@ -336,32 +349,46 @@ class NeuralEngineService {
     }
 
     _fuzzyCache[target] = bestMatch;
+    _evictCacheIfNeeded(); // Prevent unbounded growth
     if (bestMatch != null) {
-      debugPrint("🧠 NeuralEngine: Fuzzy matched '$target' (dist: $lowestDistance)");
+      debugPrint("\u{1F9E0} NeuralEngine: Fuzzy matched '$target' (dist: $lowestDistance)");
     }
     return bestMatch;
   }
 
-  // --- LEVENSHTEIN DISTANCE ---
-  int _levenshteinDistance(String a, String b) {
+  // --- LEVENSHTEIN DISTANCE (optimized single-row, O(min(n,m)) space) ---
+  int _levenshteinDistance(String a, String b, [int maxAllowed = 999]) {
     if (a.isEmpty) return b.length;
     if (b.isEmpty) return a.length;
+    // Early exit for obviously different lengths
+    if ((a.length - b.length).abs() > maxAllowed) return maxAllowed + 1;
 
-    var matrix = List.generate(a.length + 1, (i) => List.filled(b.length + 1, 0));
-    for (int i = 0; i <= a.length; i++) matrix[i][0] = i;
-    for (int j = 0; j <= b.length; j++) matrix[0][j] = j;
+    // Ensure b is the shorter string to minimize memory
+    if (a.length < b.length) {
+      final temp = a;
+      a = b;
+      b = temp;
+    }
+
+    List<int> prev = List.generate(b.length + 1, (i) => i);
+    List<int> curr = List.filled(b.length + 1, 0);
 
     for (int i = 1; i <= a.length; i++) {
+      curr[0] = i;
+      int rowMin = curr[0];
       for (int j = 1; j <= b.length; j++) {
         int cost = (a[i - 1] == b[j - 1]) ? 0 : 1;
-        matrix[i][j] = [
-          matrix[i - 1][j] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j - 1] + cost
-        ].reduce((min, val) => val < min ? val : min);
+        curr[j] = [prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost]
+            .reduce((min, val) => val < min ? val : min);
+        if (curr[j] < rowMin) rowMin = curr[j];
       }
+      // Early exit: if minimum in this row exceeds maxAllowed, no match possible
+      if (rowMin > maxAllowed) return maxAllowed + 1;
+      final tmp = prev;
+      prev = curr;
+      curr = tmp;
     }
-    return matrix[a.length][b.length];
+    return prev[b.length];
   }
 }
 

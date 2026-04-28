@@ -15,7 +15,7 @@ class WhisperService {
   bool _isProcessing = false;
   bool _isAvailable = false;
   Whisper? _whisper;
-  WhisperModelSize _currentSize = WhisperModelSize.base; // Upgraded: base multilingual
+  WhisperModelSize _currentSize = WhisperModelSize.base; // Prefer base multilingual
   
   // Model file mapping — multilingual variants (no .en suffix)
   static const Map<WhisperModelSize, String> _modelFiles = {
@@ -24,37 +24,39 @@ class WhisperService {
     WhisperModelSize.small: 'ggml-small.bin',
   };
 
+  // Fallback: also try .en variants
+  static const Map<WhisperModelSize, String> _modelFilesFallback = {
+    WhisperModelSize.tiny: 'ggml-tiny.en.bin',
+    WhisperModelSize.base: 'ggml-base.en.bin',
+    WhisperModelSize.small: 'ggml-small.en.bin',
+  };
+
   /// Check if the service is ready
   bool get isAvailable => _isAvailable;
   bool get isProcessing => _isProcessing;
   WhisperModelSize get currentSize => _currentSize;
 
   /// Initialize the service by ensuring the default model is extracted.
-  /// To upgrade to base/small, call [downloadAndSwitchModel].
+  /// Tries base first, falls back to tiny if base is not bundled.
   Future<bool> initialize({int retryCount = 2}) async {
     for (int attempt = 0; attempt <= retryCount; attempt++) {
       try {
         final Directory dir = await getApplicationSupportDirectory();
-        final String modelName = _modelFiles[_currentSize]!;
-        final String modelPath = '${dir.path}/$modelName';
-        final File modelFile = File(modelPath);
-
-        // Extract from assets if it doesn't exist
-        if (!modelFile.existsSync()) {
-          final String actualAsset = 'assets/models/${_modelFiles[_currentSize]!}';
-          debugPrint('[WhisperService] Extracting bundled $modelName from $actualAsset (multilingual)...');
-          try {
-            final ByteData data = await rootBundle.load(actualAsset);
-            final List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-            await modelFile.writeAsBytes(bytes);
-          } catch (e) {
-            debugPrint('[WhisperService] Bundle extraction failed for $modelName: $e');
-            // If it's not bundled, we can't initialize this size for now
-            if (_currentSize != WhisperModelSize.tiny) {
-               _isAvailable = false;
-               return false;
-            }
-          }
+        
+        // Try to extract the preferred model
+        bool extracted = await _tryExtractModel(dir, _currentSize);
+        
+        // If preferred model not found, try fallback sizes
+        if (!extracted && _currentSize != WhisperModelSize.tiny) {
+          debugPrint('[WhisperService] Base model not bundled, falling back to tiny...');
+          _currentSize = WhisperModelSize.tiny;
+          extracted = await _tryExtractModel(dir, _currentSize);
+        }
+        
+        if (!extracted) {
+          debugPrint('[WhisperService] No whisper model found in assets.');
+          _isAvailable = false;
+          return false;
         }
 
         _whisper = Whisper(
@@ -66,11 +68,51 @@ class WhisperService {
         debugPrint('[WhisperService] Initialized with $_currentSize model.');
         return true;
       } catch (e) {
-        debugPrint('[WhisperService] Init failed: $e');
+        debugPrint('[WhisperService] Init failed (attempt ${attempt + 1}): $e');
         if (attempt == retryCount) return false;
         await Future.delayed(const Duration(seconds: 1));
       }
     }
+    return false;
+  }
+
+  /// Try to extract a model from assets, checking both multilingual and .en variants
+  Future<bool> _tryExtractModel(Directory dir, WhisperModelSize size) async {
+    // First try multilingual variant
+    final String modelName = _modelFiles[size]!;
+    final String modelPath = '${dir.path}/$modelName';
+    final File modelFile = File(modelPath);
+
+    if (modelFile.existsSync() && modelFile.lengthSync() > 1000) {
+      return true; // Already extracted
+    }
+
+    // Try extracting multilingual from assets
+    try {
+      final String assetPath = 'assets/models/$modelName';
+      final ByteData data = await rootBundle.load(assetPath);
+      final List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      await modelFile.writeAsBytes(bytes);
+      debugPrint('[WhisperService] Extracted $modelName from assets (multilingual).');
+      return true;
+    } catch (_) {
+      debugPrint('[WhisperService] $modelName not found in assets.');
+    }
+
+    // Try .en fallback variant
+    final String fallbackName = _modelFilesFallback[size]!;
+    try {
+      final String assetPath = 'assets/models/$fallbackName';
+      final ByteData data = await rootBundle.load(assetPath);
+      final List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      // Save as the standard name so Whisper SDK finds it
+      await modelFile.writeAsBytes(bytes);
+      debugPrint('[WhisperService] Extracted $fallbackName as $modelName (English-only fallback).');
+      return true;
+    } catch (_) {
+      debugPrint('[WhisperService] $fallbackName also not found.');
+    }
+
     return false;
   }
 
@@ -106,20 +148,19 @@ class WhisperService {
     try {
       final TranscribeRequest request = TranscribeRequest(
         audio: audioFilePath,
-        language: "auto", // Upgrade: Auto-detect language (supports Multilingual models)
+        language: "auto", // Auto-detect language (supports Multilingual models)
         isTranslate: false,
-        speedUp: true, // Upgrade: Utilize GPU delegation (Metal/NNAPI) for reduced latency
+        speedUp: true, // Utilize GPU delegation for reduced latency
         threads: !Platform.isIOS ? 4 : 2, // Optimize thread count based on platform
       );
 
       final response = await _whisper!.transcribe(transcribeRequest: request);
-      
-      _isProcessing = false;
       return response.text;
     } catch (e) {
-      _isProcessing = false;
       debugPrint('[WhisperService] Error: $e');
       return '';
+    } finally {
+      _isProcessing = false; // Guaranteed reset
     }
   }
 

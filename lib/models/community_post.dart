@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class CommunityPost {
   final String id;
   final String author;
@@ -27,10 +25,10 @@ class CommunityPost {
     this.timestamp,
   });
 
-  factory CommunityPost.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+  /// Create from a Map (local JSON or Firestore)
+  factory CommunityPost.fromMap(Map<String, dynamic> data, {String? docId}) {
     return CommunityPost(
-      id: doc.id,
+      id: docId ?? data['id'] ?? '',
       author: data['author'] ?? 'Anonymous',
       role: data['role'] ?? 'Member',
       content: data['content'] ?? '',
@@ -40,7 +38,9 @@ class CommunityPost {
       comments: data['comments'] ?? 0,
       isVerified: data['isVerified'] ?? false,
       likedBy: data['likedBy'] ?? [],
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate(),
+      timestamp: data['timestamp'] is int
+          ? DateTime.fromMillisecondsSinceEpoch(data['timestamp'])
+          : null,
     );
   }
 }

@@ -83,6 +83,7 @@ class _TeacherDashState extends State<TeacherDash>
   @override
   void dispose() {
     _searchController.dispose();
+    _ttsService.dispose();
     disposeMixinSearch();
     super.dispose();
   }

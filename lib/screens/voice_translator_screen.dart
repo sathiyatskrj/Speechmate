@@ -18,7 +18,8 @@ class VoiceTranslatorScreen extends StatefulWidget {
 }
 
 class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with SingleTickerProviderStateMixin {
-  final AudioRecorder _audioRecorder = AudioRecorder();
+  // Use singletons to avoid re-creating services each time
+  AudioRecorder? _audioRecorder;
   final WhisperService _whisperService = WhisperService();
   final NeuralEngineService _neuralEngine = NeuralEngineService();
   final TtsService _ttsService = TtsService();
@@ -30,12 +31,14 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
   String _englishText = "Hold the glowing orb to speak...";
   String _nicobareseText = "Translation will appear here";
   String _audioPath = '';
+  String? _lastAudioPath; // Track last file for cleanup
 
   late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
+    _audioRecorder = AudioRecorder();
     _initServices();
     _pulseController = AnimationController(
       vsync: this,
@@ -64,11 +67,33 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
     }
   }
 
+  /// Re-create the AudioRecorder to ensure a fresh state after each use.
+  /// The `record` package disposes internal resources after stop(),
+  /// so a new instance is needed for subsequent recordings.
+  Future<void> _ensureFreshRecorder() async {
+    try {
+      _audioRecorder?.dispose();
+    } catch (_) {}
+    _audioRecorder = AudioRecorder();
+  }
+
   @override
   void dispose() {
-    _audioRecorder.dispose();
+    _audioRecorder?.dispose();
     _pulseController.dispose();
+    _ttsService.dispose();
+    _cleanupTempFile();
     super.dispose();
+  }
+
+  /// Delete temporary audio file to prevent storage leak
+  void _cleanupTempFile() {
+    if (_lastAudioPath != null) {
+      try {
+        final file = File(_lastAudioPath!);
+        if (file.existsSync()) file.deleteSync();
+      } catch (_) {}
+    }
   }
 
   Future<void> _startRecording() async {
@@ -76,11 +101,15 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
 
     try {
       await _ttsService.stop();
-      if (await _audioRecorder.hasPermission()) {
+      
+      // Always get a fresh recorder before starting
+      await _ensureFreshRecorder();
+      
+      if (await _audioRecorder!.hasPermission()) {
         final Directory tempDir = await getTemporaryDirectory();
         _audioPath = '${tempDir.path}/translation_${DateTime.now().millisecondsSinceEpoch}.wav';
 
-        await _audioRecorder.start(
+        await _audioRecorder!.start(
           const RecordConfig(
             encoder: AudioEncoder.wav,
             sampleRate: 16000,
@@ -116,7 +145,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
 
     String? path;
     try {
-      path = await _audioRecorder.stop();
+      path = await _audioRecorder!.stop();
     } catch (e) {
       debugPrint('[VoiceTranslator] Stop recording error: $e');
     }
@@ -132,6 +161,10 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen> with Sing
     }
 
     if (path != null && File(path).existsSync()) {
+      // Clean up previous temp file
+      _cleanupTempFile();
+      _lastAudioPath = path;
+      
       try {
         final String transcription = await _whisperService.transcribe(path).timeout(const Duration(seconds: 20));
 

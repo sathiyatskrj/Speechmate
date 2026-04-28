@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:speechmate/services/database_manager.dart';
@@ -19,6 +20,9 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   final AudioRecorder _audioRecorder = AudioRecorder();
 
+  // Store subscriptions so we can cancel them in dispose()
+  final List<StreamSubscription> _subscriptions = [];
+
   List<Map<String, dynamic>> _stories = [];
   bool _isLoading = true;
 
@@ -34,31 +38,42 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
     super.initState();
     _loadStories();
 
-    _audioPlayer.onPlayerStateChanged.listen((state) {
-      if (mounted) setState(() => _isPlaying = state == PlayerState.playing);
-    });
+    _subscriptions.add(
+      _audioPlayer.onPlayerStateChanged.listen((state) {
+        if (mounted) setState(() => _isPlaying = state == PlayerState.playing);
+      }),
+    );
 
-    _audioPlayer.onDurationChanged.listen((newDuration) {
-      if (mounted) setState(() => _duration = newDuration);
-    });
+    _subscriptions.add(
+      _audioPlayer.onDurationChanged.listen((newDuration) {
+        if (mounted) setState(() => _duration = newDuration);
+      }),
+    );
 
-    _audioPlayer.onPositionChanged.listen((newPosition) {
-      if (mounted) setState(() => _position = newPosition);
-    });
+    _subscriptions.add(
+      _audioPlayer.onPositionChanged.listen((newPosition) {
+        if (mounted) setState(() => _position = newPosition);
+      }),
+    );
 
-    _audioPlayer.onPlayerComplete.listen((event) {
-      if (mounted) {
-        setState(() {
-          _isPlaying = false;
-          _position = Duration.zero;
-          _playingStoryId = null;
-        });
-      }
-    });
+    _subscriptions.add(
+      _audioPlayer.onPlayerComplete.listen((event) {
+        if (mounted) {
+          setState(() {
+            _isPlaying = false;
+            _position = Duration.zero;
+            _playingStoryId = null;
+          });
+        }
+      }),
+    );
   }
 
   @override
   void dispose() {
+    for (final sub in _subscriptions) {
+      sub.cancel();
+    }
     _audioPlayer.dispose();
     _audioRecorder.dispose();
     super.dispose();

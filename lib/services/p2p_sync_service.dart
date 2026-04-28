@@ -50,14 +50,39 @@ class P2PSyncService {
     }
   }
 
+  // Schema validation - only allow known columns
+  static const Set<String> _allowedWordColumns = {'id', 'category_id', 'english', 'nicobarese', 'emoji', 'image', 'audio'};
+  static const Set<String> _allowedGAColumns = {'id', 'english', 'great_andamanese', 'pos', 'audio'};
+
+  static Map<String, dynamic>? _validateRow(Map<String, dynamic> row, Set<String> allowed) {
+    // Strip any keys not in the schema
+    final sanitized = <String, dynamic>{};
+    for (final key in row.keys) {
+      if (allowed.contains(key)) {
+        sanitized[key] = row[key];
+      }
+    }
+    // Must have at least 'english' to be valid
+    if (sanitized['english'] == null || sanitized['english'].toString().isEmpty) return null;
+    return sanitized;
+  }
+
   // To be used by Students/Import tool later
   static Future<void> importDictionaryPayload(String zipPath) async {
-    final bytes = await File(zipPath).readAsBytes();
+    final file = File(zipPath);
+    if (!await file.exists()) {
+      throw Exception('File not found: $zipPath');
+    }
+    
+    final bytes = await file.readAsBytes();
     final archive = ZipDecoder().decodeBytes(bytes);
     
-    for (final file in archive) {
-      if (file.isFile && file.name == 'dictionary_update.json') {
-        final data = file.content as List<int>;
+    int importedWords = 0;
+    int skippedWords = 0;
+    
+    for (final archiveFile in archive) {
+      if (archiveFile.isFile && archiveFile.name == 'dictionary_update.json') {
+        final data = archiveFile.content as List<int>;
         final jsonString = utf8.decode(data);
         final Map<String, dynamic> dataMap = jsonDecode(jsonString);
         
@@ -67,18 +92,33 @@ class P2PSyncService {
         if (dataMap.containsKey('words')) {
            final List<dynamic> wordsList = dataMap['words'];
            for (var item in wordsList) {
-              batch.insert('words', item, conflictAlgorithm: ConflictAlgorithm.replace);
+              if (item is! Map<String, dynamic>) { skippedWords++; continue; }
+              final validated = _validateRow(item, _allowedWordColumns);
+              if (validated != null) {
+                batch.insert('words', validated, conflictAlgorithm: ConflictAlgorithm.replace);
+                importedWords++;
+              } else {
+                skippedWords++;
+              }
            }
         }
         
         if (dataMap.containsKey('ga_dictionary')) {
            final List<dynamic> gaList = dataMap['ga_dictionary'];
            for (var item in gaList) {
-              batch.insert('ga_dictionary', item, conflictAlgorithm: ConflictAlgorithm.replace);
+              if (item is! Map<String, dynamic>) { skippedWords++; continue; }
+              final validated = _validateRow(item, _allowedGAColumns);
+              if (validated != null) {
+                batch.insert('ga_dictionary', validated, conflictAlgorithm: ConflictAlgorithm.replace);
+                importedWords++;
+              } else {
+                skippedWords++;
+              }
            }
         }
         
         await batch.commit(noResult: true);
+        debugPrint('[P2PSync] Imported $importedWords entries, skipped $skippedWords invalid.');
       }
     }
   }

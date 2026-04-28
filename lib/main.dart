@@ -7,8 +7,6 @@ import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/landing_page.dart';
 import 'package:speechmate/core/app_theme.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
 
@@ -55,15 +53,17 @@ void main() async {
     );
   };
 
-  try {
-      await Firebase.initializeApp();
-      FirebaseFirestore.instance.settings = const Settings(
-        persistenceEnabled: true,
-        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-      );
-  } catch (e) {
-      debugPrint("Firebase init failed: $e");
-  }
+  // NOTE: Firebase removed for pre-demo offline mode.
+  // Will be re-enabled post-proposal with proper authentication.
+  // try {
+  //     await Firebase.initializeApp();
+  //     FirebaseFirestore.instance.settings = const Settings(
+  //       persistenceEnabled: true,
+  //       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  //     );
+  // } catch (e) {
+  //     debugPrint("Firebase init failed: $e");
+  // }
 
   // Database initialization
   try {

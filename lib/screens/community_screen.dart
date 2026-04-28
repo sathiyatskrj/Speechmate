@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:speechmate/widgets/background.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/community_service.dart';
 import 'package:speechmate/models/community_post.dart';
@@ -25,21 +23,151 @@ class _CommunityScreenState extends State<CommunityScreen> {
   bool _isAdmin = false;
   String? _currentUid;
 
+  // Posts
+  List<CommunityPost> _posts = [];
+  Set<String> _likedPostIds = {};
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-
     _loadUser();
+    _loadPosts();
   }
-
-
 
   Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _currentUid = prefs.getString('local_device_id') ?? 'anonymous_device';
     });
+  }
+
+  Future<void> _loadPosts() async {
+    setState(() => _isLoading = true);
+    try {
+      final rawPosts = await _communityService.getPosts();
+      final likedIds = await _communityService.getLikedPosts();
+      
+      List<CommunityPost> allPosts = [];
+      
+      // Add seed posts if no local posts exist yet
+      if (rawPosts.isEmpty) {
+        allPosts = _getSeedPosts();
+      } else {
+        allPosts = rawPosts.map((m) => CommunityPost.fromMap(m)).toList();
+      }
+      
+      // Always include seed posts that aren't already in the list
+      final seedPosts = _getSeedPosts();
+      final existingIds = allPosts.map((p) => p.id).toSet();
+      for (final seed in seedPosts) {
+        if (!existingIds.contains(seed.id)) {
+          allPosts.add(seed);
+        }
+      }
+      
+      // Sort newest first
+      allPosts.sort((a, b) => (b.timestamp ?? DateTime(2000)).compareTo(a.timestamp ?? DateTime(2000)));
+      
+      if (mounted) {
+        setState(() {
+          _posts = allPosts;
+          _likedPostIds = likedIds;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('[Community] Load error: $e');
+      if (mounted) {
+        setState(() {
+          _posts = _getSeedPosts();
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  List<CommunityPost> _getSeedPosts() {
+    return [
+      CommunityPost(
+        id: 'seed_1',
+        author: 'SpeechMate Admin',
+        role: 'Administrator',
+        content: 'Welcome to the Nicobarese learning community! 🌏\n\nFeel free to ask questions, share words you\'ve learned, and help verify pronunciations. Together we are preserving an endangered language for future generations.',
+        avatar: 'A',
+        color: Colors.redAccent.value,
+        likes: 42,
+        likedBy: [],
+        comments: 5,
+        isVerified: true,
+        timestamp: DateTime.now().subtract(const Duration(days: 7)),
+      ),
+      CommunityPost(
+        id: 'seed_2',
+        author: 'Pratik B.',
+        role: 'Core Developer',
+        content: 'Just pushed a major update to the AR translator! 📸 Now it detects objects in real-time and shows Nicobarese translations with bounding boxes. Try pointing your camera at everyday objects!',
+        avatar: 'P',
+        color: Colors.blueAccent.value,
+        likes: 28,
+        likedBy: [],
+        comments: 8,
+        isVerified: true,
+        timestamp: DateTime.now().subtract(const Duration(days: 3)),
+      ),
+      CommunityPost(
+        id: 'seed_3',
+        author: 'Dr. Sharma',
+        role: 'Linguist',
+        content: 'Did you know? Nicobarese has incredibly rich semantics related to island ecology. The word for "jungle" (Tōt) carries cultural weight far beyond its English translation. Check out the Nature Hub to explore more! 🌿',
+        avatar: 'S',
+        color: Colors.green.value,
+        likes: 89,
+        likedBy: [],
+        comments: 14,
+        isVerified: true,
+        timestamp: DateTime.now().subtract(const Duration(days: 5)),
+      ),
+      CommunityPost(
+        id: 'seed_4',
+        author: 'Kunal P.',
+        role: 'VBYLD 2026 Team',
+        content: 'Our presentation at the nationals was incredible! 🇮🇳 Ranked 6th in India at VBYLD 2026. The judges were impressed by how SpeechMate preserves tribal languages completely offline. Proud to be part of this mission!',
+        avatar: 'K',
+        color: Colors.orangeAccent.value,
+        likes: 156,
+        likedBy: [],
+        comments: 22,
+        isVerified: true,
+        timestamp: DateTime.now().subtract(const Duration(days: 2)),
+      ),
+      CommunityPost(
+        id: 'seed_5',
+        author: 'Sneha G.',
+        role: 'Student • Nationals Team',
+        content: 'Learned 15 new Nicobarese words today using the flashcard game! 🎲 The spaced repetition really helps. "Nöngūm" = Nose, "Tananga" = Ear. Who else is on a streak? 🔥',
+        avatar: 'S',
+        color: Colors.purpleAccent.value,
+        likes: 34,
+        likedBy: [],
+        comments: 6,
+        isVerified: false,
+        timestamp: DateTime.now().subtract(const Duration(hours: 12)),
+      ),
+      CommunityPost(
+        id: 'seed_6',
+        author: 'Elder Mary',
+        role: 'Nicobarese Community',
+        content: 'I am very happy to see young people learning our language. When I was young, everyone spoke Nicobarese. Now only elders remember the old songs. This app gives me hope. 🙏',
+        avatar: 'M',
+        color: Colors.teal.value,
+        likes: 201,
+        likedBy: [],
+        comments: 31,
+        isVerified: true,
+        timestamp: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+    ];
   }
 
   @override
@@ -67,7 +195,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               IconButton(
                   icon: const Icon(Icons.admin_panel_settings_outlined, color: Colors.white),
                   tooltip: "Admin Login",
-                  onPressed: _showAdminLoginDialog, // Login
+                  onPressed: _showAdminLoginDialog,
               )
             else
               IconButton(
@@ -89,7 +217,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
         onPressed: _showPostDialog,
         backgroundColor: _isAdmin ? Colors.redAccent : AppColors.studentAccent,
         icon: Icon(_isAdmin ? Icons.campaign : Icons.edit),
-        label: Text(_isAdmin ? "Admin Post" : "Contribute", style: TextStyle(color: Colors.white)),
+        label: Text(_isAdmin ? "Admin Post" : "Contribute", style: const TextStyle(color: Colors.white)),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -109,67 +237,31 @@ class _CommunityScreenState extends State<CommunityScreen> {
             children: [
                 _buildSyncBanner(),
                 Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                    itemCount: _getMockPosts().length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == 0) return _buildTrendingSection();
-                      
-                      CommunityPost post = _getMockPosts()[index - 1];
-                      return _buildPostCard(post);
-                    },
-                  ),
+                  child: _isLoading
+                    ? const Center(child: CircularProgressIndicator(color: Colors.cyanAccent))
+                    : _posts.isEmpty
+                      ? _buildEmptyState()
+                      : RefreshIndicator(
+                          onRefresh: _loadPosts,
+                          color: Colors.cyanAccent,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(top: 10, bottom: 80, left: 16, right: 16),
+                            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                            itemCount: _posts.length + 1,
+                            itemBuilder: (context, index) {
+                              if (index == 0) return _buildTrendingSection();
+                              
+                              CommunityPost post = _posts[index - 1];
+                              return _buildPostCard(post);
+                            },
+                          ),
+                        ),
                 ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  List<CommunityPost> _getMockPosts() {
-      return [
-        CommunityPost(
-          id: '1',
-          author: 'SpeechMate Admin',
-          role: 'Administrator',
-          content: 'Welcome to the Nicobarese learning community! Feel free to ask questions and share your progress.',
-          avatar: 'A',
-          color: Colors.redAccent.value,
-          likes: 42,
-          likedBy: [],
-          comments: 5,
-          isVerified: true,
-          timestamp: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-        CommunityPost(
-          id: '2',
-          author: 'Neel',
-          role: 'Student',
-          content: 'I finally mastered the common phrases! The audio flashcards are so helpful.',
-          avatar: 'N',
-          color: Colors.blueAccent.value,
-          likes: 12,
-          likedBy: [],
-          comments: 2,
-          isVerified: false,
-          timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-        ),
-        CommunityPost(
-          id: '3',
-          author: 'Dr. Sharma',
-          role: 'Linguist',
-          content: 'Did you know? Nicobarese has incredibly rich semantics related to island ecology. Check out the Nature Hub!',
-          avatar: 'S',
-          color: Colors.green.value,
-          likes: 89,
-          likedBy: [],
-          comments: 14,
-          isVerified: true,
-          timestamp: DateTime.now().subtract(const Duration(hours: 5)),
-        ),
-      ];
   }
 
   Widget _buildEmptyState() {
@@ -198,9 +290,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                  Container(width: 8, height: 8, decoration: BoxDecoration(color: _isAdmin ? Colors.red : Colors.greenAccent, shape: BoxShape.circle)).animate(onPlay: (c) => c.repeat()).fadeIn(duration: 1.seconds).fadeOut(duration: 1.seconds),
+                  Container(width: 8, height: 8, decoration: BoxDecoration(color: _isAdmin ? Colors.red : Colors.amberAccent, shape: BoxShape.circle)).animate(onPlay: (c) => c.repeat()).fadeIn(duration: 1.seconds).fadeOut(duration: 1.seconds),
                   const SizedBox(width: 8),
-                  Text(_isAdmin ? "ADMIN MODE ACTIVE • REGULATING" : "LIVE • Global Community Feed", style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(_isAdmin ? "ADMIN MODE ACTIVE • REGULATING" : "OFFLINE MODE • Local Community Feed", style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
               ],
           ),
       );
@@ -223,16 +315,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
             children: [
               Icon(Icons.trending_up, color: AppColors.studentAccent),
               const SizedBox(width: 8),
-              Text("Trending Topics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+              const Text("Trending Topics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             ],
           ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             children: [
-              _buildTag("#Level1Challenge"),
-              _buildTag("#WordOfTheDay"),
-              _buildTag("#Nicobarese"),
+              _buildTag("#VBYLD2026"),
+              _buildTag("#NicobareseLearning"),
+              _buildTag("#LanguagePreservation"),
               _buildTag("#Speechmate"),
             ],
           ),
@@ -251,8 +343,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   }
 
   Widget _buildPostCard(CommunityPost post) {
-    List<dynamic> likedBy = post.likedBy; // Need to ensure CommunityPost model has likedBy
-    bool isLikedByMe = _currentUid != null && likedBy.contains(_currentUid);
+    bool isLikedByMe = _likedPostIds.contains(post.id);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -300,7 +391,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     IconButton(
                         icon: Icon(post.isVerified ? Icons.verified_user : Icons.verified_user_outlined, color: Colors.green),
                         tooltip: "Toggle Verify",
-                        onPressed: () => _communityService.toggleVerification(post.id, post.isVerified),
+                        onPressed: () async {
+                          await _communityService.toggleVerification(post.id, post.isVerified);
+                          _loadPosts();
+                        },
                     ),
                     IconButton(
                         icon: const Icon(Icons.delete_forever, color: Colors.red),
@@ -321,8 +415,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       icon: isLikedByMe ? Icons.favorite : Icons.favorite_border,
                       color: isLikedByMe ? Colors.red : Colors.grey,
                       count: post.likes,
-                      onTap: () {
-                         _communityService.toggleLike(post.id, isLikedByMe);
+                      onTap: () async {
+                         await _communityService.toggleLike(post.id, isLikedByMe);
+                         _loadPosts();
                       },
                     ),
                     const SizedBox(width: 20),
@@ -351,10 +446,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
               actions: [
                   TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
                   TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                           Navigator.pop(ctx);
-                          _communityService.deletePost(postId);
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Post deleted by Admin")));
+                          await _communityService.deletePost(postId);
+                          _loadPosts();
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Post deleted by Admin")));
+                          }
                       },
                       child: const Text("Delete", style: TextStyle(color: Colors.red)),
                   )
@@ -406,10 +504,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
               actions: [
                   TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
                   ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
                           if (textController.text.isNotEmpty) {
                               Navigator.pop(context);
-                              _communityService.addPost(
+                              await _communityService.addPost(
                                   author: _isAdmin ? "SpeechMate Admin" : "Guest User",
                                   role: _isAdmin ? "Administrator" : "Community Member",
                                   content: textController.text,
@@ -420,10 +518,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                               ProgressService().recordCommunityPost().then((_) {
                                   GamificationService.refresh();
                               });
-                              
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Posting to cloud... ☁️ +XP!"))
-                              );
+                              _loadPosts();
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Posted to community! ✍️ +XP!"))
+                                );
+                              }
                           }
                       },
                       icon: const Icon(Icons.send),
@@ -495,8 +595,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       children: [
                           const Text("About Community Hub", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
                           const SizedBox(height: 15),
-                          _buildInfoSection("What is this?", "A Live, connection to the global Speechmate community."),
-                          _buildInfoSection("Real-Time?", "Yes! Posts appear instantly for everyone online."),
+                          _buildInfoSection("What is this?", "A community hub for Speechmate learners to share progress and language knowledge."),
+                          _buildInfoSection("Offline Mode", "Currently running in offline mode. Posts are stored locally. Cloud sync will be enabled in a future update."),
                           _buildInfoSection("Privacy", "No personal data is uploaded. Be kind and respectful."),
                           const SizedBox(height: 20),
                           Center(
@@ -523,6 +623,3 @@ class _CommunityScreenState extends State<CommunityScreen> {
       );
   }
 }
-
-
-

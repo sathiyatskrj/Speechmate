@@ -58,6 +58,7 @@ class _StudentDashState extends State<StudentDash>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     searchController.dispose();
+    ttsService.dispose();
     disposeMixinSearch();
     super.dispose();
   }

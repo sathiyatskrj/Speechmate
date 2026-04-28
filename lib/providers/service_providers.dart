@@ -10,18 +10,24 @@ final databaseProvider = Provider<DatabaseManager>((ref) {
   return DatabaseManager.instance;
 });
 
+/// TtsService — init() is lightweight (synchronous handlers), safe to fire-and-forget
 final ttsServiceProvider = Provider<TtsService>((ref) {
   final service = TtsService();
   service.init();
+  ref.onDispose(() => service.dispose());
   return service;
 });
 
+/// NeuralEngineService — singleton, init() loads dictionary from DB.
+/// Using the singleton factory constructor ensures only one instance.
 final neuralEngineProvider = Provider<NeuralEngineService>((ref) {
   final service = NeuralEngineService();
+  // init() is idempotent (checks _isInit internally), safe to fire
   service.init();
   return service;
 });
 
+/// LocalLlmService — mock for now, initialize is lightweight
 final llmServiceProvider = Provider<LocalLlmService>((ref) {
   final service = LocalLlmService();
   service.initialize();

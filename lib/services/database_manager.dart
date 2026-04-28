@@ -3,16 +3,28 @@ import 'package:path/path.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
+import 'dart:async';
 
 class DatabaseManager {
   static final DatabaseManager instance = DatabaseManager._init();
   static Database? _database;
+  static Completer<Database>? _initCompleter;
 
   DatabaseManager._init();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('speechmate.db');
+    // Prevent concurrent initialization — second caller waits for the first
+    if (_initCompleter != null) return _initCompleter!.future;
+    _initCompleter = Completer<Database>();
+    try {
+      _database = await _initDB('speechmate.db');
+      _initCompleter!.complete(_database!);
+    } catch (e) {
+      _initCompleter!.completeError(e);
+      _initCompleter = null;
+      rethrow;
+    }
     return _database!;
   }
 
@@ -339,7 +351,7 @@ class DatabaseManager {
         }
         await batch.commit(noResult: true);
       } catch (e) {
-         // Fail silently
+         debugPrint('[DatabaseManager] ⚠ Failed to seed $table from $path: $e');
       }
   }
 
@@ -391,7 +403,7 @@ class DatabaseManager {
         }
         await batch.commit(noResult: true);
       } catch (e) {
-         // Fail silently if JSON missing
+         debugPrint('[DatabaseManager] ⚠ Failed to seed category $categoryId from $path: $e');
       }
   }
   
