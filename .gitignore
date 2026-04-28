@@ -49,4 +49,3 @@ tools/
 
 # Offline ML Models
 *.gguf
-assets/models/*.bin
