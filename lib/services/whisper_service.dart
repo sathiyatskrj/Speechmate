@@ -166,6 +166,7 @@ class WhisperService {
         language: "auto",
         isTranslate: false,
         speedUp: true,
+        isNoTimestamps: true, // Speeds up inference by skipping timestamp generation
         threads: !Platform.isIOS ? 4 : 2,
       );
 

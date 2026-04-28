@@ -98,7 +98,7 @@ class TtsService {
 
     // 2. Try to find audio by english word across all known folders
     if (englishWord != null && englishWord.isNotEmpty) {
-      final String cleanName = englishWord.toLowerCase().trim().replaceAll(' ', '_');
+      final String cleanName = englishWord.toLowerCase().replaceAll(RegExp(r'[^\w\s]+'), '').trim().replaceAll(RegExp(r'\s+'), '_');
       
       for (final folder in _audioFolders) {
         try {
