@@ -50,7 +50,7 @@ class _FlashCardGameState extends State<FlashCardGame> with TickerProviderStateM
       try {
         final db = await DatabaseManager.instance.database;
         data = await db.query('words', limit: 200);
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
     }
     
     if (data.isEmpty) {

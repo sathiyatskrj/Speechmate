@@ -133,7 +133,7 @@ class DatabaseManager {
      if (oldVersion < 6) {
        try {
          await db.execute('ALTER TABLE flashcards ADD COLUMN target_language TEXT DEFAULT \'nicobarese\'');
-       } catch (_) {
+       } catch (e) { debugPrint("Silent error caught: $e");
          // Column may already exist
        }
        debugPrint('[DatabaseManager] Upgraded to v6 (target_language column).');

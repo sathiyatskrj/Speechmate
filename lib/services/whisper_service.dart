@@ -97,7 +97,7 @@ class WhisperService {
       await modelFile.writeAsBytes(bytes);
       debugPrint('[WhisperService] Extracted $modelName from assets (multilingual).');
       return true;
-    } catch (_) {
+    } catch (e) { debugPrint("Silent error caught: $e");
       debugPrint('[WhisperService] $modelName not found in assets.');
     }
 
@@ -111,7 +111,7 @@ class WhisperService {
       await modelFile.writeAsBytes(bytes);
       debugPrint('[WhisperService] Extracted $fallbackName as $modelName (English-only fallback).');
       return true;
-    } catch (_) {
+    } catch (e) { debugPrint("Silent error caught: $e");
       debugPrint('[WhisperService] $fallbackName also not found.');
     }
 

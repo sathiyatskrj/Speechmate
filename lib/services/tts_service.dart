@@ -106,7 +106,7 @@ class TtsService {
           await rootBundle.load('assets/$assetPath');
           await _audioPlayer.play(AssetSource(assetPath));
           return; // Success!
-        } catch (_) {
+        } catch (e) { debugPrint("Silent error caught: $e");
           // Not in this folder, try next
         }
       }
@@ -116,7 +116,7 @@ class TtsService {
         await rootBundle.load('assets/audio/$cleanName.mp3');
         await _audioPlayer.play(AssetSource('audio/$cleanName.mp3'));
         return;
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
     }
 
     // 3. Fallback to TTS

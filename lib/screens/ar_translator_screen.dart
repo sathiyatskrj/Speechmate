@@ -106,7 +106,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       if (_cameraController != null) {
         try {
           await _cameraController!.stopImageStream();
-        } catch (_) {}
+        } catch (e) { debugPrint('Silent error caught: $e'); }
         await _cameraController!.dispose();
         _cameraController = null;
       }
@@ -424,7 +424,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
         final v = gaRows.first['great_andamanese']?.toString() ?? '';
         if (v.isNotEmpty) { _lookupCache[term] = v; return v; }
       }
-    } catch (_) {}
+    } catch (e) { debugPrint('Silent error caught: $e'); }
     _lookupCache[term] = null;
     return null;
   }
@@ -458,7 +458,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       _isCameraReady = false;
       try {
         _cameraController?.stopImageStream();
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
       _cameraController?.dispose();
       _cameraController = null;
     } else if (state == AppLifecycleState.resumed && !_isPaused) {
@@ -779,7 +779,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       final y = details.localPosition.dy / size.height;
       await _cameraController!.setFocusPoint(Offset(x, y));
       await _cameraController!.setExposurePoint(Offset(x, y));
-    } catch (_) {}
+    } catch (e) { debugPrint('Silent error caught: $e'); }
   }
 
   Widget _buildBottomBar() {

@@ -15,7 +15,7 @@ class CommunityService {
     final posts = raw.map((s) {
       try {
         return jsonDecode(s) as Map<String, dynamic>;
-      } catch (_) {
+      } catch (e) { debugPrint("Silent error caught: $e");
         return <String, dynamic>{};
       }
     }).where((m) => m.isNotEmpty).toList();
@@ -79,7 +79,7 @@ class CommunityService {
           post['likes'] = currentLikeStatus ? (likes - 1).clamp(0, 99999) : likes + 1;
         }
         return jsonEncode(post);
-      } catch (_) {
+      } catch (e) { debugPrint("Silent error caught: $e");
         return s;
       }
     }).toList();
@@ -104,7 +104,7 @@ class CommunityService {
         try {
           final post = jsonDecode(s) as Map<String, dynamic>;
           return post['id'] != postId;
-        } catch (_) {
+        } catch (e) { debugPrint("Silent error caught: $e");
           return true;
         }
       }).toList();
@@ -127,7 +127,7 @@ class CommunityService {
             post['isVerified'] = !currentStatus;
           }
           return jsonEncode(post);
-        } catch (_) {
+        } catch (e) { debugPrint("Silent error caught: $e");
           return s;
         }
       }).toList();

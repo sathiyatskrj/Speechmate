@@ -47,12 +47,12 @@ class _QuizScreenState extends State<QuizScreen> {
       List<Map<String, dynamic>> missed = [];
       try {
         missed = await smartQuizService.getMissedWords();
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
       
       List<Map<String, dynamic>> fresh = [];
       try {
         fresh = await dictionaryService.getRandomWords(5);
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
       
       // Mix 2 missed words (if any) with 3 fresh words
       List<Map<String, dynamic>> quizSet = [];
@@ -112,7 +112,7 @@ class _QuizScreenState extends State<QuizScreen> {
       List<Map<String, dynamic>> wrong = [];
       try {
         wrong = await dictionaryService.getRandomWords(3);
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
       
       List<String> opts = [correctEnglish];
       for (var w in wrong) {

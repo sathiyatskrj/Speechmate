@@ -172,7 +172,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                     if (parts.length == 2 && double.parse(parts[1]) > 0) {
                                       percentage = double.parse(parts[0]) / double.parse(parts[1]);
                                     }
-                                  } catch (_) {}
+                                  } catch (e) { debugPrint('Silent error caught: $e'); }
 
                                   return BarChartGroupData(
                                     x: idx,

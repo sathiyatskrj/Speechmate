@@ -52,7 +52,7 @@ class _WordMatchGameState extends State<WordMatchGame> with TickerProviderStateM
       try {
         final db = await DatabaseManager.instance.database;
         allWords = await db.query('words', limit: 200);
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
     }
     
     if (allWords.isEmpty) {

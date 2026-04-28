@@ -55,7 +55,7 @@ class _BodyPartsScreenState extends State<BodyPartsScreen>
         (p) => (p['english'] ?? '').toString().toLowerCase() == name.toLowerCase() ||
                (p['text'] ?? '').toString().toLowerCase() == name.toLowerCase(),
       );
-    } catch (_) {
+    } catch (e) { debugPrint("Silent error caught: $e");
       return null;
     }
   }

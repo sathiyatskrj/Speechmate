@@ -106,7 +106,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
       // Enable auto-exposure for better OCR in varying light
       try {
         await _cameraController!.setExposureMode(ExposureMode.auto);
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
       
       if (mounted) setState(() {});
       
@@ -127,7 +127,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
     }
     if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
       if (_isLiveMode) {
-        try { _cameraController?.stopImageStream(); } catch (_) {}
+        try { _cameraController?.stopImageStream(); } catch (e) { debugPrint('Silent error caught: $e'); }
       }
       _cameraController?.dispose();
       _cameraController = null;
@@ -140,7 +140,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     if (_isLiveMode) {
-      try { _cameraController?.stopImageStream(); } catch (_) {}
+      try { _cameraController?.stopImageStream(); } catch (e) { debugPrint('Silent error caught: $e'); }
     }
     _cameraController?.dispose();
     _textRecognizer.close();
@@ -666,7 +666,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                     GestureDetector(
                       onTap: () {
                          if (_isLiveMode && _cameraController != null && _cameraController!.value.isStreamingImages) {
-                           try { _cameraController!.stopImageStream(); } catch (_) {}
+                           try { _cameraController!.stopImageStream(); } catch (e) { debugPrint('Silent error caught: $e'); }
                          }
                          setState(() { _isLiveMode = false; _liveBlocks.clear(); });
                       },
@@ -758,7 +758,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                                  _flashlightOn ? FlashMode.torch : FlashMode.off,
                                );
                                setState(() {});
-                             } catch (_) {}
+                             } catch (e) { debugPrint('Silent error caught: $e'); }
                            },
                         ),
                         GestureDetector(

@@ -40,7 +40,7 @@ class FeedbackService {
     return raw.map((s) {
       try {
         return jsonDecode(s) as Map<String, dynamic>;
-      } catch (_) {
+      } catch (e) { debugPrint("Silent error caught: $e");
         return <String, dynamic>{};
       }
     }).where((m) => m.isNotEmpty).toList();

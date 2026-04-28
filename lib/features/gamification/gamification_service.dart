@@ -78,7 +78,7 @@ class GamificationService {
       final communityXP = communityPosts * 15;
       
       return wordXP + quizXP + streakXP + communityXP;
-    } catch (_) {
+    } catch (e) { debugPrint("Silent error caught: $e");
       return 0;
     }
   }
@@ -105,7 +105,7 @@ class GamificationService {
     try {
       final stats = await _progressService.getProgressStats();
       return stats['dayStreak'] ?? 0;
-    } catch (_) {
+    } catch (e) { debugPrint("Silent error caught: $e");
       return 0;
     }
   }
@@ -150,7 +150,7 @@ class GamificationService {
           'obtained': dayStreak >= 30,
         },
       ];
-    } catch (_) {
+    } catch (e) { debugPrint("Silent error caught: $e");
       return [];
     }
   }

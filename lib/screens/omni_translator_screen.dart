@@ -59,7 +59,7 @@ class _OmniTranslatorScreenState extends State<OmniTranslatorScreen> {
       try {
         final f = File(_lastAudioPath!);
         if (f.existsSync()) f.deleteSync();
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
     }
   }
 

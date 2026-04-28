@@ -109,7 +109,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
       try {
         final f = File(_lastAudioPath!);
         if (f.existsSync()) f.deleteSync();
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
     }
   }
 

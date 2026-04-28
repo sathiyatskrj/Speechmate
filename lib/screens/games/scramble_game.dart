@@ -46,7 +46,7 @@ class _ScrambleGameState extends State<ScrambleGame> with TickerProviderStateMix
       try {
         final db = await DatabaseManager.instance.database;
         allWords = await db.query('words', limit: 200);
-      } catch (_) {}
+      } catch (e) { debugPrint('Silent error caught: $e'); }
     }
     
     if (allWords.isEmpty) {
