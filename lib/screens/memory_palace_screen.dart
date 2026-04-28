@@ -11,11 +11,11 @@ class MemoryPalaceScreen extends StatefulWidget {
 
 class _MemoryPalaceScreenState extends State<MemoryPalaceScreen> {
   final List<Map<String, dynamic>> _villageNodes = [
-    {'name': 'Coconut Grove', 'term': 'Nyo-Hóm', 'icon': Icons.park, 'x': 0.1, 'y': 0.4, 'color': Color(0xFF81C784)},
-    {'name': 'Fisherman\'s Jetty', 'term': 'Pū-Tōt', 'icon': Icons.anchor, 'x': 0.5, 'y': 0.7, 'color': Color(0xFF64B5F6)},
-    {'name': 'Elder\'s Hut', 'term': 'U-Mem', 'icon': Icons.home, 'x': 0.8, 'y': 0.3, 'color': Color(0xFFFFB74D)},
-    {'name': 'Sandy Beach', 'term': 'Cō-Pū', 'icon': Icons.waves, 'x': 0.3, 'y': 0.8, 'color': Color(0xFFFFF176)},
-    {'name': 'Village Well', 'term': 'Ngō-Inrē', 'icon': Icons.water_drop, 'x': 0.6, 'y': 0.2, 'color': Color(0xFF4FC3F7)},
+    {'name': 'Coconut Grove', 'term': 'Nyo-Hóm', 'icon': Icons.park, 'x': 0.1, 'y': 0.4, 'color': const Color(0xFF81C784)},
+    {'name': 'Fisherman\'s Jetty', 'term': 'Pū-Tōt', 'icon': Icons.anchor, 'x': 0.5, 'y': 0.7, 'color': const Color(0xFF64B5F6)},
+    {'name': 'Elder\'s Hut', 'term': 'U-Mem', 'icon': Icons.home, 'x': 0.8, 'y': 0.3, 'color': const Color(0xFFFFB74D)},
+    {'name': 'Sandy Beach', 'term': 'Cō-Pū', 'icon': Icons.waves, 'x': 0.3, 'y': 0.8, 'color': const Color(0xFFFFF176)},
+    {'name': 'Village Well', 'term': 'Ngō-Inrē', 'icon': Icons.water_drop, 'x': 0.6, 'y': 0.2, 'color': const Color(0xFF4FC3F7)},
   ];
 
   void _showWordDetail(Map<String, dynamic> node) {
@@ -105,7 +105,7 @@ class _MemoryPalaceScreenState extends State<MemoryPalaceScreen> {
                            ).animate().fadeIn(delay: Duration(milliseconds: 200 * _villageNodes.indexOf(node))).scale(),
                         ),
                       );
-                   }).toList(),
+                   }),
                 ],
               );
             },

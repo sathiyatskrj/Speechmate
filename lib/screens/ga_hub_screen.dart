@@ -7,7 +7,6 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import '../services/database_manager.dart';
 import '../services/tts_service.dart';
 import '../services/whisper_service.dart';
-import '../widgets/background.dart';
 
 /// Standalone Great Andamanese Hub
 /// Contains: Dictionary, Text Translator, Voice (STT/TTS), OCR Scanner
@@ -29,7 +28,8 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
   // Dictionary state
   List<Map<String, dynamic>> _allWords = [];
   List<Map<String, dynamic>> _filteredWords = [];
-  List<Map<String, dynamic>> _phrases = [];
+  // ignore: unused_field
+  List<Map<String, dynamic>> _phrases = []; // Loaded for phrase tab (pending)
   bool _isLoading = true;
   String? _selectedPOS;
   final List<String> _posFilters = ['All', 'Noun', 'Verb', 'Adjective', 'Adverb', 'Deixis', 'Postposition'];

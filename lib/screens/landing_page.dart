@@ -4,9 +4,6 @@ import 'package:speechmate/widgets/button.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:speechmate/screens/student_dash.dart';
-import 'package:speechmate/screens/teacher_dash.dart';
 import 'package:speechmate/core/app_strings.dart';
 
 import 'package:speechmate/core/app_colors.dart';
@@ -140,7 +137,7 @@ class _LandingPageState extends State<LandingPage> {
                                  fontSize: 24, 
                                  fontWeight: FontWeight.w600, 
                                  color: Colors.white,
-                                 shadows: [Shadow(color: Colors.black12, blurRadius: 4, offset: const Offset(0,2))]
+                                 shadows: [const Shadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2))]
                               ),
                             ).animate().fadeIn().slideY(begin: -0.2, end: 0),
                             
@@ -213,7 +210,7 @@ class _LandingPageState extends State<LandingPage> {
                       : Colors.white.withValues(alpha: 0.2), // Glass effect
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: isSelected 
-                      ? [BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: 2, offset: const Offset(0, 8))]
+                      ? [const BoxShadow(color: Colors.black12, blurRadius: 20, spreadRadius: 2, offset: Offset(0, 8))]
                       : [],
                   border: Border.all(
                       color: Colors.white.withValues(alpha: isSelected ? 0.8 : 0.4),

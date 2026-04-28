@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/widgets/background.dart';
 
 class DialectHeatmapScreen extends StatefulWidget {
@@ -11,11 +10,11 @@ class DialectHeatmapScreen extends StatefulWidget {
 
 class _DialectHeatmapScreenState extends State<DialectHeatmapScreen> {
   final List<Map<String, dynamic>> _hotspots = [
-    {'name': 'Car Nicobar', 'dialect': 'Pū (Car)', 'speakers': '~29,000', 'top': 0.15, 'left': 0.45, 'color': Color(0xFFFF5252)},
-    {'name': 'Nancowry', 'dialect': 'Central Nicobarese', 'speakers': '~10,000', 'top': 0.45, 'left': 0.55, 'color': Color(0xFFFFD740)},
-    {'name': 'Little Andaman', 'dialect': 'Önge (Rel.)', 'speakers': '~100', 'top': 0.65, 'left': 0.4, 'color': Color(0xFF69F0AE)},
-    {'name': 'Great Andaman', 'dialect': 'Aka-Jeru / Great Andamanese', 'speakers': '<5', 'top': 0.05, 'left': 0.55, 'color': Color(0xFF40C4FF)},
-    {'name': 'Campbell Bay', 'dialect': 'Southern Nicobarese', 'speakers': '~5,000', 'top': 0.85, 'left': 0.6, 'color': Color(0xFFE040FB)},
+    {'name': 'Car Nicobar', 'dialect': 'Pū (Car)', 'speakers': '~29,000', 'top': 0.15, 'left': 0.45, 'color': const Color(0xFFFF5252)},
+    {'name': 'Nancowry', 'dialect': 'Central Nicobarese', 'speakers': '~10,000', 'top': 0.45, 'left': 0.55, 'color': const Color(0xFFFFD740)},
+    {'name': 'Little Andaman', 'dialect': 'Önge (Rel.)', 'speakers': '~100', 'top': 0.65, 'left': 0.4, 'color': const Color(0xFF69F0AE)},
+    {'name': 'Great Andaman', 'dialect': 'Aka-Jeru / Great Andamanese', 'speakers': '<5', 'top': 0.05, 'left': 0.55, 'color': const Color(0xFF40C4FF)},
+    {'name': 'Campbell Bay', 'dialect': 'Southern Nicobarese', 'speakers': '~5,000', 'top': 0.85, 'left': 0.6, 'color': const Color(0xFFE040FB)},
   ];
 
   void _showDialectDetails(Map<String, dynamic> hotspot) {
@@ -115,7 +114,7 @@ class _DialectHeatmapScreenState extends State<DialectHeatmapScreen> {
                         child: _PulseNode(color: spot['color']),
                       ),
                     );
-                  }).toList(),
+                  }),
                   
                   Positioned(
                     bottom: 40,

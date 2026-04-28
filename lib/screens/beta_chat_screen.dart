@@ -32,8 +32,12 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
     _initTts();
   }
 
-
-
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _flutterTts.stop();
+    super.dispose();
+  }
 
   Future<void> _initTts() async {
     await _flutterTts.setLanguage("en-US"); // Default context for TTS
@@ -42,6 +46,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
 
   Future<void> _loadData() async {
     final data = await _dictionaryService.getDialectItems();
+    if (!mounted) return;
     setState(() {
       _allDialects = data;
       _filteredDialects = data;
@@ -63,7 +68,7 @@ class _BetaChatScreenState extends State<BetaChatScreen> {
   }
 
   Future<void> _speak(String text) async {
-    if (text == null || text.isEmpty || text == '-') return;
+    if (text.isEmpty || text == '-') return;
     await _flutterTts.speak(text);
   }
 

@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/linguistics_service.dart';
-import 'package:speechmate/widgets/background.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:speechmate/core/app_colors.dart';
 

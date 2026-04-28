@@ -6,9 +6,6 @@ import 'package:camera/camera.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:speechmate/services/neural_engine_service.dart';
-import 'package:speechmate/services/tts_service.dart';
-import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/providers/service_providers.dart';
@@ -48,7 +45,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
   // Static/Capture Mode
   String? _capturedImagePath;
   Size? _staticImageSize;
-  List<TranslatedTextBlock> _staticBlocks = [];
+  final List<TranslatedTextBlock> _staticBlocks = [];
 
   // Multi-language OCR Support
   final Map<String, TextRecognitionScript> _supportedLanguages = {
@@ -125,7 +122,9 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_cameraController == null ||
-        !(_cameraController!.value.isInitialized)) return;
+        !(_cameraController!.value.isInitialized)) {
+      return;
+    }
     if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
       if (_isLiveMode) {
         try { _cameraController?.stopImageStream(); } catch (_) {}
@@ -589,13 +588,13 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
                  child: Stack(
                    children: [
                       Container(color: Colors.black54),
-                      Center(
+                      const Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const CircularProgressIndicator(color: Colors.cyanAccent),
-                            const SizedBox(height: 16),
-                            const Text("SCANNING AND DETECTING...", style: TextStyle(color: Colors.cyanAccent, letterSpacing: 2.0, fontWeight: FontWeight.bold, fontFamily: 'Courier')),
+                            CircularProgressIndicator(color: Colors.cyanAccent),
+                            SizedBox(height: 16),
+                            Text("SCANNING AND DETECTING...", style: TextStyle(color: Colors.cyanAccent, letterSpacing: 2.0, fontWeight: FontWeight.bold, fontFamily: 'Courier')),
                           ],
                         ),
                       )

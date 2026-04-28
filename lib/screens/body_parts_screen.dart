@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/database_manager.dart';
-import 'dart:ui';
 
 class BodyPartsScreen extends StatefulWidget {
   const BodyPartsScreen({super.key});

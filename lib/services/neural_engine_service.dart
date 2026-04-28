@@ -288,7 +288,9 @@ class NeuralEngineService {
       }
       lastCode = code;
     }
-    while (result.length < 4) result.write('0');
+    while (result.length < 4) {
+      result.write('0');
+    }
     return result.toString();
   }
 

@@ -155,7 +155,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                       },
                                     ),
                                   ),
-                                  leftTitles: AxisTitles(
+                                  leftTitles: const AxisTitles(
                                     sideTitles: SideTitles(showTitles: false),
                                   ),
                                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),

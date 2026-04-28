@@ -6,11 +6,11 @@ class FloatingWidget extends StatefulWidget {
   final double distance;
 
   const FloatingWidget({
-    Key? key,
+    super.key,
     required this.child,
     this.duration = const Duration(seconds: 3),
     this.distance = 10.0,
-  }) : super(key: key);
+  });
 
   @override
   State<FloatingWidget> createState() => _FloatingWidgetState();

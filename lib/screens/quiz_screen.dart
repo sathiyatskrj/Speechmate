@@ -3,7 +3,6 @@ import '../services/dictionary_service.dart';
 import '../services/smart_quiz_service.dart';
 import '../services/logger_service.dart';
 import '../core/app_colors.dart';
-import '../widgets/background.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
@@ -279,7 +278,7 @@ class _QuizScreenState extends State<QuizScreen> {
                          onPressed: () => _submitAnswer(index),
                          child: Text(
                            options.length > index ? options[index] : '',
-                           style: TextStyle(
+                           style: const TextStyle(
                              fontSize: 18, 
                              color: Colors.white
                            ),

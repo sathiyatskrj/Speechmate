@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../services/dictionary_service.dart';
 import '../../services/progress_service.dart';
 
@@ -87,7 +86,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   
   // Data
   List<String> _targetWords = [];
-  List<String> _foundWords = [];
+  final List<String> _foundWords = [];
   Map<String, String> _wordToNic = {}; // English -> Nicobarese mapping
   final List<GameItem> _items = [];
   final List<Particle> _particles = [];
@@ -95,7 +94,6 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   // Player
   double _playerY = 0;
   double _playerVy = 0;
-  bool _isGrounded = true;
   int _jumpCount = 0; // For double jump
   static const int _maxJumps = 2;
   final double _playerX = 80;
@@ -166,7 +164,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
       
       _playerY = 0;
       _playerVy = 0;
-      _isGrounded = true;
+      _jumpCount = 0;
       _distance = 0;
       _scrollSpeed = 7.0;
       
@@ -201,7 +199,6 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
       if (_playerY <= 0) {
         _playerY = 0;
         _playerVy = 0;
-        _isGrounded = true;
         _jumpCount = 0;
       }
       
@@ -419,7 +416,6 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
   void _jump() {
     if (_jumpCount < _maxJumps) {
       _playerVy = jumpForce * (_jumpCount == 1 ? 0.8 : 1.0); // Weaker 2nd jump
-      _isGrounded = false;
       _jumpCount++;
       
       // Jump Particles
@@ -549,7 +545,7 @@ class _WordRunnerGameState extends State<WordRunnerGame> with TickerProviderStat
                 
                 // Back Button
                 if (_gameState != GameState.playing)
-                  Positioned(top: 40, left: 10, child: BackButton(color: Colors.white)),
+                  const Positioned(top: 40, left: 10, child: BackButton(color: Colors.white)),
               ],
             ),
           ),
@@ -730,11 +726,11 @@ class GamePainter extends CustomPainter {
         tp.paint(canvas, Offset(item.x, itemY + 10)); // Approximate center
       } else if (item.type == ItemType.surprise) {
         // Draw Star
-        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 15, Paint()..color = Colors.yellowAccent ..maskFilter = MaskFilter.blur(BlurStyle.normal, 5));
+        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 15, Paint()..color = Colors.yellowAccent ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5));
         canvas.drawCircle(Offset(item.x + 20, itemY + 20), 8, Paint()..color = Colors.white);
       } else if (item.type == ItemType.shield) {
         // Draw Shield
-        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 15, Paint()..color = Colors.cyanAccent ..maskFilter = MaskFilter.blur(BlurStyle.normal, 5));
+        canvas.drawCircle(Offset(item.x + 20, itemY + 20), 15, Paint()..color = Colors.cyanAccent ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5));
         canvas.drawCircle(Offset(item.x + 20, itemY + 20), 10, Paint()..color = Colors.white.withValues(alpha: 0.8));
         // Shield icon approximation
         canvas.drawRRect(

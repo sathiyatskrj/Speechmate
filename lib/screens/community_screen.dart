@@ -8,6 +8,7 @@ import 'package:speechmate/features/gamification/gamification_service.dart';
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/core/app_colors.dart';
 import 'package:crypto/crypto.dart';
+import 'package:speechmate/core/safe_state.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -16,12 +17,11 @@ class CommunityScreen extends StatefulWidget {
   State<CommunityScreen> createState() => _CommunityScreenState();
 }
 
-class _CommunityScreenState extends State<CommunityScreen> {
+class _CommunityScreenState extends State<CommunityScreen> with SafeStateMixin {
   final CommunityService _communityService = CommunityService();
 
   // Admin State
   bool _isAdmin = false;
-  String? _currentUid;
 
   // Posts
   List<CommunityPost> _posts = [];
@@ -37,9 +37,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   Future<void> _loadUser() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _currentUid = prefs.getString('local_device_id') ?? 'anonymous_device';
-    });
+    final uid = prefs.getString('local_device_id') ?? 'anonymous_device';
+    // UID available for future auth integration
+    debugPrint('[Community] User: $uid');
   }
 
   Future<void> _loadPosts() async {
@@ -311,11 +311,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Icon(Icons.trending_up, color: AppColors.studentAccent),
-              const SizedBox(width: 8),
-              const Text("Trending Topics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+              SizedBox(width: 8),
+              Text("Trending Topics", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             ],
           ),
           const SizedBox(height: 10),

@@ -288,7 +288,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                       if (!isUser && msg.containsKey('word_data') && msg['word_data'] != null && !msg['word_data'].containsKey('generated')) ...[
                                         const SizedBox(width: 4),
                                         Container(
-                                          decoration: BoxDecoration(color: const Color(0xFF2A2A3D), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
+                                          decoration: const BoxDecoration(color: Color(0xFF2A2A3D), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
                                           child: IconButton(
                                             icon: const Icon(Icons.bookmark_add_rounded, size: 20, color: Colors.orangeAccent),
                                             padding: const EdgeInsets.all(6),
@@ -464,7 +464,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
           child: Container(
             width: 8,
             height: 8,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.cyanAccent,
               shape: BoxShape.circle,
             ),

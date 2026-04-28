@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/services/model_downloader_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/providers/service_providers.dart';
-import 'package:speechmate/core/app_colors.dart';
 
 class AISetupScreen extends ConsumerStatefulWidget {
   const AISetupScreen({super.key});

@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/screens/emotional_splash_screen.dart';
 import 'package:speechmate/screens/app_language_select.dart';
-import 'package:speechmate/screens/landing_page.dart';
 import 'package:speechmate/core/app_theme.dart';
 
 import 'package:speechmate/services/database_manager.dart';

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:speechmate/services/model_downloader_service.dart';
-import 'dart:io';
 
 /// Local LLM Service designed specifically for SmolLM2 135M.
 /// This service loads the model via an FFI bridge (like llama_cpp_dart)
@@ -39,6 +38,7 @@ class LocalLlmService {
 
   /// Builds the foundational system prompt, injecting Nicobarese vocabulary
   /// so the 135M model acts as a localized linguistic engine.
+  // ignore: unused_element
   String _buildSystemPrompt(String taskType) {
     // To prevent exceeding context limits (SmolLM2 supports 2k-8k tokens),
     // we take a relevant sample or the core grammar rules from the dictionary.
@@ -73,30 +73,23 @@ class LocalLlmService {
   Future<String?> translateSentence(String sentence) async {
     if (!_isInitialized) await initialize();
 
-    final systemPrompt = _buildSystemPrompt('translation');
-    final userPrompt = "Translate this: '$sentence'";
+    // Prompts prepared for GGUF integration:
+    // final systemPrompt = _buildSystemPrompt('translation');
+    // final userPrompt = "Translate this: '$sentence'";
 
-    debugPrint('[LocalLlmService] Sending translation request to SmolLM2...');
-    // TODO: Await actual GGUF inference response
-    
-    // Mocking response
-    await Future.delayed(const Duration(milliseconds: 1500));
-    return null; // Return null to indicate the mock didn't do a real LLM run so the Neural Engine can still use its fallback
+    debugPrint('[LocalLlmService] translateSentence: stub — GGUF not yet integrated');
+    return null; // Stub — Neural Engine will use its dictionary-based fallback
   }
 
   /// Evaluates a sentence for the Contextual Sentence Builder Game.
   Future<Map<String, dynamic>> evaluateSentence(String userSentence) async {
     if (!_isInitialized) await initialize();
 
-    final systemPrompt = _buildSystemPrompt('sentence_builder');
-    final userPrompt = "Evaluate this sentence based on the vocabulary: '$userSentence'";
+    // Prompts prepared for GGUF integration:
+    // final systemPrompt = _buildSystemPrompt('sentence_builder');
+    // final userPrompt = "Evaluate this sentence based on the vocabulary: '$userSentence'";
 
-    debugPrint('[LocalLlmService] Sending inference request to SmolLM2...');
-    // TODO: Await actual GGUF inference response
-    // final rawResponse = await _llm.prompt(systemPrompt + "\n" + userPrompt);
-    
-    // Mocking response for architecture validation
-    await Future.delayed(const Duration(milliseconds: 1500));
+    debugPrint('[LocalLlmService] evaluateSentence: stub — GGUF not yet integrated');
     final bool isLikelyValid = userSentence.trim().isNotEmpty;
     
     return {
@@ -111,14 +104,11 @@ class LocalLlmService {
   Future<List<String>> generateAdaptivePath(Map<String, int> categoryScores) async {
     if (!_isInitialized) await initialize();
 
-    final systemPrompt = _buildSystemPrompt('adaptive_path');
-    final userPrompt = "Student scores: $categoryScores. What should they study next?";
+    // Prompts prepared for GGUF integration:
+    // final systemPrompt = _buildSystemPrompt('adaptive_path');
+    // final userPrompt = "Student scores: $categoryScores. What should they study next?";
 
-    debugPrint('[LocalLlmService] Generating adaptive path via SmolLM2...');
-    // TODO: Await actual GGUF inference response
-    
-    // Mocking response
-    await Future.delayed(const Duration(milliseconds: 1500));
+    debugPrint('[LocalLlmService] generateAdaptivePath: stub — GGUF not yet integrated');
     return ["Review Basic Pronouns", "Practice Colors", "Listen to Flora Audio"];
   }
 }

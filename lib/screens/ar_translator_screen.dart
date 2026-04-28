@@ -450,7 +450,9 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_cameraController == null ||
-        !(_cameraController!.value.isInitialized)) return;
+        !(_cameraController!.value.isInitialized)) {
+      return;
+    }
     if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
       // Fully dispose camera when going to background to free native resources
       _isCameraReady = false;

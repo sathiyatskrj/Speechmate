@@ -3,7 +3,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/database_manager.dart';
 import '../widgets/background.dart';
-import 'package:speechmate/core/app_strings.dart';
 
 class SRSDashboardScreen extends StatefulWidget {
   const SRSDashboardScreen({super.key});

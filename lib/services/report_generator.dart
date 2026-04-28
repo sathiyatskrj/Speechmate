@@ -39,8 +39,8 @@ class ReportGenerator {
                    child: pw.Text("SpeechMate Parent Report Card", style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColors.teal800))
                 ),
                 pw.SizedBox(height: 20),
-                pw.Text("Student Name: $studentName", style: pw.TextStyle(fontSize: 18)),
-                pw.Text("Date: ${DateTime.now().toString().split(' ')[0]}", style: pw.TextStyle(color: PdfColors.grey600)),
+                pw.Text("Student Name: $studentName", style: const pw.TextStyle(fontSize: 18)),
+                pw.Text("Date: ${DateTime.now().toString().split(' ')[0]}", style: const pw.TextStyle(color: PdfColors.grey600)),
                 pw.Divider(color: PdfColors.teal200),
                 pw.SizedBox(height: 30),
                 

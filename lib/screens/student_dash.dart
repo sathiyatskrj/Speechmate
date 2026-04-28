@@ -15,7 +15,6 @@ import 'package:speechmate/screens/games/games_hub_screen.dart';
 import 'package:speechmate/screens/community_screen.dart';
 import 'package:speechmate/screens/voice_vault_screen.dart';
 import 'package:speechmate/screens/dynamic_category_screen.dart';
-import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
@@ -30,7 +29,6 @@ import 'package:speechmate/screens/ar_translator_screen.dart';
 import 'package:speechmate/screens/body_parts_screen.dart';
 import 'package:speechmate/screens/ai_setup_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
-import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/screens/regional_translator_screen.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
@@ -72,41 +70,41 @@ class _StudentDashState extends State<StudentDash>
 
   List<Map<String, dynamic>> get learningTiles => [
     // --- Premium Interactive Features (Moved to Top) ---
-    {"word": AppStrings.get('arTranslator'), "emoji": "📷", "colors": [Color(0xFF0F2027), Color(0xFF2C5364)], "navigateTo": const ARTranslatorScreen(), "icon": Icons.view_in_ar_rounded},
-    {"word": AppStrings.get('voiceVault'), "emoji": "🎙️", "colors": [Color(0xFF4CA1AF), Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
-    {"word": AppStrings.get('bookScanner'), "emoji": "📖", "colors": [Color(0xFF00B4DB), Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.document_scanner_rounded},
-    {"word": AppStrings.get('games'), "emoji": "🎲", "colors": [Color(0xFFF09819), Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
-    {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [Color(0xFFFF9A9E), Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
-    {"word": AppStrings.get('voiceTranslate'), "emoji": "🎙️", "colors": [Color(0xFFff0844), Color(0xFFffb199)], "navigateTo": const VoiceTranslatorScreen(), "icon": Icons.record_voice_over_rounded},
+    {"word": AppStrings.get('arTranslator'), "emoji": "📷", "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)], "navigateTo": const ARTranslatorScreen(), "icon": Icons.view_in_ar_rounded},
+    {"word": AppStrings.get('voiceVault'), "emoji": "🎙️", "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
+    {"word": AppStrings.get('bookScanner'), "emoji": "📖", "colors": [const Color(0xFF00B4DB), const Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.document_scanner_rounded},
+    {"word": AppStrings.get('games'), "emoji": "🎲", "colors": [const Color(0xFFF09819), const Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
+    {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
+    {"word": AppStrings.get('voiceTranslate'), "emoji": "🎙️", "colors": [const Color(0xFFff0844), const Color(0xFFffb199)], "navigateTo": const VoiceTranslatorScreen(), "icon": Icons.record_voice_over_rounded},
     
     // --- Core Learning Categories ---
-    {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [Color(0xFF6A11CB), Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers'), "icon": Icons.format_list_numbered_rounded},
-    {"word": AppStrings.get('nature'), "emoji": "🌱", "colors": [Color(0xFF11998E), Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature'), "icon": Icons.eco_rounded},
-    {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [Color(0xFFFF512F), Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings'), "icon": Icons.emoji_emotions_rounded},
-    {"word": AppStrings.get('colors'), "emoji": "🎨", "colors": [Color(0xFFff9a9e), Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors'), "icon": Icons.palette_rounded},
-    {"word": AppStrings.get('things'), "emoji": "🏡", "colors": [Color(0xFFa18cd1), Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things'), "icon": Icons.chair_rounded},
-    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [Color(0xFF8E2DE2), Color(0xFF4A00E0)], "navigateTo": const BodyPartsScreen(), "icon": Icons.accessibility_new_rounded},
-    {"word": AppStrings.get('animals'), "emoji": "🐶", "colors": [Color(0xFFFF8008), Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals'), "icon": Icons.pets_rounded},
-    {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [Color(0xFFCC2B5E), Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words'), "icon": Icons.auto_fix_high_rounded},
-    {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [Color(0xFF2193B0), Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
+    {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers'), "icon": Icons.format_list_numbered_rounded},
+    {"word": AppStrings.get('nature'), "emoji": "🌱", "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature'), "icon": Icons.eco_rounded},
+    {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings'), "icon": Icons.emoji_emotions_rounded},
+    {"word": AppStrings.get('colors'), "emoji": "🎨", "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors'), "icon": Icons.palette_rounded},
+    {"word": AppStrings.get('things'), "emoji": "🏡", "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things'), "icon": Icons.chair_rounded},
+    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [const Color(0xFF8E2DE2), const Color(0xFF4A00E0)], "navigateTo": const BodyPartsScreen(), "icon": Icons.accessibility_new_rounded},
+    {"word": AppStrings.get('animals'), "emoji": "🐶", "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals'), "icon": Icons.pets_rounded},
+    {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [const Color(0xFFCC2B5E), const Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words'), "icon": Icons.auto_fix_high_rounded},
+    {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
     
     // --- Regional Translations ---
-    {"word": "Hindi\nTranslator", "emoji": "🇮🇳", "colors": [Color(0xFFD84315), Color(0xFFFF7043)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Hindi', TranslateLanguage.hindi, 'hi', 'hi-IN', 'नमस्ते')), "icon": Icons.g_translate_rounded},
-    {"word": "Tamil\nTranslator", "emoji": "🛕", "colors": [Color(0xFF2E7D32), Color(0xFF66BB6A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', 'வணக்கம்')), "icon": Icons.g_translate_rounded},
-    {"word": "Bengali\nTranslator", "emoji": "🐅", "colors": [Color(0xFFC62828), Color(0xFFEF5350)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn', 'bn-IN', 'নমস্কার')), "icon": Icons.g_translate_rounded},
-    {"word": "Telugu\nTranslator", "emoji": "🌶️", "colors": [Color(0xFF283593), Color(0xFF5C6BC0)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu, 'te', 'te-IN', 'నమస్కారం')), "icon": Icons.g_translate_rounded},
-    {"word": "Malayalam\nTranslator", "emoji": "🥥", "colors": [Color(0xFF00695C), Color(0xFF26A69A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Malayalam', null, 'ml', 'ml-IN', 'നമസ്കാരം')), "icon": Icons.g_translate_rounded},
+    {"word": "Hindi\nTranslator", "emoji": "🇮🇳", "colors": [const Color(0xFFD84315), const Color(0xFFFF7043)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Hindi', TranslateLanguage.hindi, 'hi', 'hi-IN', 'नमस्ते')), "icon": Icons.g_translate_rounded},
+    {"word": "Tamil\nTranslator", "emoji": "🛕", "colors": [const Color(0xFF2E7D32), const Color(0xFF66BB6A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', 'வணக்கம்')), "icon": Icons.g_translate_rounded},
+    {"word": "Bengali\nTranslator", "emoji": "🐅", "colors": [const Color(0xFFC62828), const Color(0xFFEF5350)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn', 'bn-IN', 'নমস্কার')), "icon": Icons.g_translate_rounded},
+    {"word": "Telugu\nTranslator", "emoji": "🌶️", "colors": [const Color(0xFF283593), const Color(0xFF5C6BC0)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu, 'te', 'te-IN', 'నమస్కారం')), "icon": Icons.g_translate_rounded},
+    {"word": "Malayalam\nTranslator", "emoji": "🥥", "colors": [const Color(0xFF00695C), const Color(0xFF26A69A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Malayalam', null, 'ml', 'ml-IN', 'നമസ്കാരം')), "icon": Icons.g_translate_rounded},
 
     // --- Advanced / Discovery ---
-    {"word": AppStrings.get('andamaneseBeta'), "emoji": "🏝️", "colors": [Color(0xFF4A148C), Color(0xFF1A237E)], "navigateTo": const GAHubScreen(), "icon": Icons.language_rounded},
-    {"word": AppStrings.get('natureHub'), "emoji": "🌿", "colors": [Color(0xFF1B5E20), Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
-    {"word": AppStrings.get('oralHistory'), "emoji": "📻", "colors": [Color(0xFF3E2723), Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
-    {"word": AppStrings.get('tuhetKinship'), "emoji": "🌳", "colors": [Color(0xFF5D4037), Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
-    {"word": AppStrings.get('islandExplorer'), "emoji": "🧭", "colors": [Color(0xFF0277BD), Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
-    {"word": AppStrings.get('memoryPalace'), "emoji": "🏠", "colors": [Color(0xFF2E7D32), Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
-    {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [Color(0xFF302B63), Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
-    {"word": "AI Setup", "emoji": "🧠", "colors": [Color(0xFF3b8d99), Color(0xFF6b6b83)], "navigateTo": const AISetupScreen(), "icon": Icons.psychology_rounded},
-    {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [Color(0xFFFF00CC), Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
+    {"word": AppStrings.get('andamaneseBeta'), "emoji": "🏝️", "colors": [const Color(0xFF4A148C), const Color(0xFF1A237E)], "navigateTo": const GAHubScreen(), "icon": Icons.language_rounded},
+    {"word": AppStrings.get('natureHub'), "emoji": "🌿", "colors": [const Color(0xFF1B5E20), const Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
+    {"word": AppStrings.get('oralHistory'), "emoji": "📻", "colors": [const Color(0xFF3E2723), const Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
+    {"word": AppStrings.get('tuhetKinship'), "emoji": "🌳", "colors": [const Color(0xFF5D4037), const Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
+    {"word": AppStrings.get('islandExplorer'), "emoji": "🧭", "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
+    {"word": AppStrings.get('memoryPalace'), "emoji": "🏠", "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
+    {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [const Color(0xFF302B63), const Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
+    {"word": "AI Setup", "emoji": "🧠", "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)], "navigateTo": const AISetupScreen(), "icon": Icons.psychology_rounded},
+    {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [const Color(0xFFFF00CC), const Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
   ];
 
   @override

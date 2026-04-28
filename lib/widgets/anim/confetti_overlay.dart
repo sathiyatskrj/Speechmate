@@ -6,10 +6,10 @@ class ConfettiOverlay extends StatefulWidget {
   final bool isPlaying;
 
   const ConfettiOverlay({
-    Key? key,
+    super.key,
     required this.child,
     required this.isPlaying,
-  }) : super(key: key);
+  });
 
   @override
   State<ConfettiOverlay> createState() => _ConfettiOverlayState();

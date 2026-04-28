@@ -33,7 +33,6 @@ import 'package:speechmate/screens/srs_dashboard_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
-import 'package:speechmate/core/app_colors.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -68,17 +67,6 @@ class _TeacherDashState extends State<TeacherDash>
   }
 
   void _clearSearch() => clearMixinSearch(_searchController);
-
-  void _showWhisperUpgradeDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Whisper Pro"),
-        content: const Text("Upgrade to unlock advanced speech-to-text capabilities."),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Close"))],
-      ),
-    );
-  }
 
   @override
   void dispose() {
@@ -308,7 +296,7 @@ class _TeacherDashState extends State<TeacherDash>
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: [Colors.indigo.shade900, Colors.blue.shade900]),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: const Offset(0, 4))],
+        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:appinio_swiper/appinio_swiper.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/srs_engine.dart';
 import 'package:speechmate/features/gamification/gamification_service.dart';
@@ -78,7 +77,7 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
         foregroundColor: Colors.white,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

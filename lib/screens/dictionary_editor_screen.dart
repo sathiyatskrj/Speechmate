@@ -11,7 +11,6 @@ class DictionaryEditorScreen extends StatefulWidget {
 class _DictionaryEditorScreenState extends State<DictionaryEditorScreen> {
   bool _isLoading = true;
   List<Map<String, dynamic>> _words = [];
-  String _searchQuery = "";
 
   @override
   void initState() {
@@ -40,7 +39,6 @@ class _DictionaryEditorScreenState extends State<DictionaryEditorScreen> {
       return;
     }
     setState(() {
-      _searchQuery = query;
       _isLoading = true;
     });
     try {
@@ -109,7 +107,8 @@ class _DictionaryEditorScreenState extends State<DictionaryEditorScreen> {
             onPressed: () async {
               final eng = engController.text.trim();
               final nic = nicController.text.trim();
-              final pos = posController.text.trim();
+              // ignore: unused_local_variable
+              final pos = posController.text.trim(); // Reserved for future schema migration
               
               if (eng.isNotEmpty && nic.isNotEmpty) {
                 final db = await DatabaseManager.instance.database;

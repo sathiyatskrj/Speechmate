@@ -23,8 +23,15 @@ class _KinshipMapperScreenState extends State<KinshipMapperScreen> {
     _loadTerms();
   }
 
+  @override
+  void dispose() {
+    _tts.stop();
+    super.dispose();
+  }
+
   Future<void> _loadTerms() async {
     final results = await _db.queryAll('kinship');
+    if (!mounted) return;
     setState(() {
       _terms = results;
       _isLoading = false;
@@ -135,10 +142,6 @@ class _KinshipMapperScreenState extends State<KinshipMapperScreen> {
         ),
       ).animate().scale(delay: 200.ms),
     );
-  }
-
-  Widget _buildLine() {
-    return const SizedBox.shrink(); // Replaced by CustomPainter
   }
 
   void _showTermDetail(Map<String, dynamic> term) {

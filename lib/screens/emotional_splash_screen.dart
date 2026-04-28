@@ -129,17 +129,17 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
           children: [
             // DEEP SPACE GRADIENT / SEASONAL INFLUENCE
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: RadialGradient(
                   center: Alignment.bottomCenter,
                   radius: 1.5,
                   colors: [  
                     Colors.cyan, // Static base
-                    const Color(0xFF8E2DE2), // Rich Purple 
-                    const Color(0xFF0F0C29), // Deep Space
+                    Color(0xFF8E2DE2), // Rich Purple 
+                    Color(0xFF0F0C29), // Deep Space
                     Colors.black
                   ],
-                  stops: const [0.0, 0.3, 0.7, 1.0],
+                  stops: [0.0, 0.3, 0.7, 1.0],
                 ),
               ),
             ),

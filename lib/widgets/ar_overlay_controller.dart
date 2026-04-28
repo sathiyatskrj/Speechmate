@@ -50,7 +50,7 @@ class LiveTextOverlayPainter extends CustomPainter {
   }
 
   void _drawJarvisHud(Canvas canvas, Rect rect, TranslatedTextBlock block, Size size) {
-     final Color hudColor = Colors.cyanAccent;
+     const Color hudColor = Colors.cyanAccent;
      
      // 1. Draw corner brackets
      final Paint bracketPaint = Paint()
@@ -58,7 +58,7 @@ class LiveTextOverlayPainter extends CustomPainter {
        ..style = PaintingStyle.stroke
        ..strokeWidth = 3.0;
        
-     final double cornerLength = 20.0;
+     const double cornerLength = 20.0;
      
      // Top-Left
      canvas.drawPath(Path()..moveTo(rect.left, rect.top + cornerLength)..lineTo(rect.left, rect.top)..lineTo(rect.left + cornerLength, rect.top), bracketPaint);

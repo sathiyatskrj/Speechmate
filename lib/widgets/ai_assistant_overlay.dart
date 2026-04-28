@@ -11,10 +11,10 @@ class AiAssistantOverlay extends StatefulWidget {
   final VoidCallback onClose;
 
   const AiAssistantOverlay({
-    Key? key,
+    super.key,
     required this.onResult,
     required this.onClose,
-  }) : super(key: key);
+  });
 
   @override
   State<AiAssistantOverlay> createState() => _AiAssistantOverlayState();
