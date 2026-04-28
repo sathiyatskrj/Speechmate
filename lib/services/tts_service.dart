@@ -53,6 +53,13 @@ class TtsService {
     await _tts.speak(text);
   }
 
+  /// Speak Regional text
+  Future<void> speakRegional(String text, String localeId) async {
+    await _tts.stop();
+    await _tts.setLanguage(localeId);
+    await _tts.speak(text);
+  }
+
   /// Play audio from a specific category and file path.
   /// [category] maps to a subfolder under assets/audio/ (e.g. "phrases", "animals")
   /// [filename] is the mp3 file name (e.g. "good_morning.mp3")

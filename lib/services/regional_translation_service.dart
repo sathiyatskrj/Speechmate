@@ -3,17 +3,18 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:translator/translator.dart';
 
 class RegionalTranslationService {
-  OnDeviceTranslator? _translator;
+  OnDeviceTranslator? _translatorToEng;
+  OnDeviceTranslator? _translatorFromEng;
   final _modelManager = OnDeviceTranslatorModelManager();
   TranslateLanguage? _currentSource;
   final _onlineTranslator = GoogleTranslator();
 
-  /// Initializes the ML Kit Translator for a specific regional language
+  /// Initializes the ML Kit Translator for bidirectional regional language translation
   Future<bool> initialize(TranslateLanguage? source) async {
     try {
       if (source == null) return true; // Online fallback mode only
 
-      if (_currentSource == source && _translator != null) return true;
+      if (_currentSource == source && _translatorToEng != null) return true;
 
       _currentSource = source;
       
@@ -31,10 +32,16 @@ class RegionalTranslationService {
         await _modelManager.downloadModel(source.bcpCode);
       }
 
-      _translator?.close();
-      _translator = OnDeviceTranslator(
+      _translatorToEng?.close();
+      _translatorToEng = OnDeviceTranslator(
         sourceLanguage: source,
         targetLanguage: TranslateLanguage.english,
+      );
+
+      _translatorFromEng?.close();
+      _translatorFromEng = OnDeviceTranslator(
+        sourceLanguage: TranslateLanguage.english,
+        targetLanguage: source,
       );
       
       return true;
@@ -46,9 +53,9 @@ class RegionalTranslationService {
 
   /// Translates regional text to English text offline or via online fallback
   Future<String> translateToEnglish(String text, {String? fallbackLangCode}) async {
-    if (_translator != null) {
+    if (_translatorToEng != null) {
       try {
-        return await _translator!.translateText(text);
+        return await _translatorToEng!.translateText(text);
       } catch (e) {
         debugPrint("[Regional] Translation error: $e");
       }
@@ -67,7 +74,30 @@ class RegionalTranslationService {
     return text; // Return original text on complete failure
   }
 
+  /// Translates English text to regional text offline or via online fallback
+  Future<String> translateFromEnglish(String text, {String? fallbackLangCode}) async {
+    if (_translatorFromEng != null) {
+      try {
+        return await _translatorFromEng!.translateText(text);
+      } catch (e) {
+        debugPrint("[Regional] Translation error: $e");
+      }
+    }
+
+    if (fallbackLangCode != null) {
+      try {
+        debugPrint("[Regional] Using online fallback for English -> $fallbackLangCode...");
+        final translation = await _onlineTranslator.translate(text, from: 'en', to: fallbackLangCode);
+        return translation.text;
+      } catch (e) {
+        debugPrint("[Regional] Online translation error: $e");
+      }
+    }
+    return text;
+  }
+
   void dispose() {
-    _translator?.close();
+    _translatorToEng?.close();
+    _translatorFromEng?.close();
   }
 }

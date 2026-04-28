@@ -5,6 +5,10 @@ import '../services/regional_translation_service.dart';
 import '../services/dictionary_service.dart';
 import '../services/neural_engine_service.dart';
 import '../services/tts_service.dart';
+import '../services/whisper_service.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'dart:math';
 
 class RegionalLanguageConfig {
@@ -40,6 +44,10 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
   bool _isInitializing = true;
   bool _isTyping = false;
   bool _isListening = false;
+  bool _isNicobareseMode = false; // Bidirectional toggle
+  AudioRecorder? _audioRecorder;
+  final WhisperService _whisperService = WhisperService();
+  String? _lastAudioPath;
   String _errorMsg = '';
 
   @override
@@ -47,6 +55,7 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
     super.initState();
     _dictionaryService.loadDictionary(DictionaryType.words);
     _ttsService.init();
+    _whisperService.initialize();
     _initTranslation();
   }
 
@@ -69,55 +78,130 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
     }
   }
 
-  Future<void> _processTranslation(String regionalText) async {
-    if (regionalText.isEmpty) return;
+  Future<void> _processTranslation(String inputText, {bool isAlreadyEnglish = false}) async {
+    if (inputText.isEmpty) return;
 
     setState(() {
-      _messages.add({"text": regionalText, "type": "user"});
+      _messages.add({"text": inputText, "type": "user"});
       _isTyping = true;
     });
     _scrollToBottom();
     _textController.clear();
 
-    // 1. Regional -> English (Offline ML Kit or Online Fallback)
-    final englishTranslation = await _regionalTranslation.translateToEnglish(regionalText, fallbackLangCode: widget.config.fallbackLanguageCode);
-
-    // 2. English -> Nicobarese (Offline Dictionary / Neural Engine)
-    var dictResult = await _dictionaryService.searchWord(englishTranslation);
-    
     String responseText;
-    String nicobareseText = "";
 
-    if (dictResult != null) {
-       nicobareseText = dictResult['nicobarese'].toString();
-       responseText = "✨ $nicobareseText\n\n(English: ${dictResult['english']})";
-    } else {
-       final neuralResult = await _neuralEngine.predict(englishTranslation);
-       if (neuralResult.text.isNotEmpty && neuralResult.text != englishTranslation) {
-           nicobareseText = neuralResult.text;
-           responseText = "✨ $nicobareseText\n\n🤖 AI Translation (English: $englishTranslation)";
-       } else {
-           responseText = "🤔 I translated it to English as '$englishTranslation', but I don't know the Nicobarese word for it yet.";
-       }
-    }
+    if (_isNicobareseMode) {
+      // 1. Nicobarese -> English
+      String englishTranslation = inputText;
+      if (!isAlreadyEnglish) {
+        var dictResult = await _dictionaryService.searchWord(inputText);
+        if (dictResult != null && dictResult['english'] != null) {
+          englishTranslation = dictResult['english'].toString();
+        } else {
+          final neuralResult = await _neuralEngine.predict(inputText);
+          if (neuralResult.text.isNotEmpty) englishTranslation = neuralResult.text;
+        }
+      }
 
-    if (mounted) {
-      setState(() {
-        _isTyping = false;
-        _messages.add({
-          "text": responseText,
-          "type": "bot",
-          "emoji": nicobareseText.isNotEmpty ? "🌴" : "❓"
+      // 2. English -> Regional
+      final regionalTranslation = await _regionalTranslation.translateFromEnglish(
+          englishTranslation, fallbackLangCode: widget.config.fallbackLanguageCode);
+
+      responseText = "✨ $regionalTranslation\n\n(English: $englishTranslation)";
+
+      if (mounted) {
+        setState(() {
+          _isTyping = false;
+          _messages.add({"text": responseText, "type": "bot", "emoji": "🗣️"});
         });
-      });
-      if (nicobareseText.isNotEmpty) {
-        _ttsService.speakNicobarese(nicobareseText, englishWord: englishTranslation);
+        _ttsService.speakRegional(regionalTranslation, widget.config.localeId);
+      }
+    } else {
+      // 1. Regional -> English
+      final englishTranslation = await _regionalTranslation.translateToEnglish(
+          inputText, fallbackLangCode: widget.config.fallbackLanguageCode);
+
+      // 2. English -> Nicobarese
+      var dictResult = await _dictionaryService.searchWord(englishTranslation);
+      String nicobareseText = "";
+
+      if (dictResult != null) {
+         nicobareseText = dictResult['nicobarese'].toString();
+         responseText = "✨ $nicobareseText\n\n(English: ${dictResult['english']})";
+      } else {
+         final neuralResult = await _neuralEngine.predict(englishTranslation);
+         if (neuralResult.text.isNotEmpty && neuralResult.text != englishTranslation) {
+             nicobareseText = neuralResult.text;
+             responseText = "✨ $nicobareseText\n\n🤖 AI Translation (English: $englishTranslation)";
+         } else {
+             responseText = "🤔 I translated it to English as '$englishTranslation', but I don't know the Nicobarese word for it yet.";
+         }
+      }
+
+      if (mounted) {
+        setState(() {
+          _isTyping = false;
+          _messages.add({"text": responseText, "type": "bot", "emoji": nicobareseText.isNotEmpty ? "🌴" : "❓"});
+        });
+        if (nicobareseText.isNotEmpty) {
+          _ttsService.speakNicobarese(nicobareseText, englishWord: englishTranslation);
+        }
       }
     }
     _scrollToBottom();
   }
 
-  void _listen() async {
+  void _listen() {
+    if (_isNicobareseMode) {
+      _listenNicobarese();
+    } else {
+      _listenRegional();
+    }
+  }
+
+  void _listenNicobarese() async {
+    if (!_isListening) {
+      await _ttsService.stop();
+      _audioRecorder?.dispose();
+      _audioRecorder = AudioRecorder();
+      if (!await _audioRecorder!.hasPermission()) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mic permission required')));
+        return;
+      }
+      final Directory tempDir = await getTemporaryDirectory();
+      _lastAudioPath = '${tempDir.path}/rt_${DateTime.now().millisecondsSinceEpoch}.wav';
+      
+      final config = const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000, numChannels: 1);
+      await _audioRecorder!.start(config, path: _lastAudioPath!);
+      setState(() => _isListening = true);
+    } else {
+      setState(() => _isListening = false);
+      final path = await _audioRecorder!.stop();
+      if (path != null) {
+        setState(() {
+          _messages.add({"text": "🎤 Transcribing...", "type": "user"});
+          _isTyping = true;
+        });
+        _scrollToBottom();
+        final result = await _whisperService.transcribe(path);
+        if (mounted) {
+          if (result.isNotEmpty) {
+            // Remove the temporary "Transcribing" message
+            _messages.removeLast();
+            _processTranslation(result, isAlreadyEnglish: true);
+          } else {
+            setState(() {
+              _isTyping = false;
+              _messages.removeLast();
+              _messages.add({"text": "Couldn't hear you clearly. Please try again.", "type": "bot", "emoji": "⚠️"});
+            });
+          }
+        }
+      }
+    }
+  }
+
+  void _listenRegional() async {
     if (!_isListening) {
       bool available = await _speechToText.initialize(
         onStatus: (val) => debugPrint('onStatus: $val'),
@@ -159,10 +243,21 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
     });
   }
 
+  void _cleanupTempFile() {
+    if (_lastAudioPath != null) {
+      try {
+        final f = File(_lastAudioPath!);
+        if (f.existsSync()) f.deleteSync();
+      } catch (_) {}
+    }
+  }
+
   @override
   void dispose() {
     _regionalTranslation.dispose();
     _ttsService.dispose();
+    _audioRecorder?.dispose();
+    _cleanupTempFile();
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -177,6 +272,26 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
         backgroundColor: const Color(0xFF1E1E2C),
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          Row(
+            children: [
+              Text("Teacher", style: TextStyle(color: _isNicobareseMode ? Colors.white54 : Colors.cyanAccent, fontSize: 12)),
+              Switch(
+                value: _isNicobareseMode,
+                activeColor: Colors.amberAccent,
+                inactiveThumbColor: Colors.cyanAccent,
+                inactiveTrackColor: Colors.cyan.withValues(alpha: 0.3),
+                onChanged: (val) {
+                  setState(() {
+                    _isNicobareseMode = val;
+                  });
+                },
+              ),
+              Text("Student", style: TextStyle(color: _isNicobareseMode ? Colors.amberAccent : Colors.white54, fontSize: 12)),
+              const SizedBox(width: 10),
+            ],
+          )
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -284,7 +399,7 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
                       child: TextField(
                         controller: _textController,
                         decoration: InputDecoration(
-                          hintText: "Type in ${widget.config.name}...",
+                          hintText: _isNicobareseMode ? "Type in Nicobarese..." : "Type in ${widget.config.name}...",
                           hintStyle: TextStyle(color: Colors.grey.shade600),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
