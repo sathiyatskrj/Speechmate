@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services") // Added for Firebase
+    // id("com.google.gms.google-services") // Firebase — disabled for offline demo
 }
 
 android {
@@ -57,11 +57,9 @@ flutter {
     source = "../.."
 }
 dependencies {
-    // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:34.7.0')
-
-    // Firebase products
-    implementation 'com.google.firebase:firebase-analytics'
+    // Firebase — disabled for offline demo. Re-enable post-proposal.
+    // implementation platform('com.google.firebase:firebase-bom:34.7.0')
+    // implementation 'com.google.firebase:firebase-analytics'
 
     // ─── ML Kit: bundle models inside APK (fully offline) ────────────────────
     // Image Labeling — bundles the default on-device model (~5MB)
