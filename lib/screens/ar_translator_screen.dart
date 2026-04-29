@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:flutter/services.dart';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -39,22 +40,29 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   // Processing state
   bool _isDetecting = false;
   DateTime _lastFrame = DateTime.now();
-  int _throttleMs = 500; // Dynamic: auto-adjusts based on device performance
+  int _throttleMs = 400;
   int _frameCount = 0;
   DateTime _fpsCheckpoint = DateTime.now();
   double _currentFps = 0;
 
   // Extra features
   bool _flashlightOn = false;
+  double _zoomLevel = 1.0;
+  double _minZoom = 1.0;
+  double _maxZoom = 5.0;
 
   // Results
   List<_DetectedItem> _items = [];
   String _lastSpoken = '';
   Timer? _speakTimer;
+  final List<_DetectedItem> _history = [];
+  bool _showHistory = false;
 
-  // UI mode: 'live' or 'paused'
+  // UI mode
   bool _isPaused = false;
+  bool _captureMode = false; // freeze frame + deep scan
   int _lensMode = 0; // 0: Auto, 1: Objects, 2: Text
+  int _totalDetections = 0;
 
   // Animations
   late AnimationController _scanAnim;
@@ -79,7 +87,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   }
 
   void _initImageLabeler() {
-    final options = ImageLabelerOptions(confidenceThreshold: 0.35);
+    final options = ImageLabelerOptions(confidenceThreshold: 0.25);
     _imageLabeler = ImageLabeler(options: options);
   }
 
@@ -147,6 +155,13 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       }
       
       if (!mounted) return;
+
+      // Get zoom range
+      try {
+        _minZoom = await _cameraController!.getMinZoomLevel();
+        _maxZoom = await _cameraController!.getMaxZoomLevel();
+        _zoomLevel = _minZoom;
+      } catch (e) { debugPrint('[AR] Zoom query failed: $e'); }
 
       setState(() => _isCameraReady = true);
       _cameraController!.startImageStream(_onFrame);
@@ -283,11 +298,16 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       if (!mounted) return;
       setState(() => _items = items);
 
-      // Auto-speak top item
+      // Haptic feedback on new detection
       if (items.isNotEmpty && items.first.hasTranslation) {
         final top = items.first;
         if (top.nicobarese != _lastSpoken) {
+          HapticFeedback.lightImpact();
           _lastSpoken = top.nicobarese;
+          _totalDetections++;
+          // Add to history (keep last 20)
+          _history.insert(0, top);
+          if (_history.length > 20) _history.removeLast();
           _speakTimer?.cancel();
           _speakTimer = Timer(const Duration(milliseconds: 1500), () {
             if (!_isPaused && mounted) {
@@ -309,11 +329,26 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
         InputImageRotationValue.fromRawValue(_camera!.sensorOrientation) ??
             InputImageRotation.rotation0deg;
 
-    final format = InputImageFormatValue.fromRawValue(image.format.raw) ?? 
+    final format = InputImageFormatValue.fromRawValue(image.format.raw) ??
                    (Platform.isAndroid ? InputImageFormat.nv21 : InputImageFormat.bgra8888);
 
+    if (image.planes.isEmpty) return null;
+
+    // For NV21 on Android: use first plane only (contains interleaved Y+CrCb)
+    // Many devices deliver NV21 as a single plane even though planes.length > 1
     if (Platform.isAndroid) {
-      // NV21: concatenate all planes into a single byte array
+      if (image.planes.length == 1) {
+        return InputImage.fromBytes(
+          bytes: image.planes.first.bytes,
+          metadata: InputImageMetadata(
+            size: Size(image.width.toDouble(), image.height.toDouble()),
+            rotation: rotation,
+            format: format,
+            bytesPerRow: image.planes.first.bytesPerRow,
+          ),
+        );
+      }
+      // Multi-plane: concatenate carefully
       final allBytes = WriteBuffer();
       for (final plane in image.planes) {
         allBytes.putUint8List(plane.bytes);
@@ -345,37 +380,62 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   // ─────────────────── Helpers ───────────────────────────────────────────────
 
   bool _isUselessLabel(String label) {
-    const skip = {'unknown', 'other'};
+    const skip = {'unknown', 'other', 'indoor', 'outdoor', 'room', 'place', 'product', 'event', 'text', 'screenshot', 'font', 'rectangle', 'display device', 'multimedia'};
     return skip.any((s) => label == s);
   }
 
   // Maps ML Kit generic labels to real-world object names for better lookup
   static const Map<String, String> _labelSynonyms = {
+    // ML Kit base model categories
     'home good': 'cup', 'fashion good': 'cloth', 'packaged good': 'box',
     'food': 'food', 'drink': 'water', 'plant': 'tree', 'animal': 'animal',
+    // Furniture & household
     'furniture': 'chair', 'kitchenware': 'plate', 'tableware': 'plate',
-    'toy': 'toy', 'shoe': 'shoe', 'hat': 'hat', 'bottle': 'bottle',
+    'toy': 'toy', 'shoe': 'shoes', 'hat': 'hat', 'bottle': 'bottle',
     'cup': 'cup', 'bowl': 'bowl', 'knife': 'knife', 'spoon': 'spoon',
-    'fork': 'fork', 'laptop': 'computer', 'mobile phone': 'phone',
-    'cell phone': 'phone', 'book': 'book', 'clock': 'clock',
-    'scissors': 'scissors', 'umbrella': 'umbrella', 'bag': 'bag',
-    'backpack': 'bag', 'handbag': 'bag', 'suitcase': 'bag',
-    'ball': 'ball', 'bat': 'bat', 'flower pot': 'flower',
-    'vase': 'flower', 'candle': 'fire', 'lamp': 'light',
-    'person': 'person', 'man': 'man', 'woman': 'woman', 'child': 'child',
-    'baby': 'child', 'bird': 'bird', 'cat': 'cat', 'dog': 'dog',
-    'fish': 'fish', 'insect': 'insect', 'butterfly': 'butterfly',
-    'tree': 'tree', 'flower': 'flower', 'fruit': 'fruit', 'vegetable': 'vegetable',
+    'fork': 'fork', 'lamp': 'light', 'candle': 'fire',
+    // Technology
+    'laptop': 'book', 'computer': 'book', 'keyboard': 'book',
+    'mobile phone': 'phone', 'cell phone': 'phone', 'telephone': 'phone',
+    'tablet computer': 'book', 'monitor': 'light', 'television': 'light',
+    // Stationery
+    'book': 'book', 'pencil': 'pencil', 'pen': 'pen', 'paper': 'book',
+    'notebook': 'notebook', 'scissors': 'scissors',
+    // Clothing & accessories
+    'umbrella': 'umbrella', 'bag': 'bag', 'backpack': 'bag',
+    'handbag': 'bag', 'suitcase': 'bag', 'glasses': 'eye',
+    'sunglasses': 'eye', 'watch': 'clock', 'ring': 'ring',
+    'necklace': 'necklace', 'clothing': 'cloth', 'shirt': 'cloth',
+    // Sports & recreation
+    'ball': 'ball', 'bat': 'bat', 'racket': 'bat',
+    // Nature objects
+    'flower pot': 'flower', 'vase': 'flower', 'houseplant': 'tree',
+    'tree': 'tree', 'flower': 'flower', 'fruit': 'fruit',
+    'vegetable': 'vegetable', 'leaf': 'leaf', 'coconut': 'coconut',
+    // People
+    'person': 'child', 'man': 'boy', 'woman': 'girl', 'child': 'child',
+    'baby': 'child', 'human face': 'face', 'face': 'face', 'hand': 'finger',
+    // Animals
+    'bird': 'bird', 'cat': 'cat', 'dog': 'dog', 'fish': 'fish',
+    'insect': 'insect', 'butterfly': 'butterfly', 'frog': 'frog',
+    'turtle': 'turtle', 'crab': 'crab', 'snake': 'snake',
+    // Vehicles
     'car': 'car', 'bicycle': 'bicycle', 'motorcycle': 'bicycle',
     'boat': 'boat', 'ship': 'boat', 'airplane': 'airplane',
+    // Building parts
     'door': 'door', 'window': 'window', 'bed': 'bed', 'table': 'table',
-    'chair': 'chair', 'couch': 'chair', 'pen': 'pen', 'pencil': 'pen',
-    'paper': 'paper', 'key': 'key', 'watch': 'clock', 'ring': 'ring',
-    'necklace': 'necklace', 'glasses': 'eye', 'sun': 'sun', 'moon': 'moon',
-    'star': 'star', 'rain': 'rain', 'cloud': 'cloud', 'rock': 'stone',
+    'chair': 'chair', 'couch': 'chair', 'desk': 'desk', 'shelf': 'table',
+    // Nature & weather
+    'sun': 'sun', 'moon': 'moon', 'star': 'star', 'rain': 'rain',
+    'cloud': 'cloud', 'rock': 'stone', 'stone': 'stone',
     'mountain': 'mountain', 'river': 'river', 'ocean': 'sea',
-    'beach': 'sand', 'jungle': 'forest', 'indoor': 'house', 'outdoor': 'land',
-    'room': 'house', 'product': 'thing', 'place': 'land',
+    'beach': 'sand', 'jungle': 'forest', 'sky': 'sky',
+    // Food & drink
+    'bread': 'food', 'rice': 'food', 'meat': 'food', 'milk': 'water',
+    'juice': 'water', 'coffee': 'water', 'tea': 'water',
+    // Misc
+    'key': 'key', 'clock': 'clock', 'bell': 'bell', 'fan': 'fan',
+    'light': 'light', 'switch': 'switch',
   };
 
   String _resolveLabel(String raw) {
@@ -433,8 +493,10 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
       s.isEmpty ? s : s[0].toUpperCase() + s.substring(1).toLowerCase();
 
   void _togglePause() {
+    HapticFeedback.mediumImpact();
     setState(() {
       _isPaused = !_isPaused;
+      _captureMode = false;
       if (_isPaused) {
         _scanAnim.stop();
       } else {
@@ -443,6 +505,28 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
         _scanAnim.repeat(reverse: true);
       }
     });
+  }
+
+  void _captureAndScan() async {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      _captureMode = true;
+      _isPaused = true;
+      _scanAnim.stop();
+    });
+    // Run one deep scan with lower throttle
+    if (_cameraController != null && _cameraController!.value.isStreamingImages) {
+      // Already have items from last frame, just freeze
+    }
+  }
+
+  void _setZoom(double zoom) async {
+    if (_cameraController == null) return;
+    try {
+      _zoomLevel = zoom.clamp(_minZoom, _maxZoom);
+      await _cameraController!.setZoomLevel(_zoomLevel);
+      setState(() {});
+    } catch (e) { debugPrint('[AR] Zoom error: $e'); }
   }
 
   // ─────────────────── Lifecycle ─────────────────────────────────────────────
@@ -561,6 +645,144 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
             ),
           ),
 
+        // Zoom slider on right edge
+        if (_isCameraReady && !_isPaused && _maxZoom > _minZoom)
+          Positioned(
+            right: 16,
+            top: MediaQuery.of(context).size.height * 0.25,
+            bottom: MediaQuery.of(context).size.height * 0.35,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('${_zoomLevel.toStringAsFixed(1)}x',
+                    style: const TextStyle(color: Colors.cyanAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: RotatedBox(
+                    quarterTurns: 3,
+                    child: SliderTheme(
+                      data: SliderThemeData(
+                        trackHeight: 2,
+                        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                        activeTrackColor: Colors.cyanAccent,
+                        inactiveTrackColor: Colors.white24,
+                        thumbColor: Colors.cyanAccent,
+                        overlayColor: Colors.cyanAccent.withValues(alpha: 0.2),
+                      ),
+                      child: Slider(
+                        value: _zoomLevel,
+                        min: _minZoom,
+                        max: _maxZoom,
+                        onChanged: _setZoom,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        // Capture mode badge
+        if (_captureMode && _items.isNotEmpty)
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 80,
+            left: 0, right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '📸  Captured ${_items.length} item${_items.length == 1 ? '' : 's'}',
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+
+        // History panel overlay
+        if (_showHistory)
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => setState(() => _showHistory = false),
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.85),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.history, color: Colors.cyanAccent),
+                            const SizedBox(width: 8),
+                            Text('Detection History ($_totalDetections total)',
+                                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                            const Spacer(),
+                            IconButton(
+                              onPressed: () => setState(() => _showHistory = false),
+                              icon: const Icon(Icons.close, color: Colors.white54),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: _history.isEmpty
+                            ? const Center(child: Text('No detections yet', style: TextStyle(color: Colors.white38)))
+                            : ListView.builder(
+                                itemCount: _history.length,
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                itemBuilder: (_, i) {
+                                  final item = _history[i];
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: item.hasTranslation ? Colors.cyanAccent.withValues(alpha: 0.3) : Colors.white12),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 32, height: 32,
+                                          decoration: BoxDecoration(
+                                            color: Colors.cyanAccent.withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Center(child: Text('${i + 1}', style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontSize: 12))),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(item.english, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                                              Text(item.nicobarese, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                                            ],
+                                          ),
+                                        ),
+                                        Text('${(item.confidence * 100).toInt()}%',
+                                            style: const TextStyle(color: Colors.cyanAccent, fontSize: 11)),
+                                        const SizedBox(width: 8),
+                                        GestureDetector(
+                                          onTap: () => ref.read(ttsServiceProvider).speakNicobarese(item.nicobarese, englishWord: item.english),
+                                          child: const Icon(Icons.volume_up_rounded, color: Colors.cyanAccent, size: 20),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
         // 7. Bottom bar
         Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
       ]),
@@ -607,6 +829,25 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.cyanAccent),
           style: IconButton.styleFrom(backgroundColor: Colors.black45),
         ),
+        // Stats badge
+        if (_totalDetections > 0)
+          Container(
+            margin: const EdgeInsets.only(left: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.cyanAccent.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.3)),
+            ),
+            child: GestureDetector(
+              onTap: () => setState(() => _showHistory = !_showHistory),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.history, color: Colors.cyanAccent, size: 14),
+                const SizedBox(width: 4),
+                Text('$_totalDetections', style: const TextStyle(color: Colors.cyanAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+              ]),
+            ),
+          ),
         const Spacer(),
         Column(children: [
           Container(
@@ -700,10 +941,24 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      item.english,
-                      style: const TextStyle(
-                          color: Colors.white54, fontSize: 11, letterSpacing: 1),
+                    Row(
+                      children: [
+                        Text(
+                          item.english,
+                          style: const TextStyle(
+                              color: Colors.white54, fontSize: 11, letterSpacing: 1),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: Colors.cyanAccent.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text('${(item.confidence * 100).toInt()}%',
+                              style: const TextStyle(color: Colors.cyanAccent, fontSize: 9, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
                     Text(
                       item.nicobarese,
@@ -723,13 +978,12 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
                     GestureDetector(
                       onTap: () async {
                         await DatabaseManager.instance.saveToVault(item.english, item.nicobarese);
-                        if (context.mounted) {
-                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                               content: Text('Saved "${item.english}" to Vault', style: const TextStyle(color: Colors.black)),
-                               backgroundColor: Colors.cyanAccent,
-                               behavior: SnackBarBehavior.floating,
-                           ));
-                        }
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Saved "${item.english}" to Vault', style: const TextStyle(color: Colors.black)),
+                            backgroundColor: Colors.cyanAccent,
+                            behavior: SnackBarBehavior.floating,
+                        ));
                       },
                       child: Container(
                         padding: const EdgeInsets.all(10),
@@ -806,6 +1060,12 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
               _items = [];
               _lastSpoken = '';
             }),
+          ),
+          _BottomBtn(
+            icon: Icons.camera_alt_rounded,
+            label: 'Capture',
+            onTap: _captureAndScan,
+            color: Colors.amberAccent,
           ),
           _BottomBtn(
             icon: _flashlightOn ? Icons.flashlight_off_rounded : Icons.flashlight_on_rounded,
