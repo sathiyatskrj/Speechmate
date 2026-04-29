@@ -45,7 +45,7 @@ class _DocumentTranslationHubState extends State<DocumentTranslationHub> {
 
   Future<void> _pickAndProcessFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'txt'],
       );
@@ -210,16 +210,22 @@ class _DocumentTranslationHubState extends State<DocumentTranslationHub> {
             // Ambient Gradients
             Positioned(
               top: -150, right: -150,
-              child: Container(
-                width: 400, height: 400,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.indigoAccent.withValues(alpha: 0.15), filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100)),
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                child: Container(
+                  width: 400, height: 400,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.indigoAccent.withValues(alpha: 0.15)),
+                ),
               ),
             ),
             Positioned(
               bottom: -150, left: -150,
-              child: Container(
-                width: 400, height: 400,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.cyanAccent.withValues(alpha: 0.1), filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100)),
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                child: Container(
+                  width: 400, height: 400,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.cyanAccent.withValues(alpha: 0.1)),
+                ),
               ),
             ),
             
