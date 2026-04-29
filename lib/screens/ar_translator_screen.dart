@@ -323,51 +323,45 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
   }
 
   InputImage? _buildInputImage(CameraImage image) {
-    if (_camera == null) return null;
+    if (_camera == null || _cameraController == null) return null;
 
-    final rotation =
-        InputImageRotationValue.fromRawValue(_camera!.sensorOrientation) ??
-            InputImageRotation.rotation0deg;
+    final sensorOrientation = _camera!.sensorOrientation;
+    InputImageRotation? rotation;
+    if (Platform.isIOS) {
+      rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+    } else if (Platform.isAndroid) {
+      var rotationCompensation = 0;
+      // Default to portraitUp if deviceOrientation is somehow not available
+      var deviceO = _cameraController!.value.deviceOrientation;
+      final orientations = {
+        DeviceOrientation.portraitUp: 0,
+        DeviceOrientation.landscapeLeft: 90,
+        DeviceOrientation.portraitDown: 180,
+        DeviceOrientation.landscapeRight: 270,
+      };
+      rotationCompensation = orientations[deviceO] ?? 0;
+      if (_camera!.lensDirection == CameraLensDirection.front) {
+        rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
+      } else {
+        rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
+      }
+      rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
+    }
+    if (rotation == null) return null;
 
     final format = InputImageFormatValue.fromRawValue(image.format.raw) ??
                    (Platform.isAndroid ? InputImageFormat.nv21 : InputImageFormat.bgra8888);
 
     if (image.planes.isEmpty) return null;
 
-    // For NV21 on Android: use first plane only (contains interleaved Y+CrCb)
-    // Many devices deliver NV21 as a single plane even though planes.length > 1
-    if (Platform.isAndroid) {
-      if (image.planes.length == 1) {
-        return InputImage.fromBytes(
-          bytes: image.planes.first.bytes,
-          metadata: InputImageMetadata(
-            size: Size(image.width.toDouble(), image.height.toDouble()),
-            rotation: rotation,
-            format: format,
-            bytesPerRow: image.planes.first.bytesPerRow,
-          ),
-        );
-      }
-      // Multi-plane: concatenate carefully
-      final allBytes = WriteBuffer();
-      for (final plane in image.planes) {
-        allBytes.putUint8List(plane.bytes);
-      }
-      return InputImage.fromBytes(
-        bytes: allBytes.done().buffer.asUint8List(),
-        metadata: InputImageMetadata(
-          size: Size(image.width.toDouble(), image.height.toDouble()),
-          rotation: rotation,
-          format: format,
-          bytesPerRow: image.planes.first.bytesPerRow,
-        ),
-      );
+    final WriteBuffer allBytes = WriteBuffer();
+    for (final Plane plane in image.planes) {
+      allBytes.putUint8List(plane.bytes);
     }
+    final bytes = allBytes.done().buffer.asUint8List();
 
-    // iOS: single BGRA plane
-    if (image.planes.length != 1) return null;
     return InputImage.fromBytes(
-      bytes: image.planes.first.bytes,
+      bytes: bytes,
       metadata: InputImageMetadata(
         size: Size(image.width.toDouble(), image.height.toDouble()),
         rotation: rotation,
