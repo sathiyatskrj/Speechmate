@@ -333,6 +333,7 @@ class _StudentDashState extends State<StudentDash>
                                   ],
                               ),
                           ),
+                          ),
                       ],
                   ),
               ),
