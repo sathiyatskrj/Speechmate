@@ -92,6 +92,8 @@
 | **📻 Oral History Radio** | Tribal storytelling archive with local recordings |
 | **🗺️ Tuhet Mapper** | Kinship structure visualization for indigenous family trees |
 | **🌐 Dialect Comparison** | Side-by-side comparison across Car, Central, Coast, Teressa & Chowra dialects |
+| **📄 Document Translation Hub** | Deep offline PDF/TXT parser to instantly translate English curriculums to Nicobarese in a dual-pane UI |
+| **📡 P2P Sync Service** | Export and import vocabulary ZIP payloads for offline curriculum sharing between devices |
 
 ---
 
@@ -253,7 +255,7 @@ SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requi
 
 ### 🔜 Planned (v3.0+)
 - [ ] **SmolLM2 On-Device LLM** — Replace mock LLM with quantized GGUF model for true offline AI chat
-- [ ] **P2P Mesh Sync** — Share vocabulary packs via Wi-Fi Direct / QR code
+- [x] **P2P Mesh Sync** — Share vocabulary packs via offline ZIP payloads
 - [ ] **Onges Module** — Third tribal language integration
 - [ ] **Gamified Certification** — Printable tribal language certificates
 - [ ] **Collaborative Classroom** — Peer vocabulary games
