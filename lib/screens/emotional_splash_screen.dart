@@ -325,7 +325,8 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                            ..setEntry(3, 2, 0.001) // Perspective
                            ..rotateX(0.1 * math.sin(_pulseController.value * math.pi))
                            ..rotateY(0.1 * math.cos(_pulseController.value * math.pi))
-                           ..scaleByDouble(_logoScale.value),
+                           // ignore: deprecated_member_use
+                           ..scale(_logoScale.value),
                          alignment: Alignment.center,
                          child: Transform.rotate(
                            angle: _logoRotate.value,
