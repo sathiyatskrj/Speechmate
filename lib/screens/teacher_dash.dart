@@ -10,6 +10,7 @@ import 'package:speechmate/screens/common_phrases_screen.dart';
 import 'package:speechmate/screens/voice_vault_screen.dart';
 import 'package:speechmate/screens/culture_screen.dart';
 import 'package:speechmate/widgets/translation_card.dart';
+import 'package:speechmate/screens/document_translation_hub.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/report_generator.dart';
 import 'package:speechmate/services/p2p_sync_service.dart';
@@ -176,7 +177,11 @@ class _TeacherDashState extends State<TeacherDash>
                         children: [
                           StaggeredGridTile.count(
                             crossAxisCellCount: 4, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 0, title: AppStrings.get('generateReport'), icon: Icons.picture_as_pdf_outlined, color: Colors.deepOrangeAccent, onTap: () async => await ReportGenerator.generateAndPrintReport("Student")),
+                            child: _buildFeatureCard(context, 0, title: "Document Translator Hub", icon: Icons.auto_stories_rounded, color: Colors.cyanAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentTranslationHub()))),
+                          ),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 4, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 1, title: AppStrings.get('generateReport'), icon: Icons.analytics_outlined, color: Colors.deepOrangeAccent, onTap: () async => await ReportGenerator.generateAndPrintReport("Student")),
                           ),
                           StaggeredGridTile.count(
                             crossAxisCellCount: 2, mainAxisCellCount: 3,
