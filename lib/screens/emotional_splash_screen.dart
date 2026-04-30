@@ -29,7 +29,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
   late Animation<double> _versionOpacity;
   
   // PARTICLE SYSTEM
-  final int particleCount = 35; // Reduced from 75 to fix hanging and lag
+  final int particleCount = 20; // Reduced for smooth performance on low-end devices
   final List<_SplashParticle> particles = [];
   final math.Random random = math.Random();
   Offset _touchPosition = Offset.zero;
@@ -93,7 +93,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
 
     _mainController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 4000), // Sped up from 6500 to fix slow splash
+      duration: const Duration(milliseconds: 6000), // Extended for smooth experience
     );
 
     // 1. Constellation Fade In (0 - 2s)

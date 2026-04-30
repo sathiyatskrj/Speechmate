@@ -193,14 +193,14 @@ class _StudentDashState extends State<StudentDash>
 
         // --- Regional Translations ---
         {
-          "word": "Omni Broadcast",
+          "word": AppStrings.get('omniBroadcast'),
           "emoji": "📡",
           "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
           "navigateTo": const OmniTranslatorScreen(),
           "icon": Icons.cell_tower_rounded
         },
         {
-          "word": "Hindi\nTranslator",
+          "word": AppStrings.get('hindiTranslator'),
           "emoji": "🇮🇳",
           "colors": [const Color(0xFFD84315), const Color(0xFFFF7043)],
           "navigateTo": RegionalTranslatorScreen(
@@ -209,7 +209,7 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.g_translate_rounded
         },
         {
-          "word": "Tamil\nTranslator",
+          "word": AppStrings.get('tamilTranslator'),
           "emoji": "🛕",
           "colors": [const Color(0xFF2E7D32), const Color(0xFF66BB6A)],
           "navigateTo": RegionalTranslatorScreen(
@@ -218,7 +218,7 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.g_translate_rounded
         },
         {
-          "word": "Bengali\nTranslator",
+          "word": AppStrings.get('bengaliTranslator'),
           "emoji": "🐅",
           "colors": [const Color(0xFFC62828), const Color(0xFFEF5350)],
           "navigateTo": RegionalTranslatorScreen(
@@ -227,7 +227,7 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.g_translate_rounded
         },
         {
-          "word": "Telugu\nTranslator",
+          "word": AppStrings.get('teluguTranslator'),
           "emoji": "🌶️",
           "colors": [const Color(0xFF283593), const Color(0xFF5C6BC0)],
           "navigateTo": RegionalTranslatorScreen(
@@ -236,7 +236,7 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.g_translate_rounded
         },
         {
-          "word": "Malayalam\nTranslator",
+          "word": AppStrings.get('malayalamTranslator'),
           "emoji": "🥥",
           "colors": [const Color(0xFF00695C), const Color(0xFF26A69A)],
           "navigateTo": RegionalTranslatorScreen(
@@ -297,7 +297,7 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.public_rounded,
         },
         {
-          "word": "AI Setup",
+          "word": AppStrings.get('aiSetup'),
           "emoji": "🧠",
           "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)],
           "navigateTo": const AISetupScreen(),
@@ -416,13 +416,13 @@ class _StudentDashState extends State<StudentDash>
           const SizedBox(height: 20),
 
           // 🎙️ Voice Waveform Visualizer
-          const KidsSectionHeader(emoji: '🎙️', label: 'Sound Wave'),
+          KidsSectionHeader(emoji: '🎙️', label: AppStrings.get('sectionSoundWave')),
           const SizedBox(height: 8),
           const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
           const SizedBox(height: 20),
 
           // 🏆 My Progress
-          const KidsSectionHeader(emoji: '🏆', label: 'My Progress'),
+          KidsSectionHeader(emoji: '🏆', label: AppStrings.get('sectionMyProgress')),
           const SizedBox(height: 10),
           const GamificationHeader()
               .animate()
@@ -436,7 +436,7 @@ class _StudentDashState extends State<StudentDash>
           const SizedBox(height: 20),
 
           // 🥇 My Badges
-          const KidsSectionHeader(emoji: '🥇', label: 'My Badges'),
+          KidsSectionHeader(emoji: '🥇', label: AppStrings.get('sectionMyBadges')),
           const SizedBox(height: 10),
           const AchievementShowcaseWidget()
               .animate()
@@ -445,7 +445,7 @@ class _StudentDashState extends State<StudentDash>
           const SizedBox(height: 28),
 
           // 🚀 Let's Learn!
-          const KidsSectionHeader(emoji: '🚀', label: "Let's Learn!"),
+          KidsSectionHeader(emoji: '🚀', label: AppStrings.get('sectionLetsLearn')),
           const SizedBox(height: 14),
           _buildBentoGrid(),
           const SizedBox(height: 110),
@@ -1354,8 +1354,9 @@ class DailyMissionCard extends StatefulWidget {
 class _DailyMissionCardState extends State<DailyMissionCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _shimmer;
-  final double _progress = 0.45; // TODO: Fetch from actual stats
+  double _progress = 0.0;
   late Map<String, dynamic> _todaysMission;
+  bool _loadingProgress = true;
 
   @override
   void initState() {
@@ -1364,6 +1365,20 @@ class _DailyMissionCardState extends State<DailyMissionCard>
         AnimationController(vsync: this, duration: const Duration(seconds: 2))
           ..repeat(reverse: true);
     _todaysMission = SmartMissionEngine.getTodaysMission();
+    _loadRealProgress();
+  }
+
+  Future<void> _loadRealProgress() async {
+    final progressService = ProgressService();
+    final stats = await progressService.getProgressStats();
+    final wordsLearned = stats['wordsLearned'] ?? 0;
+    final target = _todaysMission['target'] as int;
+    if (mounted) {
+      setState(() {
+        _progress = (wordsLearned / target).clamp(0.0, 1.0);
+        _loadingProgress = false;
+      });
+    }
   }
 
   @override
@@ -1410,13 +1425,13 @@ class _DailyMissionCardState extends State<DailyMissionCard>
                     color: Colors.white.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('🎯', style: TextStyle(fontSize: 14)),
-                      SizedBox(width: 6),
-                      Text('DAILY MISSION',
-                          style: TextStyle(
+                      const Text('🎯', style: TextStyle(fontSize: 14)),
+                      const SizedBox(width: 6),
+                      Text(AppStrings.get('dailyMission'),
+                          style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
@@ -1450,7 +1465,7 @@ class _DailyMissionCardState extends State<DailyMissionCard>
             ),
             const SizedBox(height: 6),
             Text(
-              'Use the AR Scanner or Games to explore words 🌟',
+              AppStrings.get('missionHint'),
               style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
             ),
@@ -1473,7 +1488,7 @@ class _DailyMissionCardState extends State<DailyMissionCard>
                         color: Colors.white.withValues(alpha: 0.9),
                         fontWeight: FontWeight.bold,
                         fontSize: 13)),
-                Text('${(_progress * 100).round()}% done!',
+                Text('${(_progress * 100).round()}% ${AppStrings.get('percentDone')}',
                     style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.85),
                         fontSize: 12)),
@@ -1538,19 +1553,19 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
       children: [
         _buildStatBubble(
             emoji: '🔥',
-            label: 'Streak',
-            value: '$_streak days',
+            label: AppStrings.get('streakLabel'),
+            value: '$_streak ${AppStrings.get('days')}',
             color: const Color(0xFFFF6B35)),
         const SizedBox(width: 12),
         _buildStatBubble(
             emoji: '⭐',
-            label: 'Stars',
+            label: AppStrings.get('starsLabel'),
             value: '$_stars',
             color: const Color(0xFFFFD700)),
         const SizedBox(width: 12),
         _buildStatBubble(
             emoji: '🏅',
-            label: 'Level',
+            label: AppStrings.get('levelLabel'),
             value: _levelName,
             color: const Color(0xFF7B61FF)),
       ],
@@ -1719,7 +1734,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                               blurRadius: 10,
                               offset: const Offset(0, 4))
                         ]),
-                    child: const Text("Yay! Let's learn! 🌟",
+                    child: Text(AppStrings.get('petHappySpeech'),
                         style: TextStyle(
                             color: Colors.pinkAccent,
                             fontWeight: FontWeight.bold,
@@ -2006,78 +2021,32 @@ class _ConfettiPainter extends CustomPainter {
 /// Generates personalized daily missions based on what the child hasn't
 /// practiced recently. Uses a simple staleness score — no heavy computation.
 class SmartMissionEngine {
-  /// Pre-defined mission templates
+  /// Mission text keys for localization
+  static const List<String> _missionTextKeys = [
+    'missionLearnWords',
+    'missionPlayGames',
+    'missionScanAR',
+    'missionRecordVoice',
+    'missionBodyQuiz',
+    'missionAnimals',
+    'missionNature',
+    'missionNumbers',
+    'missionStories',
+    'missionColors',
+  ];
+
+  /// Pre-defined mission templates (targets and XP)
   static const List<Map<String, dynamic>> _missionTemplates = [
-    {
-      'text': 'Learn 5 new Nicobarese words!',
-      'target': 5,
-      'xp': 50,
-      'category': 'vocabulary',
-      'emoji': '📖'
-    },
-    {
-      'text': 'Play 2 word games!',
-      'target': 2,
-      'xp': 40,
-      'category': 'games',
-      'emoji': '🎮'
-    },
-    {
-      'text': 'Scan 3 objects with AR!',
-      'target': 3,
-      'xp': 60,
-      'category': 'ar',
-      'emoji': '📷'
-    },
-    {
-      'text': 'Record 3 voice translations!',
-      'target': 3,
-      'xp': 45,
-      'category': 'voice',
-      'emoji': '🎤'
-    },
-    {
-      'text': 'Complete 1 body parts quiz!',
-      'target': 1,
-      'xp': 35,
-      'category': 'quiz',
-      'emoji': '🦴'
-    },
-    {
-      'text': 'Explore 4 animal words!',
-      'target': 4,
-      'xp': 40,
-      'category': 'animals',
-      'emoji': '🐾'
-    },
-    {
-      'text': 'Learn 3 nature words!',
-      'target': 3,
-      'xp': 35,
-      'category': 'nature',
-      'emoji': '🌿'
-    },
-    {
-      'text': 'Practice 5 number words!',
-      'target': 5,
-      'xp': 30,
-      'category': 'numbers',
-      'emoji': '🔢'
-    },
-    {
-      'text': 'Listen to 1 oral history!',
-      'target': 1,
-      'xp': 55,
-      'category': 'stories',
-      'emoji': '📻'
-    },
-    {
-      'text': 'Translate 4 color words!',
-      'target': 4,
-      'xp': 35,
-      'category': 'colors',
-      'emoji': '🎨'
-    },
+    {'target': 5, 'xp': 50, 'category': 'vocabulary', 'emoji': '📖'},
+    {'target': 2, 'xp': 40, 'category': 'games', 'emoji': '🎮'},
+    {'target': 3, 'xp': 60, 'category': 'ar', 'emoji': '📷'},
+    {'target': 3, 'xp': 45, 'category': 'voice', 'emoji': '🎤'},
+    {'target': 1, 'xp': 35, 'category': 'quiz', 'emoji': '🦴'},
+    {'target': 4, 'xp': 40, 'category': 'animals', 'emoji': '🐾'},
+    {'target': 3, 'xp': 35, 'category': 'nature', 'emoji': '🌿'},
+    {'target': 5, 'xp': 30, 'category': 'numbers', 'emoji': '🔢'},
+    {'target': 1, 'xp': 55, 'category': 'stories', 'emoji': '📻'},
+    {'target': 4, 'xp': 35, 'category': 'colors', 'emoji': '🎨'},
   ];
 
   /// Picks today's mission deterministically from the day-of-year.
@@ -2086,7 +2055,10 @@ class SmartMissionEngine {
     final now = DateTime.now();
     final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
     final index = dayOfYear % _missionTemplates.length;
-    return Map<String, dynamic>.from(_missionTemplates[index]);
+    final template = Map<String, dynamic>.from(_missionTemplates[index]);
+    // Resolve localized text at runtime
+    template['text'] = AppStrings.get(_missionTextKeys[index]);
+    return template;
   }
 
   /// Calculates a staleness score for each category based on
