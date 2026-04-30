@@ -13,6 +13,7 @@ import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/providers/service_providers.dart';
+import 'package:speechmate/data/object_encyclopedia.dart';
 
 /// Live AR Translator
 /// Primary: ML Kit Object Detection (stream mode) — detects objects with bounding boxes live
@@ -244,24 +245,28 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
             if (finalLabel.isEmpty) continue;
 
             final nic = await _lookupNicobarese(finalLabel);
+            final info = ObjectEncyclopedia.getObjectInfo(finalLabel);
             items.add(_DetectedItem(
               english: _cap(finalLabel),
               nicobarese: nic ?? _cap(finalLabel),
               confidence: finalConfidence,
               hasTranslation: nic != null,
               boundingBox: obj.boundingBox,
+              info: info,
             ));
           }
 
           // If no bounding boxes but we found a precise label, show it without box
           if (items.isEmpty && bestPreciseLabel != null) {
             final nic = await _lookupNicobarese(bestPreciseLabel);
+            final info = ObjectEncyclopedia.getObjectInfo(bestPreciseLabel);
             items.add(_DetectedItem(
               english: _cap(bestPreciseLabel),
               nicobarese: nic ?? _cap(bestPreciseLabel),
               confidence: bestConf,
               hasTranslation: nic != null,
               boundingBox: null,
+              info: info,
             ));
           }
         } catch (e) {
@@ -1166,6 +1171,7 @@ class _DetectedItem {
   final double confidence;
   final bool hasTranslation;
   final Rect? boundingBox;
+  final Map<String, String>? info;
 
   const _DetectedItem({
     required this.english,
@@ -1173,6 +1179,7 @@ class _DetectedItem {
     required this.confidence,
     required this.hasTranslation,
     this.boundingBox,
+    this.info,
   });
 }
 
@@ -1217,7 +1224,7 @@ class _BoxOverlayPainter extends CustomPainter {
       canvas.drawLine(Offset(center.dx, center.dy - 10), Offset(center.dx, center.dy + 10), crosshairPaint);
       canvas.drawCircle(center, 4.0, crosshairPaint);
 
-      // 3. Info Panel (floating above box)
+      // 3. Info Panel (floating above or next to box)
       final tp = TextPainter(
         text: TextSpan(
           text: ' ${item.nicobarese.toUpperCase()} ',
@@ -1243,20 +1250,53 @@ class _BoxOverlayPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
       )..layout();
 
-      final double panelWidth = math.max(tp.width, subTp.width) + 16;
-      final double panelHeight = tp.height + subTp.height + 12;
+      // Collect info lines
+      List<TextPainter> infoPainters = [];
+      if (item.info != null) {
+        for (var entry in item.info!.entries) {
+          String text = "${entry.key.toUpperCase()}: ${entry.value}";
+          if (text.length > 25) text = "${text.substring(0, 23)}...";
+          final p = TextPainter(
+            text: TextSpan(
+              text: ' $text ',
+              style: TextStyle(
+                  color: color.withValues(alpha: 0.8),
+                  fontSize: 9,
+                  fontFamily: 'Courier'),
+            ),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          infoPainters.add(p);
+        }
+      }
+
+      double maxInfoWidth = 0;
+      double totalInfoHeight = 0;
+      for (var p in infoPainters) {
+        if (p.width > maxInfoWidth) maxInfoWidth = p.width;
+        totalInfoHeight += p.height + 2;
+      }
+
+      final double panelWidth = math.max(math.max(tp.width, subTp.width), maxInfoWidth) + 16;
+      final double panelHeight = tp.height + subTp.height + totalInfoHeight + 16;
       
       final badgeRect = Rect.fromLTWH(
-        scaled.left + (scaled.width - panelWidth) / 2, // Center above box
-        (scaled.top - panelHeight - 10).clamp(0, size.height),
+        scaled.right + 20, // Draw on right side to look like a real scanning HUD
+        (scaled.top - 20).clamp(0, size.height - panelHeight),
         panelWidth,
         panelHeight,
       );
 
-      // Connect line from box top to panel bottom
+      // Connect line from box top-right to panel
       canvas.drawLine(
-        Offset(center.dx, scaled.top),
-        Offset(center.dx, badgeRect.bottom),
+        Offset(scaled.right, scaled.top),
+        Offset(badgeRect.left, badgeRect.top + 10),
+        Paint()..color = color.withValues(alpha: 0.5)..strokeWidth = 1.0,
+      );
+      // Small horizontal leader line
+      canvas.drawLine(
+        Offset(scaled.right, scaled.top),
+        Offset(scaled.right + 10, scaled.top),
         Paint()..color = color.withValues(alpha: 0.5)..strokeWidth = 1.0,
       );
 
@@ -1266,8 +1306,16 @@ class _BoxOverlayPainter extends CustomPainter {
       final borderPaint = Paint()..color = color.withValues(alpha: 0.6)..style = PaintingStyle.stroke..strokeWidth = 1.0;
       canvas.drawRRect(RRect.fromRectAndRadius(badgeRect, const Radius.circular(4)), borderPaint);
 
-      tp.paint(canvas, Offset(badgeRect.left + 8, badgeRect.top + 4));
-      subTp.paint(canvas, Offset(badgeRect.left + 8, badgeRect.top + tp.height + 6));
+      double currentY = badgeRect.top + 6;
+      tp.paint(canvas, Offset(badgeRect.left + 8, currentY));
+      currentY += tp.height + 4;
+      subTp.paint(canvas, Offset(badgeRect.left + 8, currentY));
+      currentY += subTp.height + 6;
+
+      for (var p in infoPainters) {
+        p.paint(canvas, Offset(badgeRect.left + 8, currentY));
+        currentY += p.height + 2;
+      }
     }
   }
 
