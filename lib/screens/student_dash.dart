@@ -88,7 +88,6 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)],
           "navigateTo": const VoiceVaultScreen(),
           "icon": Icons.mic_external_on_rounded,
-          "isDevOnly": true
         },
         {
           "word": AppStrings.get('bookScanner'),
@@ -110,7 +109,6 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)],
           "navigateTo": const BetaChatScreen(isStudent: true),
           "icon": Icons.chat_bubble_rounded,
-          "isDevOnly": true
         },
         {
           "word": AppStrings.get('voiceTranslate'),
@@ -282,7 +280,6 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)],
           "navigateTo": const DialectHeatmapScreen(),
           "icon": Icons.explore_rounded,
-          "isDevOnly": true
         },
         {
           "word": AppStrings.get('memoryPalace'),
@@ -290,7 +287,6 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)],
           "navigateTo": const MemoryPalaceScreen(),
           "icon": Icons.map_rounded,
-          "isDevOnly": true
         },
         {
           "word": AppStrings.get('community'),
@@ -299,7 +295,6 @@ class _StudentDashState extends State<StudentDash>
           "navigateTo": const CommunityScreen(),
           "isSecret": true,
           "icon": Icons.public_rounded,
-          "isDevOnly": true
         },
         {
           "word": "AI Setup",
@@ -307,7 +302,6 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)],
           "navigateTo": const AISetupScreen(),
           "icon": Icons.psychology_rounded,
-          "isDevOnly": true
         },
         {
           "word": AppStrings.get('feedback'),
@@ -461,18 +455,12 @@ class _StudentDashState extends State<StudentDash>
   }
 
   Widget _buildBentoGrid() {
-    // Filter tiles based on devMode — hide experimental features in production
-    final visibleTiles = learningTiles.where((tile) {
-      if (tile['isDevOnly'] == true && !AppConfig.devMode) return false;
-      return true;
-    }).toList();
-
     return StaggeredGrid.count(
       crossAxisCount: 4,
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
-      children: List.generate(visibleTiles.length, (index) {
-        final tile = visibleTiles[index];
+      children: List.generate(learningTiles.length, (index) {
+        final tile = learningTiles[index];
 
         // Define Bento Grid Layout Configuration
         int crossAxisCellCount = 2; // Default width (half)
