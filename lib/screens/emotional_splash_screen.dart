@@ -29,7 +29,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
   late Animation<double> _versionOpacity;
   
   // PARTICLE SYSTEM
-  final int particleCount = 75;
+  final int particleCount = 35; // Reduced from 75 to fix hanging and lag
   final List<_SplashParticle> particles = [];
   final math.Random random = math.Random();
   Offset _touchPosition = Offset.zero;
@@ -45,25 +45,22 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
   int _currentTagline = 0;
   static const List<String> _taglines = [
     "WHERE LANGUAGE BARRIERS END.",
-    "PRESERVING VOICES OF THE ISLANDS.",
-    "ONE WORD AT A TIME.",
-    "BRIDGING CULTURES THROUGH WORDS.",
+    
   ];
 
   // TIME-AWARE GREETING
   String get _greeting {
     final hour = DateTime.now().hour;
-    if (hour < 5) return 'Good Night';
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour < 12) return 'Good Morning, Explorer!';
+    if (hour < 17) return 'Good Afternoon, Adventurer!';
+    return 'Good Evening, Superstar!';
   }
 
   Color get _greetingGradientStart {
     final hour = DateTime.now().hour;
-    if (hour < 5) return const Color(0xFF0F0C29);
-    if (hour < 12) return const Color(0xFFFF6B35);
-    if (hour < 17) return Colors.cyan;
+    if (hour < 5) return const Color(0xFF2C3E50);
+    if (hour < 12) return const Color(0xFFFFB75E);
+    if (hour < 17) return const Color(0xFF00C9FF);
     return const Color(0xFF8E2DE2);
   }
 
@@ -96,7 +93,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
 
     _mainController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 6500),
+      duration: const Duration(milliseconds: 4000), // Sped up from 6500 to fix slow splash
     );
 
     // 1. Constellation Fade In (0 - 2s)
@@ -163,6 +160,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
     try {
       await _ambientPlayer.setVolume(0.0);
       await _ambientPlayer.play(AssetSource('audio/ambient.mp3'));
+      await _ambientPlayer.seek(const Duration(seconds: 2)); // Start music from 2 sec
       // Fade in volume
       for (int i = 1; i <= 10; i++) {
         await Future.delayed(const Duration(milliseconds: 200));
@@ -259,20 +257,18 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // DEEP SPACE GRADIENT — TIME AWARE
+            // FUN PLAYFUL GRADIENT — TIME AWARE
             AnimatedContainer(
               duration: const Duration(seconds: 2),
               decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.bottomCenter,
-                  radius: 1.5,
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
                   colors: [  
                     _greetingGradientStart,
-                    const Color(0xFF8E2DE2),
-                    const Color(0xFF0F0C29),
-                    Colors.black
+                    const Color(0xFF4FACFE),
+                    const Color(0xFF00F2FE),
                   ],
-                  stops: const [0.0, 0.3, 0.7, 1.0],
                 ),
               ),
             ),
@@ -306,13 +302,21 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                        // TIME-AWARE GREETING (fades in before logo)
                        Opacity(
                          opacity: _constellationOpacity.value,
-                         child: Text(
-                           _greeting,
-                           style: TextStyle(
-                             fontSize: 16,
-                             fontWeight: FontWeight.w400,
-                             color: Colors.white.withValues(alpha: 0.6),
-                             letterSpacing: 4.0,
+                         child: Container(
+                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                           decoration: BoxDecoration(
+                             color: Colors.white.withValues(alpha: 0.3),
+                             borderRadius: BorderRadius.circular(30),
+                             border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 2)
+                           ),
+                           child: Text(
+                             _greeting,
+                             style: const TextStyle(
+                               fontSize: 18,
+                               fontWeight: FontWeight.bold,
+                               color: Colors.white,
+                               letterSpacing: 1.5,
+                             ),
                            ),
                          ),
                        ),
@@ -331,40 +335,25 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                          child: Transform.rotate(
                            angle: _logoRotate.value,
                            child: Container(
-                             width: 140,
-                             height: 140,
+                             width: 150,
+                             height: 150,
                              decoration: BoxDecoration(
                                shape: BoxShape.circle,
-                               gradient: const LinearGradient(
-                                 begin: Alignment.topLeft,
-                                 end: Alignment.bottomRight,
-                                 colors: [Colors.cyanAccent, Colors.purpleAccent],
-                               ),
+                               color: Colors.white,
+                               border: Border.all(color: Colors.white, width: 4),
                                boxShadow: [
                                  BoxShadow(
-                                   color: Colors.cyanAccent.withValues(alpha: 0.5),
-                                   blurRadius: 60 * _logoScale.value,
+                                   color: Colors.white.withValues(alpha: 0.6),
+                                   blurRadius: 30 * _logoScale.value,
                                    spreadRadius: 10,
-                                 ),
-                                 BoxShadow(
-                                   color: Colors.purpleAccent.withValues(alpha: 0.3),
-                                   blurRadius: 40 * _logoScale.value,
-                                   spreadRadius: 5,
                                  ),
                                ]
                              ),
-                             padding: const EdgeInsets.all(3),
-                             child: Container(
-                               decoration: const BoxDecoration(
-                                 shape: BoxShape.circle,
-                                 color: Colors.black,
-                               ),
-                               child: ClipOval(
-                                 child: Image.asset(
-                                   'assets/icons/logo_main.png', 
-                                   fit: BoxFit.cover,
-                                   errorBuilder: (c,o,s) => const Icon(Icons.mic, color: Colors.white, size: 60)
-                                 ),
+                             child: ClipOval(
+                               child: Image.asset(
+                                 'assets/icons/logo_main.png', 
+                                 fit: BoxFit.cover,
+                                 errorBuilder: (c,o,s) => const Icon(Icons.sentiment_very_satisfied_rounded, color: Colors.cyan, size: 80)
                                ),
                              ),
                            ),
@@ -382,7 +371,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                               children: [
                                 ShaderMask(
                                   shaderCallback: (bounds) => const LinearGradient(
-                                    colors: [Colors.white, Color(0xFFB0C4DE)],
+                                    colors: [Colors.white, Colors.yellowAccent],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter
                                   ).createShader(bounds),
@@ -390,13 +379,13 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                                     "SPEECHMATE",
                                     style: TextStyle(
                                       fontFamily: 'Roboto',
-                                      fontSize: 42,
+                                      fontSize: 48,
                                       fontWeight: FontWeight.w900,
                                       color: Colors.white,
-                                      letterSpacing: 8.0,
+                                      letterSpacing: 2.0,
                                       height: 1.0,
                                       shadows: [
-                                        Shadow(color: Colors.cyan.withValues(alpha: 0.5), blurRadius: 30, offset: const Offset(0,10))
+                                        Shadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0,5))
                                       ]
                                     ),
                                   ),
@@ -412,10 +401,10 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                                         _taglines[_currentTagline],
                                         key: ValueKey(_currentTagline),
                                         style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white.withValues(alpha: 0.5 + (0.4 * _pulseController.value)),
-                                          letterSpacing: 2.0,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.white.withValues(alpha: 0.8 + (0.2 * _pulseController.value)),
+                                          letterSpacing: 1.5,
                                         ),
                                       ),
                                     );
@@ -521,7 +510,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
 }
 
 // ---------------------------------------------------------------------------
-// 🌌 TRIBAL PHYSICS ENGINE — UPGRADED WITH GLOWING DOTS
+// 🌌 COLORFUL NEON TRIBAL SCRIPT ENGINE
 // ---------------------------------------------------------------------------
 
 class _SplashParticle {
@@ -530,37 +519,46 @@ class _SplashParticle {
   double vx;
   double vy;
   double radius;
-  String? char; // null = glowing dot, non-null = tribal character
+  String char;
   Color color;
-  double glowRadius;
   
   _SplashParticle(math.Random r)
      : x = r.nextDouble(),
        y = r.nextDouble(),
-       vx = (r.nextDouble() - 0.5) * 0.0015,
-       vy = (r.nextDouble() - 0.5) * 0.0015,
-       radius = r.nextDouble() * 10 + 8,
-       char = r.nextDouble() > 0.4 ? _getRandomChar(r) : null, // 40% dots, 60% chars
-       color = Colors.white.withValues(alpha: 0.3 + r.nextDouble() * 0.4),
-       glowRadius = r.nextDouble() * 6 + 2;
+       vx = (r.nextDouble() - 0.5) * 0.003, // Slightly faster
+       vy = -r.nextDouble() * 0.004 - 0.001, // Float up
+       radius = r.nextDouble() * 20 + 20,
+       char = _getRandomChar(r),
+       color = _getRandomColor(r);
 
   static String _getRandomChar(math.Random r) {
-    // Tribal Scripts
     final List<String> nicobarese = ['A', 'Ā', 'B', 'D', 'K', 'L', 'M', 'N', 'O', 'Ò'];
     final List<String> greatAndamanese = ['a', 'e', 'i', 'o', 'u', 'ph', 'th', 'kh'];
     final List<String> onge = ['A', 'Ŋ', 'G', 'K', 'T', 'E', 'Y', 'W'];
-    
     final all = [...nicobarese, ...greatAndamanese, ...onge];
     return all[r.nextInt(all.length)];
+  }
+
+  static Color _getRandomColor(math.Random r) {
+    final colors = [
+       Colors.pinkAccent,
+       Colors.cyanAccent,
+       Colors.yellowAccent,
+       Colors.greenAccent,
+       Colors.orangeAccent,
+       const Color(0xFFb388ff), // purpleAccent
+    ];
+    return colors[r.nextInt(colors.length)];
   }
 
   void update(Offset touchPos, Size size) {
     x += vx;
     y += vy;
 
-    // Bounce off walls
-    if (x < 0 || x > 1) vx *= -1;
-    if (y < 0 || y > 1) vy *= -1;
+    // Wrap around screen
+    if (x < -0.1) x = 1.1;
+    if (x > 1.1) x = -0.1;
+    if (y < -0.2) y = 1.1; 
     
     // Interactive Repulsion from Touch
     if (touchPos != Offset.zero) {
@@ -572,8 +570,8 @@ class _SplashParticle {
        double dist = math.sqrt(dx*dx + dy*dy);
        
        if (dist < 0.2) {
-         vx += dx * 0.001;
-         vy += dy * 0.001;
+         vx += dx * 0.008;
+         vy += dy * 0.008;
        }
     }
   }
@@ -588,60 +586,46 @@ class _ConstellationPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..strokeCap = StrokeCap.round;
-    
+    final linePaint = Paint()..strokeWidth = 1.5;
+
     for (int i = 0; i < particles.length; i++) {
        final p1 = particles[i];
        final pos1 = Offset(p1.x * size.width, p1.y * size.height);
 
-       if (p1.char != null) {
-         // Draw Tribal Character
-         final textSpan = TextSpan(
-           text: p1.char,
-           style: TextStyle(
-             color: p1.color.withValues(alpha: 0.5 + (0.3 * math.sin(pulse * math.pi))),
-             fontSize: p1.radius,
-             fontWeight: FontWeight.bold,
-             shadows: [Shadow(color: Colors.cyanAccent.withValues(alpha: 0.5), blurRadius: 4)]
-           ),
-         );
-         final textPainter = TextPainter(
-           text: textSpan,
-           textDirection: TextDirection.ltr,
-         );
-         textPainter.layout();
-         textPainter.paint(canvas, pos1 - Offset(textPainter.width / 2, textPainter.height / 2));
-       } else {
-         // Draw Glowing Dot
-         final glowAlpha = 0.3 + (0.4 * math.sin(pulse * math.pi + i.toDouble()));
-         
-         // Outer glow
-         paint.color = Colors.cyanAccent.withValues(alpha: glowAlpha * 0.3);
-         canvas.drawCircle(pos1, p1.glowRadius * 3, paint);
-         
-         // Inner glow
-         paint.color = Colors.cyanAccent.withValues(alpha: glowAlpha * 0.6);
-         canvas.drawCircle(pos1, p1.glowRadius * 1.5, paint);
-         
-         // Core dot
-         paint.color = Colors.white.withValues(alpha: glowAlpha);
-         canvas.drawCircle(pos1, p1.glowRadius * 0.5, paint);
-       }
-
-       // Connect to neighbors (Neural Mesh)
+       // Connect to neighbors (Neon Neural Mesh)
        for (int j = i + 1; j < particles.length; j++) {
          final p2 = particles[j];
          final pos2 = Offset(p2.x * size.width, p2.y * size.height);
          
          final dist = (pos1 - pos2).distance;
          
-         if (dist < 100) { // Slightly increased connection threshold
-            final double opacity = (1.0 - (dist / 100)) * 0.35;
-            paint.color = Colors.cyan.withValues(alpha: opacity);
-            paint.strokeWidth = 1.0;
-            canvas.drawLine(pos1, pos2, paint);
+         if (dist < 130) { // Large connection radius
+            final double opacity = (1.0 - (dist / 130)) * 0.4;
+            // Draw glowing connecting line matching the particle's color
+            linePaint.color = p1.color.withValues(alpha: opacity);
+            canvas.drawLine(pos1, pos2, linePaint);
          }
        }
+
+       // Draw Glowing Tribal Character
+       final textSpan = TextSpan(
+         text: p1.char,
+         style: TextStyle(
+           color: p1.color.withValues(alpha: 0.8 + (0.2 * math.sin(pulse * math.pi + i))),
+           fontWeight: FontWeight.bold,
+           fontSize: p1.radius + (math.sin(pulse * math.pi + i) * 6), // Pulsing size
+           shadows: [
+             Shadow(color: p1.color, blurRadius: 15), // Strong neon glow
+             Shadow(color: Colors.white.withValues(alpha: 0.5), blurRadius: 5), // Inner bright glow
+           ]
+         ),
+       );
+       final textPainter = TextPainter(
+         text: textSpan,
+         textDirection: TextDirection.ltr,
+       );
+       textPainter.layout();
+       textPainter.paint(canvas, pos1 - Offset(textPainter.width / 2, textPainter.height / 2));
     }
   }
 
