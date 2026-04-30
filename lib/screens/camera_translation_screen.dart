@@ -399,12 +399,24 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
      if (_cameraController == null || !_cameraController!.value.isInitialized) return;
      if (_isProcessing) return;
 
+     setState(() { _isProcessing = true; }); // Show loading immediately
+
      try {
+       // Ensure stream is stopped on iOS before taking picture to prevent hangs
+       if (_cameraController!.value.isStreamingImages) {
+         try { await _cameraController!.stopImageStream(); } catch (_) {}
+       }
+       
        final XFile image = await _cameraController!.takePicture();
+       
+       // On iOS, sometimes takePicture pauses the preview permanently until resumePreview is called
+       try { await _cameraController!.resumePreview(); } catch (_) {}
+       
        setState(() { _capturedImagePath = image.path; });
        await _processStaticImage(image.path);
      } catch (e) {
        debugPrint("Capture error: $e");
+       setState(() { _isProcessing = false; });
      }
   }
 

@@ -29,8 +29,8 @@ class TtsService {
   /// Call this once (ex: in initState)
   Future<void> init() async {
     await _tts.setVolume(1.0);
-    await _tts.setSpeechRate(0.45);
-    await _tts.setPitch(1.0);
+    await _tts.setSpeechRate(0.5);
+    await _tts.setPitch(1.6);
 
     // Track speaking state
     _tts.setStartHandler(() {
