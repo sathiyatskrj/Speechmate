@@ -43,6 +43,14 @@
 		</array>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Speechmate needs access to your microphone to record your voice and translate it into indigenous languages.</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>Speechmate uses speech recognition to accurately transcribe spoken words for the offline translator.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Speechmate requires camera access for the AR Object Translator and Book Scanner features.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Speechmate needs photo library access so you can upload images for translation.</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
