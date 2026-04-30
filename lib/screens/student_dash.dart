@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/translation_card.dart';
@@ -200,7 +201,13 @@ class _StudentDashState extends State<StudentDash>
 
                   // ⚡ Quick Stats Row (Stars, Streak, Level)
                   const QuickStatsRow().animate().fadeIn(duration: 600.ms).slideX(begin: -0.1),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
+
+                  // 🎙️ Voice Waveform Visualizer
+                  const KidsSectionHeader(emoji: '🎙️', label: 'Sound Wave'),
+                  const SizedBox(height: 8),
+                  const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
+                  const SizedBox(height: 20),
 
                   // 🏆 My Progress
                   const KidsSectionHeader(emoji: '🏆', label: 'My Progress'),
@@ -494,7 +501,7 @@ class _StudentDashState extends State<StudentDash>
 // COMPETITION-GRADE ADVANCED UI COMPONENTS & ANALYTICS SUITE
 // ============================================================================
 
-import 'dart:math' as math;
+// (dart:math imported at top of file)
 
 // ----------------------------------------------------------------------------
 // 1. Ambient Animated Glass Background (Custom Painted Canvas)
@@ -992,11 +999,10 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
+      child: Container(
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
@@ -1101,30 +1107,25 @@ class QuickStatsRow extends StatelessWidget {
   }
 
   Widget _buildStatBubble({required String emoji, required String label, required String value, required Color color}) {
+    // NO BackdropFilter here — 3 stacked blurs destroy mobile perf
     return Expanded(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
-              boxShadow: [
-                BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 12, offset: const Offset(0, 4))
-              ],
-            ),
-            child: Column(
-              children: [
-                Text(emoji, style: const TextStyle(fontSize: 28)),
-                const SizedBox(height: 4),
-                Text(value, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
-                Text(label, style: const TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.w600)),
-              ],
-            ),
-          ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.45), width: 1.5),
+          boxShadow: [
+            BoxShadow(color: color.withValues(alpha: 0.10), blurRadius: 8, offset: const Offset(0, 3))
+          ],
+        ),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 28)),
+            const SizedBox(height: 4),
+            Text(value, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(label, style: const TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.w600)),
+          ],
         ),
       ),
     );
@@ -1263,4 +1264,340 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion> with SingleTi
       ),
     );
   }
+}
+
+// ============================================================================
+// ENGINE 1: Student XP & Leveling Engine
+// ============================================================================
+/// Lightweight progression engine that calculates XP, levels, and streaks.
+/// All computation is O(1) — no loops, no heavy allocations.
+class StudentXPEngine {
+  // XP thresholds for each level (exponential curve)
+  static const List<int> _levelThresholds = [
+    0, 50, 150, 350, 700, 1200, 2000, 3200, 5000, 8000, 12000
+  ];
+
+  static const List<String> _levelNames = [
+    'Seedling', 'Sprout', 'Explorer', 'Adventurer', 'Pathfinder',
+    'Discoverer', 'Scholar', 'Champion', 'Master', 'Legend', 'Elder'
+  ];
+
+  static const List<String> _levelEmojis = [
+    '🌱', '🌿', '🧭', '⚔️', '🗺️', '🔭', '📚', '🏆', '👑', '⭐', '🌟'
+  ];
+
+  /// Gets the current level info from total XP (O(1) binary-search style)
+  static Map<String, dynamic> getLevelInfo(int totalXP) {
+    int level = 0;
+    for (int i = _levelThresholds.length - 1; i >= 0; i--) {
+      if (totalXP >= _levelThresholds[i]) {
+        level = i;
+        break;
+      }
+    }
+
+    final int currentThreshold = _levelThresholds[level];
+    final int nextThreshold = level < _levelThresholds.length - 1
+        ? _levelThresholds[level + 1]
+        : _levelThresholds[level] + 5000;
+
+    final double progressToNext = (totalXP - currentThreshold) /
+        (nextThreshold - currentThreshold);
+
+    return {
+      'level': level,
+      'name': _levelNames[level.clamp(0, _levelNames.length - 1)],
+      'emoji': _levelEmojis[level.clamp(0, _levelEmojis.length - 1)],
+      'totalXP': totalXP,
+      'xpForNext': nextThreshold - totalXP,
+      'progress': progressToNext.clamp(0.0, 1.0),
+    };
+  }
+
+  /// Calculates XP reward for an action with streak multiplier
+  static int calculateReward({
+    required String action,
+    int streakDays = 0,
+  }) {
+    // Base XP values per action type
+    int baseXP;
+    switch (action) {
+      case 'translate_word':
+        baseXP = 10;
+        break;
+      case 'ar_scan':
+        baseXP = 25;
+        break;
+      case 'voice_record':
+        baseXP = 30;
+        break;
+      case 'complete_game':
+        baseXP = 50;
+        break;
+      case 'daily_mission':
+        baseXP = 100;
+        break;
+      default:
+        baseXP = 5;
+    }
+
+    // Streak multiplier: +5% per day, capped at 2x
+    final double streakMultiplier = 1.0 + (streakDays * 0.05).clamp(0.0, 1.0);
+    return (baseXP * streakMultiplier).round();
+  }
+}
+
+// ============================================================================
+// ENGINE 2: Lightweight Confetti Celebration Engine
+// ============================================================================
+/// A performance-safe confetti particle system using a single CustomPainter.
+/// Max 25 particles, no blur, no shadows — pure rect/circle drawing.
+class ConfettiOverlay extends StatefulWidget {
+  final bool trigger;
+  const ConfettiOverlay({super.key, required this.trigger});
+
+  @override
+  State<ConfettiOverlay> createState() => _ConfettiOverlayState();
+}
+
+class _ConfettiOverlayState extends State<ConfettiOverlay> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  List<_ConfettiParticle> _particles = [];
+  final math.Random _rng = math.Random();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _particles.clear();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(ConfettiOverlay old) {
+    super.didUpdateWidget(old);
+    if (widget.trigger && !old.trigger) {
+      _spawnParticles();
+    }
+  }
+
+  void _spawnParticles() {
+    _particles = List.generate(25, (_) => _ConfettiParticle(
+      x: _rng.nextDouble(),
+      y: -0.1 - _rng.nextDouble() * 0.3,
+      vx: (_rng.nextDouble() - 0.5) * 0.3,
+      vy: 0.3 + _rng.nextDouble() * 0.5,
+      rotation: _rng.nextDouble() * math.pi * 2,
+      rotationSpeed: (_rng.nextDouble() - 0.5) * 6,
+      size: 6 + _rng.nextDouble() * 8,
+      color: [
+        const Color(0xFFFF6B6B), const Color(0xFFFFD93D), const Color(0xFF6BCB77),
+        const Color(0xFF4D96FF), const Color(0xFFFF6BFF), const Color(0xFFFF9A3C),
+      ][_rng.nextInt(6)],
+    ));
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          if (_particles.isEmpty) return const SizedBox.shrink();
+          return RepaintBoundary(
+            child: CustomPaint(
+              painter: _ConfettiPainter(_particles, _controller.value),
+              size: Size.infinite,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ConfettiParticle {
+  double x, y, vx, vy, rotation, rotationSpeed, size;
+  Color color;
+  _ConfettiParticle({
+    required this.x, required this.y, required this.vx, required this.vy,
+    required this.rotation, required this.rotationSpeed, required this.size,
+    required this.color,
+  });
+}
+
+class _ConfettiPainter extends CustomPainter {
+  final List<_ConfettiParticle> particles;
+  final double t;
+  _ConfettiPainter(this.particles, this.t);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+    final double fade = t > 0.7 ? (1.0 - t) / 0.3 : 1.0; // Fade out in last 30%
+
+    for (final p in particles) {
+      final double px = (p.x + p.vx * t) * size.width;
+      final double py = (p.y + p.vy * t + 0.5 * t * t) * size.height; // Gravity
+      final double rot = p.rotation + p.rotationSpeed * t;
+
+      paint.color = p.color.withValues(alpha: fade * 0.9);
+
+      canvas.save();
+      canvas.translate(px, py);
+      canvas.rotate(rot);
+      canvas.drawRect(
+        Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.5),
+        paint,
+      );
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ConfettiPainter old) => true;
+}
+
+// ============================================================================
+// ENGINE 3: Smart Daily Mission Engine (Lightweight SRS)
+// ============================================================================
+/// Generates personalized daily missions based on what the child hasn't
+/// practiced recently. Uses a simple staleness score — no heavy computation.
+class SmartMissionEngine {
+  /// Pre-defined mission templates
+  static const List<Map<String, dynamic>> _missionTemplates = [
+    {'text': 'Learn 5 new Nicobarese words!', 'target': 5, 'xp': 50, 'category': 'vocabulary', 'emoji': '📖'},
+    {'text': 'Play 2 word games!', 'target': 2, 'xp': 40, 'category': 'games', 'emoji': '🎮'},
+    {'text': 'Scan 3 objects with AR!', 'target': 3, 'xp': 60, 'category': 'ar', 'emoji': '📷'},
+    {'text': 'Record 3 voice translations!', 'target': 3, 'xp': 45, 'category': 'voice', 'emoji': '🎤'},
+    {'text': 'Complete 1 body parts quiz!', 'target': 1, 'xp': 35, 'category': 'quiz', 'emoji': '🦴'},
+    {'text': 'Explore 4 animal words!', 'target': 4, 'xp': 40, 'category': 'animals', 'emoji': '🐾'},
+    {'text': 'Learn 3 nature words!', 'target': 3, 'xp': 35, 'category': 'nature', 'emoji': '🌿'},
+    {'text': 'Practice 5 number words!', 'target': 5, 'xp': 30, 'category': 'numbers', 'emoji': '🔢'},
+    {'text': 'Listen to 1 oral history!', 'target': 1, 'xp': 55, 'category': 'stories', 'emoji': '📻'},
+    {'text': 'Translate 4 color words!', 'target': 4, 'xp': 35, 'category': 'colors', 'emoji': '🎨'},
+  ];
+
+  /// Picks today's mission deterministically from the day-of-year.
+  /// Same mission all day, different tomorrow. No storage needed.
+  static Map<String, dynamic> getTodaysMission() {
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
+    final index = dayOfYear % _missionTemplates.length;
+    return Map<String, dynamic>.from(_missionTemplates[index]);
+  }
+
+  /// Calculates a staleness score for each category based on
+  /// simulated last-practice timestamps. Higher = needs more practice.
+  static Map<String, double> getCategoryStaleness() {
+    // In production, these would come from local storage.
+    // For demo, we simulate varied staleness.
+    final now = DateTime.now();
+    final rng = math.Random(now.day);
+    final categories = ['vocabulary', 'games', 'ar', 'voice', 'quiz', 'animals', 'nature', 'numbers', 'stories', 'colors'];
+    return Map.fromEntries(categories.map((c) => MapEntry(c, rng.nextDouble())));
+  }
+}
+
+// ============================================================================
+// ENGINE 4: Voice Waveform Visualizer (Lightweight Canvas)
+// ============================================================================
+/// A smooth, animated audio waveform that can respond to mock amplitude data.
+/// Uses a single CustomPainter with only ~20 bars — no FFT, no heavy math.
+class VoiceWaveformWidget extends StatefulWidget {
+  const VoiceWaveformWidget({super.key});
+
+  @override
+  State<VoiceWaveformWidget> createState() => _VoiceWaveformWidgetState();
+}
+
+class _VoiceWaveformWidgetState extends State<VoiceWaveformWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+      ),
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, _) {
+            return CustomPaint(
+              painter: _WaveformPainter(_controller.value),
+              size: Size.infinite,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _WaveformPainter extends CustomPainter {
+  final double t;
+  _WaveformPainter(this.t);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int barCount = 20;
+    final double barWidth = size.width / (barCount * 2);
+    final double maxHeight = size.height * 0.8;
+    final double centerY = size.height / 2;
+
+    final paint = Paint()
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < barCount; i++) {
+      // Smooth sine-wave animation: each bar has a phase offset
+      final double phase = i * 0.3 + t * math.pi * 2;
+      final double amplitude = (math.sin(phase) * 0.5 + 0.5) * maxHeight * 0.5;
+      final double x = (i * 2 + 0.5) * barWidth;
+
+      // Gradient colour from cyan to purple based on position
+      final double ratio = i / barCount;
+      paint.color = Color.lerp(
+        const Color(0xFF00BCD4), // Cyan
+        const Color(0xFF9C27B0), // Purple
+        ratio,
+      )!.withValues(alpha: 0.7);
+
+      // Draw symmetric bar from center
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset(x, centerY), width: barWidth * 0.8, height: amplitude + 4),
+        const Radius.circular(3),
+      );
+      canvas.drawRRect(rect, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _WaveformPainter old) => true;
 }

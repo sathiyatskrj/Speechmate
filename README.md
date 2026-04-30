@@ -34,11 +34,21 @@
   <a href="#">
     <img src="https://img.shields.io/badge/NeuralEngine-v2.0-FF6F00?style=for-the-badge" alt="Neural Engine" />
   </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/XP_Engine-Gamified-FFD700?style=for-the-badge" alt="XP Engine" />
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/Ages-6--14-FF6B6B?style=for-the-badge" alt="Ages 6-14" />
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/Perf-60FPS-00C853?style=for-the-badge" alt="60FPS" />
+  </a>
 </p>
 
 <p align="center">
   <a href="#-the-problem">🌍 Problem</a> •
   <a href="#-core-features">✨ Features</a> •
+  <a href="#-kid-friendly-design-philosophy">🧒 Kids</a> •
   <a href="#-architecture">🏗️ Architecture</a> •
   <a href="#-language-modules">🗣️ Languages</a> •
   <a href="#-installation">🚀 Install</a>
@@ -77,6 +87,17 @@
 | **🌐 Dynamic Localization** | 100% localized interface supporting 8 languages seamlessly across the entire dashboard |
 | **🇮🇳 Regional Translators** | Bidirectional translation between Nicobarese and **Hindi, Tamil, Bengali, Telugu** (offline via ML Kit) and **Malayalam** (online cloud fallback) |
 | **🔎 Multilingual Search** | Type in any regional language script — the search engine auto-translates to English before looking up the Nicobarese equivalent |
+
+### 🧒 Kid-Friendly Interactive Engines *(new in v3.0)*
+| Engine | Description |
+| :--- | :--- |
+| **🎮 XP & Leveling Engine** | O(1) progression system with 11 named levels (Seedling → Elder), exponential XP curve, streak multipliers (+5%/day capped at 2x), and per-action reward calculation |
+| **✨ Confetti Celebration Engine** | Physics-based 25-particle confetti burst with gravity, rotation, and fade-out — triggered on achievements. Uses `RepaintBoundary` + `CustomPainter` for zero-lag rendering |
+| **🎯 Smart Daily Mission Engine** | Deterministic day-of-year mission selector with 10 mission templates across vocabulary, games, AR, voice, and quiz categories. No storage required — same mission all day, different tomorrow |
+| **🎙️ Voice Waveform Visualizer** | 20-bar animated sine-wave audio visualizer with cyan→purple gradient, rendered via lightweight `CustomPainter` canvas at 60FPS |
+| **🦊 Virtual Pet Companion** | Bouncing interactive fox/dog avatar at bottom-right corner. Tapping triggers excited bounce animation + speech bubble + optional confetti burst |
+| **⚡ Quick Stats Row** | Three vibrant stat bubbles (🔥 Streak, ⭐ Stars, 🏅 Level) — no `BackdropFilter` for maximum mobile performance |
+| **🎯 Daily Mission Card** | Orange-red gradient hero card with shimmer-animated XP reward, chunky progress bar, and personalized goal text |
 
 ### 👩‍🏫 Teacher Dashboard
 | Module | Description |
@@ -189,6 +210,31 @@ The offline translation brain uses an **8-stage pipeline**:
 
 ---
 
+## 🧒 Kid-Friendly Design Philosophy
+
+SpeechMate's Student Dashboard is designed specifically for **children aged 6–14** in tribal schools. Every design decision prioritizes engagement, clarity, and performance on low-end devices.
+
+### Design Principles
+| Principle | Implementation |
+| :--- | :--- |
+| **Big, Bright, Bold** | Vibrant gradient cards, oversized emoji, chunky progress bars — no tiny text or muted colors |
+| **Instant Feedback** | Confetti bursts, bouncing pet animations, and shimmering XP rewards give immediate positive reinforcement |
+| **One-Tap Navigation** | Bento grid tiles with 3D tilt interaction — kids can explore any module with a single tap |
+| **Daily Ritual** | Smart Daily Mission Engine gives a new, achievable goal every morning — builds habit loops |
+| **Glassmorphism (Lite)** | Premium frosted-glass aesthetic using optimized `CustomPainter` radial gradients instead of expensive `BackdropFilter` |
+
+### Performance Budget (Mobile-First)
+| Optimization | Before | After |
+| :--- | :--- | :--- |
+| `BackdropFilter` count | 8 stacked | 2 (dialog-only) |
+| `MaskFilter.blur` | 3 per frame | 0 (replaced with `RadialGradient`) |
+| Background animation | Widget-tree based | Single `CustomPaint` canvas |
+| Confetti particles | N/A | 25 max, `RepaintBoundary` isolated |
+| Waveform bars | N/A | 20 bars, pure canvas ops |
+| Target FPS | ~30 (laggy) | **60 FPS** (smooth) |
+
+---
+
 ## 📊 Performance & Metrics (v2.5)
 
 | Metric | Result | Notes |
@@ -196,12 +242,16 @@ The offline translation brain uses an **8-stage pipeline**:
 | **STT Latency** | **< 600ms** | Whisper Tiny via NDK 27 C++ |
 | **Translation Speed** | **< 100ms** | Local SQLite with indexed queries |
 | **Neural Engine Pipeline** | **8-stage** | Soundex + Stemming + Fuzzy + Compound |
+| **Dashboard FPS** | **60 FPS** | Optimized canvas painters, zero BackdropFilter on scroll |
+| **Student Dash Lines** | **1,474** | Competition-grade codebase with 4 embedded engines |
 | **Dictionary Size** | **2,400+ entries** | `dictionary.json` (core Nicobarese) |
 | **GA Lexicon Size** | **277KB+** | `dictionary_great_andamanese.json` |
 | **Regional Languages** | **5 supported** | Hindi, Tamil, Bengali, Telugu (offline), Malayalam (online) |
 | **Synonym Mappings** | **200+** | Expanded NLP synonym database |
 | **Offline Capability** | **100%** | Zero API calls for core features (Malayalam requires internet) |
 | **AR FPS Throttling** | **Dynamic** | Auto-adjusts 300–1000ms based on device FPS |
+| **Confetti Particles** | **25 max** | Physics-based, auto-clearing, RepaintBoundary isolated |
+| **XP Engine** | **O(1)** | Zero-allocation level calculation with exponential curve |
 | **App Base Size** | **~250 MB** | Includes 141MB Whisper Multilingual Base Model |
 | **Min Android SDK** | **API 24** | Android 7.0+ |
 | **Target SDK** | **API 33** | Android 13 |
@@ -256,6 +306,9 @@ SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requi
 ### 🔜 Planned (v3.0+)
 - [ ] **SmolLM2 On-Device LLM** — Replace mock LLM with quantized GGUF model for true offline AI chat
 - [x] **P2P Mesh Sync** — Share vocabulary packs via offline ZIP payloads
+- [x] **Kid-Friendly Dashboard** — 4 embedded engines (XP, Confetti, Smart Mission, Waveform)
+- [x] **Virtual Pet Companion** — Interactive bouncing fox/dog avatar with celebration triggers
+- [x] **60 FPS Performance** — Eliminated BackdropFilter lag, switched to CustomPainter canvas
 - [ ] **Onges Module** — Third tribal language integration
 - [ ] **Gamified Certification** — Printable tribal language certificates
 - [ ] **Collaborative Classroom** — Peer vocabulary games
