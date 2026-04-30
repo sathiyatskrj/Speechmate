@@ -7,6 +7,7 @@ import 'package:speechmate/widgets/translation_card.dart';
 import 'package:speechmate/widgets/gamification_header.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
 import 'package:speechmate/core/app_theme.dart';
+import 'package:speechmate/core/app_config.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -86,7 +87,8 @@ class _StudentDashState extends State<StudentDash>
           "emoji": "🎙️",
           "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)],
           "navigateTo": const VoiceVaultScreen(),
-          "icon": Icons.mic_external_on_rounded
+          "icon": Icons.mic_external_on_rounded,
+          "isDevOnly": true
         },
         {
           "word": AppStrings.get('bookScanner'),
@@ -107,7 +109,8 @@ class _StudentDashState extends State<StudentDash>
           "emoji": "💬",
           "colors": [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)],
           "navigateTo": const BetaChatScreen(isStudent: true),
-          "icon": Icons.chat_bubble_rounded
+          "icon": Icons.chat_bubble_rounded,
+          "isDevOnly": true
         },
         {
           "word": AppStrings.get('voiceTranslate'),
@@ -278,14 +281,16 @@ class _StudentDashState extends State<StudentDash>
           "emoji": "🧭",
           "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)],
           "navigateTo": const DialectHeatmapScreen(),
-          "icon": Icons.explore_rounded
+          "icon": Icons.explore_rounded,
+          "isDevOnly": true
         },
         {
           "word": AppStrings.get('memoryPalace'),
           "emoji": "🏠",
           "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)],
           "navigateTo": const MemoryPalaceScreen(),
-          "icon": Icons.map_rounded
+          "icon": Icons.map_rounded,
+          "isDevOnly": true
         },
         {
           "word": AppStrings.get('community'),
@@ -293,14 +298,16 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF302B63), const Color(0xFF24243E)],
           "navigateTo": const CommunityScreen(),
           "isSecret": true,
-          "icon": Icons.public_rounded
+          "icon": Icons.public_rounded,
+          "isDevOnly": true
         },
         {
           "word": "AI Setup",
           "emoji": "🧠",
           "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)],
           "navigateTo": const AISetupScreen(),
-          "icon": Icons.psychology_rounded
+          "icon": Icons.psychology_rounded,
+          "isDevOnly": true
         },
         {
           "word": AppStrings.get('feedback'),
@@ -454,39 +461,37 @@ class _StudentDashState extends State<StudentDash>
   }
 
   Widget _buildBentoGrid() {
+    // Filter tiles based on devMode — hide experimental features in production
+    final visibleTiles = learningTiles.where((tile) {
+      if (tile['isDevOnly'] == true && !AppConfig.devMode) return false;
+      return true;
+    }).toList();
+
     return StaggeredGrid.count(
       crossAxisCount: 4,
       mainAxisSpacing: 16,
       crossAxisSpacing: 16,
-      children: List.generate(learningTiles.length, (index) {
-        final tile = learningTiles[index];
+      children: List.generate(visibleTiles.length, (index) {
+        final tile = visibleTiles[index];
 
         // Define Bento Grid Layout Configuration
         int crossAxisCellCount = 2; // Default width (half)
         int mainAxisCellCount = 2; // Default height
 
         if (index == 0) {
-          // Camera Translator gets full width hero tile
+          // AR Translator gets full width hero tile
           crossAxisCellCount = 4;
           mainAxisCellCount = 2;
         } else if (index == 1) {
-          // Voice Vault
+          // Book Scanner
           crossAxisCellCount = 2;
           mainAxisCellCount = 3; // Taller
         } else if (index == 2) {
-          // Book Scanner
-          crossAxisCellCount = 2;
-          mainAxisCellCount = 2;
-        } else if (index == 3) {
           // Games Hub
           crossAxisCellCount = 2;
           mainAxisCellCount = 2;
-        } else if (index == 4) {
-          // Chat Translate
-          crossAxisCellCount = 2;
-          mainAxisCellCount = 1; // Shorter
-        } else if (index == 6) {
-          // Nature Hub Banner
+        } else if (index == 5) {
+          // Nature category — periodic wide banner
           crossAxisCellCount = 4;
           mainAxisCellCount = 2;
         } else if (index % 11 == 0 && index > 10) {

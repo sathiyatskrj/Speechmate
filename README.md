@@ -5,375 +5,263 @@
 <h1 align="center">SPEECHMATE</h1>
 
 <p align="center">
-  <strong>"Preserving Heritage, Coding the Future."</strong>
+  <strong>The only offline language learning platform for Nicobarese-speaking tribal schools.</strong>
 </p>
 
 <p align="center">
-  Bridging the gap between tribal heritage and modern education using <strong>Offline NLP + On-Device Speech Recognition</strong> and an <strong>Indigenous Digital Sovereignty Hub</strong>.
-</p>
-
-<p align="center">
-  <a href="#">
-    <img src="https://img.shields.io/badge/Dart-3.2+-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="DART" />
-  </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/STT-Whisper_Base-4285F4?style=for-the-badge&logo=openai&logoColor=white" alt="Whisper AI" />
+    <img src="https://img.shields.io/badge/100%25-Offline-00C853?style=for-the-badge" alt="Offline" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/DB-SQLite_Offline-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+    <img src="https://img.shields.io/badge/Ages-6--12-FF6B6B?style=for-the-badge" alt="Ages 6-12" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/State-Riverpod-00BCD4?style=for-the-badge" alt="Riverpod" />
+    <img src="https://img.shields.io/badge/SQLite-Sovereign_Data-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/ML_Kit-Translation-EA4335?style=for-the-badge&logo=google&logoColor=white" alt="ML Kit" />
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Offline_Translation-Pipeline_v2.0-FF6F00?style=for-the-badge" alt="Translation Pipeline" />
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/XP_Engine-Gamified-FFD700?style=for-the-badge" alt="XP Engine" />
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Ages-6--14-FF6B6B?style=for-the-badge" alt="Ages 6-14" />
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Perf-60FPS-00C853?style=for-the-badge" alt="60FPS" />
+    <img src="https://img.shields.io/badge/ML_Kit-On_Device-EA4335?style=for-the-badge&logo=google&logoColor=white" alt="ML Kit" />
   </a>
 </p>
 
 <p align="center">
   <a href="#-the-problem">🌍 Problem</a> •
-  <a href="#-core-features">✨ Features</a> •
-  <a href="#-kid-friendly-design-philosophy">🧒 Kids</a> •
-  <a href="#-architecture">🏗️ Architecture</a> •
-  <a href="#-language-modules">🗣️ Languages</a> •
+  <a href="#-who-its-for">👩‍🏫 Who It's For</a> •
+  <a href="#-what-it-does">✨ What It Does</a> •
+  <a href="#-how-it-works">🏗️ How It Works</a> •
+  <a href="#-roadmap">🛤️ Roadmap</a> •
   <a href="#-installation">🚀 Install</a>
 </p>
 
 ---
 
-## 🌍 The Problem: "When a language dies, a world disappears."
+## 🌍 The Problem
 
-**Facts:**
-*   Every **14 days**, an indigenous language dies globally.
-*   Languages like **Car Nicobarese** (Austroasiatic) and **Great Andamanese** (language isolate) are critically endangered as younger generations shift to Hindi and English.
-*   **70% of tribal students** face learning gaps due to language barriers in government schools.
-*   The Andaman & Nicobar Islands have **zero dedicated digital tools** for tribal language education.
+**30,000 children** in the Andaman & Nicobar Islands speak Car Nicobarese at home but are taught exclusively in Hindi and English at school. The result:
 
-**The Solution:**
-**SpeechMate** is an indigenous-first **Digital Sovereignty Hub** — not just a dictionary, but a **Learning & Preservation Platform**. It operates **100% offline** in remote islands and rainforests, combining a full learning suite with an on-device **Whisper Base speech-to-text model** (`ggml-base.bin`, 141MB) to teach, translate, and preserve endangered indigenous dialects.
+- **Language death:** Car Nicobarese is classified as *vulnerable* by UNESCO. Younger generations are losing fluency.
+- **Learning gaps:** Students who don't understand the language of instruction fall behind — particularly in primary grades (6–12 years old).
+- **Zero digital tools:** There are no apps, no websites, and no digital dictionaries for Nicobarese. Teachers improvise with handwritten word lists.
 
----
-
-## ✨ Core Features
-
-### 🎓 Student Dashboard
-| Module | Description |
-| :--- | :--- |
-| **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — all loaded from verified Nicobarese JSON lexicons |
-| **📸 AR Translator** | Real-time object and text translator using Google ML Kit. Features a Live AR 'Jarvis' HUD overlay tracking objects, 3 Lens Modes (Auto/Objects/Text), and **dynamic FPS-aware throttling** that auto-adjusts processing speed based on device performance |
-| **🎙️ Whisper Base** | On-device multilingual speech-to-text using `ggml-base.bin` (141MB) for offline voice translation with auto-language detection |
-| **🔊 Audio-First Playback** | Native `.mp3` audio asset playback for each word; graceful TTS fallback when audio is unavailable |
-| **🧩 Games Hub** | Word Match, Flash Cards, Word Scramble, and Word Runner — gamified vocabulary learning with XP **diminishing returns** to prevent farming |
-| **💬 Chat Translator** | Conversational translation interface powered by the **Offline Translation Pipeline v2.0** (dictionary lookup + NLP heuristics) |
-| **🗂️ Voice Vault** | Record, store, and preserve oral history and folklore |
-| **🌍 Community Hub** | Shared learning feed connecting students and educators |
-| **🏝️ Island Explorer (GIS)** | Custom-painted Andaman & Nicobar archipelago map visualizing dialect distribution zones |
-| **📖 Flashcard SRS** | SM-2 spaced repetition system for long-term word retention |
-| **🌐 Dynamic Localization** | 100% localized interface supporting 8 languages seamlessly across the entire dashboard |
-| **🇮🇳 Regional Translators** | Bidirectional translation between Nicobarese and **Hindi, Tamil, Bengali, Telugu** (offline via ML Kit) and **Malayalam** (online cloud fallback) |
-| **🔎 Multilingual Search** | Type in any regional language script — the search engine auto-translates to English before looking up the Nicobarese equivalent |
-
-### 🧒 Kid-Friendly Interactive Engines *(new in v3.0)*
-| Engine | Description |
-| :--- | :--- |
-| **🎮 XP & Leveling Engine** | O(1) progression system with 11 named levels (Seedling → Elder), exponential XP curve, streak multipliers (+5%/day capped at 2x), and per-action reward calculation |
-| **✨ Confetti Celebration Engine** | Physics-based 25-particle confetti burst with gravity, rotation, and fade-out — triggered on achievements. Uses `RepaintBoundary` + `CustomPainter` for zero-lag rendering |
-| **🎯 Smart Daily Mission Engine** | Deterministic day-of-year mission selector with 10 mission templates across vocabulary, games, camera, voice, and quiz categories. No storage required — same mission all day, different tomorrow |
-| **🎙️ Voice Waveform Visualizer** | 20-bar animated sine-wave audio visualizer with cyan→purple gradient, rendered via lightweight `CustomPainter` canvas at 60FPS |
-| **🦊 Virtual Pet Companion** | Bouncing interactive fox/dog avatar at bottom-right corner. Tapping triggers excited bounce animation + speech bubble + optional confetti burst |
-| **⚡ Quick Stats Row** | Three vibrant stat bubbles (🔥 Streak, ⭐ Stars, 🏅 Level) — live data from `ProgressService` (SharedPreferences), no `BackdropFilter` for maximum mobile performance |
-| **🎯 Daily Mission Card** | Orange-red gradient hero card with shimmer-animated XP reward, chunky progress bar, and personalized goal text |
-
-### 👩‍🏫 Teacher Dashboard
-| Module | Description |
-| :--- | :--- |
-| **🎤 Whisper Base STT** | Live voice-to-search transcription using on-device Whisper Base model to look up tribal vocabulary instantly |
-| **📝 Common Phrases** | Pre-built classroom phrase bank with audio |
-| **🏆 Certification Levels** | Structured proficiency levels (1–10) with unlock progression |
-| **🧪 Quiz Mode** | Adaptive vocabulary quiz with missed-word re-injection |
-| **📊 Progress & SRS Analytics** | Class-level progress tracking and spaced repetition dashboards |
-| **📷 Book Scanner (OCR)** | Google ML Kit camera scanner translates printed text to Nicobarese |
-| **🗣️ Voice Translator** | Premium glassmorphism UI with tap-to-toggle real-time multilingual voice translation and animated audio visualizer |
-| **🌿 Nature Hub** | Interactive flora & fauna database with native names and traditional uses |
-| **📻 Oral History Radio** | Tribal storytelling archive with local recordings |
-| **🗺️ Tuhet Mapper** | Kinship structure visualization for indigenous family trees |
-| **🌐 Dialect Comparison** | Side-by-side comparison across Car, Central, Coast, Teressa & Chowra dialects |
-| **📄 Document Translation Hub** | Deep offline PDF/TXT parser to instantly translate English curriculums to Nicobarese in a dual-pane UI |
-| **📡 P2P Sync Service** | Export and import vocabulary ZIP payloads for offline curriculum sharing between devices |
+**SpeechMate closes this gap.** It gives tribal school teachers a ready-to-use, offline-first learning platform that works on ₹6,000 Android phones with no internet connection.
 
 ---
 
-## 🗣️ Language Modules
+## 👩‍🏫 Who It's For
 
-### Mother Tongue Selection (App Start)
-Users choose their **interface language** from:
-- 🌴 **Pū (Car Nicobarese)** — Primary learning language
-- 🏔️ **Aka-Jeru (Great Andamanese)** — Opens the dedicated GA Hub
-- 🇮🇳 English · हिंदी · தமிழ் · മലയാളം · తెలుగు · বাংলা
+### Primary User: Tribal School Teachers
+Government-employed primary school teachers in Andaman & Nicobar Islands (ages 25–45) who speak Hindi/Tamil and want to teach Nicobarese vocabulary to their students but have no digital tools to do so.
 
-### Heritage Language Selection (Learning Mode)
-Users then select which language to **explore and learn**:
-- **Car Nicobarese** → Full Student/Teacher ecosystem
-- **Aka-Jeru (Great Andamanese)** → Dedicated standalone hub
-- **Onges** → Coming soon placeholder
+### End User: Students (ages 6–12)
+Children in tribal primary schools who learn best through interactive games, visual scanning, and audio-first content — not textbooks.
 
-### 🇮🇳 Regional Language Translators *(new in v2.5)*
-Bidirectional translation tiles on the Student Dashboard:
-| Language | Engine | Mode |
+### Buyer: Government Education Departments
+The Department of Tribal Welfare (A&N Administration), TISS, and state education boards who fund and deploy learning tools in tribal schools.
+
+| Role | How SpeechMate Serves Them |
+| :--- | :--- |
+| **Teacher** | Dashboard with word management, progress reports, TTS playback, and quiz tools |
+| **Student** | Interactive word games, AR object scanner, audio pronunciation, XP rewards |
+| **Government** | Offline-deployable APK, usage analytics, compliance with tribal education mandates |
+
+---
+
+## ✨ What It Does
+
+SpeechMate is a **single-purpose tool**: teach Nicobarese vocabulary to primary school students using interactive, offline methods.
+
+### Core Learning Features
+| Feature | What It Does | Why It Matters |
 | :--- | :--- | :--- |
-| **Hindi** 🇮🇳 | Google ML Kit `TranslateLanguage.hindi` | ✅ Offline |
-| **Tamil** 🛕 | Google ML Kit `TranslateLanguage.tamil` | ✅ Offline |
-| **Bengali** 🐅 | Google ML Kit `TranslateLanguage.bengali` | ✅ Offline |
-| **Telugu** 🌶️ | Google ML Kit `TranslateLanguage.telugu` | ✅ Offline |
-| **Malayalam** 🥥 | `translator` package (Google Cloud fallback) | 🌐 Online |
+| **📚 12 Word Categories** | Numbers, Nature, Animals, Colors, Body Parts, Family, and more — all with audio | Students learn words in context, not isolation |
+| **📷 AR Object Scanner** | Point phone camera at real objects → see Nicobarese translation overlaid | Contextual learning — links words to the physical world |
+| **🎲 4 Word Games** | Word Match, Flash Cards, Scramble, Word Runner | Game-based retention — students play voluntarily |
+| **🔊 Audio-First Playback** | Every word has native `.mp3` pronunciation + TTS fallback | Correct pronunciation for a primarily oral language |
+| **🇮🇳 5 Regional Translators** | Hindi, Tamil, Bengali, Telugu (offline), Malayalam (online) | Teachers who speak regional languages can look up Nicobarese equivalents |
+| **📖 Flashcard SRS** | SM-2 spaced repetition system | Long-term vocabulary retention |
+| **🎯 Daily Missions** | "Learn 5 nature words today" — changes daily | Builds daily habit loops for students |
 
-**Translation Pipeline:** Regional Text → English (ML Kit / Cloud) → Nicobarese (Offline Dictionary + Neural Engine)
-
-### 🏝️ Great Andamanese Standalone Hub
-A fully self-contained module with **4 tabs**:
-| Tab | Feature |
+### Teacher Tools
+| Feature | What It Does |
 | :--- | :--- |
-| **📖 Dictionary** | Full searchable GA lexicon with POS filters (Noun/Verb/Adjective…) + TTS |
-| **🔤 Translator** | English → Great Andamanese with exact match + word-by-word fallback |
-| **🎙️ Voice (STT→Translate)** | Whisper transcription + auto-translation to Great Andamanese |
-| **📷 OCR Scanner** | Scan any printed English text and translate it to Great Andamanese |
+| **📊 Progress Dashboard** | Track class-wide learning progress and streaks |
+| **📝 Common Phrases** | Pre-built classroom phrase bank with audio |
+| **🏆 Certification Levels** | 10 structured proficiency levels with unlock progression |
+| **📄 Document Translator** | Translate English curriculum PDFs to Nicobarese offline |
+| **📡 P2P Sync** | Share vocabulary packs between teacher devices via offline ZIP export |
+
+### What Makes It Different
+| Claim | Evidence |
+| :--- | :--- |
+| **100% offline** | No internet required. Works in Andaman & Nicobar signal dead zones. |
+| **Runs on cheap phones** | Optimized for Android 8+ devices with 2GB RAM (₹6,000 phones) |
+| **Proprietary Nicobarese dataset** | 2,400+ words across 12 categories — no public equivalent exists |
+| **Indigenous data sovereignty** | All linguistic data stored locally on device, never sent to cloud |
 
 ---
 
-## 🏗️ Technical Architecture
+## 🏗️ How It Works
 
-SpeechMate uses a **layered offline-first architecture** combining Flutter for UI, SQLite for data sovereignty, native C++ for Whisper speech-to-text inference, and ML Kit for regional translation.
+### Architecture
+
+SpeechMate uses an **offline-first architecture**: Flutter UI → SQLite database → on-device ML Kit for AR/translation.
 
 ```mermaid
 graph TD
-    User([User: Voice / Text / Camera]) --> UI[Flutter Premium UI\nRiverpod State Management]
+    User([Student / Teacher]) --> UI[Flutter UI]
     UI --> Service[Service Layer]
 
-    subgraph "AI Intelligence Layer"
-        Service --> |WhisperService| Whisper[Whisper Base Multilingual\nNative C++ via NDK 27]
-        Service --> |NeuralEngineService v2.0| Neural[Offline Translation Pipeline\nN-Gram + Stemming + Soundex + Fuzzy + Context]
-        Service --> |RegionalTranslationService| Regional[ML Kit Translation\nHindi / Tamil / Bengali / Telugu]
-        Service --> |DictionaryService| AutoTranslate[Multilingual Search\nAuto-translate queries to English]
+    subgraph "On-Device Intelligence"
+        Service --> |NeuralEngine| NLP[10-Stage Translation Pipeline]
+        Service --> |ML Kit| AR[AR Object Detection + Labeling]
+        Service --> |ML Kit| Regional[Regional Language Translation]
     end
 
-    subgraph "Data Sovereignty Layer"
-        Service --> DB[DatabaseManager\nSQLite / sqflite]
-        DB --> W[words table\nAll categories]
-        DB --> P[phrases table]
-        DB --> D[dialects table\nCar / Central / Coast...]
-        DB --> GA[ga_dictionary table\nGreat Andamanese]
-        DB --> FC[flashcards table\nSM-2 SRS]
+    subgraph "Local Data"
+        Service --> DB[SQLite Database]
+        DB --> Words[2,400+ Nicobarese Words]
+        DB --> Phrases[Classroom Phrases]
+        DB --> Dialects[5 Dialect Variants]
     end
 
-    subgraph "Asset Layer"
-        DB --> |Seeded at boot| JSON[12x JSON Lexicons\ndictionary*.json]
-        Service --> |rootBundle check| Audio[assets/audio/\nNative MP3 Playback]
-    end
-
-    Whisper --> |Transcript| Neural
-    Regional --> |English| Neural
-    Neural --> |Translation| UI
-    DB --> |Vocabulary| UI
+    NLP --> |Translation| UI
+    AR --> |Object Labels| NLP
+    Regional --> |English| NLP
 ```
 
-### 🧠 Offline Translation Pipeline v2.0
-The offline translation brain uses a **10-stage NLP pipeline** (no neural networks — pure algorithmic NLP):
-1. **Full Phrase Match** — Complete sentence lookup in phrase database
-2. **Bigram Matching** — Sliding-window 2-word compound phrase lookup
-3. **Trigram Matching** — Sliding-window 3-word compound phrase lookup
-4. **Exact Dictionary Lookup** — O(1) indexed SQLite match
-5. **Context-Aware Disambiguation** — Resolves ambiguous words (e.g. "bark") based on surrounding tokens
-6. **Advanced Stemming** — 15+ English suffix rules (ing, ed, tion, ment, ness, ly, ful, etc.)
-7. **Synonym Expansion** — 200+ curated synonym mappings
-8. **Soundex Phonetic Match** — Catches misspellings by sound similarity
-9. **Compound Word Decomposition** — Splits "rainforest" → "rain" + "forest"
-10. **Levenshtein Fuzzy Search** — Cached edit-distance matching with LRU eviction (max dist: 2)
+### Translation Pipeline (10 stages, no cloud, no generative AI)
+1. Full phrase match → 2. Bigram/Trigram matching → 3. Exact dictionary lookup → 4. Context disambiguation → 5. Stemming (15+ suffix rules) → 6. Synonym expansion (200+ mappings) → 7. Soundex phonetic match → 8. Compound word decomposition → 9. Fuzzy search (Levenshtein) → 10. Graceful fallback
 
-> **Note:** Stage 10 includes an optional LLM fallback path reserved for future SmolLM2 GGUF integration. Currently, all translation is performed via dictionary lookups + algorithmic NLP — no generative AI is used.
+### Build Modes
 
-### 🧠 Why Fully Offline?
-- **Zero Latency** — No server round-trip; responses are instantaneous
-- **Privacy** — Voice recordings never leave the child's device
-- **Accessibility** — Works in complete signal dead zones across remote islands
-- **Sovereignty** — Indigenous data is owned and stored locally, not by a cloud provider
+| Mode | APK Size | Features | Target Device |
+| :--- | :--- | :--- | :--- |
+| **Lean** (default) | ~50 MB | Dictionary, Games, AR, TTS | Android 8+, 2GB RAM |
+| **Full** | ~250 MB | + Whisper STT, advanced NLP | Android 10+, 4GB RAM |
+
+```bash
+# Build lean (default — for school deployment)
+flutter build apk --dart-define=LEAN_MODE=true
+
+# Build full (for teacher/research devices)
+flutter build apk --dart-define=LEAN_MODE=false
+```
 
 ---
 
-## 🧒 Kid-Friendly Design Philosophy
+## 📊 Data
 
-SpeechMate's Student Dashboard is designed specifically for **children aged 6–14** in tribal schools. Every design decision prioritizes engagement, clarity, and performance on low-end devices.
+All linguistic data is stored in `assets/data/` and seeded into SQLite at first launch:
 
-### Design Principles
-| Principle | Implementation |
-| :--- | :--- |
-| **Big, Bright, Bold** | Vibrant gradient cards, oversized emoji, chunky progress bars — no tiny text or muted colors |
-| **Instant Feedback** | Confetti bursts, bouncing pet animations, and shimmering XP rewards give immediate positive reinforcement |
-| **One-Tap Navigation** | Bento grid tiles with 3D tilt interaction — kids can explore any module with a single tap |
-| **Daily Ritual** | Smart Daily Mission Engine gives a new, achievable goal every morning — builds habit loops |
-| **Glassmorphism (Lite)** | Premium frosted-glass aesthetic using optimized `CustomPainter` radial gradients instead of expensive `BackdropFilter` |
-
-### Performance Budget (Mobile-First)
-| Optimization | Before | After |
-| :--- | :--- | :--- |
-| `BackdropFilter` count | 8 stacked | 2 (dialog-only) |
-| `MaskFilter.blur` | 3 per frame | 0 (replaced with `RadialGradient`) |
-| Background animation | Widget-tree based | Single `CustomPaint` canvas |
-| Confetti particles | N/A | 25 max, `RepaintBoundary` isolated |
-| Waveform bars | N/A | 20 bars, pure canvas ops |
-| Target FPS | ~30 (laggy) | **60 FPS** (smooth) |
-
----
-
-## 📊 Performance & Metrics (v2.5)
-
-| Metric | Result | Notes |
-| :--- | :--- | :--- |
-| **STT Latency** | **< 600ms** | Whisper Tiny via NDK 27 C++ |
-| **Translation Speed** | **< 100ms** | Local SQLite with indexed queries |
-| **Translation Pipeline** | **10-stage** | N-Gram + Context + Stemming + Soundex + Fuzzy + Compound |
-| **Dashboard FPS** | **60 FPS** | Optimized canvas painters, zero BackdropFilter on scroll |
-| **Student Dash Lines** | **1,474** | Competition-grade codebase with 4 embedded engines |
-| **Dictionary Size** | **2,400+ entries** | `dictionary.json` (core Nicobarese) |
-| **GA Lexicon Size** | **277KB+** | `dictionary_great_andamanese.json` |
-| **Regional Languages** | **5 supported** | Hindi, Tamil, Bengali, Telugu (offline), Malayalam (online) |
-| **Synonym Mappings** | **200+** | Expanded NLP synonym database |
-| **Offline Capability** | **100%** | Zero API calls for core features (Malayalam requires internet) |
-| **Camera FPS Throttling** | **Dynamic** | Auto-adjusts 300–1000ms based on device FPS |
-| **Confetti Particles** | **25 max** | Physics-based, auto-clearing, RepaintBoundary isolated |
-| **XP Engine** | **O(1)** | Zero-allocation level calculation with exponential curve |
-| **App Base Size** | **~250 MB** | Includes 141MB Whisper Multilingual Base Model |
-| **Min Android SDK** | **API 24** | Android 7.0+ |
-| **Target SDK** | **API 33** | Android 13 |
-
----
-
-## 📂 Data Architecture
-
-All linguistic data is managed in `assets/data/` and seeded into SQLite at first launch:
-
-| File | Category | Words |
+| File | Category | Entries |
 | :--- | :--- | :--- |
 | `dictionary.json` | Core Nicobarese (verbs, nouns, pronouns) | 2,400+ |
 | `dictionary_numbers.json` | Numbers | ~20 |
 | `dictionary_nature.json` | Nature & environment | ~30 |
 | `dictionary_colors.json` | Colors | ~15 |
-| `dictionary_feelings.json` | Emotions & feelings | ~20 |
+| `dictionary_feelings.json` | Emotions | ~20 |
 | `dictionary_things.json` | Everyday objects | ~40 |
 | `dictionary_body_parts.json` | Human anatomy | ~30 |
 | `dictionary_animals.json` | Fauna | ~20 |
-| `dictionary_magic.json` | Greetings & magic words | ~25 |
+| `dictionary_magic.json` | Greetings & social words | ~25 |
 | `dictionary_family.json` | Kinship & family | ~20 |
-| `dictionary_phrases.json` | Common classroom phrases | ~30 |
-| `dictionary_dialects.json` | 5-dialect comparison table | large |
 | `dictionary_great_andamanese.json` | Great Andamanese lexicon | 1,000+ |
 
 ---
 
-## 🚀 Scalability: Adding New Languages
+## 🗣️ Supported Languages
 
-SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requires only:
+### Interface Languages
+🌴 Pū (Car Nicobarese) · 🏔️ Aka-Jeru (Great Andamanese) · 🇬🇧 English · 🇮🇳 हिंदी · தமிழ் · മലയാളം · తెలుగు · বাংলা
 
-1. **Lexicon**: Create `assets/data/dictionary_<lang>.json`
-2. **Audio**: Add audio samples to `assets/audio/<lang>/`
-3. **Seed**: Register the file in `main.dart` → `seedCategoryFromJson()`
-4. **UI**: Add a tile in `languages.dart` or `app_language_select.dart`
-
-```json
-// Scalable JSON structure (shared across all languages)
-{
-  "english": "Water",
-  "nicobarese": "Mak",
-  "emoji": "💧",
-  "audio": "water.mp3"
-}
-```
+### Regional Translators
+| Language | Engine | Mode |
+| :--- | :--- | :--- |
+| Hindi | Google ML Kit | ✅ Offline |
+| Tamil | Google ML Kit | ✅ Offline |
+| Bengali | Google ML Kit | ✅ Offline |
+| Telugu | Google ML Kit | ✅ Offline |
+| Malayalam | Cloud fallback | 🌐 Online |
 
 ---
 
-## 🔮 Roadmap
+## 🛤️ Roadmap
 
-### 🔜 Planned (v3.0+)
-- [ ] **SmolLM2 On-Device LLM** — Add quantized GGUF model for true offline generative AI chat (currently all translation is algorithmic NLP)
-- [x] **P2P Mesh Sync** — Share vocabulary packs via offline ZIP payloads
-- [x] **Kid-Friendly Dashboard** — 4 embedded engines (XP, Confetti, Smart Mission, Waveform)
-- [x] **Virtual Pet Companion** — Interactive bouncing fox/dog avatar with celebration triggers
-- [x] **60 FPS Performance** — Eliminated BackdropFilter lag, switched to CustomPainter canvas
-- [ ] **Onges Module** — Third tribal language integration
-- [ ] **Gamified Certification** — Printable tribal language certificates
-- [ ] **Collaborative Classroom** — Peer vocabulary games
-- [ ] **Cloud Sync** — Optional Firebase backup for community posts
-- [ ] **Major Dependency Audit** — Upgrade 32 constrained major-version packages
+We ship in phases, not features. Each phase has a measurable success metric.
+
+| Phase | Timeline | Goal | Success Metric |
+| :--- | :--- | :--- | :--- |
+| **Pilot** | Now → Month 3 | Deploy to 1 school, 20 students | 80%+ weekly app opens |
+| **Validate** | Month 3–6 | Expand to 3 schools, 100 students | Teacher satisfaction > 7/10 |
+| **Scale** | Month 6–9 | MOU with A&N Dept of Education | Government letter of intent |
+| **Fundraise** | Month 9–12 | Secure ₹50L seed / CSR grant | 500 active students, 10 schools |
+
+### Completed
+- [x] 12 word categories with audio
+- [x] AR object scanner with real-time translation overlay
+- [x] 4 interactive word games
+- [x] 5 regional language translators (offline)
+- [x] Great Andamanese standalone hub
+- [x] Teacher dashboard with progress tracking
+- [x] SM-2 spaced repetition flashcards
+- [x] Offline document translation (PDF/TXT)
+- [x] P2P vocabulary sync (ZIP export)
+- [x] Gamification engine (XP, streaks, daily missions)
+
+### Planned (after pilot validation)
+- [ ] Community recording program (tribal elder pronunciation)
+- [ ] Teacher certification system
+- [ ] Onges language module
+- [ ] Cloud sync for community posts (optional)
 
 ---
 
-## 🛠️ Installation
+## 💰 Sustainability Model
+
+Cultural data is not monetized. The **software and deployment services** sustain the project.
+
+| Tier | Target | Price | Deliverable |
+| :--- | :--- | :--- | :--- |
+| **School License** | Dept of Tribal Welfare | ₹2,000–₹5,000/school/year | Offline APK + Teacher admin |
+| **NGO Package** | UNESCO, Azim Premji, Aga Khan | ₹50K–₹2L/project | Custom vocabulary + onboarding |
+| **Research License** | CIIL, SIL International | Grant-based | Anonymized usage data |
+
+---
+
+## 🚀 Installation
 
 ```bash
-# 1. Clone the repository
+# 1. Clone
 git clone https://github.com/sathiyatskrj/Speechmate.git
 cd Speechmate
 
-# 2. Install Flutter dependencies
+# 2. Install dependencies
 flutter pub get
 
-# 3. Pull the ML models via Git LFS
+# 3. Pull ML models (Git LFS)
 git lfs pull
-# (Ensures assets/models/ggml-base.bin is downloaded)
 
-# 4. Run in development
+# 4. Run
 flutter run
 
-# 5. Build release APK
-flutter build apk --release
+# 5. Build lean APK for school deployment
+flutter build apk --dart-define=LEAN_MODE=true
 ```
 
-**Requirements:**
-- Flutter 3.29+ / Dart 3.2+
-- Android NDK 27.0.12077973
-- Android SDK Platform 34
-
----
-
-## ❤️ Real-World Impact
-
-> **"This tool changes how we teach. Usually, English is alien to these kids. SpeechMate bridges that gap using their own mother tongue."**
-> — *Primary School Teacher, Car Nicobar*
-
-> **"SpeechMate is a lighthouse for our dying words. Seeing Great Andamanese digitalized gives our elders hope."**
-> — *Community Leader, Strait Island*
+**Requirements:** Flutter 3.29+ · Dart 3.2+ · Android NDK 27 · Android SDK 34
 
 ---
 
 ## 📜 License & Indigenous Data Sovereignty
 
-This project is licensed under an **Apache License 2.0 with a Custom Cultural Non-Commercial Restriction**.
+Licensed under **Apache 2.0 with Cultural Non-Commercial Restriction**.
 
-While the software architecture is open-source (providing standard Apache 2.0 patent protections and modification rights), the **linguistic datasets, dictionaries, audio files, and cultural artifacts** belonging to the Great Andamanese, Nicobarese, and other tribal groups are strictly restricted from commercialization. 
-
-You may not use, sell, monetize, or profit from these specific cultural and linguistic assets without explicit, prior written consent from the appropriate tribal councils or governmental bodies representing these indigenous groups.
+The software architecture is open-source. The **linguistic datasets, dictionaries, audio files, and cultural artifacts** belonging to the Nicobarese, Great Andamanese, and other tribal groups may not be used, sold, or monetized without explicit written consent from the appropriate tribal councils.
 
 ---
 
 <p align="center">
-  <i>"Where Language Barriers End, Digital Sovereignty Begins."</i>
-</p>
-
-<p align="center">
   Built with ❤️ for the tribal communities of the Andaman & Nicobar Islands
 </p>
-
