@@ -399,23 +399,33 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
      if (_cameraController == null || !_cameraController!.value.isInitialized) return;
      if (_isProcessing) return;
 
-     setState(() { _isProcessing = true; }); // Show loading immediately
+     setState(() { _isProcessing = true; });
 
      try {
-       // Ensure stream is stopped on iOS before taking picture to prevent hangs
+       // Ensure stream is stopped on Android/iOS before taking picture
        if (_cameraController!.value.isStreamingImages) {
-         try { await _cameraController!.stopImageStream(); } catch (_) {}
+         try { 
+            await _cameraController!.stopImageStream(); 
+            await Future.delayed(const Duration(milliseconds: 200)); // Allow camera hardware to settle
+         } catch (_) {}
        }
        
        final XFile image = await _cameraController!.takePicture();
        
-       // On iOS, sometimes takePicture pauses the preview permanently until resumePreview is called
+       // On some devices, takePicture permanently pauses the preview
        try { await _cameraController!.resumePreview(); } catch (_) {}
        
        setState(() { _capturedImagePath = image.path; });
        await _processStaticImage(image.path);
      } catch (e) {
        debugPrint("Capture error: $e");
+       if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text('Camera capture failed. Try using the Gallery instead.')),
+         );
+       }
+       // Ensure we don't stay frozen
+       try { await _cameraController!.resumePreview(); } catch (_) {}
        setState(() { _isProcessing = false; });
      }
   }
