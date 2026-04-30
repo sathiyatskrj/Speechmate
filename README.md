@@ -73,13 +73,18 @@ Languages like **Car Nicobarese** (Austroasiatic) and **Great Andamanese** (lang
 | **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — loaded from Nicobarese JSON lexicons |
 | **📷 AR Translator** | Real-time object and text translator using Google ML Kit with an AR overlay showing Nicobarese translations on detected objects. Features 3 lens modes (Auto/Objects/Text) and dynamic FPS-aware throttling |
 | **🎙️ Whisper STT Engine** | On-device speech-to-text using Whisper Base (`ggml-base.bin`, 141MB) for offline voice translation, optimized with a fast-path local audio shortcut layer for zero-latency common phrase matching |
-| **🔊 Audio Playback** | Native `.mp3` pronunciation for each word; TTS fallback when audio files are unavailable |
+| **🔊 Omni Translator Broadcast** | Speak once, translate and broadcast audio into 5 regional languages simultaneously |
+| **🏰 Memory Palace** | Spatial learning mode linking vocabulary to visual nodes (e.g., 'Coconut Grove', 'Fisherman\'s jetty') in a virtual indigenous village |
+| **🎓 Structured Lessons** | Formal curriculum paths (Level 1-10) for guided language acquisition alongside open-play modules |
 | **🧩 Games Hub** | Word Match, Flash Cards, Word Scramble, and Word Runner — gamified vocabulary learning |
 | **💬 Chat Translator** | Conversational translation interface powered by offline dictionary lookup + NLP heuristics |
 | **🗂️ Voice Vault** | Record and preserve oral history and folklore recordings |
 | **🌍 Community Hub** | Shared learning feed connecting students and educators |
-| **🏝️ Island Explorer** | Custom-painted Andaman & Nicobar map showing dialect distribution zones |
+| **🗺️ Dialect Heatmap** | Custom-painted, interactive Andaman & Nicobar map showing dialect distribution zones |
+| **🌿 Culture Hub** | Deep dives into indigenous traditions, folklore, and cultural context |
 | **📖 Flashcard SRS** | SM-2 spaced repetition system for long-term vocabulary retention |
+| **📸 QR Sync** | Offline peer-to-peer vocabulary and progress synchronization via QR codes |
+| **📝 Feedback System** | Built-in mechanism for users to submit linguistic corrections directly to elders/teachers |
 | **🌐 8-Language UI** | Interface localized in Nicobarese, Great Andamanese, English, Hindi, Tamil, Malayalam, Telugu, Bengali |
 | **🇮🇳 Regional Translators** | Bidirectional translation: Nicobarese ↔ Hindi, Tamil, Bengali, Telugu (offline via ML Kit) and Malayalam (online fallback) |
 | **🔎 Multilingual Search** | Type in any regional language script — auto-translates to English before Nicobarese lookup |
@@ -100,6 +105,7 @@ Languages like **Car Nicobarese** (Austroasiatic) and **Great Andamanese** (lang
 | **🎤 Voice Search** | Whisper-powered voice-to-search for vocabulary lookup |
 | **📝 Common Phrases** | Pre-built classroom phrase bank with audio |
 | **🏆 Certification Levels** | 10 structured proficiency levels with unlock progression |
+| **🔤 Dictionary Editor** | Allows teachers/elders to locally edit, correct, or add new custom vocabulary directly on the device |
 | **🧪 Quiz Mode** | Adaptive vocabulary quiz with missed-word re-injection |
 | **📊 Progress Analytics** | Class-level progress tracking and spaced repetition dashboards |
 | **📷 Book Scanner (OCR)** | ML Kit camera scanner to translate printed English text to Nicobarese |
