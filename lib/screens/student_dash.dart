@@ -48,6 +48,14 @@ class _StudentDashState extends State<StudentDash>
     with WidgetsBindingObserver, SearchableDashboardMixin {
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
+  bool _showConfetti = false;
+
+  void _triggerConfetti() {
+    setState(() => _showConfetti = true);
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) setState(() => _showConfetti = false);
+    });
+  }
 
   @override
   void initState() {
@@ -356,7 +364,8 @@ class _StudentDashState extends State<StudentDash>
                 ],
               ),
             ),
-            const VirtualPetCompanion(),
+            VirtualPetCompanion(onPetHappy: _triggerConfetti),
+            ConfettiOverlay(trigger: _showConfetti),
           ],
         ),
       ),
@@ -1660,7 +1669,8 @@ class KidsSectionHeader extends StatelessWidget {
 /// A bouncing, interactive virtual pet that floats at the bottom-right corner.
 /// Provides positive reinforcement when tapped.
 class VirtualPetCompanion extends StatefulWidget {
-  const VirtualPetCompanion({super.key});
+  final VoidCallback? onPetHappy;
+  const VirtualPetCompanion({super.key, this.onPetHappy});
 
   @override
   State<VirtualPetCompanion> createState() => _VirtualPetCompanionState();
@@ -1669,11 +1679,16 @@ class VirtualPetCompanion extends StatefulWidget {
 class _VirtualPetCompanionState extends State<VirtualPetCompanion>
     with SingleTickerProviderStateMixin {
   late AnimationController _bounceController;
+  final TtsService _ttsService = TtsService();
   bool _isHappy = false;
+  int _petIndex = 0;
+  final List<String> _pets = ['🦊', '🐶', '🐯', '🐼', '🐰', '🐸', '🐨'];
+  final List<Color> _petColors = [Colors.pinkAccent, Colors.orangeAccent, Colors.amber, Colors.green, Colors.purple, Colors.teal, Colors.blueAccent];
 
   @override
   void initState() {
     super.initState();
+    _ttsService.init();
     _bounceController =
         AnimationController(vsync: this, duration: const Duration(seconds: 2))
           ..repeat(reverse: true);
@@ -1682,18 +1697,25 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
   @override
   void dispose() {
     _bounceController.dispose();
+    _ttsService.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final petColor = _petColors[_petIndex];
     return Positioned(
       bottom: 20,
       right: 20,
       child: GestureDetector(
         onTap: () {
           if (_isHappy) return;
-          setState(() => _isHappy = true);
+          if (widget.onPetHappy != null) widget.onPetHappy!();
+          _ttsService.speakEnglish(AppStrings.get('petHappySpeech'));
+          setState(() {
+            _isHappy = true;
+            _petIndex = (_petIndex + 1) % _pets.length;
+          });
           _bounceController.duration = const Duration(milliseconds: 300);
           _bounceController.repeat(reverse: true);
           Future.delayed(const Duration(seconds: 3), () {
@@ -1736,7 +1758,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                         ]),
                     child: Text(AppStrings.get('petHappySpeech'),
                         style: TextStyle(
-                            color: Colors.pinkAccent,
+                            color: petColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 12)),
                   ).animate().scale(curve: Curves.elasticOut),
@@ -1749,16 +1771,16 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.pinkAccent.withValues(alpha: 0.4),
+                        color: petColor.withValues(alpha: 0.4),
                         blurRadius: 20,
                         offset: const Offset(0, 10))
                   ],
                   border: Border.all(
-                      color: Colors.pinkAccent.withValues(alpha: 0.6),
+                      color: petColor.withValues(alpha: 0.6),
                       width: 3),
                 ),
                 child: Center(
-                  child: Text(_isHappy ? '🐶' : '🦊',
+                  child: Text(_pets[_petIndex],
                       style: const TextStyle(fontSize: 42)),
                 ),
               ),
