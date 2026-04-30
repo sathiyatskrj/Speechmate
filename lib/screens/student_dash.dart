@@ -8,7 +8,7 @@ import 'package:speechmate/widgets/gamification_header.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
 import 'package:speechmate/core/app_theme.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
-import 'package:speechmate/widgets/tap_scale.dart'; 
+import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -73,44 +73,243 @@ class _StudentDashState extends State<StudentDash>
   void _onClear() => clearMixinSearch(searchController);
 
   List<Map<String, dynamic>> get learningTiles => [
-    // --- Premium Interactive Features (Moved to Top) ---
-    {"word": AppStrings.get('arTranslator'), "emoji": "📷", "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)], "navigateTo": const ARTranslatorScreen(), "icon": Icons.view_in_ar_rounded},
-    {"word": AppStrings.get('voiceVault'), "emoji": "🎙️", "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)], "navigateTo": const VoiceVaultScreen(), "icon": Icons.mic_external_on_rounded},
-    {"word": AppStrings.get('bookScanner'), "emoji": "📖", "colors": [const Color(0xFF00B4DB), const Color(0xFF0083B0)], "navigateTo": const CameraTranslationScreen(), "icon": Icons.document_scanner_rounded},
-    {"word": AppStrings.get('games'), "emoji": "🎲", "colors": [const Color(0xFFF09819), const Color(0xFFEDDE5D)], "navigateTo": const GamesHubScreen(), "icon": Icons.sports_esports_rounded},
-    {"word": AppStrings.get('chatTranslate'), "emoji": "💬", "colors": [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)], "navigateTo": const BetaChatScreen(isStudent: true), "icon": Icons.chat_bubble_rounded},
-    {"word": AppStrings.get('voiceTranslate'), "emoji": "🎙️", "colors": [const Color(0xFFff0844), const Color(0xFFffb199)], "navigateTo": const VoiceTranslatorScreen(), "icon": Icons.record_voice_over_rounded},
-    
-    // --- Core Learning Categories ---
-    {"word": AppStrings.get('numbers'), "emoji": "123", "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)], "navigateTo": const DynamicCategoryScreen(categoryId: 'numbers', title: 'Numbers'), "icon": Icons.format_list_numbered_rounded},
-    {"word": AppStrings.get('nature'), "emoji": "🌱", "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)], "navigateTo": const DynamicCategoryScreen(categoryId: 'nature', title: 'Nature'), "icon": Icons.eco_rounded},
-    {"word": AppStrings.get('feelings'), "emoji": "🎭", "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)], "navigateTo": const DynamicCategoryScreen(categoryId: 'feelings', title: 'Feelings'), "icon": Icons.emoji_emotions_rounded},
-    {"word": AppStrings.get('colors'), "emoji": "🎨", "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)], "navigateTo": const DynamicCategoryScreen(categoryId: 'colors', title: 'Colors'), "icon": Icons.palette_rounded},
-    {"word": AppStrings.get('things'), "emoji": "🏡", "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)], "navigateTo": const DynamicCategoryScreen(categoryId: 'things', title: 'Things'), "icon": Icons.chair_rounded},
-    {"word": AppStrings.get('bodyParts'), "emoji": "🦴", "colors": [const Color(0xFF8E2DE2), const Color(0xFF4A00E0)], "navigateTo": const BodyPartsScreen(), "icon": Icons.accessibility_new_rounded},
-    {"word": AppStrings.get('animals'), "emoji": "🐶", "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)], "navigateTo": const DynamicCategoryScreen(categoryId: 'animals', title: 'Animals'), "icon": Icons.pets_rounded},
-    {"word": AppStrings.get('magicWords'), "emoji": "🔮", "colors": [const Color(0xFFCC2B5E), const Color(0xFF753A88)], "navigateTo": const DynamicCategoryScreen(categoryId: 'magic', title: 'Magic Words'), "icon": Icons.auto_fix_high_rounded},
-    {"word": AppStrings.get('family'), "emoji": "👨‍👩‍👧", "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)], "navigateTo": const DynamicCategoryScreen(categoryId: 'family', title: 'Family'), "icon": Icons.family_restroom_rounded},
-    
-    // --- Regional Translations ---
-    {"word": "Omni Broadcast", "emoji": "📡", "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)], "navigateTo": const OmniTranslatorScreen(), "icon": Icons.cell_tower_rounded},
-    {"word": "Hindi\nTranslator", "emoji": "🇮🇳", "colors": [const Color(0xFFD84315), const Color(0xFFFF7043)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Hindi', TranslateLanguage.hindi, 'hi', 'hi-IN', 'नमस्ते')), "icon": Icons.g_translate_rounded},
-    {"word": "Tamil\nTranslator", "emoji": "🛕", "colors": [const Color(0xFF2E7D32), const Color(0xFF66BB6A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', 'வணக்கம்')), "icon": Icons.g_translate_rounded},
-    {"word": "Bengali\nTranslator", "emoji": "🐅", "colors": [const Color(0xFFC62828), const Color(0xFFEF5350)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn', 'bn-IN', 'নমস্কার')), "icon": Icons.g_translate_rounded},
-    {"word": "Telugu\nTranslator", "emoji": "🌶️", "colors": [const Color(0xFF283593), const Color(0xFF5C6BC0)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu, 'te', 'te-IN', 'నమస్కారం')), "icon": Icons.g_translate_rounded},
-    {"word": "Malayalam\nTranslator", "emoji": "🥥", "colors": [const Color(0xFF00695C), const Color(0xFF26A69A)], "navigateTo": RegionalTranslatorScreen(config: RegionalLanguageConfig('Malayalam', null, 'ml', 'ml-IN', 'നമസ്കാരം')), "icon": Icons.g_translate_rounded},
+        // --- Premium Interactive Features (Moved to Top) ---
+        {
+          "word": AppStrings.get('arTranslator'),
+          "emoji": "📷",
+          "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)],
+          "navigateTo": const ARTranslatorScreen(),
+          "icon": Icons.view_in_ar_rounded
+        },
+        {
+          "word": AppStrings.get('voiceVault'),
+          "emoji": "🎙️",
+          "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)],
+          "navigateTo": const VoiceVaultScreen(),
+          "icon": Icons.mic_external_on_rounded
+        },
+        {
+          "word": AppStrings.get('bookScanner'),
+          "emoji": "📖",
+          "colors": [const Color(0xFF00B4DB), const Color(0xFF0083B0)],
+          "navigateTo": const CameraTranslationScreen(),
+          "icon": Icons.document_scanner_rounded
+        },
+        {
+          "word": AppStrings.get('games'),
+          "emoji": "🎲",
+          "colors": [const Color(0xFFF09819), const Color(0xFFEDDE5D)],
+          "navigateTo": const GamesHubScreen(),
+          "icon": Icons.sports_esports_rounded
+        },
+        {
+          "word": AppStrings.get('chatTranslate'),
+          "emoji": "💬",
+          "colors": [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)],
+          "navigateTo": const BetaChatScreen(isStudent: true),
+          "icon": Icons.chat_bubble_rounded
+        },
+        {
+          "word": AppStrings.get('voiceTranslate'),
+          "emoji": "🎙️",
+          "colors": [const Color(0xFFff0844), const Color(0xFFffb199)],
+          "navigateTo": const VoiceTranslatorScreen(),
+          "icon": Icons.record_voice_over_rounded
+        },
 
-    // --- Advanced / Discovery ---
-    {"word": AppStrings.get('andamaneseBeta'), "emoji": "🏝️", "colors": [const Color(0xFF4A148C), const Color(0xFF1A237E)], "navigateTo": const GAHubScreen(), "icon": Icons.language_rounded},
-    {"word": AppStrings.get('natureHub'), "emoji": "🌿", "colors": [const Color(0xFF1B5E20), const Color(0xFF004D40)], "navigateTo": const FloraFaunaScreen(), "icon": Icons.eco_rounded},
-    {"word": AppStrings.get('oralHistory'), "emoji": "📻", "colors": [const Color(0xFF3E2723), const Color(0xFF1B5E20)], "navigateTo": const StoryRadioScreen(), "icon": Icons.radio_rounded},
-    {"word": AppStrings.get('tuhetKinship'), "emoji": "🌳", "colors": [const Color(0xFF5D4037), const Color(0xFF3E2723)], "navigateTo": const KinshipMapperScreen(), "icon": Icons.account_tree_rounded},
-    {"word": AppStrings.get('islandExplorer'), "emoji": "🧭", "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)], "navigateTo": const DialectHeatmapScreen(), "icon": Icons.explore_rounded},
-    {"word": AppStrings.get('memoryPalace'), "emoji": "🏠", "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)], "navigateTo": const MemoryPalaceScreen(), "icon": Icons.map_rounded},
-    {"word": AppStrings.get('community'), "emoji": "🌍", "colors": [const Color(0xFF302B63), const Color(0xFF24243E)], "navigateTo": const CommunityScreen(), "isSecret": true, "icon": Icons.public_rounded},
-    {"word": "AI Setup", "emoji": "🧠", "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)], "navigateTo": const AISetupScreen(), "icon": Icons.psychology_rounded},
-    {"word": AppStrings.get('feedback'), "emoji": "⭐", "colors": [const Color(0xFFFF00CC), const Color(0xFF333399)], "navigateTo": const FeedbackScreen(), "icon": Icons.feedback_rounded},
-  ];
+        // --- Core Learning Categories ---
+        {
+          "word": AppStrings.get('numbers'),
+          "emoji": "123",
+          "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'numbers', title: 'Numbers'),
+          "icon": Icons.format_list_numbered_rounded
+        },
+        {
+          "word": AppStrings.get('nature'),
+          "emoji": "🌱",
+          "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'nature', title: 'Nature'),
+          "icon": Icons.eco_rounded
+        },
+        {
+          "word": AppStrings.get('feelings'),
+          "emoji": "🎭",
+          "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'feelings', title: 'Feelings'),
+          "icon": Icons.emoji_emotions_rounded
+        },
+        {
+          "word": AppStrings.get('colors'),
+          "emoji": "🎨",
+          "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'colors', title: 'Colors'),
+          "icon": Icons.palette_rounded
+        },
+        {
+          "word": AppStrings.get('things'),
+          "emoji": "🏡",
+          "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'things', title: 'Things'),
+          "icon": Icons.chair_rounded
+        },
+        {
+          "word": AppStrings.get('bodyParts'),
+          "emoji": "🦴",
+          "colors": [const Color(0xFF8E2DE2), const Color(0xFF4A00E0)],
+          "navigateTo": const BodyPartsScreen(),
+          "icon": Icons.accessibility_new_rounded
+        },
+        {
+          "word": AppStrings.get('animals'),
+          "emoji": "🐶",
+          "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'animals', title: 'Animals'),
+          "icon": Icons.pets_rounded
+        },
+        {
+          "word": AppStrings.get('magicWords'),
+          "emoji": "🔮",
+          "colors": [const Color(0xFFCC2B5E), const Color(0xFF753A88)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'magic', title: 'Magic Words'),
+          "icon": Icons.auto_fix_high_rounded
+        },
+        {
+          "word": AppStrings.get('family'),
+          "emoji": "👨‍👩‍👧",
+          "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'family', title: 'Family'),
+          "icon": Icons.family_restroom_rounded
+        },
+
+        // --- Regional Translations ---
+        {
+          "word": "Omni Broadcast",
+          "emoji": "📡",
+          "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
+          "navigateTo": const OmniTranslatorScreen(),
+          "icon": Icons.cell_tower_rounded
+        },
+        {
+          "word": "Hindi\nTranslator",
+          "emoji": "🇮🇳",
+          "colors": [const Color(0xFFD84315), const Color(0xFFFF7043)],
+          "navigateTo": RegionalTranslatorScreen(
+              config: RegionalLanguageConfig(
+                  'Hindi', TranslateLanguage.hindi, 'hi', 'hi-IN', 'नमस्ते')),
+          "icon": Icons.g_translate_rounded
+        },
+        {
+          "word": "Tamil\nTranslator",
+          "emoji": "🛕",
+          "colors": [const Color(0xFF2E7D32), const Color(0xFF66BB6A)],
+          "navigateTo": RegionalTranslatorScreen(
+              config: RegionalLanguageConfig(
+                  'Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', 'வணக்கம்')),
+          "icon": Icons.g_translate_rounded
+        },
+        {
+          "word": "Bengali\nTranslator",
+          "emoji": "🐅",
+          "colors": [const Color(0xFFC62828), const Color(0xFFEF5350)],
+          "navigateTo": RegionalTranslatorScreen(
+              config: RegionalLanguageConfig('Bengali',
+                  TranslateLanguage.bengali, 'bn', 'bn-IN', 'নমস্কার')),
+          "icon": Icons.g_translate_rounded
+        },
+        {
+          "word": "Telugu\nTranslator",
+          "emoji": "🌶️",
+          "colors": [const Color(0xFF283593), const Color(0xFF5C6BC0)],
+          "navigateTo": RegionalTranslatorScreen(
+              config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu,
+                  'te', 'te-IN', 'నమస్కారం')),
+          "icon": Icons.g_translate_rounded
+        },
+        {
+          "word": "Malayalam\nTranslator",
+          "emoji": "🥥",
+          "colors": [const Color(0xFF00695C), const Color(0xFF26A69A)],
+          "navigateTo": RegionalTranslatorScreen(
+              config: RegionalLanguageConfig(
+                  'Malayalam', null, 'ml', 'ml-IN', 'നമസ്കാരം')),
+          "icon": Icons.g_translate_rounded
+        },
+
+        // --- Advanced / Discovery ---
+        {
+          "word": AppStrings.get('andamaneseBeta'),
+          "emoji": "🏝️",
+          "colors": [const Color(0xFF4A148C), const Color(0xFF1A237E)],
+          "navigateTo": const GAHubScreen(),
+          "icon": Icons.language_rounded
+        },
+        {
+          "word": AppStrings.get('natureHub'),
+          "emoji": "🌿",
+          "colors": [const Color(0xFF1B5E20), const Color(0xFF004D40)],
+          "navigateTo": const FloraFaunaScreen(),
+          "icon": Icons.eco_rounded
+        },
+        {
+          "word": AppStrings.get('oralHistory'),
+          "emoji": "📻",
+          "colors": [const Color(0xFF3E2723), const Color(0xFF1B5E20)],
+          "navigateTo": const StoryRadioScreen(),
+          "icon": Icons.radio_rounded
+        },
+        {
+          "word": AppStrings.get('tuhetKinship'),
+          "emoji": "🌳",
+          "colors": [const Color(0xFF5D4037), const Color(0xFF3E2723)],
+          "navigateTo": const KinshipMapperScreen(),
+          "icon": Icons.account_tree_rounded
+        },
+        {
+          "word": AppStrings.get('islandExplorer'),
+          "emoji": "🧭",
+          "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)],
+          "navigateTo": const DialectHeatmapScreen(),
+          "icon": Icons.explore_rounded
+        },
+        {
+          "word": AppStrings.get('memoryPalace'),
+          "emoji": "🏠",
+          "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)],
+          "navigateTo": const MemoryPalaceScreen(),
+          "icon": Icons.map_rounded
+        },
+        {
+          "word": AppStrings.get('community'),
+          "emoji": "🌍",
+          "colors": [const Color(0xFF302B63), const Color(0xFF24243E)],
+          "navigateTo": const CommunityScreen(),
+          "isSecret": true,
+          "icon": Icons.public_rounded
+        },
+        {
+          "word": "AI Setup",
+          "emoji": "🧠",
+          "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)],
+          "navigateTo": const AISetupScreen(),
+          "icon": Icons.psychology_rounded
+        },
+        {
+          "word": AppStrings.get('feedback'),
+          "emoji": "⭐",
+          "colors": [const Color(0xFFFF00CC), const Color(0xFF333399)],
+          "navigateTo": const FeedbackScreen(),
+          "icon": Icons.feedback_rounded
+        },
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -126,36 +325,37 @@ class _StudentDashState extends State<StudentDash>
             SafeArea(
               child: Column(
                 children: [
-                SmartDashboardHeader(
-                  isTeacher: false,
-                  searchController: searchController,
-                  onSearch: _onSearch,
-                  onClear: _onClear,
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        if (isSearchLoading)
-                          const Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Center(
-                              child: CircularProgressIndicator(color: Colors.cyanAccent),
-                            ),
-                          )
-                        else if (searchController.text.isNotEmpty)
-                          _buildSearchResults(),
-                        _buildDashboardContent(),
-                      ],
+                  SmartDashboardHeader(
+                    isTeacher: false,
+                    searchController: searchController,
+                    onSearch: _onSearch,
+                    onClear: _onClear,
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          if (isSearchLoading)
+                            const Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                    color: Colors.cyanAccent),
+                              ),
+                            )
+                          else if (searchController.text.isNotEmpty)
+                            _buildSearchResults(),
+                          _buildDashboardContent(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const VirtualPetCompanion(),
+            const VirtualPetCompanion(),
           ],
         ),
       ),
@@ -163,245 +363,295 @@ class _StudentDashState extends State<StudentDash>
   }
 
   Widget _buildSearchResults() {
-      return Padding(
-        padding: const EdgeInsets.all(20),
-        child: TranslationCard(
-          nicobarese: searchResult != null ? (searchResult!['nicobarese'] ?? "Translation not available") : "No match found",
-          english: searchResult != null ? (searchResult!['english'] ?? searchResult!['text'] ?? "No translation") : "",
-          isError: searchResult == null,
-          searchedNicobarese: searchedNicobarese,
-          showSpeaker: searchResult != null, 
-          onSpeak: () {
-              if (searchResult == null) return;
-              final textToSpeak = searchedNicobarese 
-                  ? (searchResult!['english'] ?? searchResult!['text'] ?? "")
-                  : (searchResult!['nicobarese'] ?? "");
-              if (textToSpeak.isEmpty) return;
-              if (searchedNicobarese) {
-                  ttsService.speakEnglish(textToSpeak);
-              } else {
-                  ttsService.speakNicobarese(
-                    textToSpeak, 
-                    englishWord: searchResult!['english'] ?? searchResult!['text']
-                  );
-              }
-          },
-        ).animate().fadeIn().scale(curve: Curves.easeOutBack),
-      );
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: TranslationCard(
+        nicobarese: searchResult != null
+            ? (searchResult!['nicobarese'] ?? "Translation not available")
+            : "No match found",
+        english: searchResult != null
+            ? (searchResult!['english'] ??
+                searchResult!['text'] ??
+                "No translation")
+            : "",
+        isError: searchResult == null,
+        searchedNicobarese: searchedNicobarese,
+        showSpeaker: searchResult != null,
+        onSpeak: () {
+          if (searchResult == null) return;
+          final textToSpeak = searchedNicobarese
+              ? (searchResult!['english'] ?? searchResult!['text'] ?? "")
+              : (searchResult!['nicobarese'] ?? "");
+          if (textToSpeak.isEmpty) return;
+          if (searchedNicobarese) {
+            ttsService.speakEnglish(textToSpeak);
+          } else {
+            ttsService.speakNicobarese(textToSpeak,
+                englishWord: searchResult!['english'] ?? searchResult!['text']);
+          }
+        },
+      ).animate().fadeIn().scale(curve: Curves.easeOutBack),
+    );
   }
 
-   Widget _buildDashboardContent() {
-       return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                  // 🎯 Daily Mission Card
-                  const DailyMissionCard().animate().fadeIn(duration: 700.ms).slideY(begin: 0.15),
-                  const SizedBox(height: 20),
+  Widget _buildDashboardContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 🎯 Daily Mission Card
+          const DailyMissionCard()
+              .animate()
+              .fadeIn(duration: 700.ms)
+              .slideY(begin: 0.15),
+          const SizedBox(height: 20),
 
-                  // ⚡ Quick Stats Row (Stars, Streak, Level)
-                  const QuickStatsRow().animate().fadeIn(duration: 600.ms).slideX(begin: -0.1),
-                  const SizedBox(height: 20),
+          // ⚡ Quick Stats Row (Stars, Streak, Level)
+          const QuickStatsRow()
+              .animate()
+              .fadeIn(duration: 600.ms)
+              .slideX(begin: -0.1),
+          const SizedBox(height: 20),
 
-                  // 🎙️ Voice Waveform Visualizer
-                  const KidsSectionHeader(emoji: '🎙️', label: 'Sound Wave'),
-                  const SizedBox(height: 8),
-                  const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
-                  const SizedBox(height: 20),
+          // 🎙️ Voice Waveform Visualizer
+          const KidsSectionHeader(emoji: '🎙️', label: 'Sound Wave'),
+          const SizedBox(height: 8),
+          const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
+          const SizedBox(height: 20),
 
-                  // 🏆 My Progress
-                  const KidsSectionHeader(emoji: '🏆', label: 'My Progress'),
-                  const SizedBox(height: 10),
-                  const GamificationHeader().animate().fadeIn(duration: 600.ms).slideY(begin: 0.1),
-                  const SizedBox(height: 20),
-                  const ProgressRadarChartWidget().animate().fadeIn(duration: 900.ms).scale(),
-                  const SizedBox(height: 20),
+          // 🏆 My Progress
+          const KidsSectionHeader(emoji: '🏆', label: 'My Progress'),
+          const SizedBox(height: 10),
+          const GamificationHeader()
+              .animate()
+              .fadeIn(duration: 600.ms)
+              .slideY(begin: 0.1),
+          const SizedBox(height: 20),
+          const ProgressRadarChartWidget()
+              .animate()
+              .fadeIn(duration: 900.ms)
+              .scale(),
+          const SizedBox(height: 20),
 
-                  // 🥇 My Badges
-                  const KidsSectionHeader(emoji: '🥇', label: 'My Badges'),
-                  const SizedBox(height: 10),
-                  const AchievementShowcaseWidget().animate().fadeIn(duration: 800.ms).slideX(begin: 0.1),
-                  const SizedBox(height: 28),
+          // 🥇 My Badges
+          const KidsSectionHeader(emoji: '🥇', label: 'My Badges'),
+          const SizedBox(height: 10),
+          const AchievementShowcaseWidget()
+              .animate()
+              .fadeIn(duration: 800.ms)
+              .slideX(begin: 0.1),
+          const SizedBox(height: 28),
 
-                  // 🚀 Let's Learn!
-                  const KidsSectionHeader(emoji: '🚀', label: "Let's Learn!"),
-                  const SizedBox(height: 14),
-                  _buildBentoGrid(),
-                  const SizedBox(height: 110),
-              ],
-          ),
-       );
-   }
+          // 🚀 Let's Learn!
+          const KidsSectionHeader(emoji: '🚀', label: "Let's Learn!"),
+          const SizedBox(height: 14),
+          _buildBentoGrid(),
+          const SizedBox(height: 110),
+        ],
+      ),
+    );
+  }
 
   Widget _buildBentoGrid() {
-      return StaggeredGrid.count(
-        crossAxisCount: 4,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        children: List.generate(learningTiles.length, (index) {
-          final tile = learningTiles[index];
-          
-          // Define Bento Grid Layout Configuration
-          int crossAxisCellCount = 2; // Default width (half)
-          int mainAxisCellCount = 2; // Default height
+    return StaggeredGrid.count(
+      crossAxisCount: 4,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      children: List.generate(learningTiles.length, (index) {
+        final tile = learningTiles[index];
 
-          if (index == 0) { // Camera Translator gets full width hero tile
-             crossAxisCellCount = 4; 
-             mainAxisCellCount = 2;
-          } else if (index == 1) { // Voice Vault
-             crossAxisCellCount = 2;
-             mainAxisCellCount = 3; // Taller
-          } else if (index == 2) { // Book Scanner
-             crossAxisCellCount = 2;
-             mainAxisCellCount = 2; 
-          } else if (index == 3) { // Games Hub
-             crossAxisCellCount = 2;
-             mainAxisCellCount = 2; 
-          } else if (index == 4) { // Chat Translate
-             crossAxisCellCount = 2;
-             mainAxisCellCount = 1; // Shorter
-          } else if (index == 6) { // Nature Hub Banner
-             crossAxisCellCount = 4;
-             mainAxisCellCount = 2;
-          } else if (index % 11 == 0 && index > 10) { // Periodic large banners
-             crossAxisCellCount = 4;
-             mainAxisCellCount = 2;
-          }
+        // Define Bento Grid Layout Configuration
+        int crossAxisCellCount = 2; // Default width (half)
+        int mainAxisCellCount = 2; // Default height
 
-          return StaggeredGridTile.count(
-            crossAxisCellCount: crossAxisCellCount,
-            mainAxisCellCount: mainAxisCellCount,
-            child: _buildPremiumTile(tile, index, crossAxisCellCount, mainAxisCellCount),
-          );
-        }),
-      );
+        if (index == 0) {
+          // Camera Translator gets full width hero tile
+          crossAxisCellCount = 4;
+          mainAxisCellCount = 2;
+        } else if (index == 1) {
+          // Voice Vault
+          crossAxisCellCount = 2;
+          mainAxisCellCount = 3; // Taller
+        } else if (index == 2) {
+          // Book Scanner
+          crossAxisCellCount = 2;
+          mainAxisCellCount = 2;
+        } else if (index == 3) {
+          // Games Hub
+          crossAxisCellCount = 2;
+          mainAxisCellCount = 2;
+        } else if (index == 4) {
+          // Chat Translate
+          crossAxisCellCount = 2;
+          mainAxisCellCount = 1; // Shorter
+        } else if (index == 6) {
+          // Nature Hub Banner
+          crossAxisCellCount = 4;
+          mainAxisCellCount = 2;
+        } else if (index % 11 == 0 && index > 10) {
+          // Periodic large banners
+          crossAxisCellCount = 4;
+          mainAxisCellCount = 2;
+        }
+
+        return StaggeredGridTile.count(
+          crossAxisCellCount: crossAxisCellCount,
+          mainAxisCellCount: mainAxisCellCount,
+          child: _buildPremiumTile(
+              tile, index, crossAxisCellCount, mainAxisCellCount),
+        );
+      }),
+    );
   }
 
-  Widget _buildPremiumTile(Map<String, dynamic> tile, int index, int crossAxis, int mainAxis) {
-      bool isShort = mainAxis <= 1;
-      bool isWide = crossAxis > 2;
+  Widget _buildPremiumTile(
+      Map<String, dynamic> tile, int index, int crossAxis, int mainAxis) {
+    bool isShort = mainAxis <= 1;
+    bool isWide = crossAxis > 2;
 
-      return PremiumTiltCard(
-          onTap: () {
-              if (tile['isSecret'] == true) {
-                  _showSecretAccessDialog(context, tile['navigateTo']);
-              } else {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => tile['navigateTo']));
-              }
-          },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              (tile['colors'][0] as Color).withValues(alpha: 0.7), 
-                              (tile['colors'][1] as Color).withValues(alpha: 0.5),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
-                          boxShadow: [
-                              BoxShadow(color: (tile['colors'][0] as Color).withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 8))
-                          ]
-                      ),
-                      child: Stack(
-                          children: [
-                              // Large watermark icon for depth
-                              Positioned(
-                                  right: isShort ? -5 : -15, 
-                                  bottom: isShort ? -15 : -25, 
-                                  child: Opacity(
-                                    opacity: 0.1,
-                                    child: Icon(tile['icon'], size: isShort ? 70 : 120, color: Colors.white)
-                                  ),
-                              ),
-                              // Optional Animated Sparkles for kids
-                              Positioned(
-                                  top: 10, right: 10,
-                                  child: Icon(Icons.star_rounded, color: Colors.white.withValues(alpha: 0.5), size: 28).animate(onPlay: (controller) => controller.repeat(reverse: true)).scaleXY(end: 1.3, duration: 800.ms),
-                              ),
-                              Positioned.fill(
-                                  child: Padding(
-                                      padding: EdgeInsets.all(isShort ? 12 : 16),
-                                      child: isShort ? _buildShortLayout(tile) : _buildNormalLayout(tile, isWide),
-                                  ),
-                              ),
-                          ],
-                      ),
-              ),
+    return PremiumTiltCard(
+      onTap: () {
+        if (tile['isSecret'] == true) {
+          _showSecretAccessDialog(context, tile['navigateTo']);
+        } else {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => tile['navigateTo']));
+        }
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    (tile['colors'][0] as Color).withValues(alpha: 0.7),
+                    (tile['colors'][1] as Color).withValues(alpha: 0.5),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                      color:
+                          (tile['colors'][0] as Color).withValues(alpha: 0.2),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8))
+                ]),
+            child: Stack(
+              children: [
+                // Large watermark icon for depth
+                Positioned(
+                  right: isShort ? -5 : -15,
+                  bottom: isShort ? -15 : -25,
+                  child: Opacity(
+                      opacity: 0.1,
+                      child: Icon(tile['icon'],
+                          size: isShort ? 70 : 120, color: Colors.white)),
+                ),
+                // Optional Animated Sparkles for kids
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Icon(Icons.star_rounded,
+                          color: Colors.white.withValues(alpha: 0.5), size: 28)
+                      .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true))
+                      .scaleXY(end: 1.3, duration: 800.ms),
+                ),
+                Positioned.fill(
+                  child: Padding(
+                    padding: EdgeInsets.all(isShort ? 12 : 16),
+                    child: isShort
+                        ? _buildShortLayout(tile)
+                        : _buildNormalLayout(tile, isWide),
+                  ),
+                ),
+              ],
             ),
           ),
-      ).animate().fadeIn(delay: (index * 40).ms).scale(curve: Curves.easeOutBack, duration: 500.ms);
+        ),
+      ),
+    )
+        .animate()
+        .fadeIn(delay: (index * 40).ms)
+        .scale(curve: Curves.easeOutBack, duration: 500.ms);
   }
 
   Widget _buildShortLayout(Map<String, dynamic> tile) {
-      return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-              Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.25), 
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5)
-                  ),
-                  child: Icon(tile['icon'], color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                  child: Text(
-                      tile['word'], 
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                  ),
-              ),
-          ],
-      );
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.25),
+              shape: BoxShape.circle,
+              border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.5), width: 1.5)),
+          child: Icon(tile['icon'], color: Colors.white, size: 24),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            tile['word'],
+            style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                letterSpacing: 0.5),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildNormalLayout(Map<String, dynamic> tile, bool isWide) {
-      return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-              Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.25), 
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2)
-                  ),
-                  child: Icon(tile['icon'], color: Colors.white, size: 32),
-              ),
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Text(
-                          tile['word'], 
-                          style: TextStyle(
-                            color: Colors.white, 
-                            fontWeight: FontWeight.w900, 
-                            fontSize: isWide ? 24 : 18, 
-                            height: 1.1,
-                            letterSpacing: 0.5, 
-                            shadows: [
-                              Shadow(color: Colors.black.withValues(alpha: 0.3), offset: const Offset(0, 2), blurRadius: 4)
-                            ]
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                      ),
-                  ),
-              ),
-          ],
-      );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.5), width: 2)),
+          child: Icon(tile['icon'], color: Colors.white, size: 32),
+        ),
+        Expanded(
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              tile['word'],
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: isWide ? 24 : 18,
+                  height: 1.1,
+                  letterSpacing: 0.5,
+                  shadows: [
+                    Shadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        offset: const Offset(0, 2),
+                        blurRadius: 4)
+                  ]),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   void _showSecretAccessDialog(BuildContext context, Widget targetScreen) {
@@ -418,11 +668,18 @@ class _StudentDashState extends State<StudentDash>
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(28),
               gradient: LinearGradient(
-                colors: [Colors.white.withValues(alpha: 0.15), Colors.white.withValues(alpha: 0.05)],
-                begin: Alignment.topLeft, end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: 0.15),
+                  Colors.white.withValues(alpha: 0.05)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
               border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 30)],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3), blurRadius: 30)
+              ],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -430,7 +687,10 @@ class _StudentDashState extends State<StudentDash>
                 const Text("🔒", style: TextStyle(fontSize: 40)),
                 const SizedBox(height: 12),
                 Text(AppStrings.get('seniorStudentAccess'),
-                    style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(AppStrings.get('solveToEnter'),
                     style: const TextStyle(color: Colors.white70, fontSize: 15),
@@ -440,7 +700,10 @@ class _StudentDashState extends State<StudentDash>
                   controller: answerController,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
                   decoration: InputDecoration(
                     hintText: "?",
                     hintStyle: const TextStyle(color: Colors.white38),
@@ -448,11 +711,13 @@ class _StudentDashState extends State<StudentDash>
                     fillColor: Colors.white.withValues(alpha: 0.1),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.3)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.2)),
                     ),
                   ),
                 ),
@@ -462,7 +727,8 @@ class _StudentDashState extends State<StudentDash>
                     Expanded(
                       child: TextButton(
                         onPressed: () => Navigator.pop(context),
-                        style: TextButton.styleFrom(foregroundColor: Colors.white54),
+                        style: TextButton.styleFrom(
+                            foregroundColor: Colors.white54),
                         child: Text(AppStrings.get('cancel')),
                       ),
                     ),
@@ -472,19 +738,26 @@ class _StudentDashState extends State<StudentDash>
                         onPressed: () {
                           if (answerController.text.trim() == "27") {
                             Navigator.pop(context);
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => targetScreen));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => targetScreen));
                           } else {
                             Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(AppStrings.get('incorrectAccessDenied'))));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    AppStrings.get('incorrectAccessDenied'))));
                           }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.cyanAccent,
                           foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: Text(AppStrings.get('enter'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                        child: Text(AppStrings.get('enter'),
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -517,13 +790,16 @@ class AmbientGlassBackground extends StatefulWidget {
   State<AmbientGlassBackground> createState() => _AmbientGlassBackgroundState();
 }
 
-class _AmbientGlassBackgroundState extends State<AmbientGlassBackground> with SingleTickerProviderStateMixin {
+class _AmbientGlassBackgroundState extends State<AmbientGlassBackground>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 25))..repeat();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 25))
+          ..repeat();
   }
 
   @override
@@ -567,25 +843,31 @@ class _AmbientPainter extends CustomPainter {
     // FAST HARDWARE ACCELERATED GRADIENTS (FIXES HANGING ON PHONES)
     // Replaced MaskFilter.blur which kills mobile performance with RadialGradients.
     void drawFastGlowingOrb(double x, double y, double radius, Color color) {
-       final rect = Rect.fromCircle(center: Offset(x, y), radius: radius);
-       final paint = Paint()
-         ..shader = RadialGradient(
-           colors: [color.withValues(alpha: 0.5), color.withValues(alpha: 0.0)],
-           stops: const [0.1, 1.0],
-         ).createShader(rect);
-       canvas.drawRect(rect, paint);
+      final rect = Rect.fromCircle(center: Offset(x, y), radius: radius);
+      final paint = Paint()
+        ..shader = RadialGradient(
+          colors: [color.withValues(alpha: 0.5), color.withValues(alpha: 0.0)],
+          stops: const [0.1, 1.0],
+        ).createShader(rect);
+      canvas.drawRect(rect, paint);
     }
 
-    final double x1 = size.width * 0.5 + math.sin(progress * math.pi * 2) * size.width * 0.4;
-    final double y1 = size.height * 0.3 + math.cos(progress * math.pi * 2) * size.height * 0.2;
+    final double x1 =
+        size.width * 0.5 + math.sin(progress * math.pi * 2) * size.width * 0.4;
+    final double y1 = size.height * 0.3 +
+        math.cos(progress * math.pi * 2) * size.height * 0.2;
     drawFastGlowingOrb(x1, y1, 300, Colors.cyanAccent);
 
-    final double x2 = size.width * 0.2 + math.cos(progress * math.pi * 2 + math.pi) * size.width * 0.3;
-    final double y2 = size.height * 0.8 + math.sin(progress * math.pi * 2 + math.pi) * size.height * 0.3;
+    final double x2 = size.width * 0.2 +
+        math.cos(progress * math.pi * 2 + math.pi) * size.width * 0.3;
+    final double y2 = size.height * 0.8 +
+        math.sin(progress * math.pi * 2 + math.pi) * size.height * 0.3;
     drawFastGlowingOrb(x2, y2, 350, Colors.pinkAccent);
 
-    final double x3 = size.width * 0.8 + math.sin(progress * math.pi * 2 + math.pi/2) * size.width * 0.3;
-    final double y3 = size.height * 0.5 + math.cos(progress * math.pi * 2 + math.pi/2) * size.height * 0.4;
+    final double x3 = size.width * 0.8 +
+        math.sin(progress * math.pi * 2 + math.pi / 2) * size.width * 0.3;
+    final double y3 = size.height * 0.5 +
+        math.cos(progress * math.pi * 2 + math.pi / 2) * size.height * 0.4;
     drawFastGlowingOrb(x3, y3, 280, Colors.purpleAccent);
   }
 
@@ -608,7 +890,8 @@ class PremiumTiltCard extends StatefulWidget {
   State<PremiumTiltCard> createState() => _PremiumTiltCardState();
 }
 
-class _PremiumTiltCardState extends State<PremiumTiltCard> with SingleTickerProviderStateMixin {
+class _PremiumTiltCardState extends State<PremiumTiltCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   double _tiltX = 0.0;
   double _tiltY = 0.0;
@@ -616,7 +899,8 @@ class _PremiumTiltCardState extends State<PremiumTiltCard> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
   }
 
   @override
@@ -646,44 +930,42 @@ class _PremiumTiltCardState extends State<PremiumTiltCard> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = Size(constraints.maxWidth, constraints.maxHeight);
-        return GestureDetector(
-          onTapDown: (_) => _controller.forward(),
-          onTapUp: (_) {
-            _reset();
-            widget.onTap();
+    return LayoutBuilder(builder: (context, constraints) {
+      final size = Size(constraints.maxWidth, constraints.maxHeight);
+      return GestureDetector(
+        onTapDown: (_) => _controller.forward(),
+        onTapUp: (_) {
+          _reset();
+          widget.onTap();
+        },
+        onTapCancel: _reset,
+        onPanUpdate: (details) => _onPanUpdate(details, size),
+        onPanEnd: (_) => _reset(),
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            final scale = 1.0 - (_controller.value * 0.05);
+            return Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001) // perspective
+                ..rotateX(_tiltX)
+                ..rotateY(_tiltY)
+                ..scale(scale, scale, scale),
+              alignment: Alignment.center,
+              child: child,
+            );
           },
-          onTapCancel: _reset,
-          onPanUpdate: (details) => _onPanUpdate(details, size),
-          onPanEnd: (_) => _reset(),
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              final scale = 1.0 - (_controller.value * 0.05);
-              return Transform(
-                transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.001) // perspective
-                  ..rotateX(_tiltX)
-                  ..rotateY(_tiltY)
-                  ..scale(scale, scale, scale),
-                alignment: Alignment.center,
-                child: child,
-              );
-            },
-            child: widget.child,
-          ),
-        );
-      }
-    );
+          child: widget.child,
+        ),
+      );
+    });
   }
 }
 
 // ----------------------------------------------------------------------------
 // 3. Daily Discovery Glass Card
 // ----------------------------------------------------------------------------
-/// Prominently displays the "Word of the Day" with rich typography and 
+/// Prominently displays the "Word of the Day" with rich typography and
 /// glassmorphic background to encourage daily engagement.
 class DailyDiscoveryCard extends StatelessWidget {
   const DailyDiscoveryCard({super.key});
@@ -697,47 +979,78 @@ class DailyDiscoveryCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white.withValues(alpha: 0.6), Colors.white.withValues(alpha: 0.2)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.5),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))
-            ]
-          ),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withValues(alpha: 0.6),
+                  Colors.white.withValues(alpha: 0.2)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.6), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10))
+              ]),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.purpleAccent.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Text("WORD OF THE DAY", style: TextStyle(color: Colors.purple, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                    child: const Text("WORD OF THE DAY",
+                        style: TextStyle(
+                            color: Colors.purple,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5)),
                   ),
                   const Spacer(),
-                  const Icon(Icons.volume_up_rounded, color: Colors.purpleAccent),
+                  const Icon(Icons.volume_up_rounded,
+                      color: Colors.purpleAccent),
                 ],
               ),
               const SizedBox(height: 16),
-              const Text("Pōt", style: TextStyle(fontSize: 42, fontWeight: FontWeight.w900, color: Colors.black87, height: 1.0)),
-              const Text("Nicobarese", style: TextStyle(fontSize: 14, color: Colors.black54, fontStyle: FontStyle.italic)),
+              const Text("Pōt",
+                  style: TextStyle(
+                      fontSize: 42,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.black87,
+                      height: 1.0)),
+              const Text("Nicobarese",
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                      fontStyle: FontStyle.italic)),
               const SizedBox(height: 16),
               Container(height: 1, color: Colors.black12),
               const SizedBox(height: 16),
               const Row(
                 children: [
-                  Icon(Icons.translate_rounded, size: 16, color: Colors.black54),
+                  Icon(Icons.translate_rounded,
+                      size: 16, color: Colors.black54),
                   SizedBox(width: 8),
-                  Text("Meaning:", style: TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w600)),
+                  Text("Meaning:",
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w600)),
                   SizedBox(width: 8),
-                  Text("Ocean / Sea", style: TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.bold)),
+                  Text("Ocean / Sea",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold)),
                 ],
               )
             ],
@@ -751,26 +1064,36 @@ class DailyDiscoveryCard extends StatelessWidget {
 // ----------------------------------------------------------------------------
 // 4. Progress Radar Chart Widget (Animated Custom Canvas)
 // ----------------------------------------------------------------------------
-/// Renders a complex spider/radar chart displaying the student's fluency 
+/// Renders a complex spider/radar chart displaying the student's fluency
 /// across multiple linguistic domains. Built purely via the Canvas API.
 class ProgressRadarChartWidget extends StatefulWidget {
   const ProgressRadarChartWidget({super.key});
 
   @override
-  State<ProgressRadarChartWidget> createState() => _ProgressRadarChartWidgetState();
+  State<ProgressRadarChartWidget> createState() =>
+      _ProgressRadarChartWidgetState();
 }
 
-class _ProgressRadarChartWidgetState extends State<ProgressRadarChartWidget> with SingleTickerProviderStateMixin {
+class _ProgressRadarChartWidgetState extends State<ProgressRadarChartWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  
+
   // Dummy data for competition showcase presentation
   final List<double> values = [0.85, 0.60, 0.95, 0.45, 0.75];
-  final List<String> labels = ["Nature", "Family", "Numbers", "Colors", "Animals"];
+  final List<String> labels = [
+    "Nature",
+    "Family",
+    "Numbers",
+    "Colors",
+    "Animals"
+  ];
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..forward();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..forward();
   }
 
   @override
@@ -786,13 +1109,14 @@ class _ProgressRadarChartWidgetState extends State<ProgressRadarChartWidget> wit
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.5),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20)
-        ]
-      ),
+          color: Colors.white.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+              color: Colors.white.withValues(alpha: 0.6), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05), blurRadius: 20)
+          ]),
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
@@ -800,7 +1124,9 @@ class _ProgressRadarChartWidgetState extends State<ProgressRadarChartWidget> wit
             painter: _RadarChartPainter(
               values: values,
               labels: labels,
-              progress: CurvedAnimation(parent: _controller, curve: Curves.elasticOut).value,
+              progress:
+                  CurvedAnimation(parent: _controller, curve: Curves.elasticOut)
+                      .value,
             ),
           );
         },
@@ -814,7 +1140,8 @@ class _RadarChartPainter extends CustomPainter {
   final List<String> labels;
   final double progress;
 
-  _RadarChartPainter({required this.values, required this.labels, required this.progress});
+  _RadarChartPainter(
+      {required this.values, required this.labels, required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -850,16 +1177,23 @@ class _RadarChartPainter extends CustomPainter {
       final double x = center.dx + radius * math.cos(i * angle - math.pi / 2);
       final double y = center.dy + radius * math.sin(i * angle - math.pi / 2);
       canvas.drawLine(center, Offset(x, y), webPaint);
-      
+
       final labelSpan = TextSpan(
-        text: labels[i],
-        style: const TextStyle(color: Colors.black54, fontSize: 10, fontWeight: FontWeight.bold)
-      );
-      final tp = TextPainter(text: labelSpan, textDirection: TextDirection.ltr)..layout();
-      
+          text: labels[i],
+          style: const TextStyle(
+              color: Colors.black54,
+              fontSize: 10,
+              fontWeight: FontWeight.bold));
+      final tp = TextPainter(text: labelSpan, textDirection: TextDirection.ltr)
+        ..layout();
+
       // Calculate label offsets outside the web
-      final double lx = center.dx + (radius + 20) * math.cos(i * angle - math.pi / 2) - tp.width/2;
-      final double ly = center.dy + (radius + 20) * math.sin(i * angle - math.pi / 2) - tp.height/2;
+      final double lx = center.dx +
+          (radius + 20) * math.cos(i * angle - math.pi / 2) -
+          tp.width / 2;
+      final double ly = center.dy +
+          (radius + 20) * math.sin(i * angle - math.pi / 2) -
+          tp.height / 2;
       tp.paint(canvas, Offset(lx, ly));
     }
 
@@ -890,17 +1224,22 @@ class _RadarChartPainter extends CustomPainter {
       ..strokeWidth = 2.0
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(dataPath, dataBorderPaint);
-    
+
     // Draw Data Points on top
     for (int i = 0; i < sides; i++) {
       final double r = radius * values[i] * progress;
       final double x = center.dx + r * math.cos(i * angle - math.pi / 2);
       final double y = center.dy + r * math.sin(i * angle - math.pi / 2);
-      
-      final pointPaint = Paint()..color = Colors.cyanAccent..style = PaintingStyle.fill;
-      canvas.drawCircle(Offset(x,y), 4, pointPaint);
-      final pointBorder = Paint()..color = Colors.white..style = PaintingStyle.stroke..strokeWidth = 1.5;
-      canvas.drawCircle(Offset(x,y), 4, pointBorder);
+
+      final pointPaint = Paint()
+        ..color = Colors.cyanAccent
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(x, y), 4, pointPaint);
+      final pointBorder = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
+      canvas.drawCircle(Offset(x, y), 4, pointBorder);
     }
   }
 
@@ -918,16 +1257,40 @@ class AchievementShowcaseWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final achievements = [
-      {'title': 'First Word', 'color': Colors.orangeAccent, 'icon': Icons.star_rounded},
-      {'title': 'Explorer', 'color': Colors.cyanAccent, 'icon': Icons.explore_rounded},
-      {'title': '7 Day Streak', 'color': Colors.pinkAccent, 'icon': Icons.local_fire_department_rounded},
-      {'title': 'Grammar Pro', 'color': Colors.greenAccent, 'icon': Icons.spellcheck_rounded},
+      {
+        'title': 'First Word',
+        'color': Colors.orangeAccent,
+        'icon': Icons.star_rounded
+      },
+      {
+        'title': 'Explorer',
+        'color': Colors.cyanAccent,
+        'icon': Icons.explore_rounded
+      },
+      {
+        'title': '7 Day Streak',
+        'color': Colors.pinkAccent,
+        'icon': Icons.local_fire_department_rounded
+      },
+      {
+        'title': 'Grammar Pro',
+        'color': Colors.greenAccent,
+        'icon': Icons.spellcheck_rounded
+      },
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppStrings.get('achievements') != 'achievements' ? AppStrings.get('achievements').toUpperCase() : "ACHIEVEMENTS", style: const TextStyle(color: Colors.black54, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+        Text(
+            AppStrings.get('achievements') != 'achievements'
+                ? AppStrings.get('achievements').toUpperCase()
+                : "ACHIEVEMENTS",
+            style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1)),
         const SizedBox(height: 12),
         SizedBox(
           height: 90,
@@ -946,17 +1309,30 @@ class AchievementShowcaseWidget extends StatelessWidget {
                       height: 55,
                       width: 55,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.5),
-                        border: Border.all(color: (a['color'] as Color).withValues(alpha: 0.8), width: 2),
-                        boxShadow: [
-                          BoxShadow(color: (a['color'] as Color).withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))
-                        ]
-                      ),
-                      child: Icon(a['icon'] as IconData, color: a['color'] as Color, size: 28),
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.5),
+                          border: Border.all(
+                              color:
+                                  (a['color'] as Color).withValues(alpha: 0.8),
+                              width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                                color: (a['color'] as Color)
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4))
+                          ]),
+                      child: Icon(a['icon'] as IconData,
+                          color: a['color'] as Color, size: 28),
                     ),
                     const SizedBox(height: 6),
-                    Text(a['title'] as String, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black87), textAlign: TextAlign.center, maxLines: 2),
+                    Text(a['title'] as String,
+                        style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87),
+                        textAlign: TextAlign.center,
+                        maxLines: 2),
                   ],
                 ),
               );
@@ -982,7 +1358,8 @@ class DailyMissionCard extends StatefulWidget {
   State<DailyMissionCard> createState() => _DailyMissionCardState();
 }
 
-class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerProviderStateMixin {
+class _DailyMissionCardState extends State<DailyMissionCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _shimmer;
   final double _progress = 0.45; // TODO: Fetch from actual stats
   late Map<String, dynamic> _todaysMission;
@@ -990,7 +1367,9 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _shimmer = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    _shimmer =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat(reverse: true);
     _todaysMission = SmartMissionEngine.getTodaysMission();
   }
 
@@ -1009,83 +1388,106 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
       child: Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFF6B6B), Color(0xFFFFB347)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
-            boxShadow: [
-              BoxShadow(color: const Color(0xFFFF6B6B).withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 8))
-            ],
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF6B6B), Color(0xFFFFB347)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('🎯', style: TextStyle(fontSize: 14)),
-                        SizedBox(width: 6),
-                        Text('DAILY MISSION', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-                      ],
-                    ),
+          borderRadius: BorderRadius.circular(28),
+          border:
+              Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
+          boxShadow: [
+            BoxShadow(
+                color: const Color(0xFFFF6B6B).withValues(alpha: 0.4),
+                blurRadius: 20,
+                offset: const Offset(0, 8))
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  const Spacer(),
-                  AnimatedBuilder(
-                    animation: _shimmer,
-                    builder: (ctx, _) => Text(
-                      '+$xpReward ⭐',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7 + 0.3 * _shimmer.value),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                      ),
-                    ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('🎯', style: TextStyle(fontSize: 14)),
+                      SizedBox(width: 6),
+                      Text('DAILY MISSION',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2)),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Text(
-                missionText,
-                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, height: 1.2),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Use the AR Scanner or Games to explore words 🌟',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
-              ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: LinearProgressIndicator(
-                  value: _progress,
-                  minHeight: 12,
-                  backgroundColor: Colors.white.withValues(alpha: 0.3),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
+                const Spacer(),
+                AnimatedBuilder(
+                  animation: _shimmer,
+                  builder: (ctx, _) => Text(
+                    '+$xpReward ⭐',
+                    style: TextStyle(
+                      color: Colors.white
+                          .withValues(alpha: 0.7 + 0.3 * _shimmer.value),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              missionText,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  height: 1.2),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Use the AR Scanner or Games to explore words 🌟',
+              style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(50),
+              child: LinearProgressIndicator(
+                value: _progress,
+                minHeight: 12,
+                backgroundColor: Colors.white.withValues(alpha: 0.3),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('${(_progress * target).round()} / $target', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.bold, fontSize: 13)),
-                  Text('${(_progress * 100).round()}% done!', style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
-                ],
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('${(_progress * target).round()} / $target',
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13)),
+                Text('${(_progress * 100).round()}% done!',
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 12)),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1115,10 +1517,11 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
   }
 
   Future<void> _loadStats() async {
-    final progressService = ProgressService(); // Must import 'package:speechmate/services/progress_service.dart' if not already
+    final progressService =
+        ProgressService(); // Must import 'package:speechmate/services/progress_service.dart' if not already
     final stats = await progressService.getProgressStats();
     final xpInfo = StudentXPEngine.getLevelInfo(stats['studentXP'] ?? 0);
-    
+
     if (mounted) {
       setState(() {
         _streak = stats['dayStreak'] ?? 0;
@@ -1132,21 +1535,40 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const SizedBox(height: 80, child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)));
+      return const SizedBox(
+          height: 80,
+          child: Center(
+              child: CircularProgressIndicator(color: Colors.cyanAccent)));
     }
-    
+
     return Row(
       children: [
-        _buildStatBubble(emoji: '🔥', label: 'Streak', value: '$_streak days', color: const Color(0xFFFF6B35)),
+        _buildStatBubble(
+            emoji: '🔥',
+            label: 'Streak',
+            value: '$_streak days',
+            color: const Color(0xFFFF6B35)),
         const SizedBox(width: 12),
-        _buildStatBubble(emoji: '⭐', label: 'Stars', value: '$_stars', color: const Color(0xFFFFD700)),
+        _buildStatBubble(
+            emoji: '⭐',
+            label: 'Stars',
+            value: '$_stars',
+            color: const Color(0xFFFFD700)),
         const SizedBox(width: 12),
-        _buildStatBubble(emoji: '🏅', label: 'Level', value: _levelName, color: const Color(0xFF7B61FF)),
+        _buildStatBubble(
+            emoji: '🏅',
+            label: 'Level',
+            value: _levelName,
+            color: const Color(0xFF7B61FF)),
       ],
     );
   }
 
-  Widget _buildStatBubble({required String emoji, required String label, required String value, required Color color}) {
+  Widget _buildStatBubble(
+      {required String emoji,
+      required String label,
+      required String value,
+      required Color color}) {
     // NO BackdropFilter here — 3 stacked blurs destroy mobile perf
     return Expanded(
       child: Container(
@@ -1156,15 +1578,26 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: color.withValues(alpha: 0.45), width: 1.5),
           boxShadow: [
-            BoxShadow(color: color.withValues(alpha: 0.10), blurRadius: 8, offset: const Offset(0, 3))
+            BoxShadow(
+                color: color.withValues(alpha: 0.10),
+                blurRadius: 8,
+                offset: const Offset(0, 3))
           ],
         ),
         child: Column(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 28)),
             const SizedBox(height: 4),
-            Text(value, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
-            Text(label, style: const TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.w600)),
+            Text(value,
+                style: TextStyle(
+                    color: color, fontWeight: FontWeight.w900, fontSize: 14),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+            Text(label,
+                style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600)),
           ],
         ),
       ),
@@ -1179,7 +1612,8 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
 class KidsSectionHeader extends StatelessWidget {
   final String emoji;
   final String label;
-  const KidsSectionHeader({super.key, required this.emoji, required this.label});
+  const KidsSectionHeader(
+      {super.key, required this.emoji, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -1201,7 +1635,8 @@ class KidsSectionHeader extends StatelessWidget {
           child: Container(
             height: 2,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Colors.black12, Colors.transparent]),
+              gradient: const LinearGradient(
+                  colors: [Colors.black12, Colors.transparent]),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -1223,14 +1658,17 @@ class VirtualPetCompanion extends StatefulWidget {
   State<VirtualPetCompanion> createState() => _VirtualPetCompanionState();
 }
 
-class _VirtualPetCompanionState extends State<VirtualPetCompanion> with SingleTickerProviderStateMixin {
+class _VirtualPetCompanionState extends State<VirtualPetCompanion>
+    with SingleTickerProviderStateMixin {
   late AnimationController _bounceController;
   bool _isHappy = false;
 
   @override
   void initState() {
     super.initState();
-    _bounceController = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    _bounceController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 2))
+          ..repeat(reverse: true);
   }
 
   @override
@@ -1262,7 +1700,10 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion> with SingleTi
           animation: _bounceController,
           builder: (context, child) {
             return Transform.translate(
-              offset: Offset(0, -15 * Curves.easeInOutSine.transform(_bounceController.value)),
+              offset: Offset(
+                  0,
+                  -15 *
+                      Curves.easeInOutSine.transform(_bounceController.value)),
               child: child,
             );
           },
@@ -1274,13 +1715,22 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion> with SingleTi
                 Positioned(
                   top: -52,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: const Offset(0, 4))]
-                    ),
-                    child: const Text("Yay! Let's learn! 🌟", style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold, fontSize: 12)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: const Offset(0, 4))
+                        ]),
+                    child: const Text("Yay! Let's learn! 🌟",
+                        style: TextStyle(
+                            color: Colors.pinkAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12)),
                   ).animate().scale(curve: Curves.elasticOut),
                 ),
               Container(
@@ -1290,12 +1740,18 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion> with SingleTi
                   color: Colors.white,
                   shape: BoxShape.circle,
                   boxShadow: [
-                    BoxShadow(color: Colors.pinkAccent.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 10))
+                    BoxShadow(
+                        color: Colors.pinkAccent.withValues(alpha: 0.4),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10))
                   ],
-                  border: Border.all(color: Colors.pinkAccent.withValues(alpha: 0.6), width: 3),
+                  border: Border.all(
+                      color: Colors.pinkAccent.withValues(alpha: 0.6),
+                      width: 3),
                 ),
                 child: Center(
-                  child: Text(_isHappy ? '🐶' : '🦊', style: const TextStyle(fontSize: 42)),
+                  child: Text(_isHappy ? '🐶' : '🦊',
+                      style: const TextStyle(fontSize: 42)),
                 ),
               ),
             ],
@@ -1314,16 +1770,45 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion> with SingleTi
 class StudentXPEngine {
   // XP thresholds for each level (exponential curve)
   static const List<int> _levelThresholds = [
-    0, 50, 150, 350, 700, 1200, 2000, 3200, 5000, 8000, 12000
+    0,
+    50,
+    150,
+    350,
+    700,
+    1200,
+    2000,
+    3200,
+    5000,
+    8000,
+    12000
   ];
 
   static const List<String> _levelNames = [
-    'Seedling', 'Sprout', 'Explorer', 'Adventurer', 'Pathfinder',
-    'Discoverer', 'Scholar', 'Champion', 'Master', 'Legend', 'Elder'
+    'Seedling',
+    'Sprout',
+    'Explorer',
+    'Adventurer',
+    'Pathfinder',
+    'Discoverer',
+    'Scholar',
+    'Champion',
+    'Master',
+    'Legend',
+    'Elder'
   ];
 
   static const List<String> _levelEmojis = [
-    '🌱', '🌿', '🧭', '⚔️', '🗺️', '🔭', '📚', '🏆', '👑', '⭐', '🌟'
+    '🌱',
+    '🌿',
+    '🧭',
+    '⚔️',
+    '🗺️',
+    '🔭',
+    '📚',
+    '🏆',
+    '👑',
+    '⭐',
+    '🌟'
   ];
 
   /// Gets the current level info from total XP (O(1) binary-search style)
@@ -1341,8 +1826,8 @@ class StudentXPEngine {
         ? _levelThresholds[level + 1]
         : _levelThresholds[level] + 5000;
 
-    final double progressToNext = (totalXP - currentThreshold) /
-        (nextThreshold - currentThreshold);
+    final double progressToNext =
+        (totalXP - currentThreshold) / (nextThreshold - currentThreshold);
 
     return {
       'level': level,
@@ -1400,7 +1885,8 @@ class ConfettiOverlay extends StatefulWidget {
   State<ConfettiOverlay> createState() => _ConfettiOverlayState();
 }
 
-class _ConfettiOverlayState extends State<ConfettiOverlay> with SingleTickerProviderStateMixin {
+class _ConfettiOverlayState extends State<ConfettiOverlay>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   List<_ConfettiParticle> _particles = [];
   final math.Random _rng = math.Random();
@@ -1408,7 +1894,8 @@ class _ConfettiOverlayState extends State<ConfettiOverlay> with SingleTickerProv
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2000));
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _particles.clear();
@@ -1425,19 +1912,25 @@ class _ConfettiOverlayState extends State<ConfettiOverlay> with SingleTickerProv
   }
 
   void _spawnParticles() {
-    _particles = List.generate(25, (_) => _ConfettiParticle(
-      x: _rng.nextDouble(),
-      y: -0.1 - _rng.nextDouble() * 0.3,
-      vx: (_rng.nextDouble() - 0.5) * 0.3,
-      vy: 0.3 + _rng.nextDouble() * 0.5,
-      rotation: _rng.nextDouble() * math.pi * 2,
-      rotationSpeed: (_rng.nextDouble() - 0.5) * 6,
-      size: 6 + _rng.nextDouble() * 8,
-      color: [
-        const Color(0xFFFF6B6B), const Color(0xFFFFD93D), const Color(0xFF6BCB77),
-        const Color(0xFF4D96FF), const Color(0xFFFF6BFF), const Color(0xFFFF9A3C),
-      ][_rng.nextInt(6)],
-    ));
+    _particles = List.generate(
+        25,
+        (_) => _ConfettiParticle(
+              x: _rng.nextDouble(),
+              y: -0.1 - _rng.nextDouble() * 0.3,
+              vx: (_rng.nextDouble() - 0.5) * 0.3,
+              vy: 0.3 + _rng.nextDouble() * 0.5,
+              rotation: _rng.nextDouble() * math.pi * 2,
+              rotationSpeed: (_rng.nextDouble() - 0.5) * 6,
+              size: 6 + _rng.nextDouble() * 8,
+              color: [
+                const Color(0xFFFF6B6B),
+                const Color(0xFFFFD93D),
+                const Color(0xFF6BCB77),
+                const Color(0xFF4D96FF),
+                const Color(0xFFFF6BFF),
+                const Color(0xFFFF9A3C),
+              ][_rng.nextInt(6)],
+            ));
     _controller.forward(from: 0);
   }
 
@@ -1470,8 +1963,13 @@ class _ConfettiParticle {
   double x, y, vx, vy, rotation, rotationSpeed, size;
   Color color;
   _ConfettiParticle({
-    required this.x, required this.y, required this.vx, required this.vy,
-    required this.rotation, required this.rotationSpeed, required this.size,
+    required this.x,
+    required this.y,
+    required this.vx,
+    required this.vy,
+    required this.rotation,
+    required this.rotationSpeed,
+    required this.size,
     required this.color,
   });
 }
@@ -1497,7 +1995,8 @@ class _ConfettiPainter extends CustomPainter {
       canvas.translate(px, py);
       canvas.rotate(rot);
       canvas.drawRect(
-        Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.5),
+        Rect.fromCenter(
+            center: Offset.zero, width: p.size, height: p.size * 0.5),
         paint,
       );
       canvas.restore();
@@ -1516,16 +2015,76 @@ class _ConfettiPainter extends CustomPainter {
 class SmartMissionEngine {
   /// Pre-defined mission templates
   static const List<Map<String, dynamic>> _missionTemplates = [
-    {'text': 'Learn 5 new Nicobarese words!', 'target': 5, 'xp': 50, 'category': 'vocabulary', 'emoji': '📖'},
-    {'text': 'Play 2 word games!', 'target': 2, 'xp': 40, 'category': 'games', 'emoji': '🎮'},
-    {'text': 'Scan 3 objects with AR!', 'target': 3, 'xp': 60, 'category': 'ar', 'emoji': '📷'},
-    {'text': 'Record 3 voice translations!', 'target': 3, 'xp': 45, 'category': 'voice', 'emoji': '🎤'},
-    {'text': 'Complete 1 body parts quiz!', 'target': 1, 'xp': 35, 'category': 'quiz', 'emoji': '🦴'},
-    {'text': 'Explore 4 animal words!', 'target': 4, 'xp': 40, 'category': 'animals', 'emoji': '🐾'},
-    {'text': 'Learn 3 nature words!', 'target': 3, 'xp': 35, 'category': 'nature', 'emoji': '🌿'},
-    {'text': 'Practice 5 number words!', 'target': 5, 'xp': 30, 'category': 'numbers', 'emoji': '🔢'},
-    {'text': 'Listen to 1 oral history!', 'target': 1, 'xp': 55, 'category': 'stories', 'emoji': '📻'},
-    {'text': 'Translate 4 color words!', 'target': 4, 'xp': 35, 'category': 'colors', 'emoji': '🎨'},
+    {
+      'text': 'Learn 5 new Nicobarese words!',
+      'target': 5,
+      'xp': 50,
+      'category': 'vocabulary',
+      'emoji': '📖'
+    },
+    {
+      'text': 'Play 2 word games!',
+      'target': 2,
+      'xp': 40,
+      'category': 'games',
+      'emoji': '🎮'
+    },
+    {
+      'text': 'Scan 3 objects with AR!',
+      'target': 3,
+      'xp': 60,
+      'category': 'ar',
+      'emoji': '📷'
+    },
+    {
+      'text': 'Record 3 voice translations!',
+      'target': 3,
+      'xp': 45,
+      'category': 'voice',
+      'emoji': '🎤'
+    },
+    {
+      'text': 'Complete 1 body parts quiz!',
+      'target': 1,
+      'xp': 35,
+      'category': 'quiz',
+      'emoji': '🦴'
+    },
+    {
+      'text': 'Explore 4 animal words!',
+      'target': 4,
+      'xp': 40,
+      'category': 'animals',
+      'emoji': '🐾'
+    },
+    {
+      'text': 'Learn 3 nature words!',
+      'target': 3,
+      'xp': 35,
+      'category': 'nature',
+      'emoji': '🌿'
+    },
+    {
+      'text': 'Practice 5 number words!',
+      'target': 5,
+      'xp': 30,
+      'category': 'numbers',
+      'emoji': '🔢'
+    },
+    {
+      'text': 'Listen to 1 oral history!',
+      'target': 1,
+      'xp': 55,
+      'category': 'stories',
+      'emoji': '📻'
+    },
+    {
+      'text': 'Translate 4 color words!',
+      'target': 4,
+      'xp': 35,
+      'category': 'colors',
+      'emoji': '🎨'
+    },
   ];
 
   /// Picks today's mission deterministically from the day-of-year.
@@ -1544,8 +2103,20 @@ class SmartMissionEngine {
     // For demo, we simulate varied staleness.
     final now = DateTime.now();
     final rng = math.Random(now.day);
-    final categories = ['vocabulary', 'games', 'ar', 'voice', 'quiz', 'animals', 'nature', 'numbers', 'stories', 'colors'];
-    return Map.fromEntries(categories.map((c) => MapEntry(c, rng.nextDouble())));
+    final categories = [
+      'vocabulary',
+      'games',
+      'ar',
+      'voice',
+      'quiz',
+      'animals',
+      'nature',
+      'numbers',
+      'stories',
+      'colors'
+    ];
+    return Map.fromEntries(
+        categories.map((c) => MapEntry(c, rng.nextDouble())));
   }
 }
 
@@ -1561,13 +2132,16 @@ class VoiceWaveformWidget extends StatefulWidget {
   State<VoiceWaveformWidget> createState() => _VoiceWaveformWidgetState();
 }
 
-class _VoiceWaveformWidgetState extends State<VoiceWaveformWidget> with SingleTickerProviderStateMixin {
+class _VoiceWaveformWidgetState extends State<VoiceWaveformWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat();
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3))
+          ..repeat();
   }
 
   @override
@@ -1612,8 +2186,7 @@ class _WaveformPainter extends CustomPainter {
     final double maxHeight = size.height * 0.8;
     final double centerY = size.height / 2;
 
-    final paint = Paint()
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     for (int i = 0; i < barCount; i++) {
       // Smooth sine-wave animation: each bar has a phase offset
@@ -1627,11 +2200,15 @@ class _WaveformPainter extends CustomPainter {
         const Color(0xFF00BCD4), // Cyan
         const Color(0xFF9C27B0), // Purple
         ratio,
-      )!.withValues(alpha: 0.7);
+      )!
+          .withValues(alpha: 0.7);
 
       // Draw symmetric bar from center
       final rect = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(x, centerY), width: barWidth * 0.8, height: amplitude + 4),
+        Rect.fromCenter(
+            center: Offset(x, centerY),
+            width: barWidth * 0.8,
+            height: amplitude + 4),
         const Radius.circular(3),
       );
       canvas.drawRRect(rect, paint);
