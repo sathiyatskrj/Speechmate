@@ -72,7 +72,7 @@ Languages like **Car Nicobarese** (Austroasiatic) and **Great Andamanese** (lang
 | :--- | :--- |
 | **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — loaded from Nicobarese JSON lexicons |
 | **📷 AR Translator** | Real-time object and text translator using Google ML Kit with an AR overlay showing Nicobarese translations on detected objects. Features 3 lens modes (Auto/Objects/Text) and dynamic FPS-aware throttling |
-| **🎙️ Whisper STT** | On-device speech-to-text using Whisper Base (`ggml-base.bin`, 141MB) for offline voice translation |
+| **🎙️ Whisper STT Engine** | On-device speech-to-text using Whisper Base (`ggml-base.bin`, 141MB) for offline voice translation, optimized with a fast-path local audio shortcut layer for zero-latency common phrase matching |
 | **🔊 Audio Playback** | Native `.mp3` pronunciation for each word; TTS fallback when audio files are unavailable |
 | **🧩 Games Hub** | Word Match, Flash Cards, Word Scramble, and Word Runner — gamified vocabulary learning |
 | **💬 Chat Translator** | Conversational translation interface powered by offline dictionary lookup + NLP heuristics |
@@ -91,7 +91,7 @@ Languages like **Car Nicobarese** (Austroasiatic) and **Great Andamanese** (lang
 | **Daily Missions** | Deterministic daily goal selector (e.g., "Learn 5 nature words") — no storage required |
 | **Quick Stats** | Live streak, stars, and level display from SharedPreferences |
 | **Confetti System** | Physics-based particle effects on achievements |
-| **Virtual Pet** | Interactive companion that reacts to student progress |
+| **Virtual Pet** | **Tamagotchi-inspired companion** with dynamic mood states (hunger, energy, happiness), XP-driven evolution (egg → legendary), interactive behaviors (feeding, zoomies, sleeping), and speech bubbles |
 | **Voice Waveform** | Animated audio visualizer |
 
 ### 👩‍🏫 Teacher Dashboard
