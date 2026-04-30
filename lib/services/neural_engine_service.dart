@@ -140,8 +140,43 @@ class NeuralEngineService {
     List<String> translatedTokens = [];
     double confidenceAccumulator = 0.0;
     int wordsProcessed = 0;
+    Set<int> skipIndices = {}; // Track tokens processed by n-grams
 
-    for (String token in tokens) {
+    // Phase 0.5: Bigram & Trigram Phrase Matching (Sliding Window)
+    for (int i = 0; i < tokens.length; i++) {
+      if (skipIndices.contains(i)) continue;
+
+      // Try Trigram (3 words)
+      if (i <= tokens.length - 3) {
+        String trigram = "${tokens[i]} ${tokens[i+1]} ${tokens[i+2]}".replaceAll(RegExp(r'[^\w\s]'), '').toLowerCase();
+        String? match = await _dictionaryService.lookupExact(trigram);
+        if (match != null) {
+          translatedTokens.add(match);
+          skipIndices.addAll([i, i+1, i+2]);
+          confidenceAccumulator += 3.0; // High confidence for trigram
+          wordsProcessed += 3;
+          continue;
+        }
+      }
+
+      // Try Bigram (2 words)
+      if (i <= tokens.length - 2 && !skipIndices.contains(i)) {
+        String bigram = "${tokens[i]} ${tokens[i+1]}".replaceAll(RegExp(r'[^\w\s]'), '').toLowerCase();
+        String? match = await _dictionaryService.lookupExact(bigram);
+        if (match != null) {
+          translatedTokens.add(match);
+          skipIndices.addAll([i, i+1]);
+          confidenceAccumulator += 2.0; // High confidence for bigram
+          wordsProcessed += 2;
+          continue;
+        }
+      }
+    }
+
+    for (int i = 0; i < tokens.length; i++) {
+      if (skipIndices.contains(i)) continue;
+      String token = tokens[i];
+
       if (token.trim().isEmpty) continue;
       wordsProcessed++;
 
@@ -156,6 +191,12 @@ class NeuralEngineService {
 
       // 1. Exact Lookup
       translation = await _dictionaryService.lookupExact(cleanToken);
+
+      // 1.5 Context-Aware Disambiguation
+      if (translation == null) {
+        translation = _contextAwareDisambiguation(lowerToken, tokens);
+        if (translation != null) confidenceAccumulator += 0.2; // Bonus confidence
+      }
 
       // 2. Advanced Stemming (handles ing, ed, s, ly, ness, ment, tion, er, est)
       if (translation == null) {
@@ -225,6 +266,34 @@ class NeuralEngineService {
 
     // isAiGenerated=false because this came from dictionary lookups, not LLM
     return NeuralResult(text: resultText, confidence: finalConfidence, isAiGenerated: false);
+  }
+
+  // --- CONTEXT-AWARE DISAMBIGUATION ---
+  /// Resolves ambiguous words based on surrounding context
+  String? _contextAwareDisambiguation(String target, List<String> contextTokens) {
+    String contextStr = contextTokens.join(" ").toLowerCase();
+    
+    // Example: "bark"
+    if (target == 'bark') {
+      if (contextStr.contains('tree') || contextStr.contains('branch') || contextStr.contains('wood')) {
+        return 'Tōt-bark'; // Simulated dictionary entry for tree bark
+      }
+      if (contextStr.contains('dog') || contextStr.contains('animal') || contextStr.contains('loud')) {
+        return 'Kap-sound'; // Simulated dictionary entry for dog bark
+      }
+    }
+    
+    // Example: "bat"
+    if (target == 'bat') {
+      if (contextStr.contains('ball') || contextStr.contains('play') || contextStr.contains('hit')) {
+        return 'Dan-bat'; // Sports bat
+      }
+      if (contextStr.contains('cave') || contextStr.contains('night') || contextStr.contains('animal')) {
+        return 'Nöt-bat'; // Animal bat
+      }
+    }
+
+    return null;
   }
 
   // --- TOKENIZER ---

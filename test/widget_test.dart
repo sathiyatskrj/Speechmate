@@ -24,7 +24,7 @@ void main() {
       expect(find.text('2'), findsOneWidget);
 
       // Verify level title is displayed
-      expect(find.text('Seed Planter'), findsOneWidget);
+      expect(find.text('Shell Gatherer'), findsOneWidget);
 
       // Verify XP text is displayed
       expect(find.text('150 / 250 XP'), findsOneWidget);
@@ -51,7 +51,7 @@ void main() {
       );
 
       expect(find.text('4'), findsOneWidget);
-      expect(find.text('Story Teller'), findsOneWidget);
+      expect(find.text('Turtle Tracker'), findsOneWidget);
       expect(find.text('500 / 850 XP'), findsOneWidget);
       expect(find.text('7'), findsOneWidget);
     });

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Bridging the gap between tribal heritage and modern education using <strong>Offline Gen-AI</strong> and an <strong>Indigenous Digital Sovereignty Hub</strong>.
+  Bridging the gap between tribal heritage and modern education using <strong>Offline NLP + On-Device Speech Recognition</strong> and an <strong>Indigenous Digital Sovereignty Hub</strong>.
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
     <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/STT-Whisper_Pro-4285F4?style=for-the-badge&logo=openai&logoColor=white" alt="Whisper AI" />
+    <img src="https://img.shields.io/badge/STT-Whisper_Base-4285F4?style=for-the-badge&logo=openai&logoColor=white" alt="Whisper AI" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/DB-SQLite_Offline-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
@@ -32,7 +32,7 @@
     <img src="https://img.shields.io/badge/ML_Kit-Translation-EA4335?style=for-the-badge&logo=google&logoColor=white" alt="ML Kit" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/NeuralEngine-v2.0-FF6F00?style=for-the-badge" alt="Neural Engine" />
+    <img src="https://img.shields.io/badge/Offline_Translation-Pipeline_v2.0-FF6F00?style=for-the-badge" alt="Translation Pipeline" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/XP_Engine-Gamified-FFD700?style=for-the-badge" alt="XP Engine" />
@@ -65,7 +65,7 @@
 *   The Andaman & Nicobar Islands have **zero dedicated digital tools** for tribal language education.
 
 **The Solution:**
-**SpeechMate** is an indigenous-first **Digital Sovereignty Hub** — not just a dictionary, but a **Universal Education & Preservation Platform**. It operates **100% offline** in remote islands and rainforests, combining a full learning suite with an on-device **Whisper AI speech engine** to teach, translate, and preserve endangered indigenous dialects.
+**SpeechMate** is an indigenous-first **Digital Sovereignty Hub** — not just a dictionary, but a **Learning & Preservation Platform**. It operates **100% offline** in remote islands and rainforests, combining a full learning suite with an on-device **Whisper Base speech-to-text model** (`ggml-base.bin`, 141MB) to teach, translate, and preserve endangered indigenous dialects.
 
 ---
 
@@ -75,11 +75,11 @@
 | Module | Description |
 | :--- | :--- |
 | **📚 12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — all loaded from verified Nicobarese JSON lexicons |
-| **🔍 AR Translator** | Live Augmented Reality translator using Google ML Kit Image Labeler to detect 400+ specific objects, featuring 3 Lens Modes (Auto/Objects/Text), direct Vault saving, and **dynamic FPS-aware throttling** that auto-adjusts processing speed (300–1000ms) based on device performance |
+| **📸 AR Translator** | Real-time object and text translator using Google ML Kit. Features a Live AR 'Jarvis' HUD overlay tracking objects, 3 Lens Modes (Auto/Objects/Text), and **dynamic FPS-aware throttling** that auto-adjusts processing speed based on device performance |
 | **🎙️ Whisper Base** | On-device multilingual speech-to-text using `ggml-base.bin` (141MB) for offline voice translation with auto-language detection |
 | **🔊 Audio-First Playback** | Native `.mp3` audio asset playback for each word; graceful TTS fallback when audio is unavailable |
 | **🧩 Games Hub** | Word Match, Flash Cards, Word Scramble, and Word Runner — gamified vocabulary learning with XP **diminishing returns** to prevent farming |
-| **💬 AI Chat Translator** | Conversational translation interface powered by **Neural Engine v2.0** |
+| **💬 Chat Translator** | Conversational translation interface powered by the **Offline Translation Pipeline v2.0** (dictionary lookup + NLP heuristics) |
 | **🗂️ Voice Vault** | Record, store, and preserve oral history and folklore |
 | **🌍 Community Hub** | Shared learning feed connecting students and educators |
 | **🏝️ Island Explorer (GIS)** | Custom-painted Andaman & Nicobar archipelago map visualizing dialect distribution zones |
@@ -93,16 +93,16 @@
 | :--- | :--- |
 | **🎮 XP & Leveling Engine** | O(1) progression system with 11 named levels (Seedling → Elder), exponential XP curve, streak multipliers (+5%/day capped at 2x), and per-action reward calculation |
 | **✨ Confetti Celebration Engine** | Physics-based 25-particle confetti burst with gravity, rotation, and fade-out — triggered on achievements. Uses `RepaintBoundary` + `CustomPainter` for zero-lag rendering |
-| **🎯 Smart Daily Mission Engine** | Deterministic day-of-year mission selector with 10 mission templates across vocabulary, games, AR, voice, and quiz categories. No storage required — same mission all day, different tomorrow |
+| **🎯 Smart Daily Mission Engine** | Deterministic day-of-year mission selector with 10 mission templates across vocabulary, games, camera, voice, and quiz categories. No storage required — same mission all day, different tomorrow |
 | **🎙️ Voice Waveform Visualizer** | 20-bar animated sine-wave audio visualizer with cyan→purple gradient, rendered via lightweight `CustomPainter` canvas at 60FPS |
 | **🦊 Virtual Pet Companion** | Bouncing interactive fox/dog avatar at bottom-right corner. Tapping triggers excited bounce animation + speech bubble + optional confetti burst |
-| **⚡ Quick Stats Row** | Three vibrant stat bubbles (🔥 Streak, ⭐ Stars, 🏅 Level) — no `BackdropFilter` for maximum mobile performance |
+| **⚡ Quick Stats Row** | Three vibrant stat bubbles (🔥 Streak, ⭐ Stars, 🏅 Level) — live data from `ProgressService` (SharedPreferences), no `BackdropFilter` for maximum mobile performance |
 | **🎯 Daily Mission Card** | Orange-red gradient hero card with shimmer-animated XP reward, chunky progress bar, and personalized goal text |
 
 ### 👩‍🏫 Teacher Dashboard
 | Module | Description |
 | :--- | :--- |
-| **🎤 Whisper Pro** | Live voice-to-search transcription to look up tribal vocabulary instantly |
+| **🎤 Whisper Base STT** | Live voice-to-search transcription using on-device Whisper Base model to look up tribal vocabulary instantly |
 | **📝 Common Phrases** | Pre-built classroom phrase bank with audio |
 | **🏆 Certification Levels** | Structured proficiency levels (1–10) with unlock progression |
 | **🧪 Quiz Mode** | Adaptive vocabulary quiz with missed-word re-injection |
@@ -157,7 +157,7 @@ A fully self-contained module with **4 tabs**:
 
 ## 🏗️ Technical Architecture
 
-SpeechMate uses a **layered offline-first architecture** combining Flutter for UI, SQLite for data sovereignty, native C++ for AI inference, and ML Kit for regional translation.
+SpeechMate uses a **layered offline-first architecture** combining Flutter for UI, SQLite for data sovereignty, native C++ for Whisper speech-to-text inference, and ML Kit for regional translation.
 
 ```mermaid
 graph TD
@@ -166,7 +166,7 @@ graph TD
 
     subgraph "AI Intelligence Layer"
         Service --> |WhisperService| Whisper[Whisper Base Multilingual\nNative C++ via NDK 27]
-        Service --> |NeuralEngineService v2.0| Neural[Neural Translation\nSoundex + Stemming + Fuzzy + Compound]
+        Service --> |NeuralEngineService v2.0| Neural[Offline Translation Pipeline\nN-Gram + Stemming + Soundex + Fuzzy + Context]
         Service --> |RegionalTranslationService| Regional[ML Kit Translation\nHindi / Tamil / Bengali / Telugu]
         Service --> |DictionaryService| AutoTranslate[Multilingual Search\nAuto-translate queries to English]
     end
@@ -191,16 +191,20 @@ graph TD
     DB --> |Vocabulary| UI
 ```
 
-### 🧠 Neural Engine v2.0
-The offline translation brain uses an **8-stage pipeline**:
-1. **N-Gram Phrase Match** — Full sentence lookup in phrase database
-2. **Exact Dictionary Lookup** — O(1) indexed SQLite match
-3. **Advanced Stemming** — 15+ English suffix rules (ing, ed, tion, ment, ness, ly, ful, etc.)
-4. **Synonym Expansion** — 200+ curated synonym mappings
-5. **Soundex Phonetic Match** — Catches misspellings by sound similarity
-6. **Compound Word Decomposition** — Splits "rainforest" → "rain" + "forest"
-7. **Levenshtein Fuzzy Search** — Cached edit-distance matching (max dist: 2)
-8. **LLM Contextual Fallback** — Reserved for future SmolLM2 GGUF integration
+### 🧠 Offline Translation Pipeline v2.0
+The offline translation brain uses a **10-stage NLP pipeline** (no neural networks — pure algorithmic NLP):
+1. **Full Phrase Match** — Complete sentence lookup in phrase database
+2. **Bigram Matching** — Sliding-window 2-word compound phrase lookup
+3. **Trigram Matching** — Sliding-window 3-word compound phrase lookup
+4. **Exact Dictionary Lookup** — O(1) indexed SQLite match
+5. **Context-Aware Disambiguation** — Resolves ambiguous words (e.g. "bark") based on surrounding tokens
+6. **Advanced Stemming** — 15+ English suffix rules (ing, ed, tion, ment, ness, ly, ful, etc.)
+7. **Synonym Expansion** — 200+ curated synonym mappings
+8. **Soundex Phonetic Match** — Catches misspellings by sound similarity
+9. **Compound Word Decomposition** — Splits "rainforest" → "rain" + "forest"
+10. **Levenshtein Fuzzy Search** — Cached edit-distance matching with LRU eviction (max dist: 2)
+
+> **Note:** Stage 10 includes an optional LLM fallback path reserved for future SmolLM2 GGUF integration. Currently, all translation is performed via dictionary lookups + algorithmic NLP — no generative AI is used.
 
 ### 🧠 Why Fully Offline?
 - **Zero Latency** — No server round-trip; responses are instantaneous
@@ -241,7 +245,7 @@ SpeechMate's Student Dashboard is designed specifically for **children aged 6–
 | :--- | :--- | :--- |
 | **STT Latency** | **< 600ms** | Whisper Tiny via NDK 27 C++ |
 | **Translation Speed** | **< 100ms** | Local SQLite with indexed queries |
-| **Neural Engine Pipeline** | **8-stage** | Soundex + Stemming + Fuzzy + Compound |
+| **Translation Pipeline** | **10-stage** | N-Gram + Context + Stemming + Soundex + Fuzzy + Compound |
 | **Dashboard FPS** | **60 FPS** | Optimized canvas painters, zero BackdropFilter on scroll |
 | **Student Dash Lines** | **1,474** | Competition-grade codebase with 4 embedded engines |
 | **Dictionary Size** | **2,400+ entries** | `dictionary.json` (core Nicobarese) |
@@ -249,7 +253,7 @@ SpeechMate's Student Dashboard is designed specifically for **children aged 6–
 | **Regional Languages** | **5 supported** | Hindi, Tamil, Bengali, Telugu (offline), Malayalam (online) |
 | **Synonym Mappings** | **200+** | Expanded NLP synonym database |
 | **Offline Capability** | **100%** | Zero API calls for core features (Malayalam requires internet) |
-| **AR FPS Throttling** | **Dynamic** | Auto-adjusts 300–1000ms based on device FPS |
+| **Camera FPS Throttling** | **Dynamic** | Auto-adjusts 300–1000ms based on device FPS |
 | **Confetti Particles** | **25 max** | Physics-based, auto-clearing, RepaintBoundary isolated |
 | **XP Engine** | **O(1)** | Zero-allocation level calculation with exponential curve |
 | **App Base Size** | **~250 MB** | Includes 141MB Whisper Multilingual Base Model |
@@ -304,7 +308,7 @@ SpeechMate is **language-agnostic by design**. Adding Onges or Sentinelese requi
 ## 🔮 Roadmap
 
 ### 🔜 Planned (v3.0+)
-- [ ] **SmolLM2 On-Device LLM** — Replace mock LLM with quantized GGUF model for true offline AI chat
+- [ ] **SmolLM2 On-Device LLM** — Add quantized GGUF model for true offline generative AI chat (currently all translation is algorithmic NLP)
 - [x] **P2P Mesh Sync** — Share vocabulary packs via offline ZIP payloads
 - [x] **Kid-Friendly Dashboard** — 4 embedded engines (XP, Confetti, Smart Mission, Waveform)
 - [x] **Virtual Pet Companion** — Interactive bouncing fox/dog avatar with celebration triggers

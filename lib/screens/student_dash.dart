@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:speechmate/services/tts_service.dart';
+import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/widgets/translation_card.dart';
 import 'package:speechmate/widgets/gamification_header.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
@@ -245,7 +246,7 @@ class _StudentDashState extends State<StudentDash>
           int crossAxisCellCount = 2; // Default width (half)
           int mainAxisCellCount = 2; // Default height
 
-          if (index == 0) { // AR Translator gets full width hero tile
+          if (index == 0) { // Camera Translator gets full width hero tile
              crossAxisCellCount = 4; 
              mainAxisCellCount = 2;
           } else if (index == 1) { // Voice Vault
@@ -983,12 +984,14 @@ class DailyMissionCard extends StatefulWidget {
 
 class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerProviderStateMixin {
   late AnimationController _shimmer;
-  final double _progress = 0.45; // 45% done — mocked
+  final double _progress = 0.45; // TODO: Fetch from actual stats
+  late Map<String, dynamic> _todaysMission;
 
   @override
   void initState() {
     super.initState();
     _shimmer = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    _todaysMission = SmartMissionEngine.getTodaysMission();
   }
 
   @override
@@ -999,6 +1002,9 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final int xpReward = _todaysMission['xp'];
+    final String missionText = _todaysMission['text'];
+    final int target = _todaysMission['target'];
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
@@ -1040,7 +1046,7 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
                   AnimatedBuilder(
                     animation: _shimmer,
                     builder: (ctx, _) => Text(
-                      '+50 ⭐',
+                      '+$xpReward ⭐',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7 + 0.3 * _shimmer.value),
                         fontWeight: FontWeight.w900,
@@ -1051,8 +1057,8 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
                 ],
               ),
               const SizedBox(height: 14),
-              const Text(
-                'Learn 5 new Nicobarese words!',
+              Text(
+                missionText,
                 style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, height: 1.2),
               ),
               const SizedBox(height: 6),
@@ -1074,13 +1080,12 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${(_progress * 5).round()} / 5 words', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text('${(_progress * target).round()} / $target', style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.bold, fontSize: 13)),
                   Text('${(_progress * 100).round()}% done!', style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
                 ],
               ),
             ],
           ),
-        ),
       ),
     );
   }
@@ -1090,18 +1095,53 @@ class _DailyMissionCardState extends State<DailyMissionCard> with SingleTickerPr
 // 2. Quick Stats Row (Streak 🔥, Stars ⭐, Level 🏅)
 // ----------------------------------------------------------------------------
 /// Three colourful bubble-cards showing a student's key stats at a glance.
-class QuickStatsRow extends StatelessWidget {
+class QuickStatsRow extends StatefulWidget {
   const QuickStatsRow({super.key});
 
   @override
+  State<QuickStatsRow> createState() => _QuickStatsRowState();
+}
+
+class _QuickStatsRowState extends State<QuickStatsRow> {
+  int _streak = 0;
+  int _stars = 0;
+  String _levelName = 'Seedling';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStats();
+  }
+
+  Future<void> _loadStats() async {
+    final progressService = ProgressService(); // Must import 'package:speechmate/services/progress_service.dart' if not already
+    final stats = await progressService.getProgressStats();
+    final xpInfo = StudentXPEngine.getLevelInfo(stats['studentXP'] ?? 0);
+    
+    if (mounted) {
+      setState(() {
+        _streak = stats['dayStreak'] ?? 0;
+        _stars = stats['studentStars'] ?? 0;
+        _levelName = xpInfo['name'];
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const SizedBox(height: 80, child: Center(child: CircularProgressIndicator(color: Colors.cyanAccent)));
+    }
+    
     return Row(
       children: [
-        _buildStatBubble(emoji: '🔥', label: 'Streak', value: '7 days', color: const Color(0xFFFF6B35)),
+        _buildStatBubble(emoji: '🔥', label: 'Streak', value: '$_streak days', color: const Color(0xFFFF6B35)),
         const SizedBox(width: 12),
-        _buildStatBubble(emoji: '⭐', label: 'Stars', value: '342', color: const Color(0xFFFFD700)),
+        _buildStatBubble(emoji: '⭐', label: 'Stars', value: '$_stars', color: const Color(0xFFFFD700)),
         const SizedBox(width: 12),
-        _buildStatBubble(emoji: '🏅', label: 'Level', value: 'Explorer', color: const Color(0xFF7B61FF)),
+        _buildStatBubble(emoji: '🏅', label: 'Level', value: _levelName, color: const Color(0xFF7B61FF)),
       ],
     );
   }

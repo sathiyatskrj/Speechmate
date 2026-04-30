@@ -4,6 +4,7 @@ import '../../services/dictionary_service.dart';
 import '../../services/database_manager.dart';
 import '../../services/progress_service.dart';
 import '../../widgets/tap_scale.dart';
+import '../student_dash.dart';
 import 'games_hub_screen.dart';
 
 class WordMatchGame extends StatefulWidget {
@@ -123,11 +124,10 @@ class _WordMatchGameState extends State<WordMatchGame> with TickerProviderStateM
             _isWon = true;
             _score += 200; // Completion bonus
           });
-          ProgressService().recordQuizTaken(); // Award XP
+          _awardXP();
         }
       } else {
         // Mismatch
-        _mistakes++;
         setState(() => _selectedItem = null);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -140,6 +140,17 @@ class _WordMatchGameState extends State<WordMatchGame> with TickerProviderStateM
         );
       }
     }
+  }
+
+  Future<void> _awardXP() async {
+    final progressService = ProgressService();
+    final currentStreak = await progressService.getStreak();
+    final xpReward = StudentXPEngine.calculateReward(
+      action: 'complete_game',
+      streakDays: currentStreak,
+    );
+    await progressService.addStudentXP(xpReward);
+    await progressService.recordQuizTaken(); // Legacy stats
   }
 
   @override

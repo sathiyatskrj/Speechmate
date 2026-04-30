@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'dart:math' as math;
 import 'package:flutter/services.dart';
 
 import 'package:camera/camera.dart';
@@ -1194,45 +1195,79 @@ class _BoxOverlayPainter extends CustomPainter {
 
       final color = i == 0 ? Colors.cyanAccent : Colors.white54;
 
-      // Draw bounding box
-      final boxPaint = Paint()
-        ..color = color.withValues(alpha: 0.8)
-        ..strokeWidth = i == 0 ? 2.5 : 1.5
-        ..style = PaintingStyle.stroke;
-      canvas.drawRRect(
-          RRect.fromRectAndRadius(scaled, const Radius.circular(6)), boxPaint);
+      // 1. Draw corner brackets (Jarvis HUD style)
+      final Paint bracketPaint = Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = i == 0 ? 3.0 : 2.0;
 
-      // Draw label badge above box
+      const double cornerLength = 20.0;
+      canvas.drawPath(Path()..moveTo(scaled.left, scaled.top + cornerLength)..lineTo(scaled.left, scaled.top)..lineTo(scaled.left + cornerLength, scaled.top), bracketPaint);
+      canvas.drawPath(Path()..moveTo(scaled.right - cornerLength, scaled.top)..lineTo(scaled.right, scaled.top)..lineTo(scaled.right, scaled.top + cornerLength), bracketPaint);
+      canvas.drawPath(Path()..moveTo(scaled.left, scaled.bottom - cornerLength)..lineTo(scaled.left, scaled.bottom)..lineTo(scaled.left + cornerLength, scaled.bottom), bracketPaint);
+      canvas.drawPath(Path()..moveTo(scaled.right, scaled.bottom - cornerLength)..lineTo(scaled.right, scaled.bottom)..lineTo(scaled.right - cornerLength, scaled.bottom), bracketPaint);
+
+      // 2. Center Crosshair
+      final Offset center = scaled.center;
+      final Paint crosshairPaint = Paint()
+        ..color = color.withValues(alpha: 0.5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0;
+      canvas.drawLine(Offset(center.dx - 10, center.dy), Offset(center.dx + 10, center.dy), crosshairPaint);
+      canvas.drawLine(Offset(center.dx, center.dy - 10), Offset(center.dx, center.dy + 10), crosshairPaint);
+      canvas.drawCircle(center, 4.0, crosshairPaint);
+
+      // 3. Info Panel (floating above box)
       final tp = TextPainter(
         text: TextSpan(
-          text: ' ${item.nicobarese} ',
+          text: ' ${item.nicobarese.toUpperCase()} ',
           style: TextStyle(
               color: Colors.white,
-              fontSize: i == 0 ? 14 : 11,
-              fontWeight: FontWeight.bold),
+              fontSize: i == 0 ? 16 : 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              fontFamily: 'Courier'),
         ),
         textDirection: TextDirection.ltr,
       )..layout();
 
+      final subTp = TextPainter(
+        text: TextSpan(
+          text: ' ${item.english.toUpperCase()} [${(item.confidence * 100).toInt()}%] ',
+          style: TextStyle(
+              color: color,
+              fontSize: i == 0 ? 11 : 9,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Courier'),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      final double panelWidth = math.max(tp.width, subTp.width) + 16;
+      final double panelHeight = tp.height + subTp.height + 12;
+      
       final badgeRect = Rect.fromLTWH(
-        scaled.left,
-        (scaled.top - tp.height - 6).clamp(0, size.height),
-        tp.width + 8,
-        tp.height + 4,
+        scaled.left + (scaled.width - panelWidth) / 2, // Center above box
+        (scaled.top - panelHeight - 10).clamp(0, size.height),
+        panelWidth,
+        panelHeight,
       );
 
-      final bgPaint = Paint()
-        ..color = (i == 0 ? Colors.cyanAccent : Colors.black87)
-            .withValues(alpha: 0.85);
-      canvas.drawRRect(
-          RRect.fromRectAndRadius(badgeRect, const Radius.circular(4)),
-          bgPaint);
-
-      tp.paint(
-        canvas,
-        Offset(badgeRect.left + 4,
-            badgeRect.top + (badgeRect.height - tp.height) / 2),
+      // Connect line from box top to panel bottom
+      canvas.drawLine(
+        Offset(center.dx, scaled.top),
+        Offset(center.dx, badgeRect.bottom),
+        Paint()..color = color.withValues(alpha: 0.5)..strokeWidth = 1.0,
       );
+
+      final bgPaint = Paint()..color = Colors.black87..style = PaintingStyle.fill;
+      canvas.drawRRect(RRect.fromRectAndRadius(badgeRect, const Radius.circular(4)), bgPaint);
+
+      final borderPaint = Paint()..color = color.withValues(alpha: 0.6)..style = PaintingStyle.stroke..strokeWidth = 1.0;
+      canvas.drawRRect(RRect.fromRectAndRadius(badgeRect, const Radius.circular(4)), borderPaint);
+
+      tp.paint(canvas, Offset(badgeRect.left + 8, badgeRect.top + 4));
+      subTp.paint(canvas, Offset(badgeRect.left + 8, badgeRect.top + tp.height + 6));
     }
   }
 

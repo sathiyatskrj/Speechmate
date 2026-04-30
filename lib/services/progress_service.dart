@@ -7,6 +7,32 @@ class ProgressService {
   static const String _keyQuizScores = 'quiz_scores';
   static const String _keyCommunityPosts = 'community_posts';
 
+  // --- Student Gamification Stats ---
+  static const String _keyStudentXP = 'student_xp';
+  static const String _keyStudentStars = 'student_stars';
+
+  Future<int> getStudentXP() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyStudentXP) ?? 0;
+  }
+
+  Future<void> addStudentXP(int amount) async {
+    final prefs = await SharedPreferences.getInstance();
+    int current = prefs.getInt(_keyStudentXP) ?? 0;
+    await prefs.setInt(_keyStudentXP, current + amount);
+  }
+
+  Future<int> getStudentStars() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyStudentStars) ?? 0;
+  }
+
+  Future<void> addStudentStars(int amount) async {
+    final prefs = await SharedPreferences.getInstance();
+    int current = prefs.getInt(_keyStudentStars) ?? 0;
+    await prefs.setInt(_keyStudentStars, current + amount);
+  }
+
   Future<int> getSearchCount() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_keySearchCount) ?? 0;
@@ -105,6 +131,8 @@ class ProgressService {
       'dayStreak': prefs.getInt(_keyStreakCount) ?? 0,
       'quizzesTaken': prefs.getInt(_keyQuizzesTaken) ?? 0,
       'communityPosts': prefs.getInt(_keyCommunityPosts) ?? 0,
+      'studentXP': prefs.getInt(_keyStudentXP) ?? 0,
+      'studentStars': prefs.getInt(_keyStudentStars) ?? 0,
     };
   }
 }

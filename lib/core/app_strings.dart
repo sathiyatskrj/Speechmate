@@ -111,7 +111,7 @@ class AppStrings {
     'days': 'days',
 
     // New additions for full localization
-    'arTranslator': 'AR Translator 🆕',
+    'arTranslator': 'AR Translator 📸',
     'bookScanner': 'Book Scanner',
     'voiceTranslate': 'Voice Translate',
     'andamaneseBeta': 'Andamanese ᴮᴱᵀᴬ',

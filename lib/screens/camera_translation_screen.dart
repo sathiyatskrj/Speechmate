@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/providers/service_providers.dart';
 import 'package:speechmate/widgets/ar_overlay_controller.dart';
-import 'package:speechmate/data/ar_mock_data.dart';
+import 'package:speechmate/data/object_encyclopedia.dart';
 
 class CameraTranslationScreen extends ConsumerStatefulWidget {
   const CameraTranslationScreen({super.key});
@@ -180,7 +180,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
         
         if (objectName.isNotEmpty && objectConfidence > 0.5) {
            final result = await ref.read(neuralEngineProvider).predict(objectName);
-           final info = ARMockData.getObjectInfo(objectName);
+           final info = ObjectEncyclopedia.getObjectInfo(objectName);
            newBlocks.add(TranslatedTextBlock(
              rect: obj.boundingBox,
              original: objectName,
@@ -317,7 +317,7 @@ class _CameraTranslationScreenState extends ConsumerState<CameraTranslationScree
         }
         if (objectName.isNotEmpty && objectConfidence > 0.5) {
            final result = await ref.read(neuralEngineProvider).predict(objectName);
-           final info = ARMockData.getObjectInfo(objectName);
+           final info = ObjectEncyclopedia.getObjectInfo(objectName);
            _staticBlocks.add(TranslatedTextBlock(
              rect: obj.boundingBox,
              original: objectName,

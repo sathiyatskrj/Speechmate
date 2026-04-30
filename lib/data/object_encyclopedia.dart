@@ -1,4 +1,4 @@
-class ARMockData {
+class ObjectEncyclopedia {
   static Map<String, String> getObjectInfo(String objectName) {
     final key = objectName.toLowerCase();
     
