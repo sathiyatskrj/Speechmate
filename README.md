@@ -185,16 +185,22 @@ flutter run
 
 ---
 
-## 📜 License
+## 📜 Licensing
 
-**Software (code):** Apache 2.0 — free to use, modify, and distribute.
+SpeechMate uses a **split-licensing model** to keep the source code open while strictly protecting indigenous data sovereignty.
 
-**Linguistic data (separate terms):** The dictionary entries, audio recordings, and cultural content belonging to the Nicobarese, Great Andamanese, and other indigenous groups are **not** covered by Apache 2.0. This data:
-- May not be sold or monetized.
-- May not be used commercially without written consent from the relevant tribal council or governmental authority.
-- May be used freely for non-commercial research and education with attribution.
+### 1. Software Code: Apache 2.0
+All source code in this repository is licensed under the [Apache License 2.0](LICENSE). You are free to use, modify, and distribute the software for commercial and non-commercial purposes.
 
-> The code and the data have separate terms. Using this repository does not grant rights to the linguistic data. See `LICENSE-DATA` for full details on data sovereignty and restrictions.
+### 2. Linguistic Data: CC BY-NC 4.0
+All dictionary entries, audio recordings, and cultural content (located in `assets/data/` and `assets/audio/`) are licensed under **Creative Commons Attribution-NonCommercial 4.0 (CC BY-NC 4.0)**, combined with Traditional Knowledge (TK) protocols. See [LICENSE-DATA](LICENSE-DATA) for details.
+
+**Key rules for the data:**
+- 🚫 **No Commercial Use:** You may not sell, monetize, or use the data in commercial products without written consent from the relevant tribal council.
+- 🚫 **No AI Training:** You may not use this data to train commercial AI or LLMs.
+- ✅ **Educational/Research Use:** You may use the data freely for non-commercial research, personal learning, and educational tools with proper attribution.
+
+> **Summary:** You can fork and build upon the app's code freely under Apache 2.0, but the tribal language data is strictly protected under CC BY-NC 4.0 and cannot be exploited for profit.
 
 ---
 
