@@ -193,7 +193,7 @@ SpeechMate uses a **split-licensing model** to keep the source code open while s
 All source code in this repository is licensed under the [Apache License 2.0](LICENSE). You are free to use, modify, and distribute the software for commercial and non-commercial purposes.
 
 ### 2. Linguistic Data: CC BY-NC 4.0
-All dictionary entries, audio recordings, and cultural content (located in `assets/data/` and `assets/audio/`) are licensed under **Creative Commons Attribution-NonCommercial 4.0 (CC BY-NC 4.0)**, combined with Traditional Knowledge (TK) protocols. See [LICENSE-DATA](LICENSE-DATA) for details.
+All dictionary entries, audio recordings, and cultural content (located in `assets/data/` and `assets/audio/`) are licensed under **Creative Commons Attribution-NonCommercial 4.0 (CC BY-NC 4.0)**, combined with Traditional Knowledge (TK) protocols. See [DATA_TERMS.txt](DATA_TERMS.txt) for details.
 
 **Key rules for the data:**
 - 🚫 **No Commercial Use:** You may not sell, monetize, or use the data in commercial products without written consent from the relevant tribal council.
