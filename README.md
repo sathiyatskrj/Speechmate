@@ -39,7 +39,7 @@
 
 > *"A Nicobarese child walks into a government school in Car Nicobar. The teacher speaks Hindi. The textbook is in English. The child's mother tongue — spoken by fewer than 30,000 people — has no place in the classroom. By the time she graduates, she may no longer speak it."*
 
-**Car Nicobarese** and **Great Andamanese** are critically endangered. There are **zero dedicated digital tools** for learning them. Children in these schools cannot bridge the gap between their mother tongue and the medium of instruction — not because they lack ability, but because the tools don't exist.
+**Car Nicobarese** and **Great Andamanese** are critically endangered. There are **no widely accessible or child-focused digital tools** for learning them. Children in these schools cannot bridge the gap between their mother tongue and the medium of instruction — not because they lack ability, but because offline-first tools tailored for tribal classrooms don't exist.
 
 - A language dies every **14 days** globally.
 - The Andaman & Nicobar school system has no tribal-language digital curriculum.
@@ -91,14 +91,14 @@ This is a **pre-pilot prototype**. Here is what each feature's status actually i
 
 ## ⚡ Why SpeechMate?
 
-| | Google Translate | Duolingo | Offline Dictionary Apps | SpeechMate |
-| :--- | :---: | :---: | :---: | :---: |
-| Nicobarese language | ❌ | ❌ | ❌ | ✅ |
-| Great Andamanese | ❌ | ❌ | ❌ | ✅ |
-| Works fully offline | ⚠️ | ⚠️ | ✅ | ✅* |
-| Built for ages 6–14 | ❌ | ✅ | ❌ | ✅ |
-| Teacher dashboard | ❌ | ❌ | ❌ | ✅ |
-| Voice-based learning | ✅ | ✅ | ❌ | ✅ |
+| Feature | Google Translate | Duolingo | Offline Dictionary Apps | SpeechMate |
+| :--- | :--- | :--- | :--- | :--- |
+| **Tribal Languages** | No Nicobarese support | No Nicobarese support | No tribal languages | ✅ Nicobarese & G. Andamanese |
+| **Connectivity** | Requires internet | Requires internet | ✅ Works offline | ✅ Works fully offline* |
+| **Target Audience** | General audience | ✅ Child-focused | General audience | ✅ Built for ages 6–14 |
+| **Classroom Fit** | Not designed for tribal classrooms | Not designed for tribal classrooms | Not designed for tribal classrooms | ✅ Tailored for tribal classrooms |
+| **Educator Tools** | None | Schools edition | None | ✅ Custom teacher dashboard |
+| **Voice Learning** | ✅ Supported | ✅ Supported | No voice features | ✅ Supported |
 
 > *\*Core vocabulary and translation is offline. AR overlay and Malayalam use partial online features.*
 
