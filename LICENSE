@@ -1,3 +1,7 @@
+SCOPE: This license applies to the SOFTWARE SOURCE CODE only.
+Linguistic datasets, dictionaries, audio recordings, and cultural content
+are governed separately by the LICENSE-DATA file in this repository.
+
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -199,17 +203,3 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-==============================================================================
-ADDITIONAL RESTRICTION ON COMMERCIALIZATION OF CULTURAL ASSETS:
-==============================================================================
-
-Notwithstanding any terms in the Apache License, Version 2.0 above, the
-following restriction applies to specific assets within this repository:
-
-The language datasets, dictionaries, cultural artifacts, oral histories,
-and audio files associated with Great Andamanese, Nicobarese, and any other
-tribal languages included in this repository are strictly restricted from
-commercialization. You may not use, sell, monetize, or profit from these
-specific cultural and linguistic assets without explicit, prior written
-consent from the appropriate tribal councils or governmental bodies
-representing these indigenous groups.

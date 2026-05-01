@@ -1,0 +1,45 @@
+SpeechMate Linguistic Data License Agreement
+
+This license applies exclusively to the linguistic datasets, dictionary JSON files,
+audio recordings, visual representations, and cultural artifacts contained
+within the `assets/data/` and `assets/audio/` directories of this repository,
+as well as any other files specifically pertaining to the indigenous languages
+(Nicobarese, Great Andamanese, etc.).
+
+This license DOES NOT apply to the software source code, which is licensed
+separately under the Apache License 2.0.
+
+1. DATA SOVEREIGNTY
+The linguistic and cultural data in this repository represents the heritage of
+the respective tribal communities. The creators of SpeechMate act only as
+facilitators and do not claim ownership or copyright over the indigenous
+languages, words, or cultural concepts.
+
+2. NON-COMMERCIAL USE ONLY
+You may not use, sell, monetize, or otherwise profit from the linguistic
+datasets or audio files provided in this repository.
+
+3. PERMITTED USES
+You may freely use, reproduce, and distribute the data strictly for:
+a) Non-commercial academic research and linguistic preservation.
+b) Non-commercial educational applications and tools.
+c) Personal learning and study.
+
+4. ATTRIBUTION
+Any public, educational, or academic use of this data must include clear
+attribution to the SpeechMate project as the source dataset, alongside
+acknowledgment of the original indigenous communities.
+
+5. RESTRICTIONS
+a) You may not use this data to train commercial AI, ML, or LLM models.
+b) You may not claim ownership or copyright over any portion of the data.
+c) You may not distribute the data under terms less restrictive than this license.
+
+6. COMMERCIAL EXEMPTIONS
+Any commercial use requires prior, explicit, written consent from the
+appropriate tribal councils or governmental bodies representing these
+indigenous groups (e.g., the Department of Tribal Welfare, Andaman &
+Nicobar Administration).
+
+By accessing or using the data files in this repository, you agree to abide
+by these terms out of respect for the indigenous communities.
