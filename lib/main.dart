@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:speechmate/screens/emotional_splash_screen.dart';
+import 'package:speechmate/screens/general_splash_screen.dart';
 import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/core/app_theme.dart';
 
@@ -136,7 +136,7 @@ class MyApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: const EmotionalSplashScreen(nextScreen: LanguageSelectionScreen()),
+      home: const GeneralSplashScreen(nextScreen: LanguageSelectionScreen()),
     );
   }
 }

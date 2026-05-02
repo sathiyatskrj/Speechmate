@@ -6,9 +6,9 @@ name: Build & Release
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "speechmate_general" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "speechmate_general" ]
   workflow_dispatch:  # Allow manual trigger
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -116,10 +116,10 @@ jobs:
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          name: "${{ env.APP_NAME }} v${{ env.APP_VERSION }}"
-          tag_name: "v${{ env.APP_VERSION }}"
+          name: "${{ github.ref_name == 'speechmate_general' && format('{0} v{1} (General Public)', env.APP_NAME, env.APP_VERSION) || format('{0} v{1}', env.APP_NAME, env.APP_VERSION) }}"
+          tag_name: "v${{ env.APP_VERSION }}${{ github.ref_name == 'speechmate_general' && '-public' || '' }}"
           body: |
-            ## 📦 SpeechMate v${{ env.APP_VERSION }} — Offline Demo Build
+            ## 📦 SpeechMate v${{ env.APP_VERSION }} — ${{ github.ref_name == 'speechmate_general' && 'General Public Release' || 'Offline Demo Build' }}
             
             🔧 **All 20 audit issues resolved**
             🎤 Voice translator fixed (multi-recording support)
@@ -201,8 +201,8 @@ jobs:
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          name: "${{ env.APP_NAME }} v${{ env.APP_VERSION }}"
-          tag_name: "v${{ env.APP_VERSION }}"
+          name: "${{ github.ref_name == 'speechmate_general' && format('{0} v{1} (General Public)', env.APP_NAME, env.APP_VERSION) || format('{0} v{1}', env.APP_NAME, env.APP_VERSION) }}"
+          tag_name: "v${{ env.APP_VERSION }}${{ github.ref_name == 'speechmate_general' && '-public' || '' }}"
           files: build/ios/iphoneos/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-unsigned.ipa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
