@@ -1,17 +1,17 @@
 <p align="center">
-  <img src="assets/icons/banner_hero.png" width="100%" alt="SpeechMate — Andaman & Nicobar Translation Hub">
+  <img src="assets/icons/banner_hero.png" width="100%" alt="SpeechMate — Offline Tribal Language Learning">
 </p>
 
-<h1 align="center">SPEECHMATE: General Public & Tourism Edition</h1>
+<h1 align="center">SPEECHMATE</h1>
 
 <p align="center">
-  <strong>The ultimate offline language and culture companion for the Andaman &amp; Nicobar Islands.</strong><br>
-  <em>Built for travelers, researchers, and language enthusiasts bridging the communication gap.</em>
+  <strong>Offline-first language learning for endangered Nicobarese and Great Andamanese languages.</strong><br>
+  <em>Built for tribal primary schools in the Andaman &amp; Nicobar Islands.</em>
 </p>
 
 <p align="center">
   <a href="#">
-    <img src="https://img.shields.io/badge/Stage-General_Public_Prototype-blue?style=for-the-badge" alt="General Public Prototype" />
+    <img src="https://img.shields.io/badge/Stage-Pre--Pilot_Prototype-orange?style=for-the-badge" alt="Pre-Pilot Prototype" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter 3.29+" />
@@ -20,14 +20,14 @@
     <img src="https://img.shields.io/badge/Offline--First-Core_Features-00C853?style=for-the-badge" alt="Offline-First" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/Target-Tourists_%26_General_Public-FF6B6B?style=for-the-badge" alt="Tourists & Public" />
+    <img src="https://img.shields.io/badge/Target-Ages_6–14-FF6B6B?style=for-the-badge" alt="Ages 6-14" />
   </a>
 </p>
 
 <p align="center">
   <a href="#-the-problem">🌍 Problem</a> •
   <a href="#-core-value">🎯 Core</a> •
-  <a href="#-features-for-travelers">🧳 Features</a> •
+  <a href="#-status">📊 Status</a> •
   <a href="#-why-speechmate">⚡ Why Us</a> •
   <a href="#-installation">🚀 Install</a> •
   <a href="#-license">📜 License</a>
@@ -37,65 +37,72 @@
 
 ## 🌍 The Problem
 
-> *"A traveler arrives in the remote islands of the Andaman and Nicobar archipelago. Between the indigenous communities speaking Nicobarese or Great Andamanese, and the local settlers speaking Hindi, Tamil, Bengali, or Malayalam, the language barrier is immense. With virtually zero internet connectivity on these remote islands, cloud-based translators are useless."*
+> *"A Nicobarese child walks into a government school in Car Nicobar. The teacher speaks Hindi. The textbook is in English. The child's mother tongue — spoken by fewer than 30,000 people — has no place in the classroom. By the time she graduates, she may no longer speak it."*
 
-The Andaman & Nicobar Islands are a melting pot of languages and cultures, including critically endangered indigenous languages like **Car Nicobarese** and **Aka-Jeru (Great Andamanese)**. 
+**Car Nicobarese** and **Great Andamanese** are critically endangered. There are **no widely accessible or child-focused digital tools** for learning them. Children in these schools cannot bridge the gap between their mother tongue and the medium of instruction — not because they lack ability, but because offline-first tools tailored for tribal classrooms don't exist.
 
-Currently, there are **no digital tools** that allow tourists, anthropologists, or general citizens to effectively bridge this gap offline.
+- A language dies every **14 days** globally.
+- The Andaman & Nicobar school system has no tribal-language digital curriculum.
+- Remote islands have **unreliable or zero internet connectivity** — cloud-based tools don't work here.
 
-- The islands have **unreliable or zero internet connectivity** — standard apps like Google Translate fail entirely for niche regional and tribal languages.
-- Visitors lose out on deep **cultural immersion** because they cannot communicate with the locals.
-- Endangered languages remain inaccessible to the wider public, accelerating their decline.
-
-**SpeechMate (General Edition)** is built to solve this. It provides a robust, offline-first translation hub tailored specifically for the linguistic landscape of the Andaman & Nicobar Islands.
+**SpeechMate** is an attempt to build that missing tool. It is a **pre-pilot prototype** — functional, but not yet validated in schools.
 
 ---
 
 ## 🎯 Core Value
 
-**One sentence:** An offline, voice-enabled translation and cultural immersion hub for anyone visiting or interacting with the Andaman & Nicobar Islands.
+**One sentence:** Offline voice-based Nicobarese vocabulary learning for tribal primary school children and their teachers.
 
 **Two features that matter most:**
 
 | Feature | What it does | Status |
 | :--- | :--- | :--- |
-| **🎙️ Omni-Lingual Translation** | Speak in English/Hindi/Tamil/Bengali/Telugu/Malayalam → translate to local languages | ✅ Working |
-| **📸 AR & OCR Scanning** | Point your camera at signs or documents to translate them instantly offline | ✅ Working |
+| **🎙️ Voice Translation** | Speak in Hindi/Tamil/Bengali/Telugu → hear Nicobarese audio | ✅ Working |
+| **📚 Vocabulary Learning** | 12 categories, 2,400+ words, games, flashcards, spaced repetition | ✅ Working |
 
-Everything else in this app is designed to help users explore, understand, and respect the local culture.
+Everything else in this app supports these two features or is exploratory.
 
 ---
 
-## 🧳 Features for Travelers & The Public
+## 📊 Status (Honest)
 
-This edition strips away the classroom elements of the core app and focuses entirely on real-world utility for the general public:
+This is a **pre-pilot prototype**. Here is what each feature's status actually is:
 
-| Feature | Use Case for Tourists | Status |
+| Feature | Status | Notes |
 | :--- | :--- | :--- |
-| **Regional Translators** | Translate Hindi, Tamil, Bengali, Telugu, and Malayalam locally | ✅ Working |
-| **Tribal Dictionaries** | Access 2,400+ words in Nicobarese and Great Andamanese | ✅ Working |
-| **On-device Voice STT** | Speak directly into the app for hands-free translation (Whisper) | ✅ Working |
-| **Camera Translator** | Scan local restaurant menus, signs, or documents | ✅ Working |
-| **Common Phrases** | Quick-access to survival phrases (greetings, directions, food) | ✅ Working |
-| **Cultural Hub** | Learn about the heritage, traditions, and history of the tribes | 🧪 *Coming Soon* |
-| **Community Board** | Connect with other travelers and local guides | 🧪 *Coming Soon* |
-| **AR Translator** | Live object detection with translated overlays | ⚠️ *Experimental* |
+| Nicobarese dictionary (2,400+ words) | ✅ **Working** | JSON lexicons, seeded to SQLite |
+| Word learning games (4 games) | ✅ **Working** | Match, Flashcards, Scramble, Runner |
+| SM-2 Spaced Repetition (SRS) | ✅ **Working** | Standard Anki-style algorithm |
+| XP / leveling / daily missions | ✅ **Working** | Deterministic, no backend needed |
+| Regional language translation (4 lang) | ✅ **Working** | Google ML Kit offline models |
+| On-device STT (Whisper Base) | ✅ **Working** | Via NDK 27 C++ — tested on mid-range Android |
+| Teacher dashboard | ✅ **Working** | Phrase bank, quiz mode, OCR scanner |
+| AR object → Nicobarese overlay | ⚠️ **Partial** | Works on static images; live video overlay is experimental |
+| Malayalam translation | ⚠️ **Partial** | Requires internet (cloud fallback) |
+| Great Andamanese hub | ⚠️ **Partial** | Lexicon loaded; voice + OCR functional, community features UI-only |
+| Omni-Broadcast (5 languages at once) | 🧪 **Experimental** | Architecture built; latency on low-end devices not validated |
+| Dialect heatmap, Culture Hub | 🧪 **Experimental** | UI complete; data is placeholder |
+| P2P sync, Document translation | 🧪 **Experimental** | Feature works but no field testing |
+| Virtual pet | 🧪 **Experimental** | Functional; pedagogical value untested |
 
-> **Note:** This version skips role-selection and dives straight into the unified Dashboard.
+> **Not yet done:** User testing, accuracy benchmarks, school deployment, community audio recordings.
 
 ---
 
 ## ⚡ Why SpeechMate?
 
-| Feature | Google Translate | Traditional Phrasebooks | SpeechMate (General Edition) |
-| :--- | :--- | :--- | :--- |
-| **Tribal Languages** | No Nicobarese/Aka-Jeru | Extremely rare/outdated | ✅ Full Support |
-| **Connectivity Required** | Yes (for lesser known langs) | None | ✅ Works fully offline* |
-| **Voice Translation** | Yes | No | ✅ Built-in offline STT |
-| **Camera Translation** | Yes | No | ✅ Supported |
-| **Cultural Context** | None | Limited | ✅ Built-in Culture Hub |
+| Feature | Google Translate | Duolingo | Offline Dictionary Apps | SpeechMate |
+| :--- | :--- | :--- | :--- | :--- |
+| **Tribal Languages** | No Nicobarese support | No Nicobarese support | No tribal languages | ✅ Nicobarese & G. Andamanese |
+| **Connectivity** | Requires internet | Requires internet | ✅ Works offline | ✅ Works fully offline* |
+| **Target Audience** | General audience | ✅ Child-focused | General audience | ✅ Built for ages 6–14 |
+| **Classroom Fit** | Not designed for tribal classrooms | Not designed for tribal classrooms | Not designed for tribal classrooms | ✅ Tailored for tribal classrooms |
+| **Educator Tools** | None | Schools edition | None | ✅ Custom teacher dashboard |
+| **Voice Learning** | ✅ Supported | ✅ Supported | No voice features | ✅ Supported |
 
-> *\*Core vocabulary, Whisper STT, and translation algorithms run 100% on-device.*
+> *\*Core vocabulary and translation is offline. AR overlay and Malayalam use partial online features.*
+
+**The gap is real.** No tool — commercial or academic — currently supports Nicobarese or Great Andamanese language learning for children.
 
 ---
 
@@ -110,24 +117,48 @@ Flutter UI (Riverpod)
     └── DatabaseManager (SQLite) — All linguistic data, locally stored
 ```
 
-> No generative AI or cloud LLMs. All translation is deterministic dictionary + algorithmic NLP, ensuring zero data privacy leaks.
+**Translation pipeline (7 meaningful stages):**
+Dictionary lookup → Bigram/Trigram phrase match → Stemming → Synonym expansion → Soundex phonetic fallback → Compound word split → Levenshtein fuzzy match.
+
+> No generative AI or cloud LLMs. All translation is deterministic dictionary + algorithmic NLP.
 
 ### Technical Specs
 
 | Metric | Value | Notes |
 | :--- | :--- | :--- |
 | App size | ~250 MB | Includes 141 MB Whisper model |
-| STT latency | ~600ms | Tested on a mid-range Android (Snapdragon 6xx). |
+| STT latency | ~600ms | Tested on a mid-range Android (Snapdragon 6xx). Low-end devices not benchmarked. |
 | Translation speed | <100ms | SQLite indexed lookup |
+| Dictionary | 2,400+ entries | Core Nicobarese lexicon |
 | Min Android | API 24 | Android 7.0+ |
+
+---
+
+## 🛤️ Roadmap
+
+### Phase 1 — Validation (Next)
+- [ ] Pilot in 2–3 A&N tribal schools with ~30 students
+- [ ] Collect teacher feedback on classroom usability
+- [ ] Community recording program with tribal elders
+- [ ] Benchmark STT latency on low-end school devices
+
+### Phase 2 — Refinement (Post-Pilot)
+- [ ] Lean APK build (<50 MB, Whisper-optional)
+- [ ] Validated accuracy metrics for translation
+- [ ] Onges language module
+
+### Phase 3 — Scale (Future)
+- [ ] Cloud sync for community content
+- [ ] On-device LLM for generative practice (SmolLM2 GGUF)
+- [ ] Government curriculum integration
 
 ---
 
 ## 🚀 Installation
 
 ```bash
-# 1. Clone the General branch
-git clone -b speechmate_general https://github.com/sathiyatskrj/Speechmate.git
+# 1. Clone
+git clone https://github.com/sathiyatskrj/Speechmate.git
 cd Speechmate
 
 # 2. Install dependencies
@@ -144,6 +175,16 @@ flutter run
 
 ---
 
+## 📂 Additional Documentation
+
+| Document | Contents |
+| :--- | :--- |
+| [`/docs/architecture.md`](docs/architecture.md) | Full system architecture, service layer, Mermaid diagrams |
+| [`/docs/features.md`](docs/features.md) | Complete feature list for all modules |
+| [`/docs/data.md`](docs/data.md) | Lexicon structure, JSON format, how to add languages |
+
+---
+
 ## 📜 Licensing
 
 SpeechMate uses a **split-licensing model** to keep the source code open while strictly protecting indigenous data sovereignty.
@@ -157,10 +198,13 @@ All dictionary entries, audio recordings, and cultural content (located in `asse
 **Key rules for the data:**
 - 🚫 **No Commercial Use:** You may not sell, monetize, or use the data in commercial products without written consent from the relevant tribal council.
 - 🚫 **No AI Training:** You may not use this data to train commercial AI or LLMs.
-- ✅ **Educational/Tourism Use:** You may use the data freely for non-commercial research, personal learning, and respectful tourism tools with proper attribution.
+- ✅ **Educational/Research Use:** You may use the data freely for non-commercial research, personal learning, and educational tools with proper attribution.
+
+> **Summary:** You can fork and build upon the app's code freely under Apache 2.0, but the tribal language data is strictly protected under CC BY-NC 4.0 and cannot be exploited for profit.
 
 ---
 
 <p align="center">
-  Bridging the gap between travelers and the rich heritage of the Andaman &amp; Nicobar Islands.
+  Built for the tribal communities of the Andaman &amp; Nicobar Islands.<br>
+  <em>Pre-pilot prototype — not yet validated in schools.</em>
 </p>
