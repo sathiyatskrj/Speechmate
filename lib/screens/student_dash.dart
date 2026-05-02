@@ -81,7 +81,7 @@ class _StudentDashState extends State<StudentDash>
 
   void _onClear() => clearMixinSearch(searchController);
 
-  List<Map<String, dynamic>> get learningTiles => [
+  late final List<Map<String, dynamic>> learningTiles = [
         // ═══════════════════════════════════════════════════
         // 🌐 TRANSLATION TOOLS (Top Priority for Public)
         // ═══════════════════════════════════════════════════
@@ -295,7 +295,7 @@ class _StudentDashState extends State<StudentDash>
         body: Stack(
           children: [
             // Vibrant Background for Glassmorphism
-            const AmbientGlassBackground(),
+            const RepaintBoundary(child: AmbientGlassBackground()),
             SafeArea(
               child: Column(
                 children: [
@@ -329,8 +329,8 @@ class _StudentDashState extends State<StudentDash>
                 ],
               ),
             ),
-            VirtualPetCompanion(onPetHappy: _triggerConfetti),
-            ConfettiOverlay(trigger: _showConfetti),
+            RepaintBoundary(child: VirtualPetCompanion(onPetHappy: _triggerConfetti)),
+            RepaintBoundary(child: ConfettiOverlay(trigger: _showConfetti)),
           ],
         ),
       ),
@@ -449,69 +449,59 @@ class _StudentDashState extends State<StudentDash>
               context, MaterialPageRoute(builder: (_) => tile['navigateTo']));
         }
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    (tile['colors'][0] as Color).withValues(alpha: 0.7),
-                    (tile['colors'][1] as Color).withValues(alpha: 0.5),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.5), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                      color:
-                          (tile['colors'][0] as Color).withValues(alpha: 0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8))
-                ]),
-            child: Stack(
-              children: [
-                // Large watermark icon for depth
-                Positioned(
-                  right: isShort ? -5 : -15,
-                  bottom: isShort ? -15 : -25,
-                  child: Opacity(
-                      opacity: 0.1,
-                      child: Icon(tile['icon'],
-                          size: isShort ? 70 : 120, color: Colors.white)),
-                ),
-                // Optional Animated Sparkles for kids
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Icon(Icons.star_rounded,
-                          color: Colors.white.withValues(alpha: 0.5), size: 28)
-                      .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true))
-                      .scaleXY(end: 1.3, duration: 800.ms),
-                ),
-                Positioned.fill(
-                  child: Padding(
-                    padding: EdgeInsets.all(isShort ? 12 : 16),
-                    child: isShort
-                        ? _buildShortLayout(tile)
-                        : _buildNormalLayout(tile, isWide),
-                  ),
-                ),
+      child: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                (tile['colors'][0] as Color).withValues(alpha: 0.7),
+                (tile['colors'][1] as Color).withValues(alpha: 0.5),
               ],
             ),
-          ),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+                color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                  color:
+                      (tile['colors'][0] as Color).withValues(alpha: 0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8))
+            ]),
+        child: Stack(
+          children: [
+            // Large watermark icon for depth
+            Positioned(
+              right: isShort ? -5 : -15,
+              bottom: isShort ? -15 : -25,
+              child: Opacity(
+                  opacity: 0.1,
+                  child: Icon(tile['icon'],
+                      size: isShort ? 70 : 120, color: Colors.white)),
+            ),
+            // Static sparkle accent (no animation controller)
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Icon(Icons.star_rounded,
+                      color: Colors.white.withValues(alpha: 0.4), size: 24),
+            ),
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.all(isShort ? 12 : 16),
+                child: isShort
+                    ? _buildShortLayout(tile)
+                    : _buildNormalLayout(tile, isWide),
+              ),
+            ),
+          ],
         ),
       ),
     )
         .animate()
-        .fadeIn(delay: (index * 40).ms)
-        .scale(curve: Curves.easeOutBack, duration: 500.ms);
+        .fadeIn(delay: (index.clamp(0, 5) * 40).ms)
+        .scale(curve: Curves.easeOutBack, duration: 400.ms);
   }
 
   Widget _buildShortLayout(Map<String, dynamic> tile) {
@@ -760,49 +750,51 @@ class _AmbientPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Base gradient
+    // Base gradient — clean white-to-ice blue
     final Rect rect = Offset.zero & size;
     final Paint bgPaint = Paint()
       ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFE0C3FC), Color(0xFF8EC5FC), Color(0xFFE0C3FC)],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFFE8F5FE), Color(0xFFF0FFFE), Color(0xFFE0F7FA)],
       ).createShader(rect);
     canvas.drawRect(rect, bgPaint);
 
-    // FAST HARDWARE ACCELERATED GRADIENTS (FIXES HANGING ON PHONES)
-    // Replaced MaskFilter.blur which kills mobile performance with RadialGradients.
+    // FAST HARDWARE ACCELERATED GRADIENTS
     void drawFastGlowingOrb(double x, double y, double radius, Color color) {
       final rect = Rect.fromCircle(center: Offset(x, y), radius: radius);
       final paint = Paint()
         ..shader = RadialGradient(
-          colors: [color.withValues(alpha: 0.5), color.withValues(alpha: 0.0)],
+          colors: [color.withValues(alpha: 0.45), color.withValues(alpha: 0.0)],
           stops: const [0.1, 1.0],
         ).createShader(rect);
       canvas.drawRect(rect, paint);
     }
 
+    // Orb 1 — Electric blue (top area)
     final double x1 =
         size.width * 0.5 + math.sin(progress * math.pi * 2) * size.width * 0.4;
-    final double y1 = size.height * 0.3 +
-        math.cos(progress * math.pi * 2) * size.height * 0.2;
-    drawFastGlowingOrb(x1, y1, 300, Colors.cyanAccent);
+    final double y1 = size.height * 0.25 +
+        math.cos(progress * math.pi * 2) * size.height * 0.15;
+    drawFastGlowingOrb(x1, y1, 300, const Color(0xFF00B0FF));
 
+    // Orb 2 — Vivid teal (bottom-left)
     final double x2 = size.width * 0.2 +
         math.cos(progress * math.pi * 2 + math.pi) * size.width * 0.3;
-    final double y2 = size.height * 0.8 +
-        math.sin(progress * math.pi * 2 + math.pi) * size.height * 0.3;
-    drawFastGlowingOrb(x2, y2, 350, Colors.pinkAccent);
+    final double y2 = size.height * 0.75 +
+        math.sin(progress * math.pi * 2 + math.pi) * size.height * 0.2;
+    drawFastGlowingOrb(x2, y2, 320, const Color(0xFF00E5FF));
 
+    // Orb 3 — Bright lime green (right side)
     final double x3 = size.width * 0.8 +
-        math.sin(progress * math.pi * 2 + math.pi / 2) * size.width * 0.3;
+        math.sin(progress * math.pi * 2 + math.pi / 2) * size.width * 0.25;
     final double y3 = size.height * 0.5 +
-        math.cos(progress * math.pi * 2 + math.pi / 2) * size.height * 0.4;
-    drawFastGlowingOrb(x3, y3, 280, Colors.purpleAccent);
+        math.cos(progress * math.pi * 2 + math.pi / 2) * size.height * 0.3;
+    drawFastGlowingOrb(x3, y3, 260, const Color(0xFF69F0AE));
   }
 
   @override
-  bool shouldRepaint(covariant _AmbientPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _AmbientPainter oldDelegate) => oldDelegate.progress != progress;
 }
 
 // ----------------------------------------------------------------------------
@@ -1174,7 +1166,8 @@ class _RadarChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _RadarChartPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _RadarChartPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
 
 // ----------------------------------------------------------------------------
@@ -2242,7 +2235,7 @@ class _ConfettiPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ConfettiPainter old) => true;
+  bool shouldRepaint(covariant _ConfettiPainter old) => old.t != t;
 }
 
 // ============================================================================
@@ -2411,5 +2404,5 @@ class _WaveformPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WaveformPainter old) => true;
+  bool shouldRepaint(covariant _WaveformPainter old) => old.t != t;
 }

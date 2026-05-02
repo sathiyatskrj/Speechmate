@@ -197,7 +197,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: const Color(0xFFECF8FF),
       body: GestureDetector(
         onTap: () {
           if (_mainController.value > 0.3) _skipSplash();
@@ -260,20 +260,20 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Color(0xFF00D2FF),
-                                  Color(0xFF3A7BD5),
+                                  Color(0xFF00B0FF),
+                                  Color(0xFF00E5FF),
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF00D2FF)
-                                      .withValues(alpha: 0.4),
+                                  color: const Color(0xFF00B0FF)
+                                      .withValues(alpha: 0.35),
                                   blurRadius: 30 * _logoScale.value,
-                                  spreadRadius: 8,
+                                  spreadRadius: 5,
                                 ),
                                 BoxShadow(
-                                  color: const Color(0xFF3A7BD5)
-                                      .withValues(alpha: 0.3),
+                                  color: const Color(0xFF00E5FF)
+                                      .withValues(alpha: 0.2),
                                   blurRadius: 50,
                                   spreadRadius: 2,
                                 ),
@@ -292,7 +292,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                                     fit: BoxFit.cover,
                                     errorBuilder: (c, o, s) => const Icon(
                                         Icons.language,
-                                        color: Color(0xFF3A7BD5),
+                                        color: Color(0xFF00B0FF),
                                         size: 60),
                                   ),
                                 ),
@@ -313,9 +313,9 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                             shaderCallback: (bounds) =>
                                 const LinearGradient(
                               colors: [
-                                Color(0xFF00D2FF),
-                                Color(0xFF7B2FFF),
-                                Color(0xFFFF6B6B),
+                                Color(0xFF0091EA),
+                                Color(0xFF00BFA5),
+                                Color(0xFF2979FF),
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -330,8 +330,8 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                                 height: 1.0,
                                 shadows: [
                                   Shadow(
-                                      color: Colors.black
-                                          .withValues(alpha: 0.3),
+                                      color: const Color(0xFF0091EA)
+                                          .withValues(alpha: 0.25),
                                       blurRadius: 15,
                                       offset: const Offset(0, 5))
                                 ],
@@ -357,8 +357,8 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: Colors.white.withValues(
-                                      alpha: 0.6 +
+                                  color: const Color(0xFF37474F).withValues(
+                                      alpha: 0.5 +
                                           (0.3 * _pulseController.value)),
                                   letterSpacing: 2.5,
                                 ),
@@ -378,10 +378,10 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                           runSpacing: 8,
                           alignment: WrapAlignment.center,
                           children: [
-                            _featureBadge("🎙️ Voice", const Color(0xFFFF6B6B)),
-                            _featureBadge("📸 Camera", const Color(0xFF00D2FF)),
-                            _featureBadge("🌐 Offline", const Color(0xFF00E676)),
-                            _featureBadge("🏝️ Islands", const Color(0xFFFFAB40)),
+                            _featureBadge("🎙️ Voice", const Color(0xFF0091EA)),
+                            _featureBadge("📸 Camera", const Color(0xFF00BFA5)),
+                            _featureBadge("🌐 Offline", const Color(0xFF00C853)),
+                            _featureBadge("🏝️ Islands", const Color(0xFF2979FF)),
                           ],
                         ),
                       ),
@@ -411,16 +411,16 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                             value: _loadProgress,
                             minHeight: 4,
                             backgroundColor:
-                                Colors.white.withValues(alpha: 0.08),
+                                const Color(0xFF0091EA).withValues(alpha: 0.12),
                             valueColor: const AlwaysStoppedAnimation(
-                                Color(0xFF00D2FF)),
+                                Color(0xFF00B0FF)),
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Preparing your experience...',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.3),
+                            color: const Color(0xFF546E7A).withValues(alpha: 0.5),
                             fontSize: 11,
                             letterSpacing: 1,
                           ),
@@ -444,7 +444,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                     child: Text(
                       'TAP TO CONTINUE',
                       style: TextStyle(
-                        color: Colors.white38,
+                        color: const Color(0xFF90A4AE),
                         fontSize: 11,
                         letterSpacing: 3,
                         fontWeight: FontWeight.w300,
@@ -468,7 +468,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                     child: Text(
                       'v1.4.8 • General Edition',
                       style: TextStyle(
-                        color: Colors.white24,
+                        color: const Color(0xFFB0BEC5),
                         fontSize: 11,
                         letterSpacing: 1.5,
                         fontWeight: FontWeight.w300,
@@ -517,66 +517,57 @@ class _GradientWavePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Deep dark base
+    // Crisp white-to-ice base
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFF0A0E21),
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFE8F5FE), Color(0xFFF0FFFE), Color(0xFFE0F7FA)],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
     );
 
-    // Animated aurora blobs
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Blob 1 — Cyan top-right
+    // Blob 1 — Electric blue (top-right)
     final blob1Center = Offset(
       size.width * (0.7 + 0.15 * math.sin(progress * 2 * math.pi)),
       size.height * (0.2 + 0.1 * math.cos(progress * 2 * math.pi)),
     );
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFF00D2FF).withValues(alpha: 0.25 + 0.1 * pulse),
-        const Color(0xFF00D2FF).withValues(alpha: 0.0),
+        const Color(0xFF00B0FF).withValues(alpha: 0.35 + 0.1 * pulse),
+        const Color(0xFF00B0FF).withValues(alpha: 0.0),
       ],
     ).createShader(Rect.fromCircle(center: blob1Center, radius: size.width * 0.45));
     canvas.drawCircle(blob1Center, size.width * 0.45, paint);
 
-    // Blob 2 — Purple bottom-left
+    // Blob 2 — Vivid teal (bottom-left)
     final blob2Center = Offset(
       size.width * (0.25 + 0.12 * math.cos(progress * 2 * math.pi + 1)),
       size.height * (0.75 + 0.08 * math.sin(progress * 2 * math.pi + 1)),
     );
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFF7B2FFF).withValues(alpha: 0.2 + 0.1 * pulse),
-        const Color(0xFF7B2FFF).withValues(alpha: 0.0),
+        const Color(0xFF00E5FF).withValues(alpha: 0.3 + 0.1 * pulse),
+        const Color(0xFF00E5FF).withValues(alpha: 0.0),
       ],
     ).createShader(Rect.fromCircle(center: blob2Center, radius: size.width * 0.5));
     canvas.drawCircle(blob2Center, size.width * 0.5, paint);
 
-    // Blob 3 — Pink/coral center-bottom
+    // Blob 3 — Bright lime green (center-right)
     final blob3Center = Offset(
       size.width * (0.55 + 0.1 * math.sin(progress * 2 * math.pi + 2.5)),
       size.height * (0.55 + 0.12 * math.cos(progress * 2 * math.pi + 2.5)),
     );
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFFFF6B6B).withValues(alpha: 0.15 + 0.08 * pulse),
-        const Color(0xFFFF6B6B).withValues(alpha: 0.0),
+        const Color(0xFF69F0AE).withValues(alpha: 0.25 + 0.08 * pulse),
+        const Color(0xFF69F0AE).withValues(alpha: 0.0),
       ],
     ).createShader(Rect.fromCircle(center: blob3Center, radius: size.width * 0.4));
     canvas.drawCircle(blob3Center, size.width * 0.4, paint);
-
-    // Blob 4 — Amber/gold top-left accent
-    final blob4Center = Offset(
-      size.width * (0.15 + 0.1 * math.sin(progress * 2 * math.pi + 4)),
-      size.height * (0.15 + 0.06 * math.cos(progress * 2 * math.pi + 4)),
-    );
-    paint.shader = RadialGradient(
-      colors: [
-        const Color(0xFFFFAB40).withValues(alpha: 0.12 + 0.06 * pulse),
-        const Color(0xFFFFAB40).withValues(alpha: 0.0),
-      ],
-    ).createShader(Rect.fromCircle(center: blob4Center, radius: size.width * 0.3));
-    canvas.drawCircle(blob4Center, size.width * 0.3, paint);
   }
 
   @override
@@ -601,12 +592,12 @@ class _FloatingParticle {
 
   static Color _randomColor(math.Random r) {
     final colors = [
-      const Color(0xFF00D2FF),
-      const Color(0xFF7B2FFF),
-      const Color(0xFFFF6B6B),
-      const Color(0xFF00E676),
-      const Color(0xFFFFAB40),
-      Colors.white,
+      const Color(0xFF00B0FF),
+      const Color(0xFF00E5FF),
+      const Color(0xFF69F0AE),
+      const Color(0xFF00BFA5),
+      const Color(0xFF2979FF),
+      const Color(0xFF80D8FF),
     ];
     return colors[r.nextInt(colors.length)];
   }

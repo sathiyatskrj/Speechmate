@@ -32,7 +32,7 @@ class _LanguagesState extends State<Languages> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.onboardingDeep,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -41,7 +41,7 @@ class _LanguagesState extends State<Languages> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppColors.studentAccent.withValues(alpha: 0.4), Colors.black],
+                colors: [AppColors.onboardingStart.withValues(alpha: 0.5), AppColors.onboardingDeep],
               ),
             ),
           ),

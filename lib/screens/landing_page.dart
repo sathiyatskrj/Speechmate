@@ -42,13 +42,13 @@ class _LandingPageState extends State<LandingPage> {
     } else if (selectedRole == 'teacher') {
       baseColor = Colors.blueAccent;
     } else {
-      // Adaptive Season background for neutral
-      baseColor = AppColors.studentAccent;
+      // Matches splash screen palette for visual continuity
+      baseColor = AppColors.onboardingStart;
     }
     
     final currentGradient = [
        baseColor,
-       Colors.black,
+       AppColors.onboardingDeep,
     ];
 
     return PopScope(
