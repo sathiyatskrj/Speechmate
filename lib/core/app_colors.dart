@@ -11,6 +11,11 @@ class AppColors {
     Color(0xFF000000), 
   ];
 
+  // --- Onboarding Flow (matches splash screen palette) ---
+  static const Color onboardingStart = Color(0xFF4FACFE);
+  static const Color onboardingMid = Color(0xFF00F2FE);
+  static const Color onboardingDeep = Color(0xFF0A1628);
+
   // --- Teacher Palette (Static Premium) ---
   static const Color teacherPrimary = Color(0xFF1A237E); 
   static const Color teacherAccent = Color(0xFF00E5FF); 
