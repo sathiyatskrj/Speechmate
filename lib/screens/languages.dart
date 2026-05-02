@@ -72,7 +72,7 @@ class _LanguagesState extends State<Languages> {
                           langCode: "nc", 
                           colors: [const Color(0xFFE91E63), const Color(0xFFFF6F00)], 
                           icon: Icons.map,
-                          onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const StudentDash())),
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentDash())),
                         ),
                         _buildLanguageButton(
                           label: "Aka-Jeru (Great Andamanese)", 

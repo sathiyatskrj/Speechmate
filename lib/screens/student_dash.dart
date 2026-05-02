@@ -49,6 +49,7 @@ class _StudentDashState extends State<StudentDash>
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
   bool _showConfetti = false;
+  bool _isInitFinished = false;
 
   void _triggerConfetti() {
     setState(() => _showConfetti = true);
@@ -61,8 +62,22 @@ class _StudentDashState extends State<StudentDash>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ttsService.init();
-    initSearch();
+    _initializeServices();
+  }
+
+  Future<void> _initializeServices() async {
+    try {
+      await ttsService.init();
+      await initSearch();
+      await dashSearchNeuralEngine.init();
+    } catch (e) {
+      debugPrint("StudentDash initialization error: $e");
+    }
+    if (mounted) {
+      setState(() {
+        _isInitFinished = true;
+      });
+    }
   }
 
   @override
@@ -287,6 +302,15 @@ class _StudentDashState extends State<StudentDash>
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitFinished) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF0F4F8),
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.cyanAccent),
+        ),
+      );
+    }
+
     return Theme(
       data: AppTheme.studentTheme,
       child: Scaffold(

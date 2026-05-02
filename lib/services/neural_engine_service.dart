@@ -117,7 +117,12 @@ class NeuralEngineService {
 
   Future<void> init() async {
     if (_isInit) return;
-    _wordCache = await _dictionaryService.loadDictionary(DictionaryType.words);
+    try {
+      _wordCache = await _dictionaryService.loadDictionary(DictionaryType.words);
+      await _llmService.initialize();
+    } catch (e) {
+      debugPrint("🧠 NeuralEngine init error: $e");
+    }
     _isInit = true;
     debugPrint("🧠 NeuralEngine v2.0: Online and Ready (${_wordCache.length} words cached)");
   }
