@@ -6,9 +6,9 @@ name: Build & Release
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "speechmate_general" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "speechmate_general" ]
   workflow_dispatch:  # Allow manual trigger
 
 # ─────────────────────────────────────────────────────────────────────────────
