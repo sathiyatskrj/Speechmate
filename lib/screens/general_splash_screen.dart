@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'dart:math' as math;
+import 'package:audioplayers/audioplayers.dart';
 
 class GeneralSplashScreen extends StatefulWidget {
   final Widget nextScreen;
@@ -34,6 +35,9 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
   final int _particleCount = 25;
   final List<_FloatingParticle> _particles = [];
   final math.Random _random = math.Random();
+
+  // Ambient Audio
+  final AudioPlayer _ambientPlayer = AudioPlayer();
 
   // Taglines
   int _currentTagline = 0;
@@ -140,7 +144,37 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
       }
     });
 
+    _playAmbientAudio();
     _preloadData();
+  }
+
+  Future<void> _playAmbientAudio() async {
+    try {
+      await _ambientPlayer.setVolume(0.0);
+      await _ambientPlayer.setReleaseMode(ReleaseMode.loop);
+      await _ambientPlayer.setSource(AssetSource('audio/ambient.mp3'));
+      await _ambientPlayer.resume();
+      await _ambientPlayer.seek(const Duration(seconds: 2));
+      for (int i = 1; i <= 10; i++) {
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (!mounted) return;
+        await _ambientPlayer.setVolume(i * 0.04);
+      }
+    } catch (e) {
+      debugPrint('[Splash] Ambient audio error: $e');
+    }
+  }
+
+  Future<void> _fadeOutAudio() async {
+    try {
+      for (int i = 8; i >= 0; i--) {
+        await Future.delayed(const Duration(milliseconds: 50));
+        await _ambientPlayer.setVolume(i * 0.04);
+      }
+      await _ambientPlayer.stop();
+    } catch (e) {
+      debugPrint('[Splash] Audio fade error: $e');
+    }
   }
 
   Future<void> _preloadData() async {
@@ -168,7 +202,8 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
     }
   }
 
-  void _navigateNext() {
+  void _navigateNext() async {
+    await _fadeOutAudio();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -191,6 +226,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
     _mainController.dispose();
     _pulseController.dispose();
     _waveController.dispose();
+    _ambientPlayer.dispose();
     super.dispose();
   }
 

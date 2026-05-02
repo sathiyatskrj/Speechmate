@@ -159,7 +159,9 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
   Future<void> _playAmbientAudio() async {
     try {
       await _ambientPlayer.setVolume(0.0);
-      await _ambientPlayer.play(AssetSource('audio/ambient.mp3'));
+      await _ambientPlayer.setReleaseMode(ReleaseMode.loop);
+      await _ambientPlayer.setSource(AssetSource('audio/ambient.mp3'));
+      await _ambientPlayer.resume();
       await _ambientPlayer.seek(const Duration(seconds: 2)); // Start music from 2 sec
       // Fade in volume
       for (int i = 1; i <= 10; i++) {

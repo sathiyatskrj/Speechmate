@@ -28,22 +28,26 @@ class TtsService {
 
   /// Call this once (ex: in initState)
   Future<void> init() async {
-    await _tts.setVolume(1.0);
-    await _tts.setSpeechRate(0.5);
-    await _tts.setPitch(1.6);
+    try {
+      await _tts.setVolume(1.0);
+      await _tts.setSpeechRate(0.5);
+      await _tts.setPitch(1.6);
 
-    // Track speaking state
-    _tts.setStartHandler(() {
-      _isSpeaking = true;
-    });
+      // Track speaking state
+      _tts.setStartHandler(() {
+        _isSpeaking = true;
+      });
 
-    _tts.setCompletionHandler(() {
-      _isSpeaking = false;
-    });
+      _tts.setCompletionHandler(() {
+        _isSpeaking = false;
+      });
 
-    _tts.setCancelHandler(() {
-      _isSpeaking = false;
-    });
+      _tts.setCancelHandler(() {
+        _isSpeaking = false;
+      });
+    } catch (e) {
+      debugPrint("[TTS Init Error] $e");
+    }
   }
 
   /// Speak English text
