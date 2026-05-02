@@ -53,7 +53,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
     _ttsService.init();
     _loadData();
     _initWhisper();
@@ -272,6 +272,10 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
             const Tab(icon: Icon(Icons.translate, size: 18), text: 'Translator'),
             const Tab(icon: Icon(Icons.mic, size: 18), text: 'Voice'),
             const Tab(icon: Icon(Icons.document_scanner, size: 18), text: 'OCR Scan'),
+            const Tab(icon: Icon(Icons.public, size: 18), text: 'Community'),
+            const Tab(icon: Icon(Icons.museum, size: 18), text: 'Culture'),
+            const Tab(icon: Icon(Icons.card_membership, size: 18), text: 'Certification'),
+            const Tab(icon: Icon(Icons.format_quote, size: 18), text: 'Phrases'),
           ],
         ),
       ),
@@ -292,6 +296,10 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
                   _buildTranslatorTab(),
                   _buildVoiceTab(),
                   _buildOCRTab(),
+                  _buildCommunityTab(),
+                  _buildCultureTab(),
+                  _buildCertificationTab(),
+                  _buildPhrasesTab(),
                 ],
               ),
       ),
@@ -666,6 +674,101 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
           ),
         ],
       ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════
+  // NEW TABS
+  // ═══════════════════════════════════════════════
+  Widget _buildCommunityTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.public, color: Colors.deepPurpleAccent, size: 60),
+          const SizedBox(height: 20),
+          const Text('Great Andamanese Community', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          const Text('Connect with other learners and heritage speakers.\n(Coming Soon)', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCultureTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.museum, color: Colors.amberAccent, size: 60),
+          const SizedBox(height: 20),
+          const Text('Cultural Heritage', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          const Text('Learn about the history, traditions, and stories.\n(Coming Soon)', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCertificationTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.card_membership, color: Colors.greenAccent, size: 60),
+          const SizedBox(height: 20),
+          const Text('Certification', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          const Text('Take tests to verify your proficiency in Aka-Jeru.\n(Coming Soon)', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhrasesTab() {
+    return Column(
+      children: [
+        _buildBetaBanner(),
+        const SizedBox(height: 10),
+        Expanded(
+          child: _phrases.isEmpty
+              ? const Center(child: Text('No phrases available', style: TextStyle(color: Colors.white54)))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: _phrases.length,
+                  itemBuilder: (context, index) {
+                    final p = _phrases[index];
+                    final english = p['english']?.toString() ?? '';
+                    final ga = p['great_andamanese']?.toString() ?? '';
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(english, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 6),
+                          Text(ga, style: const TextStyle(color: Colors.amberAccent, fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic)),
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(onPressed: () => _ttsService.speakEnglish(english), icon: const Icon(Icons.volume_up, color: Colors.white54)),
+                              IconButton(onPressed: () => _addToFlashcards(english, ga), icon: const Icon(Icons.bookmark_add_outlined, color: Colors.amberAccent)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 }
