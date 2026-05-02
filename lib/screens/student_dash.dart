@@ -82,20 +82,15 @@ class _StudentDashState extends State<StudentDash>
   void _onClear() => clearMixinSearch(searchController);
 
   List<Map<String, dynamic>> get learningTiles => [
-        // --- Premium Interactive Features (Moved to Top) ---
+        // ═══════════════════════════════════════════════════
+        // 🌐 TRANSLATION TOOLS (Top Priority for Public)
+        // ═══════════════════════════════════════════════════
         {
-          "word": AppStrings.get('arTranslator'),
-          "emoji": "📷",
-          "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)],
-          "navigateTo": const ARTranslatorScreen(),
-          "icon": Icons.view_in_ar_rounded
-        },
-        {
-          "word": AppStrings.get('voiceVault'),
+          "word": AppStrings.get('voiceTranslate'),
           "emoji": "🎙️",
-          "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)],
-          "navigateTo": const VoiceVaultScreen(),
-          "icon": Icons.mic_external_on_rounded,
+          "colors": [const Color(0xFFff0844), const Color(0xFFffb199)],
+          "navigateTo": const VoiceTranslatorScreen(),
+          "icon": Icons.record_voice_over_rounded
         },
         {
           "word": AppStrings.get('bookScanner'),
@@ -105,11 +100,11 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.document_scanner_rounded
         },
         {
-          "word": AppStrings.get('games'),
-          "emoji": "🎲",
-          "colors": [const Color(0xFFF09819), const Color(0xFFEDDE5D)],
-          "navigateTo": const GamesHubScreen(),
-          "icon": Icons.sports_esports_rounded
+          "word": AppStrings.get('omniBroadcast'),
+          "emoji": "📡",
+          "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
+          "navigateTo": const OmniTranslatorScreen(),
+          "icon": Icons.cell_tower_rounded
         },
         {
           "word": AppStrings.get('chatTranslate'),
@@ -119,94 +114,16 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.chat_bubble_rounded,
         },
         {
-          "word": AppStrings.get('voiceTranslate'),
-          "emoji": "🎙️",
-          "colors": [const Color(0xFFff0844), const Color(0xFFffb199)],
-          "navigateTo": const VoiceTranslatorScreen(),
-          "icon": Icons.record_voice_over_rounded
+          "word": AppStrings.get('arTranslator'),
+          "emoji": "📷",
+          "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)],
+          "navigateTo": const ARTranslatorScreen(),
+          "icon": Icons.view_in_ar_rounded
         },
 
-        // --- Core Learning Categories ---
-        {
-          "word": AppStrings.get('numbers'),
-          "emoji": "123",
-          "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'numbers', title: 'Numbers'),
-          "icon": Icons.format_list_numbered_rounded
-        },
-        {
-          "word": AppStrings.get('nature'),
-          "emoji": "🌱",
-          "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'nature', title: 'Nature'),
-          "icon": Icons.eco_rounded
-        },
-        {
-          "word": AppStrings.get('feelings'),
-          "emoji": "🎭",
-          "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'feelings', title: 'Feelings'),
-          "icon": Icons.emoji_emotions_rounded
-        },
-        {
-          "word": AppStrings.get('colors'),
-          "emoji": "🎨",
-          "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'colors', title: 'Colors'),
-          "icon": Icons.palette_rounded
-        },
-        {
-          "word": AppStrings.get('things'),
-          "emoji": "🏡",
-          "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'things', title: 'Things'),
-          "icon": Icons.chair_rounded
-        },
-        {
-          "word": AppStrings.get('bodyParts'),
-          "emoji": "🦴",
-          "colors": [const Color(0xFF8E2DE2), const Color(0xFF4A00E0)],
-          "navigateTo": const BodyPartsScreen(),
-          "icon": Icons.accessibility_new_rounded
-        },
-        {
-          "word": AppStrings.get('animals'),
-          "emoji": "🐶",
-          "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'animals', title: 'Animals'),
-          "icon": Icons.pets_rounded
-        },
-        {
-          "word": AppStrings.get('magicWords'),
-          "emoji": "🔮",
-          "colors": [const Color(0xFFCC2B5E), const Color(0xFF753A88)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'magic', title: 'Magic Words'),
-          "icon": Icons.auto_fix_high_rounded
-        },
-        {
-          "word": AppStrings.get('family'),
-          "emoji": "👨‍👩‍👧",
-          "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'family', title: 'Family'),
-          "icon": Icons.family_restroom_rounded
-        },
-
-        // --- Regional Translations ---
-        {
-          "word": AppStrings.get('omniBroadcast'),
-          "emoji": "📡",
-          "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
-          "navigateTo": const OmniTranslatorScreen(),
-          "icon": Icons.cell_tower_rounded
-        },
+        // ═══════════════════════════════════════════════════
+        // 🇮🇳 REGIONAL LANGUAGE TRANSLATORS
+        // ═══════════════════════════════════════════════════
         {
           "word": AppStrings.get('hindiTranslator'),
           "emoji": "🇮🇳",
@@ -253,7 +170,9 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.g_translate_rounded
         },
 
-        // --- Advanced / Discovery ---
+        // ═══════════════════════════════════════════════════
+        // 🏝️ TRIBAL LANGUAGE HUBS
+        // ═══════════════════════════════════════════════════
         {
           "word": AppStrings.get('andamaneseBeta'),
           "emoji": "🏝️",
@@ -261,6 +180,10 @@ class _StudentDashState extends State<StudentDash>
           "navigateTo": const GAHubScreen(),
           "icon": Icons.language_rounded
         },
+
+        // ═══════════════════════════════════════════════════
+        // 🌿 CULTURAL DISCOVERY & TOURISM
+        // ═══════════════════════════════════════════════════
         {
           "word": AppStrings.get('natureHub'),
           "emoji": "🌿",
@@ -276,13 +199,6 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.radio_rounded
         },
         {
-          "word": AppStrings.get('tuhetKinship'),
-          "emoji": "🌳",
-          "colors": [const Color(0xFF5D4037), const Color(0xFF3E2723)],
-          "navigateTo": const KinshipMapperScreen(),
-          "icon": Icons.account_tree_rounded
-        },
-        {
           "word": AppStrings.get('islandExplorer'),
           "emoji": "🧭",
           "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)],
@@ -290,27 +206,76 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.explore_rounded,
         },
         {
-          "word": AppStrings.get('memoryPalace'),
-          "emoji": "🏠",
-          "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)],
-          "navigateTo": const MemoryPalaceScreen(),
-          "icon": Icons.map_rounded,
-        },
-        {
           "word": AppStrings.get('community'),
           "emoji": "🌍",
           "colors": [const Color(0xFF302B63), const Color(0xFF24243E)],
           "navigateTo": const CommunityScreen(),
-          "isSecret": true,
           "icon": Icons.public_rounded,
         },
+
+        // ═══════════════════════════════════════════════════
+        // 📚 QUICK DICTIONARY (Explore Vocabulary)
+        // ═══════════════════════════════════════════════════
         {
-          "word": AppStrings.get('aiSetup'),
-          "emoji": "🧠",
-          "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)],
-          "navigateTo": const AISetupScreen(),
-          "icon": Icons.psychology_rounded,
+          "word": AppStrings.get('numbers'),
+          "emoji": "123",
+          "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'numbers', title: 'Numbers'),
+          "icon": Icons.format_list_numbered_rounded
         },
+        {
+          "word": AppStrings.get('animals'),
+          "emoji": "🐶",
+          "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'animals', title: 'Animals'),
+          "icon": Icons.pets_rounded
+        },
+        {
+          "word": AppStrings.get('nature'),
+          "emoji": "🌱",
+          "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'nature', title: 'Nature'),
+          "icon": Icons.eco_rounded
+        },
+        {
+          "word": AppStrings.get('family'),
+          "emoji": "👨‍👩‍👧",
+          "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'family', title: 'Family'),
+          "icon": Icons.family_restroom_rounded
+        },
+        {
+          "word": AppStrings.get('things'),
+          "emoji": "🏡",
+          "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'things', title: 'Things'),
+          "icon": Icons.chair_rounded
+        },
+        {
+          "word": AppStrings.get('feelings'),
+          "emoji": "🎭",
+          "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'feelings', title: 'Feelings'),
+          "icon": Icons.emoji_emotions_rounded
+        },
+        {
+          "word": AppStrings.get('colors'),
+          "emoji": "🎨",
+          "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'colors', title: 'Colors'),
+          "icon": Icons.palette_rounded
+        },
+
+        // ═══════════════════════════════════════════════════
+        // ⚙️ UTILITIES
+        // ═══════════════════════════════════════════════════
         {
           "word": AppStrings.get('feedback'),
           "emoji": "⭐",
@@ -410,51 +375,14 @@ class _StudentDashState extends State<StudentDash>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🎯 Daily Mission Card
-          const DailyMissionCard()
-              .animate()
-              .fadeIn(duration: 700.ms)
-              .slideY(begin: 0.15),
-          const SizedBox(height: 20),
-
-          // ⚡ Quick Stats Row (Stars, Streak, Level)
-          const QuickStatsRow()
-              .animate()
-              .fadeIn(duration: 600.ms)
-              .slideX(begin: -0.1),
-          const SizedBox(height: 20),
-
           // 🎙️ Voice Waveform Visualizer
           KidsSectionHeader(emoji: '🎙️', label: AppStrings.get('sectionSoundWave')),
           const SizedBox(height: 8),
           const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
           const SizedBox(height: 20),
 
-          // 🏆 My Progress
-          KidsSectionHeader(emoji: '🏆', label: AppStrings.get('sectionMyProgress')),
-          const SizedBox(height: 10),
-          const GamificationHeader()
-              .animate()
-              .fadeIn(duration: 600.ms)
-              .slideY(begin: 0.1),
-          const SizedBox(height: 20),
-          const ProgressRadarChartWidget()
-              .animate()
-              .fadeIn(duration: 900.ms)
-              .scale(),
-          const SizedBox(height: 20),
-
-          // 🥇 My Badges
-          KidsSectionHeader(emoji: '🥇', label: AppStrings.get('sectionMyBadges')),
-          const SizedBox(height: 10),
-          const AchievementShowcaseWidget()
-              .animate()
-              .fadeIn(duration: 800.ms)
-              .slideX(begin: 0.1),
-          const SizedBox(height: 28),
-
-          // 🚀 Let's Learn!
-          KidsSectionHeader(emoji: '🚀', label: AppStrings.get('sectionLetsLearn')),
+          // 🧭 Explore
+          KidsSectionHeader(emoji: '🧭', label: 'Explore'),
           const SizedBox(height: 14),
           _buildBentoGrid(),
           const SizedBox(height: 110),
