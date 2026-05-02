@@ -83,7 +83,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.onboardingDeep,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -93,8 +93,8 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.studentAccent.withValues(alpha: 0.3),
-                  Colors.black,
+                  AppColors.onboardingStart.withValues(alpha: 0.4),
+                  AppColors.onboardingDeep,
                 ],
               ),
             ),

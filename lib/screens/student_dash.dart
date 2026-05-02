@@ -81,7 +81,7 @@ class _StudentDashState extends State<StudentDash>
 
   void _onClear() => clearMixinSearch(searchController);
 
-  List<Map<String, dynamic>> get learningTiles => [
+  late final List<Map<String, dynamic>> learningTiles = [
         // --- Premium Interactive Features (Moved to Top) ---
         {
           "word": AppStrings.get('arTranslator'),
@@ -330,7 +330,7 @@ class _StudentDashState extends State<StudentDash>
         body: Stack(
           children: [
             // Vibrant Background for Glassmorphism
-            const AmbientGlassBackground(),
+            const RepaintBoundary(child: AmbientGlassBackground()),
             SafeArea(
               child: Column(
                 children: [
@@ -364,8 +364,8 @@ class _StudentDashState extends State<StudentDash>
                 ],
               ),
             ),
-            VirtualPetCompanion(onPetHappy: _triggerConfetti),
-            ConfettiOverlay(trigger: _showConfetti),
+            RepaintBoundary(child: VirtualPetCompanion(onPetHappy: _triggerConfetti)),
+            RepaintBoundary(child: ConfettiOverlay(trigger: _showConfetti)),
           ],
         ),
       ),
@@ -521,69 +521,59 @@ class _StudentDashState extends State<StudentDash>
               context, MaterialPageRoute(builder: (_) => tile['navigateTo']));
         }
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    (tile['colors'][0] as Color).withValues(alpha: 0.7),
-                    (tile['colors'][1] as Color).withValues(alpha: 0.5),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.5), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                      color:
-                          (tile['colors'][0] as Color).withValues(alpha: 0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8))
-                ]),
-            child: Stack(
-              children: [
-                // Large watermark icon for depth
-                Positioned(
-                  right: isShort ? -5 : -15,
-                  bottom: isShort ? -15 : -25,
-                  child: Opacity(
-                      opacity: 0.1,
-                      child: Icon(tile['icon'],
-                          size: isShort ? 70 : 120, color: Colors.white)),
-                ),
-                // Optional Animated Sparkles for kids
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: Icon(Icons.star_rounded,
-                          color: Colors.white.withValues(alpha: 0.5), size: 28)
-                      .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true))
-                      .scaleXY(end: 1.3, duration: 800.ms),
-                ),
-                Positioned.fill(
-                  child: Padding(
-                    padding: EdgeInsets.all(isShort ? 12 : 16),
-                    child: isShort
-                        ? _buildShortLayout(tile)
-                        : _buildNormalLayout(tile, isWide),
-                  ),
-                ),
+      child: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                (tile['colors'][0] as Color).withValues(alpha: 0.7),
+                (tile['colors'][1] as Color).withValues(alpha: 0.5),
               ],
             ),
-          ),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+                color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                  color:
+                      (tile['colors'][0] as Color).withValues(alpha: 0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8))
+            ]),
+        child: Stack(
+          children: [
+            // Large watermark icon for depth
+            Positioned(
+              right: isShort ? -5 : -15,
+              bottom: isShort ? -15 : -25,
+              child: Opacity(
+                  opacity: 0.1,
+                  child: Icon(tile['icon'],
+                      size: isShort ? 70 : 120, color: Colors.white)),
+            ),
+            // Static sparkle accent (no animation controller)
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Icon(Icons.star_rounded,
+                      color: Colors.white.withValues(alpha: 0.4), size: 24),
+            ),
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.all(isShort ? 12 : 16),
+                child: isShort
+                    ? _buildShortLayout(tile)
+                    : _buildNormalLayout(tile, isWide),
+              ),
+            ),
+          ],
         ),
       ),
     )
         .animate()
-        .fadeIn(delay: (index * 40).ms)
-        .scale(curve: Curves.easeOutBack, duration: 500.ms);
+        .fadeIn(delay: (index.clamp(0, 5) * 40).ms)
+        .scale(curve: Curves.easeOutBack, duration: 400.ms);
   }
 
   Widget _buildShortLayout(Map<String, dynamic> tile) {
@@ -874,7 +864,7 @@ class _AmbientPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _AmbientPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _AmbientPainter oldDelegate) => oldDelegate.progress != progress;
 }
 
 // ----------------------------------------------------------------------------
@@ -1246,7 +1236,8 @@ class _RadarChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _RadarChartPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _RadarChartPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
 
 // ----------------------------------------------------------------------------
@@ -2314,7 +2305,7 @@ class _ConfettiPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ConfettiPainter old) => true;
+  bool shouldRepaint(covariant _ConfettiPainter old) => old.t != t;
 }
 
 // ============================================================================
@@ -2483,5 +2474,5 @@ class _WaveformPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WaveformPainter old) => true;
+  bool shouldRepaint(covariant _WaveformPainter old) => old.t != t;
 }
