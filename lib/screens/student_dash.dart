@@ -363,8 +363,20 @@ class _StudentDashState extends State<StudentDash>
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
-            // Vibrant Background for Glassmorphism
-            const RepaintBoundary(child: AmbientGlassBackground()),
+            // Safe static background instead of heavy AmbientGlassBackground
+            // to prevent Native OS memory crashes.
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF1E3C72).withValues(alpha: 0.8), // Deep blue
+                    const Color(0xFF2A5298).withValues(alpha: 0.8), // Lighter blue
+                  ],
+                ),
+              ),
+            ),
             SafeArea(
               child: Column(
                 children: [
