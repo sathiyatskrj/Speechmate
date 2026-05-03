@@ -52,8 +52,20 @@ class _TeacherDashState extends State<TeacherDash>
   @override
   void initState() {
     super.initState();
-    _ttsService.init();
-    initSearch();
+    _safeInit();
+  }
+
+  Future<void> _safeInit() async {
+    try {
+      _ttsService.init();
+    } catch (e) {
+      debugPrint('[TeacherDash] TTS init error (non-fatal): $e');
+    }
+    try {
+      await initSearch();
+    } catch (e) {
+      debugPrint('[TeacherDash] Search init error (non-fatal): $e');
+    }
     _loadDailyWord();
   }
 
