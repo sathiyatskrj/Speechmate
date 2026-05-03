@@ -30,7 +30,7 @@ class TtsService {
   Future<void> init() async {
     await _tts.setVolume(1.0);
     await _tts.setSpeechRate(0.5);
-    await _tts.setPitch(1.6);
+    await _tts.setPitch(1.0); // Reset to normal pitch
 
     // Track speaking state
     _tts.setStartHandler(() {
@@ -47,16 +47,20 @@ class TtsService {
   }
 
   /// Speak English text
-  Future<void> speakEnglish(String text) async {
+  Future<void> speakEnglish(String text, {double pitch = 1.0, double rate = 0.5}) async {
     await _tts.stop();
     await _tts.setLanguage("en-US");
+    await _tts.setPitch(pitch);
+    await _tts.setSpeechRate(rate);
     await _tts.speak(text);
   }
 
   /// Speak Regional text
-  Future<void> speakRegional(String text, String localeId) async {
+  Future<void> speakRegional(String text, String localeId, {double pitch = 1.0, double rate = 0.5}) async {
     await _tts.stop();
     await _tts.setLanguage(localeId);
+    await _tts.setPitch(pitch);
+    await _tts.setSpeechRate(rate);
     await _tts.speak(text);
   }
 
@@ -87,6 +91,8 @@ class TtsService {
     String? englishWord, 
     String? audioCategory,
     String? audioFile,
+    double pitch = 1.0,
+    double rate = 0.5,
   }) async {
     await stop(); // Stop any current audio
 
@@ -121,6 +127,8 @@ class TtsService {
 
     // 3. Fallback to TTS
     await _tts.setLanguage("en-IN");
+    await _tts.setPitch(pitch);
+    await _tts.setSpeechRate(rate);
     await _tts.speak(text);
   }
 

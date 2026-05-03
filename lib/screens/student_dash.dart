@@ -398,8 +398,20 @@ class _StudentDashState extends State<StudentDash>
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
-            // Vibrant Background for Glassmorphism
-            const RepaintBoundary(child: AmbientGlassBackground()),
+            // Safe static background instead of heavy AmbientGlassBackground
+            // to prevent Native OS memory crashes.
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF1E3C72).withValues(alpha: 0.8), // Deep blue
+                    const Color(0xFF2A5298).withValues(alpha: 0.8), // Lighter blue
+                  ],
+                ),
+              ),
+            ),
             SafeArea(
               child: Column(
                 children: [
@@ -1914,7 +1926,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
 
   /// Feed the pet (long press)
   void _feedPet() {
-    _ttsService.speakEnglish('Yummy!');
+    _ttsService.speakEnglish('Yummy!', pitch: 1.6);
     setState(() {
       _hunger = (_hunger + 25).clamp(0, 100);
       _happiness = (_happiness + 10).clamp(0, 100);
@@ -1945,11 +1957,11 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
 
       if (evolved) {
         _speechText = '🎉 I EVOLVED!';
-        _ttsService.speakEnglish('I evolved! Look at me!');
+        _ttsService.speakEnglish('I evolved! Look at me!', pitch: 1.6);
       } else {
         final lines = _moodSpeechLines;
         _speechText = lines[_rng.nextInt(lines.length)];
-        _ttsService.speakEnglish(_speechText);
+        _ttsService.speakEnglish(_speechText, pitch: 1.6);
       }
       _showSpeech = true;
       _showHearts = true;
