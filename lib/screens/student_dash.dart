@@ -49,6 +49,7 @@ class _StudentDashState extends State<StudentDash>
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
   bool _showConfetti = false;
+  bool _isInitFinished = false;
 
   void _triggerConfetti() {
     setState(() => _showConfetti = true);
@@ -74,6 +75,16 @@ class _StudentDashState extends State<StudentDash>
       await initSearch();
     } catch (e) {
       debugPrint('[StudentDash] Search init error (non-fatal): $e');
+    }
+    try {
+      await dashSearchNeuralEngine.init();
+    } catch (e) {
+      debugPrint('[StudentDash] NeuralEngine init error (non-fatal): $e');
+    }
+    if (mounted) {
+      setState(() {
+        _isInitFinished = true;
+      });
     }
   }
 
@@ -334,6 +345,15 @@ class _StudentDashState extends State<StudentDash>
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitFinished) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF0F4F8),
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.cyanAccent),
+        ),
+      );
+    }
+
     return Theme(
       data: AppTheme.studentTheme,
       child: Scaffold(
