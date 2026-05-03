@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:speechmate/screens/languages.dart';
+import 'package:speechmate/screens/landing_page.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/core/app_strings.dart';
@@ -34,7 +34,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     if (!context.mounted) return;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const Languages()),
+      MaterialPageRoute(builder: (_) => const LandingPage()),
     );
   }
 

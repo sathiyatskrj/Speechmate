@@ -61,8 +61,20 @@ class _StudentDashState extends State<StudentDash>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ttsService.init();
-    initSearch();
+    _safeInit();
+  }
+
+  Future<void> _safeInit() async {
+    try {
+      ttsService.init();
+    } catch (e) {
+      debugPrint('[StudentDash] TTS init error (non-fatal): $e');
+    }
+    try {
+      await initSearch();
+    } catch (e) {
+      debugPrint('[StudentDash] Search init error (non-fatal): $e');
+    }
   }
 
   @override

@@ -14,14 +14,19 @@ mixin SearchableDashboardMixin<T extends StatefulWidget> on State<T> {
   bool hasSearched = false;
 
   Future<void> initSearch() async {
-    await dashSearchDictService.loadDictionary(DictionaryType.words);
-    await dashSearchDictService.loadDictionary(DictionaryType.phrases);
+    try {
+      await dashSearchDictService.loadDictionary(DictionaryType.words);
+      await dashSearchDictService.loadDictionary(DictionaryType.phrases);
+    } catch (e) {
+      debugPrint('[SearchMixin] initSearch error (non-fatal): $e');
+    }
   }
 
   Future<void> performMixinSearch(String query) async {
     if (query.isEmpty) return;
     setState(() => isSearchLoading = true);
 
+    try {
     // 1. Direct Search (Exact/Fuzzy from Dictionary)
     var found = await dashSearchDictService.searchEverywhere(query);
 
@@ -58,6 +63,17 @@ mixin SearchableDashboardMixin<T extends StatefulWidget> on State<T> {
         }
         isSearchLoading = false;
       });
+    }
+    } catch (e) {
+      debugPrint('[SearchMixin] performMixinSearch error (non-fatal): $e');
+      if (mounted) {
+        setState(() {
+          searchResult = null;
+          hasSearched = true;
+          searchedNicobarese = false;
+          isSearchLoading = false;
+        });
+      }
     }
   }
 
