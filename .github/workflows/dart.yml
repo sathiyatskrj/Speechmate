@@ -1,6 +1,5 @@
 env:
-  APP_VERSION: 1.4.8
-  APP_NAME: Speechmate
+  APP_VERSION: 1.4.9
 
 name: Build & Release
 
@@ -25,6 +24,23 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true  # Pull Git LFS files (whisper model)
+
+      # ── Determine edition name based on branch ─────────────────────────────
+      - name: Set edition variables
+        run: |
+          if [ "${{ github.ref_name }}" = "speechmate_general" ]; then
+            echo "EDITION=General" >> $GITHUB_ENV
+            echo "APP_NAME=SpeechMate-General" >> $GITHUB_ENV
+            echo "RELEASE_TITLE=SpeechMate General v${{ env.APP_VERSION }} (Public Edition)" >> $GITHUB_ENV
+            echo "TAG_SUFFIX=-public" >> $GITHUB_ENV
+            echo "RELEASE_DESC=General Public Edition — For common people, tourists, and language enthusiasts." >> $GITHUB_ENV
+          else
+            echo "EDITION=Institutional" >> $GITHUB_ENV
+            echo "APP_NAME=SpeechMate" >> $GITHUB_ENV
+            echo "RELEASE_TITLE=SpeechMate v${{ env.APP_VERSION }} (Institutional Edition)" >> $GITHUB_ENV
+            echo "TAG_SUFFIX=" >> $GITHUB_ENV
+            echo "RELEASE_DESC=Institutional Edition — For students and teachers in tribal language classrooms." >> $GITHUB_ENV
+          fi
 
       - name: Verify LFS model
         run: |
@@ -79,62 +95,68 @@ jobs:
       - name: Build AAB
         run: flutter build appbundle --release
 
-      # ── Rename all outputs ────────────────────────────────────────────────
+      # ── Rename all outputs with edition-aware names ────────────────────────
       - name: Rename artifacts
         run: |
           # Universal APK
           mv build/app/outputs/flutter-apk/app-release.apk \
-             build/app/outputs/flutter-apk/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-universal.apk
+             build/app/outputs/flutter-apk/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-universal.apk
 
           # Compact APK (arm64 split)
           mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk \
-             build/app/outputs/flutter-apk/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-compact-arm64.apk
+             build/app/outputs/flutter-apk/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-compact-arm64.apk
 
           # AAB
           mv build/app/outputs/bundle/release/app-release.aab \
-             build/app/outputs/bundle/release/${{ env.APP_NAME }}-${{ env.APP_VERSION }}.aab
+             build/app/outputs/bundle/release/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}.aab
 
       - name: Upload Universal APK
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}-Universal-APK
-          path: build/app/outputs/flutter-apk/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-universal.apk
+          name: ${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-Universal-APK
+          path: build/app/outputs/flutter-apk/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-universal.apk
 
       - name: Upload Compact APK
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}-Compact-arm64-APK
-          path: build/app/outputs/flutter-apk/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-compact-arm64.apk
+          name: ${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-Compact-arm64-APK
+          path: build/app/outputs/flutter-apk/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-compact-arm64.apk
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}-AAB
-          path: build/app/outputs/bundle/release/${{ env.APP_NAME }}-${{ env.APP_VERSION }}.aab
+          name: ${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-AAB
+          path: build/app/outputs/bundle/release/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}.aab
 
       - name: Create GitHub Release (Android)
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          name: "${{ github.ref_name == 'speechmate_general' && format('{0} v{1} (General Public)', env.APP_NAME, env.APP_VERSION) || format('{0} v{1}', env.APP_NAME, env.APP_VERSION) }}"
-          tag_name: "v${{ env.APP_VERSION }}${{ github.ref_name == 'speechmate_general' && '-public' || '' }}"
+          name: "${{ env.RELEASE_TITLE }}"
+          tag_name: "v${{ env.APP_VERSION }}${{ env.TAG_SUFFIX }}"
           body: |
-            ## 📦 SpeechMate v${{ env.APP_VERSION }} — ${{ github.ref_name == 'speechmate_general' && 'General Public Release' || 'Offline Demo Build' }}
+            ## 📦 ${{ env.RELEASE_TITLE }}
             
-            🔧 **All 20 audit issues resolved**
-            🎤 Voice translator fixed (multi-recording support)
-            🧠 Whisper upgraded to base multilingual model
-            🔌 Firebase removed — fully offline mode
+            > ${{ env.RELEASE_DESC }}
             
+            ### Downloads
             | Build | Description | Size (approx) |
             |-------|-------------|---------------|
             | **Universal APK** | Works on ALL Android devices (arm32 + arm64) | ~250 MB |
             | **Compact APK** | Modern phones only (arm64, Android 5.0+) | ~150 MB |
-            | **AAB** | Google Play Store bundle | - |
+            | **AAB** | Google Play Store bundle | — |
+            | **iOS IPA** | Unsigned IPA for sideloading/testing | — |
+            
+            ### What's New
+            - 🛡️ Crash-safe service initialization (TTS, NeuralEngine, Dictionary)
+            - 🧭 Fixed navigation flow for role selection
+            - 🎤 Voice translator improvements
+            - 🧠 Whisper base multilingual model
+            - 🔌 Fully offline — no Firebase dependency
           files: |
-            build/app/outputs/flutter-apk/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-universal.apk
-            build/app/outputs/flutter-apk/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-compact-arm64.apk
-            build/app/outputs/bundle/release/${{ env.APP_NAME }}-${{ env.APP_VERSION }}.aab
+            build/app/outputs/flutter-apk/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-universal.apk
+            build/app/outputs/flutter-apk/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-compact-arm64.apk
+            build/app/outputs/bundle/release/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -151,6 +173,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
+
+      # ── Determine edition name based on branch ─────────────────────────────
+      - name: Set edition variables
+        run: |
+          if [ "${{ github.ref_name }}" = "speechmate_general" ]; then
+            echo "EDITION=General" >> $GITHUB_ENV
+            echo "APP_NAME=SpeechMate-General" >> $GITHUB_ENV
+            echo "RELEASE_TITLE=SpeechMate General v${{ env.APP_VERSION }} (Public Edition)" >> $GITHUB_ENV
+            echo "TAG_SUFFIX=-public" >> $GITHUB_ENV
+          else
+            echo "EDITION=Institutional" >> $GITHUB_ENV
+            echo "APP_NAME=SpeechMate" >> $GITHUB_ENV
+            echo "RELEASE_TITLE=SpeechMate v${{ env.APP_VERSION }} (Institutional Edition)" >> $GITHUB_ENV
+            echo "TAG_SUFFIX=" >> $GITHUB_ENV
+          fi
 
       - name: Verify LFS model
         run: |
@@ -189,20 +226,20 @@ jobs:
           mkdir -p build/ios/iphoneos/Payload
           cp -r build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/
           cd build/ios/iphoneos
-          zip -r ${{ env.APP_NAME }}-${{ env.APP_VERSION }}-unsigned.ipa Payload/
+          zip -r ${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-ios.ipa Payload/
 
       - name: Upload iOS IPA
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}-iOS-IPA
-          path: build/ios/iphoneos/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-unsigned.ipa
+          name: ${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-iOS-IPA
+          path: build/ios/iphoneos/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-ios.ipa
 
       - name: Upload iOS IPA to Release
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          name: "${{ github.ref_name == 'speechmate_general' && format('{0} v{1} (General Public)', env.APP_NAME, env.APP_VERSION) || format('{0} v{1}', env.APP_NAME, env.APP_VERSION) }}"
-          tag_name: "v${{ env.APP_VERSION }}${{ github.ref_name == 'speechmate_general' && '-public' || '' }}"
-          files: build/ios/iphoneos/${{ env.APP_NAME }}-${{ env.APP_VERSION }}-unsigned.ipa
+          name: "${{ env.RELEASE_TITLE }}"
+          tag_name: "v${{ env.APP_VERSION }}${{ env.TAG_SUFFIX }}"
+          files: build/ios/iphoneos/${{ env.APP_NAME }}-v${{ env.APP_VERSION }}-ios.ipa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
