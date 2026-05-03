@@ -20,10 +20,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository (with LFS)
+      - name: Checkout repository (without LFS)
         uses: actions/checkout@v4
         with:
-          lfs: true  # Pull Git LFS files (whisper model)
+          lfs: false  # Disabled to avoid GitHub LFS bandwidth limits
 
       # ── Determine edition name based on branch ─────────────────────────────
       - name: Set edition variables
@@ -42,18 +42,17 @@ jobs:
             echo "RELEASE_DESC=Institutional Edition — For students and teachers in tribal language classrooms." >> $GITHUB_ENV
           fi
 
-      - name: Verify LFS model
+      - name: Download Whisper Model
         run: |
-          echo "Checking ggml-base.bin..."
-          ls -lh assets/models/
+          echo "Downloading ggml-base.bin directly to avoid LFS quota..."
+          mkdir -p assets/models
+          wget -q -O assets/models/ggml-base.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin
           FILE_SIZE=$(stat -f%z assets/models/ggml-base.bin 2>/dev/null || stat -c%s assets/models/ggml-base.bin 2>/dev/null || echo 0)
           if [ "$FILE_SIZE" -lt 100000000 ]; then
-            echo "ERROR: ggml-base.bin is too small ($FILE_SIZE bytes). LFS pull may have failed."
-            echo "Attempting manual LFS pull..."
-            git lfs pull
-            ls -lh assets/models/
+            echo "ERROR: ggml-base.bin download failed ($FILE_SIZE bytes)."
+            exit 1
           fi
-          echo "Model file OK."
+          echo "Model file downloaded successfully."
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
@@ -169,10 +168,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository (with LFS)
+      - name: Checkout repository (without LFS)
         uses: actions/checkout@v4
         with:
-          lfs: true
+          lfs: false  # Disabled to avoid GitHub LFS bandwidth limits
 
       # ── Determine edition name based on branch ─────────────────────────────
       - name: Set edition variables
@@ -189,14 +188,17 @@ jobs:
             echo "TAG_SUFFIX=" >> $GITHUB_ENV
           fi
 
-      - name: Verify LFS model
+      - name: Download Whisper Model
         run: |
-          ls -lh assets/models/
-          FILE_SIZE=$(stat -f%z assets/models/ggml-base.bin 2>/dev/null || echo 0)
+          echo "Downloading ggml-base.bin directly to avoid LFS quota..."
+          mkdir -p assets/models
+          curl -L -s -o assets/models/ggml-base.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin
+          FILE_SIZE=$(stat -f%z assets/models/ggml-base.bin 2>/dev/null || stat -c%s assets/models/ggml-base.bin 2>/dev/null || echo 0)
           if [ "$FILE_SIZE" -lt 100000000 ]; then
-            echo "LFS file incomplete, pulling..."
-            git lfs pull
+            echo "ERROR: ggml-base.bin download failed ($FILE_SIZE bytes)."
+            exit 1
           fi
+          echo "Model file downloaded successfully."
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
