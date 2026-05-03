@@ -68,10 +68,18 @@ class _StudentDashState extends State<StudentDash>
   Future<void> _initializeServices() async {
     try {
       await ttsService.init();
+    } catch (e) {
+      debugPrint('[StudentDash] TTS init error (non-fatal): $e');
+    }
+    try {
       await initSearch();
+    } catch (e) {
+      debugPrint('[StudentDash] Search init error (non-fatal): $e');
+    }
+    try {
       await dashSearchNeuralEngine.init();
     } catch (e) {
-      debugPrint("StudentDash initialization error: $e");
+      debugPrint('[StudentDash] NeuralEngine init error (non-fatal): $e');
     }
     if (mounted) {
       setState(() {

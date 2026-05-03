@@ -14,50 +14,66 @@ mixin SearchableDashboardMixin<T extends StatefulWidget> on State<T> {
   bool hasSearched = false;
 
   Future<void> initSearch() async {
-    await dashSearchDictService.loadDictionary(DictionaryType.words);
-    await dashSearchDictService.loadDictionary(DictionaryType.phrases);
+    try {
+      await dashSearchDictService.loadDictionary(DictionaryType.words);
+      await dashSearchDictService.loadDictionary(DictionaryType.phrases);
+    } catch (e) {
+      debugPrint('[SearchMixin] initSearch error (non-fatal): $e');
+    }
   }
 
   Future<void> performMixinSearch(String query) async {
     if (query.isEmpty) return;
     setState(() => isSearchLoading = true);
 
-    // 1. Direct Search (Exact/Fuzzy from Dictionary)
-    var found = await dashSearchDictService.searchEverywhere(query);
+    try {
+      // 1. Direct Search (Exact/Fuzzy from Dictionary)
+      var found = await dashSearchDictService.searchEverywhere(query);
 
-    // 2. Neural Engine Fallback
-    if (found == null) {
-      final neuralResult = await dashSearchNeuralEngine.predict(query);
-      if (neuralResult.text.isNotEmpty) {
-        found = {
-          'english': query,
-          'nicobarese': neuralResult.text,
-          '_isGenerated': true,
-          '_confidence': neuralResult.confidence,
-        };
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        searchResult = found;
-        hasSearched = true;
-
-        if (found != null) {
-          if (found.containsKey('_searchedNicobarese')) {
-            searchedNicobarese = found['_searchedNicobarese'];
-          } else if (found.containsKey('_isGenerated')) {
-            searchedNicobarese = false;
-          } else {
-            final q = query.trim().toLowerCase();
-            searchedNicobarese =
-                found['nicobarese'].toString().toLowerCase() == q;
-          }
-        } else {
-          searchedNicobarese = false;
+      // 2. Neural Engine Fallback
+      if (found == null) {
+        final neuralResult = await dashSearchNeuralEngine.predict(query);
+        if (neuralResult.text.isNotEmpty) {
+          found = {
+            'english': query,
+            'nicobarese': neuralResult.text,
+            '_isGenerated': true,
+            '_confidence': neuralResult.confidence,
+          };
         }
-        isSearchLoading = false;
-      });
+      }
+
+      if (mounted) {
+        setState(() {
+          searchResult = found;
+          hasSearched = true;
+
+          if (found != null) {
+            if (found.containsKey('_searchedNicobarese')) {
+              searchedNicobarese = found['_searchedNicobarese'];
+            } else if (found.containsKey('_isGenerated')) {
+              searchedNicobarese = false;
+            } else {
+              final q = query.trim().toLowerCase();
+              searchedNicobarese =
+                  found['nicobarese'].toString().toLowerCase() == q;
+            }
+          } else {
+            searchedNicobarese = false;
+          }
+          isSearchLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('[SearchMixin] performMixinSearch error (non-fatal): $e');
+      if (mounted) {
+        setState(() {
+          searchResult = null;
+          hasSearched = true;
+          searchedNicobarese = false;
+          isSearchLoading = false;
+        });
+      }
     }
   }
 
