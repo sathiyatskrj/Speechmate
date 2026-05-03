@@ -4,10 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class TtsService {
+  static final TtsService _instance = TtsService._internal();
+  factory TtsService() => _instance;
+  
+  TtsService._internal();
+
   final FlutterTts _tts = FlutterTts();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   bool _isSpeaking = false;
+  bool _isInit = false;
 
   bool get isSpeaking => _isSpeaking;
 
@@ -28,6 +34,9 @@ class TtsService {
 
   /// Call this once (ex: in initState)
   Future<void> init() async {
+    if (_isInit) return;
+    _isInit = true;
+    
     await _tts.setVolume(1.0);
     await _tts.setSpeechRate(0.5);
     await _tts.setPitch(1.0); // Reset to normal pitch
@@ -139,9 +148,8 @@ class TtsService {
     _isSpeaking = false;
   }
 
-  /// Dispose when no longer needed
+  /// Stop without disposing the underlying player (since it's a singleton)
   void dispose() {
-    _tts.stop();
-    _audioPlayer.dispose();
+    stop();
   }
 }

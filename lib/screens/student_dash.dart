@@ -49,7 +49,6 @@ class _StudentDashState extends State<StudentDash>
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
   bool _showConfetti = false;
-  bool _isInitFinished = false;
 
   void _triggerConfetti() {
     setState(() => _showConfetti = true);
@@ -62,38 +61,8 @@ class _StudentDashState extends State<StudentDash>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _safeInit();
-  }
-
-  String? _initError;
-
-  Future<void> _safeInit() async {
-    try {
-      try {
-        ttsService.init();
-      } catch (e) {
-        debugPrint('[StudentDash] TTS init error (non-fatal): $e');
-      }
-      try {
-        await initSearch();
-      } catch (e) {
-        debugPrint('[StudentDash] Search init error (non-fatal): $e');
-      }
-      try {
-        await dashSearchNeuralEngine.init();
-      } catch (e) {
-        debugPrint('[StudentDash] NeuralEngine init error (non-fatal): $e');
-      }
-    } catch (e, stack) {
-      debugPrint('[StudentDash] FATAL init error: $e\n$stack');
-      _initError = e.toString();
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isInitFinished = true;
-        });
-      }
-    }
+    ttsService.init();
+    initSearch();
   }
 
   @override
@@ -112,7 +81,7 @@ class _StudentDashState extends State<StudentDash>
 
   void _onClear() => clearMixinSearch(searchController);
 
-  late final List<Map<String, dynamic>> learningTiles = [
+  List<Map<String, dynamic>> get learningTiles => [
         // --- Premium Interactive Features (Moved to Top) ---
         {
           "word": AppStrings.get('arTranslator'),
@@ -353,43 +322,6 @@ class _StudentDashState extends State<StudentDash>
 
   @override
   Widget build(BuildContext context) {
-    if (!_isInitFinished) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFF0F4F8),
-        body: Center(
-          child: CircularProgressIndicator(color: Colors.cyanAccent),
-        ),
-      );
-    }
-
-    if (_initError != null) {
-      return Scaffold(
-        backgroundColor: const Color(0xFFF0F4F8),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 48),
-                const SizedBox(height: 16),
-                const Text("Some features may be limited", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Text(_initError!, style: const TextStyle(color: Colors.grey, fontSize: 12), textAlign: TextAlign.center),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() { _initError = null; });
-                  },
-                  child: const Text("Continue Anyway"),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
     try {
     return Theme(
       data: AppTheme.studentTheme,
@@ -398,20 +330,8 @@ class _StudentDashState extends State<StudentDash>
         extendBodyBehindAppBar: true,
         body: Stack(
           children: [
-            // Safe static background instead of heavy AmbientGlassBackground
-            // to prevent Native OS memory crashes.
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF1E3C72).withValues(alpha: 0.8), // Deep blue
-                    const Color(0xFF2A5298).withValues(alpha: 0.8), // Lighter blue
-                  ],
-                ),
-              ),
-            ),
+            // Vibrant Background for Glassmorphism
+            const RepaintBoundary(child: AmbientGlassBackground()),
             SafeArea(
               child: Column(
                 children: [
