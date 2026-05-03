@@ -65,26 +65,34 @@ class _StudentDashState extends State<StudentDash>
     _safeInit();
   }
 
+  String? _initError;
+
   Future<void> _safeInit() async {
     try {
-      ttsService.init();
-    } catch (e) {
-      debugPrint('[StudentDash] TTS init error (non-fatal): $e');
-    }
-    try {
-      await initSearch();
-    } catch (e) {
-      debugPrint('[StudentDash] Search init error (non-fatal): $e');
-    }
-    try {
-      await dashSearchNeuralEngine.init();
-    } catch (e) {
-      debugPrint('[StudentDash] NeuralEngine init error (non-fatal): $e');
-    }
-    if (mounted) {
-      setState(() {
-        _isInitFinished = true;
-      });
+      try {
+        ttsService.init();
+      } catch (e) {
+        debugPrint('[StudentDash] TTS init error (non-fatal): $e');
+      }
+      try {
+        await initSearch();
+      } catch (e) {
+        debugPrint('[StudentDash] Search init error (non-fatal): $e');
+      }
+      try {
+        await dashSearchNeuralEngine.init();
+      } catch (e) {
+        debugPrint('[StudentDash] NeuralEngine init error (non-fatal): $e');
+      }
+    } catch (e, stack) {
+      debugPrint('[StudentDash] FATAL init error: $e\n$stack');
+      _initError = e.toString();
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isInitFinished = true;
+        });
+      }
     }
   }
 
@@ -354,6 +362,35 @@ class _StudentDashState extends State<StudentDash>
       );
     }
 
+    if (_initError != null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF0F4F8),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 48),
+                const SizedBox(height: 16),
+                const Text("Some features may be limited", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(_initError!, style: const TextStyle(color: Colors.grey, fontSize: 12), textAlign: TextAlign.center),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() { _initError = null; });
+                  },
+                  child: const Text("Continue Anyway"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    try {
     return Theme(
       data: AppTheme.studentTheme,
       child: Scaffold(
@@ -402,6 +439,32 @@ class _StudentDashState extends State<StudentDash>
         ),
       ),
     );
+    } catch (e, stack) {
+      debugPrint('[StudentDash] Build error: $e\n$stack');
+      return Scaffold(
+        backgroundColor: const Color(0xFFF0F4F8),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                const SizedBox(height: 16),
+                const Text("Dashboard Error", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(e.toString(), style: const TextStyle(color: Colors.grey, fontSize: 12), textAlign: TextAlign.center, maxLines: 5),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Go Back"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildSearchResults() {
