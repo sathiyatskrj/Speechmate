@@ -67,10 +67,15 @@ void main() async {
   // Database initialization
   try {
       await DatabaseManager.instance.database;
-      await DatabaseManager.instance.seedExtraFromJson('phrases', 'assets/data/dictionary_phrases.json', (item) => {
-        'english': item['english']?.toString() ?? '',
-        'nicobarese': item['nicobarese']?.toString() ?? '',
-        'text': item['text']?.toString() ?? '',
+      await DatabaseManager.instance.seedExtraFromJson('phrases', 'assets/data/dictionary_phrases.json', (item) {
+        final audio = item['audio'];
+        return {
+          'english': item['english']?.toString() ?? '',
+          'nicobarese': item['nicobarese']?.toString() ?? '',
+          'text': item['text']?.toString() ?? '',
+          'audio_category': audio is Map ? (audio['category']?.toString() ?? '') : '',
+          'audio_file': audio is Map ? (audio['file']?.toString() ?? '') : '',
+        };
       });
       await DatabaseManager.instance.seedExtraFromJson('dialects', 'assets/data/dictionary_dialects.json', (item) => {
         'english': item['english']?.toString() ?? '',

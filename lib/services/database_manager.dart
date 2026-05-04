@@ -34,7 +34,7 @@ class DatabaseManager {
 
     return await openDatabase(
       path,
-      version: 8,
+      version: 9,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: _createIndexes,
@@ -178,6 +178,17 @@ class DatabaseManager {
        ''');
        debugPrint('[DatabaseManager] Upgraded to v8 (kinship table).');
      }
+     if (oldVersion < 9) {
+       try {
+         await db.execute('ALTER TABLE phrases ADD COLUMN audio_category TEXT DEFAULT \'\'');
+         await db.execute('ALTER TABLE phrases ADD COLUMN audio_file TEXT DEFAULT \'\'');
+         // Re-seed phrases with audio metadata
+         await db.delete('phrases');
+       } catch (e) {
+         debugPrint('[DatabaseManager] v9 upgrade note: $e');
+       }
+       debugPrint('[DatabaseManager] Upgraded to v9 (phrases audio columns).');
+     }
   }
 
   Future _createDB(Database db, int version) async {
@@ -217,7 +228,9 @@ class DatabaseManager {
       id $idType,
       english TEXT,
       nicobarese TEXT,
-      text TEXT
+      text TEXT,
+      audio_category TEXT,
+      audio_file TEXT
     )
     ''');
     
