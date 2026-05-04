@@ -331,7 +331,9 @@ class _StudentDashState extends State<StudentDash>
         body: Stack(
           children: [
             // Vibrant Background for Glassmorphism
-            const RepaintBoundary(child: AmbientGlassBackground()),
+            // NOTE: AmbientGlassBackground returns Positioned.fill, so it must be
+            // a direct Stack child (no RepaintBoundary wrapper — it's inside instead).
+            const AmbientGlassBackground(),
             SafeArea(
               child: Column(
                 children: [
@@ -365,8 +367,10 @@ class _StudentDashState extends State<StudentDash>
                 ],
               ),
             ),
-            RepaintBoundary(child: VirtualPetCompanion(onPetHappy: _triggerConfetti)),
-            RepaintBoundary(child: ConfettiOverlay(trigger: _showConfetti)),
+            // NOTE: VirtualPetCompanion returns Positioned, so it must be
+            // a direct Stack child (no RepaintBoundary wrapper).
+            VirtualPetCompanion(onPetHappy: _triggerConfetti),
+            ConfettiOverlay(trigger: _showConfetti),
           ],
         ),
       ),
@@ -830,14 +834,16 @@ class _AmbientGlassBackgroundState extends State<AmbientGlassBackground>
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            painter: _AmbientPainter(_controller.value),
-            size: Size.infinite,
-          );
-        },
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
+              painter: _AmbientPainter(_controller.value),
+              size: Size.infinite,
+            );
+          },
+        ),
       ),
     );
   }
