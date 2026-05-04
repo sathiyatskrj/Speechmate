@@ -9,6 +9,7 @@ import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/core/app_colors.dart';
+import 'package:speechmate/services/progress_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 
@@ -24,14 +25,24 @@ class _LanguagesState extends State<Languages> {
   double? get buttonWidth => 280;
   double? get buttonHeight => 70;
 
+  int _xp = 0;
+  int _streak = 0;
 
   @override
   void initState() {
     super.initState();
+    _loadProgress();
   }
 
-
-
+  Future<void> _loadProgress() async {
+    final stats = await ProgressService().getProgressStats();
+    if (mounted) {
+      setState(() {
+        _xp = stats['studentXP'] ?? 0;
+        _streak = stats['dayStreak'] ?? 0;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +64,56 @@ class _LanguagesState extends State<Languages> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                // ────── GAMIFICATION TOP BAR ──────
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Streak Counter
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.local_fire_department, color: Colors.orange, size: 20),
+                            const SizedBox(width: 6),
+                            Text(
+                              "$_streak Day${_streak == 1 ? '' : 's'}",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn().slideX(begin: -0.2),
+                      
+                      // XP Counter
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.purple.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.purple.withValues(alpha: 0.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.star_rounded, color: Colors.purpleAccent, size: 20),
+                            const SizedBox(width: 6),
+                            Text(
+                              "$_xp XP",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn().slideX(begin: 0.2),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
                 Text(
                   AppStrings.get('selectLanguage'),
                   textAlign: TextAlign.center,
