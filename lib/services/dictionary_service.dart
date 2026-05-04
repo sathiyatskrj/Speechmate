@@ -108,8 +108,21 @@ class DictionaryService {
     // 3. Search phrases
     final phraseResult = await searchPhrase(query);
     if (phraseResult != null) {
+      // Reconstruct audio metadata for phrase playback
+      Map<String, dynamic>? audioMeta;
+      final audioCategory = phraseResult['audio_category']?.toString() ?? '';
+      final audioFile = phraseResult['audio_file']?.toString() ?? '';
+      if (audioCategory.isNotEmpty && audioFile.isNotEmpty) {
+        audioMeta = {'category': audioCategory, 'file': audioFile};
+      }
+      // Ensure 'english' is populated (phrases use 'text' field, not 'english')
+      final englishText = (phraseResult['english']?.toString() ?? '').isNotEmpty
+          ? phraseResult['english'].toString()
+          : (phraseResult['text']?.toString() ?? '');
       return {
         ...phraseResult,
+        'english': englishText,
+        if (audioMeta != null) 'audio': audioMeta,
         '_type': 'phrases',
         '_searchedNicobarese': false,
       };
@@ -184,9 +197,17 @@ class DictionaryService {
     
     final phraseMatch = await searchPhrase(query);
     if (phraseMatch != null) {
+      // Reconstruct audio metadata for phrase playback
+      Map<String, dynamic>? audioMeta;
+      final audioCategory = phraseMatch['audio_category']?.toString() ?? '';
+      final audioFile = phraseMatch['audio_file']?.toString() ?? '';
+      if (audioCategory.isNotEmpty && audioFile.isNotEmpty) {
+        audioMeta = {'category': audioCategory, 'file': audioFile};
+      }
       return {
           'english': phraseMatch['text'] ?? phraseMatch['english'],
           'nicobarese': phraseMatch['nicobarese'],
+          if (audioMeta != null) 'audio': audioMeta,
           '_type': 'phrase',
           '_isExact': true
       };

@@ -19,6 +19,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
   late AnimationController _mainController;
   late AnimationController _pulseController;
   late AnimationController _waveController;
+  late AnimationController _emojiController;
 
   late Animation<double> _logoScale;
   late Animation<double> _logoOpacity;
@@ -31,44 +32,54 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
   double _loadProgress = 0.0;
   bool _isPreloading = true;
 
-  // Floating particles
-  final int _particleCount = 25;
-  final List<_FloatingParticle> _particles = [];
+  // Floating emoji particles — fun for kids! 🌈
+  final int _particleCount = 18;
+  final List<_FunParticle> _particles = [];
   final math.Random _random = math.Random();
 
   // Ambient Audio
   final AudioPlayer _ambientPlayer = AudioPlayer();
 
+  // Time-aware greeting for children
+  String get _greeting {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return '🌅 Good Morning, Explorer!';
+    if (hour < 17) return '☀️ Good Afternoon, Champion!';
+    return '🌙 Good Evening, Superstar!';
+  }
+
   // Taglines
   int _currentTagline = 0;
   static const List<String> _taglines = [
-    "TRANSLATE • EXPLORE • CONNECT",
-    "YOUR ISLAND LANGUAGE COMPANION",
-    "BRIDGING CULTURES OFFLINE",
+    "🗣️ SPEAK • 🎨 LEARN • 🌍 EXPLORE",
+    "🏝️ YOUR ISLAND LANGUAGE BUDDY",
+    "✨ MAKING WORDS FUN & EASY",
   ];
 
   @override
   void initState() {
     super.initState();
 
-    // Generate floating particles
+    // Generate floating emoji particles
     for (int i = 0; i < _particleCount; i++) {
-      _particles.add(_FloatingParticle(_random));
+      _particles.add(_FunParticle(_random));
     }
 
-    // Pulse controller for ambient effects
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
 
-    // Wave controller for background animation
     _waveController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 6),
+      duration: const Duration(seconds: 8),
     )..repeat();
 
-    // Main sequencing controller
+    _emojiController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat();
+
     _mainController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 5500),
@@ -226,6 +237,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
     _mainController.dispose();
     _pulseController.dispose();
     _waveController.dispose();
+    _emojiController.dispose();
     _ambientPlayer.dispose();
     super.dispose();
   }
@@ -233,7 +245,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFECF8FF),
+      backgroundColor: const Color(0xFF1A0533),
       body: GestureDetector(
         onTap: () {
           if (_mainController.value > 0.3) _skipSplash();
@@ -241,12 +253,12 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // ═══ ANIMATED GRADIENT BACKGROUND ═══
+            // ═══ RAINBOW CANDY GRADIENT BACKGROUND ═══
             AnimatedBuilder(
               animation: _waveController,
               builder: (context, child) {
                 return CustomPaint(
-                  painter: _GradientWavePainter(
+                  painter: _RainbowWavePainter(
                     progress: _waveController.value,
                     pulse: _pulseController.value,
                   ),
@@ -255,14 +267,14 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
               },
             ),
 
-            // ═══ FLOATING PARTICLES ═══
+            // ═══ FLOATING EMOJI PARTICLES ═══
             AnimatedBuilder(
               animation: _mainController,
               builder: (context, child) {
                 return Opacity(
                   opacity: _logoOpacity.value,
                   child: CustomPaint(
-                    painter: _ParticlePainter(
+                    painter: _EmojiParticlePainter(
                       particles: _particles,
                       pulse: _pulseController.value,
                     ),
@@ -282,6 +294,35 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                     children: [
                       const Spacer(flex: 2),
 
+                      // ── TIME-AWARE GREETING ──
+                      Opacity(
+                        opacity: _logoOpacity.value,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withValues(alpha: 0.15),
+                                Colors.white.withValues(alpha: 0.05),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+                          ),
+                          child: Text(
+                            _greeting,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 25),
+
                       // ── LOGO ──
                       Transform.scale(
                         scale: _logoScale.value,
@@ -296,20 +337,22 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Color(0xFF00B0FF),
-                                  Color(0xFF00E5FF),
+                                  Color(0xFFFF6B6B), // Coral
+                                  Color(0xFFFFE66D), // Sunny yellow
+                                  Color(0xFF4ECDC4), // Teal
+                                  Color(0xFF45B7D1), // Sky blue
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF00B0FF)
-                                      .withValues(alpha: 0.35),
+                                  color: const Color(0xFFFF6B6B)
+                                      .withValues(alpha: 0.4),
                                   blurRadius: 30 * _logoScale.value,
                                   spreadRadius: 5,
                                 ),
                                 BoxShadow(
-                                  color: const Color(0xFF00E5FF)
-                                      .withValues(alpha: 0.2),
+                                  color: const Color(0xFF4ECDC4)
+                                      .withValues(alpha: 0.3),
                                   blurRadius: 50,
                                   spreadRadius: 2,
                                 ),
@@ -327,8 +370,8 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                                     'assets/icons/logo_main.png',
                                     fit: BoxFit.cover,
                                     errorBuilder: (c, o, s) => const Icon(
-                                        Icons.language,
-                                        color: Color(0xFF00B0FF),
+                                        Icons.auto_awesome,
+                                        color: Color(0xFFFF6B6B),
                                         size: 60),
                                   ),
                                 ),
@@ -340,7 +383,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
 
                       const SizedBox(height: 35),
 
-                      // ── APP NAME ──
+                      // ── APP NAME — RAINBOW GRADIENT ──
                       Transform.translate(
                         offset: Offset(0, _titleSlide.value),
                         child: Opacity(
@@ -349,9 +392,11 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                             shaderCallback: (bounds) =>
                                 const LinearGradient(
                               colors: [
-                                Color(0xFF0091EA),
-                                Color(0xFF00BFA5),
-                                Color(0xFF2979FF),
+                                Color(0xFFFF6B6B), // Red/coral
+                                Color(0xFFFFE66D), // Yellow
+                                Color(0xFF4ECDC4), // Teal
+                                Color(0xFF45B7D1), // Blue
+                                Color(0xFFBB6BD9), // Purple
                               ],
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
@@ -359,15 +404,14 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                             child: Text(
                               "SPEECHMATE",
                               style: TextStyle(
-                                fontSize: 42,
+                                fontSize: 44,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
                                 letterSpacing: 3.0,
                                 height: 1.0,
                                 shadows: [
                                   Shadow(
-                                      color: const Color(0xFF0091EA)
-                                          .withValues(alpha: 0.25),
+                                      color: Colors.black.withValues(alpha: 0.3),
                                       blurRadius: 15,
                                       offset: const Offset(0, 5))
                                 ],
@@ -391,12 +435,12 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                                 _taglines[_currentTagline],
                                 key: ValueKey(_currentTagline),
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF37474F).withValues(
-                                      alpha: 0.5 +
+                                  color: Colors.white.withValues(
+                                      alpha: 0.7 +
                                           (0.3 * _pulseController.value)),
-                                  letterSpacing: 2.5,
+                                  letterSpacing: 1.5,
                                 ),
                               ),
                             );
@@ -406,7 +450,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
 
                       const SizedBox(height: 35),
 
-                      // ── FEATURE BADGES ──
+                      // ── FEATURE BADGES — COLORFUL ──
                       Opacity(
                         opacity: _badgesOpacity.value,
                         child: Wrap(
@@ -414,10 +458,10 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                           runSpacing: 8,
                           alignment: WrapAlignment.center,
                           children: [
-                            _featureBadge("🎙️ Voice", const Color(0xFF0091EA)),
-                            _featureBadge("📸 Camera", const Color(0xFF00BFA5)),
-                            _featureBadge("🌐 Offline", const Color(0xFF00C853)),
-                            _featureBadge("🏝️ Islands", const Color(0xFF2979FF)),
+                            _featureBadge("🎙️ Voice", const Color(0xFFFF6B6B)),
+                            _featureBadge("📸 Camera", const Color(0xFFFFE66D)),
+                            _featureBadge("🌐 Offline", const Color(0xFF4ECDC4)),
+                            _featureBadge("🏝️ Islands", const Color(0xFFBB6BD9)),
                           ],
                         ),
                       ),
@@ -429,7 +473,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
               ),
             ),
 
-            // ═══ PROGRESS BAR ═══
+            // ═══ PROGRESS BAR — RAINBOW ═══
             if (_isPreloading)
               Positioned(
                 bottom: 80,
@@ -443,20 +487,36 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(6),
-                          child: LinearProgressIndicator(
-                            value: _loadProgress,
-                            minHeight: 4,
-                            backgroundColor:
-                                const Color(0xFF0091EA).withValues(alpha: 0.12),
-                            valueColor: const AlwaysStoppedAnimation(
-                                Color(0xFF00B0FF)),
+                          child: Container(
+                            height: 6,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              color: Colors.white.withValues(alpha: 0.1),
+                            ),
+                            child: FractionallySizedBox(
+                              widthFactor: _loadProgress,
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFFF6B6B),
+                                      Color(0xFFFFE66D),
+                                      Color(0xFF4ECDC4),
+                                      Color(0xFF45B7D1),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Preparing your experience...',
+                          '✨ Preparing your adventure...',
                           style: TextStyle(
-                            color: const Color(0xFF546E7A).withValues(alpha: 0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                             fontSize: 11,
                             letterSpacing: 1,
                           ),
@@ -475,15 +535,15 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
               child: AnimatedBuilder(
                 animation: _mainController,
                 builder: (_, __) => Opacity(
-                  opacity: _skipOpacity.value * 0.5,
-                  child: const Center(
+                  opacity: _skipOpacity.value * 0.6,
+                  child: Center(
                     child: Text(
-                      'TAP TO CONTINUE',
+                      '👆 TAP TO CONTINUE',
                       style: TextStyle(
-                        color: const Color(0xFF90A4AE),
-                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.5),
+                        fontSize: 12,
                         letterSpacing: 3,
-                        fontWeight: FontWeight.w300,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -500,14 +560,14 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
                 animation: _mainController,
                 builder: (_, __) => Opacity(
                   opacity: _badgesOpacity.value * 0.5,
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      'v1.4.8 • General Edition',
+                      'v1.5.0 • General Edition 🌟',
                       style: TextStyle(
-                        color: const Color(0xFFB0BEC5),
+                        color: Colors.white.withValues(alpha: 0.4),
                         fontSize: 11,
                         letterSpacing: 1.5,
-                        fontWeight: FontWeight.w300,
+                        fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
@@ -524,9 +584,14 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        gradient: LinearGradient(
+          colors: [color.withValues(alpha: 0.25), color.withValues(alpha: 0.1)],
+        ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.4), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 1.5),
+        boxShadow: [
+          BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 8, spreadRadius: 1),
+        ],
       ),
       child: Text(
         label,
@@ -542,68 +607,85 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen>
 }
 
 // ═══════════════════════════════════════════════════
-// 🌊 ANIMATED WAVE GRADIENT BACKGROUND
+// 🌈 RAINBOW CANDY WAVE BACKGROUND
 // ═══════════════════════════════════════════════════
 
-class _GradientWavePainter extends CustomPainter {
+class _RainbowWavePainter extends CustomPainter {
   final double progress;
   final double pulse;
 
-  _GradientWavePainter({required this.progress, required this.pulse});
+  _RainbowWavePainter({required this.progress, required this.pulse});
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Crisp white-to-ice base
+    // Deep space-candy base
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
       Paint()
         ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFE8F5FE), Color(0xFFF0FFFE), Color(0xFFE0F7FA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1A0533), // Deep purple-black
+            Color(0xFF0D1B2A), // Deep navy
+            Color(0xFF1B0A2E), // Dark violet
+          ],
         ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
     );
 
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Blob 1 — Electric blue (top-right)
+    // Blob 1 — Coral/Pink (top-right)
     final blob1Center = Offset(
-      size.width * (0.7 + 0.15 * math.sin(progress * 2 * math.pi)),
-      size.height * (0.2 + 0.1 * math.cos(progress * 2 * math.pi)),
+      size.width * (0.75 + 0.12 * math.sin(progress * 2 * math.pi)),
+      size.height * (0.15 + 0.08 * math.cos(progress * 2 * math.pi)),
     );
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFF00B0FF).withValues(alpha: 0.35 + 0.1 * pulse),
-        const Color(0xFF00B0FF).withValues(alpha: 0.0),
+        const Color(0xFFFF6B6B).withValues(alpha: 0.35 + 0.1 * pulse),
+        const Color(0xFFFF6B6B).withValues(alpha: 0.0),
       ],
-    ).createShader(Rect.fromCircle(center: blob1Center, radius: size.width * 0.45));
-    canvas.drawCircle(blob1Center, size.width * 0.45, paint);
+    ).createShader(Rect.fromCircle(center: blob1Center, radius: size.width * 0.5));
+    canvas.drawCircle(blob1Center, size.width * 0.5, paint);
 
-    // Blob 2 — Vivid teal (bottom-left)
+    // Blob 2 — Sunny Yellow (center-left)
     final blob2Center = Offset(
-      size.width * (0.25 + 0.12 * math.cos(progress * 2 * math.pi + 1)),
-      size.height * (0.75 + 0.08 * math.sin(progress * 2 * math.pi + 1)),
+      size.width * (0.2 + 0.1 * math.cos(progress * 2 * math.pi + 1.5)),
+      size.height * (0.45 + 0.1 * math.sin(progress * 2 * math.pi + 1.5)),
     );
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFF00E5FF).withValues(alpha: 0.3 + 0.1 * pulse),
-        const Color(0xFF00E5FF).withValues(alpha: 0.0),
+        const Color(0xFFFFE66D).withValues(alpha: 0.2 + 0.08 * pulse),
+        const Color(0xFFFFE66D).withValues(alpha: 0.0),
       ],
-    ).createShader(Rect.fromCircle(center: blob2Center, radius: size.width * 0.5));
-    canvas.drawCircle(blob2Center, size.width * 0.5, paint);
+    ).createShader(Rect.fromCircle(center: blob2Center, radius: size.width * 0.45));
+    canvas.drawCircle(blob2Center, size.width * 0.45, paint);
 
-    // Blob 3 — Bright lime green (center-right)
+    // Blob 3 — Teal/Cyan (bottom-right)
     final blob3Center = Offset(
-      size.width * (0.55 + 0.1 * math.sin(progress * 2 * math.pi + 2.5)),
-      size.height * (0.55 + 0.12 * math.cos(progress * 2 * math.pi + 2.5)),
+      size.width * (0.7 + 0.08 * math.sin(progress * 2 * math.pi + 3)),
+      size.height * (0.75 + 0.06 * math.cos(progress * 2 * math.pi + 3)),
     );
     paint.shader = RadialGradient(
       colors: [
-        const Color(0xFF69F0AE).withValues(alpha: 0.25 + 0.08 * pulse),
-        const Color(0xFF69F0AE).withValues(alpha: 0.0),
+        const Color(0xFF4ECDC4).withValues(alpha: 0.3 + 0.1 * pulse),
+        const Color(0xFF4ECDC4).withValues(alpha: 0.0),
       ],
-    ).createShader(Rect.fromCircle(center: blob3Center, radius: size.width * 0.4));
-    canvas.drawCircle(blob3Center, size.width * 0.4, paint);
+    ).createShader(Rect.fromCircle(center: blob3Center, radius: size.width * 0.5));
+    canvas.drawCircle(blob3Center, size.width * 0.5, paint);
+
+    // Blob 4 — Purple/Violet (bottom-left)
+    final blob4Center = Offset(
+      size.width * (0.25 + 0.1 * math.cos(progress * 2 * math.pi + 4.5)),
+      size.height * (0.8 + 0.08 * math.sin(progress * 2 * math.pi + 4.5)),
+    );
+    paint.shader = RadialGradient(
+      colors: [
+        const Color(0xFFBB6BD9).withValues(alpha: 0.25 + 0.08 * pulse),
+        const Color(0xFFBB6BD9).withValues(alpha: 0.0),
+      ],
+    ).createShader(Rect.fromCircle(center: blob4Center, radius: size.width * 0.4));
+    canvas.drawCircle(blob4Center, size.width * 0.4, paint);
   }
 
   @override
@@ -611,34 +693,29 @@ class _GradientWavePainter extends CustomPainter {
 }
 
 // ═══════════════════════════════════════════════════
-// ✨ FLOATING PARTICLE SYSTEM
+// ✨ FUN EMOJI PARTICLE SYSTEM — CHILD FRIENDLY
 // ═══════════════════════════════════════════════════
 
-class _FloatingParticle {
-  double x, y, vx, vy, radius;
-  Color color;
+class _FunParticle {
+  double x, y, vx, vy, size;
+  String emoji;
+  double rotationSpeed;
 
-  _FloatingParticle(math.Random r)
+  static const List<String> _emojis = [
+    '⭐', '🌟', '✨', '💫', '🎨', '📚', '🎵', '🌈',
+    '🦋', '🌺', '🎯', '🏝️', '🐚', '🌴', '🎪', '🪁',
+  ];
+
+  _FunParticle(math.Random r)
       : x = r.nextDouble(),
         y = r.nextDouble(),
-        vx = (r.nextDouble() - 0.5) * 0.002,
-        vy = -r.nextDouble() * 0.003 - 0.0005,
-        radius = r.nextDouble() * 3 + 1,
-        color = _randomColor(r);
+        vx = (r.nextDouble() - 0.5) * 0.001,
+        vy = -r.nextDouble() * 0.002 - 0.0003,
+        size = r.nextDouble() * 14 + 10,
+        emoji = _emojis[r.nextInt(_emojis.length)],
+        rotationSpeed = (r.nextDouble() - 0.5) * 0.02;
 
-  static Color _randomColor(math.Random r) {
-    final colors = [
-      const Color(0xFF00B0FF),
-      const Color(0xFF00E5FF),
-      const Color(0xFF69F0AE),
-      const Color(0xFF00BFA5),
-      const Color(0xFF2979FF),
-      const Color(0xFF80D8FF),
-    ];
-    return colors[r.nextInt(colors.length)];
-  }
-
-  void update(Size size) {
+  void update(Size screenSize) {
     x += vx;
     y += vy;
     if (x < -0.05) x = 1.05;
@@ -647,41 +724,40 @@ class _FloatingParticle {
   }
 }
 
-class _ParticlePainter extends CustomPainter {
-  final List<_FloatingParticle> particles;
+class _EmojiParticlePainter extends CustomPainter {
+  final List<_FunParticle> particles;
   final double pulse;
 
-  _ParticlePainter({required this.particles, required this.pulse});
+  _EmojiParticlePainter({required this.particles, required this.pulse});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    final linePaint = Paint()..strokeWidth = 0.5;
-
     for (int i = 0; i < particles.length; i++) {
       final p = particles[i];
       final pos = Offset(p.x * size.width, p.y * size.height);
-      final alpha = 0.3 + 0.3 * math.sin(pulse * math.pi + i);
+      final alpha = 0.3 + 0.4 * math.sin(pulse * math.pi + i * 0.7);
 
-      // Glow dot
-      paint.color = p.color.withValues(alpha: alpha);
-      canvas.drawCircle(pos, p.radius + (pulse * 1.5), paint);
+      // Draw emoji text
+      final textSpan = TextSpan(
+        text: p.emoji,
+        style: TextStyle(
+          fontSize: p.size + (math.sin(pulse * math.pi + i) * 3),
+          color: Colors.white.withValues(alpha: alpha),
+        ),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(
+          canvas, pos - Offset(textPainter.width / 2, textPainter.height / 2));
 
-      // Soft halo
-      paint.color = p.color.withValues(alpha: alpha * 0.2);
-      canvas.drawCircle(pos, p.radius * 4, paint);
-
-      // Connect nearby particles
-      for (int j = i + 1; j < particles.length; j++) {
-        final p2 = particles[j];
-        final pos2 = Offset(p2.x * size.width, p2.y * size.height);
-        final dist = (pos - pos2).distance;
-        if (dist < 100) {
-          linePaint.color =
-              p.color.withValues(alpha: (1 - dist / 100) * 0.15);
-          canvas.drawLine(pos, pos2, linePaint);
-        }
-      }
+      // Soft glow behind each emoji
+      final glowPaint = Paint()
+        ..color = const Color(0xFFFFE66D).withValues(alpha: alpha * 0.1)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(pos, p.size * 1.5, glowPaint);
     }
   }
 
