@@ -4,19 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/widgets/translation_card.dart';
-import 'package:speechmate/widgets/gamification_header.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
 import 'package:speechmate/core/app_theme.dart';
-import 'package:speechmate/core/app_config.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
-import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 // Screens
-import 'package:speechmate/screens/games/games_hub_screen.dart';
 import 'package:speechmate/screens/community_screen.dart';
-import 'package:speechmate/screens/voice_vault_screen.dart';
 import 'package:speechmate/screens/dynamic_category_screen.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
@@ -25,14 +20,10 @@ import 'package:speechmate/screens/flora_fauna_screen.dart';
 import 'package:speechmate/screens/omni_translator_screen.dart';
 
 import 'package:speechmate/screens/story_radio_screen.dart';
-import 'package:speechmate/screens/kinship_mapper_screen.dart';
 import 'package:speechmate/screens/dialect_heatmap_screen.dart';
-import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/screens/ar_translator_screen.dart';
-import 'package:speechmate/screens/body_parts_screen.dart';
-import 'package:speechmate/screens/ai_setup_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/screens/regional_translator_screen.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
@@ -296,7 +287,9 @@ class _StudentDashState extends State<StudentDash>
         body: Stack(
           children: [
             // Vibrant Background for Glassmorphism
-            const RepaintBoundary(child: AmbientGlassBackground()),
+            // NOTE: AmbientGlassBackground returns Positioned.fill, so it must be
+            // a direct Stack child (no RepaintBoundary wrapper — it's inside instead).
+            const AmbientGlassBackground(),
             SafeArea(
               child: Column(
                 children: [
@@ -330,8 +323,10 @@ class _StudentDashState extends State<StudentDash>
                 ],
               ),
             ),
-            RepaintBoundary(child: VirtualPetCompanion(onPetHappy: _triggerConfetti)),
-            RepaintBoundary(child: ConfettiOverlay(trigger: _showConfetti)),
+            // NOTE: VirtualPetCompanion returns Positioned, so it must be
+            // a direct Stack child (no RepaintBoundary wrapper).
+            VirtualPetCompanion(onPetHappy: _triggerConfetti),
+            ConfettiOverlay(trigger: _showConfetti),
           ],
         ),
       ),
@@ -758,14 +753,16 @@ class _AmbientGlassBackgroundState extends State<AmbientGlassBackground>
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            painter: _AmbientPainter(_controller.value),
-            size: Size.infinite,
-          );
-        },
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
+              painter: _AmbientPainter(_controller.value),
+              size: Size.infinite,
+            );
+          },
+        ),
       ),
     );
   }
@@ -1313,7 +1310,6 @@ class _DailyMissionCardState extends State<DailyMissionCard>
   late AnimationController _shimmer;
   double _progress = 0.0;
   late Map<String, dynamic> _todaysMission;
-  bool _loadingProgress = true;
 
   @override
   void initState() {
@@ -1333,7 +1329,6 @@ class _DailyMissionCardState extends State<DailyMissionCard>
     if (mounted) {
       setState(() {
         _progress = (wordsLearned / target).clamp(0.0, 1.0);
-        _loadingProgress = false;
       });
     }
   }

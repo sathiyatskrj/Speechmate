@@ -1,15 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speechmate/services/neural_engine_service.dart';
-import 'package:speechmate/services/dictionary_service.dart';
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('Neural Engine Pipeline Tests', () {
-    late NeuralEngineService neuralEngine;
-
     setUp(() async {
-      neuralEngine = NeuralEngineService();
       // Using mock or default behavior for tests
     });
 

@@ -393,7 +393,7 @@ class _TeacherDashState extends State<TeacherDash>
     final TextEditingController pathController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text("Import Vocabulary 📥"),
         content: Column(
@@ -416,14 +416,14 @@ class _TeacherDashState extends State<TeacherDash>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text("Cancel"),
           ),
           ElevatedButton.icon(
             onPressed: () async {
               final path = pathController.text.trim();
               if (path.isEmpty) return;
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Importing vocabulary...")),
               );
