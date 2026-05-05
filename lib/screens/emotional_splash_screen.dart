@@ -449,21 +449,43 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                             ).createShader(bounds),
-                            child: Text(
-                              "SPEECHMATE",
-                              style: TextStyle(
-                                fontSize: 44,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                letterSpacing: 3.0,
-                                height: 1.0,
-                                shadows: [
-                                  Shadow(
-                                      color: Colors.black.withValues(alpha: 0.3),
-                                      blurRadius: 15,
-                                      offset: const Offset(0, 5))
-                                ],
-                              ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "SPEECHMATE",
+                                  style: TextStyle(
+                                    fontSize: 44,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: 3.0,
+                                    height: 1.0,
+                                    shadows: [
+                                      Shadow(
+                                          color: Colors.black.withValues(alpha: 0.3),
+                                          blurRadius: 15,
+                                          offset: const Offset(0, 5))
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Where Language Barriers End",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    letterSpacing: 1.2,
+                                    height: 1.0,
+                                    shadows: [
+                                      Shadow(
+                                          color: Colors.black.withValues(alpha: 0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 3))
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
