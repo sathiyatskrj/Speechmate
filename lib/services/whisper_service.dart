@@ -233,9 +233,12 @@ class WhisperService {
       // Track file for cleanup
       trackTempFile(audioFilePath);
 
+      // Optimizations:
+      // 1. Hardcoding language to "en" bypasses the slow language detection phase.
+      // 2. Increasing timeout to 120s avoids TimeoutException aborting slow base models.
       final TranscribeRequest request = TranscribeRequest(
         audio: audioFilePath,
-        language: "auto",
+        language: "en", // Bypass expensive language detection for speed
         isTranslate: false,
         speedUp: true,
         isNoTimestamps: true, // Speeds up inference by skipping timestamp generation
@@ -243,7 +246,7 @@ class WhisperService {
       );
 
       final response = await _whisper!.transcribe(transcribeRequest: request)
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 120)); // Generous timeout for base model on old devices
       
       _lastTranscribeTime = DateTime.now();
       _consecutiveFailures = 0; // Success — reset failure counter
