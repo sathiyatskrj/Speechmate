@@ -15,7 +15,7 @@ class WhisperService {
   bool _isProcessing = false;
   bool _isAvailable = false;
   Whisper? _whisper;
-  WhisperModelSize _currentSize = WhisperModelSize.tiny; // Prefer tiny for speed
+  WhisperModelSize _currentSize = WhisperModelSize.base; // Prefer base multilingual
   int _consecutiveFailures = 0;
   static const int _maxConsecutiveFailures = 2;
   
@@ -163,7 +163,7 @@ class WhisperService {
     try {
       final TranscribeRequest request = TranscribeRequest(
         audio: audioFilePath,
-        language: "auto",
+        language: "en", // Speed optimization
         isTranslate: false,
         speedUp: true,
         isNoTimestamps: true, // Speeds up inference by skipping timestamp generation
@@ -171,7 +171,8 @@ class WhisperService {
       );
 
       final response = await _whisper!.transcribe(transcribeRequest: request)
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 120)); // Increased timeout
+
       
       _consecutiveFailures = 0; // Success — reset failure counter
       return response.text;
