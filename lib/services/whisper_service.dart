@@ -15,7 +15,7 @@ class WhisperService {
   bool _isProcessing = false;
   bool _isAvailable = false;
   Whisper? _whisper;
-  WhisperModelSize _currentSize = WhisperModelSize.base; // Prefer base multilingual
+  WhisperModelSize _currentSize = WhisperModelSize.tiny; // Prefer tiny for speed
   int _consecutiveFailures = 0;
   static const int _maxConsecutiveFailures = 2;
   
