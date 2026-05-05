@@ -19,7 +19,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
   late AnimationController _mainController;
   late AnimationController _pulseController;
   late AnimationController _waveController;
-  late AnimationController _emojiController;
+  late AnimationController _physicsController;
 
   late Animation<double> _logoScale;
   late Animation<double> _logoOpacity;
@@ -32,10 +32,13 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
   double _loadProgress = 0.0;
   bool _isPreloading = true;
 
-  // Floating emoji particles — fun for kids! 🌈
-  final int _particleCount = 18;
-  final List<_FunParticle> _particles = [];
+  // Physics-based authentic island words
+  final List<PhysicsWord> _words = [];
   final math.Random _random = math.Random();
+  final List<String> _authenticWords = [
+    'Minyuku', 'Kojito', 'Bulu', 'Töku', 'Lūng', 'Kamorta',
+    'Onges', 'Jarawa', 'Andamanese', 'Shompen'
+  ];
 
   // Ambient Audio
   final AudioPlayer _ambientPlayer = AudioPlayer();
@@ -59,11 +62,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
   @override
   void initState() {
     super.initState();
-
-    // Generate floating emoji particles
-    for (int i = 0; i < _particleCount; i++) {
-      _particles.add(_FunParticle(_random));
-    }
+    _initializePhysics();
 
     _pulseController = AnimationController(
       vsync: this,
@@ -75,9 +74,9 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
       duration: const Duration(seconds: 8),
     )..repeat();
 
-    _emojiController = AnimationController(
+    _physicsController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 10),
     )..repeat();
 
     _mainController = AnimationController(
@@ -136,15 +135,12 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
       }
     });
 
-    // Animate particles
-    _waveController.addListener(() {
-      if (!mounted) return;
-      final size = MediaQuery.of(context).size;
-      setState(() {
-        for (var p in _particles) {
-          p.update(size);
-        }
-      });
+    _physicsController.addListener(() {
+      if (mounted) {
+        setState(() {
+          _updatePhysics();
+        });
+      }
     });
 
     _mainController.forward();
@@ -159,11 +155,69 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
     _preloadData();
   }
 
+  void _initializePhysics() {
+    for (int i = 0; i < 20; i++) {
+      _words.add(PhysicsWord(
+        word: _authenticWords[_random.nextInt(_authenticWords.length)],
+        x: _random.nextDouble(),
+        y: -_random.nextDouble() * 2.0, // Start above screen
+        vx: (_random.nextDouble() - 0.5) * 0.015,
+        vy: 0.0,
+        color: _getRandomBrightColor(),
+        size: _random.nextDouble() * 20 + 14,
+        rotation: _random.nextDouble() * math.pi * 2,
+        angularVelocity: (_random.nextDouble() - 0.5) * 0.08,
+      ));
+    }
+  }
+
+  Color _getRandomBrightColor() {
+    final colors = [
+      const Color(0xFFFF6B6B),
+      const Color(0xFFFFE66D),
+      const Color(0xFF4ECDC4),
+      const Color(0xFF45B7D1),
+      const Color(0xFFBB6BD9),
+      const Color(0xFFFF9F43),
+      const Color(0xFF1DD1A1),
+    ];
+    return colors[_random.nextInt(colors.length)];
+  }
+
+  void _updatePhysics() {
+    final dt = 0.016; // Approx 60fps
+    final gravity = 0.005;
+    final bounce = -0.7;
+
+    for (var word in _words) {
+      word.vy += gravity * dt;
+      word.x += word.vx;
+      word.y += word.vy;
+      word.rotation += word.angularVelocity;
+
+      // Floor collision
+      if (word.y > 0.95) {
+        word.y = 0.95;
+        word.vy *= bounce;
+        word.vx *= 0.95; // friction
+      }
+
+      // Wall collision
+      if (word.x < 0) {
+        word.x = 0;
+        word.vx *= bounce;
+      } else if (word.x > 1) {
+        word.x = 1;
+        word.vx *= bounce;
+      }
+    }
+  }
+
   Future<void> _playAmbientAudio() async {
     try {
       await _ambientPlayer.setVolume(0.0);
       await _ambientPlayer.setReleaseMode(ReleaseMode.loop);
-      await _ambientPlayer.setSource(AssetSource('audio/ambient.mp3'));
+      await _ambientPlayer.setSource(AssetSource('audio/ambient_child.mp3'));
       await _ambientPlayer.resume();
       await _ambientPlayer.seek(const Duration(seconds: 2));
       for (int i = 1; i <= 10; i++) {
@@ -237,7 +291,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
     _mainController.dispose();
     _pulseController.dispose();
     _waveController.dispose();
-    _emojiController.dispose();
+    _physicsController.dispose();
     _ambientPlayer.dispose();
     super.dispose();
   }
@@ -267,19 +321,13 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
               },
             ),
 
-            // ═══ FLOATING EMOJI PARTICLES ═══
+            // ═══ PHYSICS AUTHENTIC WORDS ═══
             AnimatedBuilder(
-              animation: _mainController,
+              animation: _physicsController,
               builder: (context, child) {
-                return Opacity(
-                  opacity: _logoOpacity.value,
-                  child: CustomPaint(
-                    painter: _EmojiParticlePainter(
-                      particles: _particles,
-                      pulse: _pulseController.value,
-                    ),
-                    size: Size.infinite,
-                  ),
+                return CustomPaint(
+                  size: Size.infinite,
+                  painter: PhysicsWordPainter(words: _words, pulse: _pulseController.value),
                 );
               },
             ),
@@ -693,71 +741,74 @@ class _RainbowWavePainter extends CustomPainter {
 }
 
 // ═══════════════════════════════════════════════════
-// ✨ FUN EMOJI PARTICLE SYSTEM — CHILD FRIENDLY
+// ✨ PHYSICS WORDS SYSTEM — CHILD FRIENDLY
 // ═══════════════════════════════════════════════════
 
-class _FunParticle {
-  double x, y, vx, vy, size;
-  String emoji;
-  double rotationSpeed;
+class PhysicsWord {
+  String word;
+  double x, y;
+  double vx, vy;
+  Color color;
+  double size;
+  double rotation;
+  double angularVelocity;
 
-  static const List<String> _emojis = [
-    '⭐', '🌟', '✨', '💫', '🎨', '📚', '🎵', '🌈',
-    '🦋', '🌺', '🎯', '🏝️', '🐚', '🌴', '🎪', '🪁',
-  ];
-
-  _FunParticle(math.Random r)
-      : x = r.nextDouble(),
-        y = r.nextDouble(),
-        vx = (r.nextDouble() - 0.5) * 0.001,
-        vy = -r.nextDouble() * 0.002 - 0.0003,
-        size = r.nextDouble() * 14 + 10,
-        emoji = _emojis[r.nextInt(_emojis.length)],
-        rotationSpeed = (r.nextDouble() - 0.5) * 0.02;
-
-  void update(Size screenSize) {
-    x += vx;
-    y += vy;
-    if (x < -0.05) x = 1.05;
-    if (x > 1.05) x = -0.05;
-    if (y < -0.1) y = 1.1;
-  }
+  PhysicsWord({
+    required this.word,
+    required this.x,
+    required this.y,
+    required this.vx,
+    required this.vy,
+    required this.color,
+    required this.size,
+    required this.rotation,
+    required this.angularVelocity,
+  });
 }
 
-class _EmojiParticlePainter extends CustomPainter {
-  final List<_FunParticle> particles;
+class PhysicsWordPainter extends CustomPainter {
+  final List<PhysicsWord> words;
   final double pulse;
 
-  _EmojiParticlePainter({required this.particles, required this.pulse});
+  PhysicsWordPainter({required this.words, required this.pulse});
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (int i = 0; i < particles.length; i++) {
-      final p = particles[i];
-      final pos = Offset(p.x * size.width, p.y * size.height);
-      final alpha = 0.3 + 0.4 * math.sin(pulse * math.pi + i * 0.7);
+    for (int i = 0; i < words.length; i++) {
+      var word = words[i];
+      if (word.y < -0.1) continue; // Don't draw if too far off screen
 
-      // Draw emoji text
+      final pos = Offset(word.x * size.width, word.y * size.height);
+      final alpha = 0.6 + 0.4 * math.sin(pulse * math.pi + i * 0.7);
+      
+      canvas.save();
+      canvas.translate(pos.dx, pos.dy);
+      canvas.rotate(word.rotation);
+      
       final textSpan = TextSpan(
-        text: p.emoji,
+        text: word.word,
         style: TextStyle(
-          fontSize: p.size + (math.sin(pulse * math.pi + i) * 3),
-          color: Colors.white.withValues(alpha: alpha),
+          fontSize: word.size + (math.sin(pulse * math.pi + i) * 2),
+          fontWeight: FontWeight.w900,
+          color: word.color.withValues(alpha: alpha),
+          shadows: [
+            Shadow(
+              color: Colors.black.withValues(alpha: 0.2 * alpha),
+              blurRadius: 4,
+              offset: const Offset(2, 2),
+            )
+          ],
         ),
       );
+      
       final textPainter = TextPainter(
         text: textSpan,
         textDirection: TextDirection.ltr,
       );
       textPainter.layout();
-      textPainter.paint(
-          canvas, pos - Offset(textPainter.width / 2, textPainter.height / 2));
-
-      // Soft glow behind each emoji
-      final glowPaint = Paint()
-        ..color = const Color(0xFFFFE66D).withValues(alpha: alpha * 0.1)
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(pos, p.size * 1.5, glowPaint);
+      textPainter.paint(canvas, Offset(-textPainter.width / 2, -textPainter.height / 2));
+      
+      canvas.restore();
     }
   }
 
