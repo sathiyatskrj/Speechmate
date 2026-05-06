@@ -112,7 +112,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
     try {
       await _ambientPlayer.setVolume(0.0);
       await _ambientPlayer.setReleaseMode(ReleaseMode.loop);
-      await _ambientPlayer.setSource(AssetSource('audio/ambient_professional.mp3'));
+      await _ambientPlayer.setSource(AssetSource('audio/ambient.mp3'));
       await _ambientPlayer.resume();
       for (int i = 1; i <= 10; i++) {
         await Future.delayed(const Duration(milliseconds: 200));

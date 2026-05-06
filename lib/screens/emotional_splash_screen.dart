@@ -161,8 +161,8 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
       await _ambientPlayer.setVolume(0.0);
       await _ambientPlayer.setReleaseMode(ReleaseMode.loop);
       await _ambientPlayer.setSource(AssetSource('audio/ambient.mp3'));
+      await _ambientPlayer.seek(const Duration(seconds: 2)); // Seek before playing
       await _ambientPlayer.resume();
-      await _ambientPlayer.seek(const Duration(seconds: 2)); // Start music from 2 sec
       // Fade in volume
       for (int i = 1; i <= 10; i++) {
         await Future.delayed(const Duration(milliseconds: 200));
@@ -377,19 +377,37 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen> with Tick
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter
                                   ).createShader(bounds),
-                                  child: Text(
-                                    "SPEECHMATE",
-                                    style: TextStyle(
-                                      fontFamily: 'Roboto',
-                                      fontSize: 48,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.white,
-                                      letterSpacing: 2.0,
-                                      height: 1.0,
-                                      shadows: [
-                                        Shadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0,5))
-                                      ]
-                                    ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        "SPEECHMATE",
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.white,
+                                          letterSpacing: 2.0,
+                                          height: 1.0,
+                                          shadows: [
+                                            Shadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0,5))
+                                          ]
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        "Where Language Barriers End",
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white.withValues(alpha: 0.85),
+                                          letterSpacing: 1.2,
+                                          shadows: [
+                                            Shadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0,3))
+                                          ]
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const SizedBox(height: 16),
