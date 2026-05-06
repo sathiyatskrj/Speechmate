@@ -207,10 +207,9 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
     _lastAudioPath = path;
 
     try {
-      // Step 1: Transcribe
-      final transcription = await _whisperService
-          .transcribe(path)
-          .timeout(const Duration(seconds: 25));
+      // Step 1: Transcribe — WhisperService has its own 30s timeout,
+      // no extra timeout here to avoid premature abort race conditions.
+      final transcription = await _whisperService.transcribe(path);
 
       if (transcription.trim().isEmpty) {
         if (mounted) {
@@ -240,6 +239,8 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
       _ttsService.speakNicobarese(result.text, englishWord: transcription);
     } catch (e) {
       debugPrint('[VoiceTranslator] Process error: $e');
+      // Proactively reset the whisper engine so next attempt works
+      _whisperService.reset();
       if (mounted) {
         setState(() {
           _inputText = _inputText.isEmpty ? 'Processing failed' : _inputText;
