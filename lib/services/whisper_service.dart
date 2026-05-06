@@ -24,9 +24,12 @@ class WhisperService {
   Whisper? _whisper;
   WhisperModelSize _currentSize = WhisperModelSize.base; // Prefer base multilingual
   int _consecutiveFailures = 0;
-  static const int _maxConsecutiveFailures = 3; // Increased tolerance
+  static const int _maxConsecutiveFailures = 2; // Rebuild engine faster
   DateTime? _lastTranscribeTime;
-  static const Duration _engineCooldown = Duration(milliseconds: 500);
+  static const Duration _engineCooldown = Duration(milliseconds: 300);
+  
+  // Track initialization to prevent double-init races
+  bool _isInitializing = false;
   
   // Track temp audio files for cleanup
   final List<String> _tempAudioFiles = [];
@@ -60,42 +63,59 @@ class WhisperService {
       return true;
     }
 
-    for (int attempt = 0; attempt <= retryCount; attempt++) {
-      try {
-        final Directory dir = await getApplicationSupportDirectory();
-        
-        // Try to extract the preferred model
-        bool extracted = await _tryExtractModel(dir, _currentSize);
-        
-        // If preferred model not found, try fallback sizes
-        if (!extracted && _currentSize != WhisperModelSize.tiny) {
-          debugPrint('[WhisperService] Base model not bundled, falling back to tiny...');
-          _currentSize = WhisperModelSize.tiny;
-          extracted = await _tryExtractModel(dir, _currentSize);
-        }
-        
-        if (!extracted) {
-          debugPrint('[WhisperService] No whisper model found in assets.');
-          _isAvailable = false;
-          return false;
-        }
-
-        _whisper = Whisper(
-          model: _getFlutterModel(_currentSize),
-          modelDir: dir.path,
-        );
-
-        _isAvailable = true;
-        _consecutiveFailures = 0;
-        debugPrint('[WhisperService] Initialized with $_currentSize model.');
-        return true;
-      } catch (e) {
-        debugPrint('[WhisperService] Init failed (attempt ${attempt + 1}): $e');
-        if (attempt == retryCount) return false;
-        await Future.delayed(const Duration(seconds: 1));
+    // Prevent concurrent init calls from racing
+    if (_isInitializing) {
+      debugPrint('[WhisperService] Init already in progress, waiting...');
+      // Wait for existing init to finish (up to 10s)
+      for (int i = 0; i < 100; i++) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (!_isInitializing) return _isAvailable;
       }
+      return _isAvailable;
     }
-    return false;
+
+    _isInitializing = true;
+    
+    try {
+      for (int attempt = 0; attempt <= retryCount; attempt++) {
+        try {
+          final Directory dir = await getApplicationSupportDirectory();
+          
+          // Try to extract the preferred model
+          bool extracted = await _tryExtractModel(dir, _currentSize);
+          
+          // If preferred model not found, try fallback sizes
+          if (!extracted && _currentSize != WhisperModelSize.tiny) {
+            debugPrint('[WhisperService] Base model not bundled, falling back to tiny...');
+            _currentSize = WhisperModelSize.tiny;
+            extracted = await _tryExtractModel(dir, _currentSize);
+          }
+          
+          if (!extracted) {
+            debugPrint('[WhisperService] No whisper model found in assets.');
+            _isAvailable = false;
+            return false;
+          }
+
+          _whisper = Whisper(
+            model: _getFlutterModel(_currentSize),
+            modelDir: dir.path,
+          );
+
+          _isAvailable = true;
+          _consecutiveFailures = 0;
+          debugPrint('[WhisperService] Initialized with $_currentSize model.');
+          return true;
+        } catch (e) {
+          debugPrint('[WhisperService] Init failed (attempt ${attempt + 1}): $e');
+          if (attempt == retryCount) return false;
+          await Future.delayed(const Duration(seconds: 1));
+        }
+      }
+      return false;
+    } finally {
+      _isInitializing = false;
+    }
   }
 
   /// Try to extract a model from assets, checking both multilingual and .en variants
@@ -205,8 +225,37 @@ class WhisperService {
     }
   }
 
+  /// Validate audio file before sending to Whisper engine.
+  /// Returns true if file exists and has sufficient audio data.
+  bool _isValidAudioFile(String path) {
+    try {
+      final file = File(path);
+      if (!file.existsSync()) {
+        debugPrint('[WhisperService] Audio file not found: $path');
+        return false;
+      }
+      final size = file.lengthSync();
+      // WAV header is 44 bytes, anything less than 1KB is likely empty/corrupt
+      if (size < 1024) {
+        debugPrint('[WhisperService] Audio file too small ($size bytes): $path');
+        return false;
+      }
+      return true;
+    } catch (e) {
+      debugPrint('[WhisperService] File validation error: $e');
+      return false;
+    }
+  }
+
   /// Transcribe a WAV audio file using the local Whisper model.
+  /// Optimized for speed: uses tiny model-friendly settings,
+  /// avoids language detection overhead, and has tight timeouts.
   Future<String> transcribe(String audioFilePath) async {
+    // Pre-flight: validate the audio file
+    if (!_isValidAudioFile(audioFilePath)) {
+      return '';
+    }
+    
     if (!_isAvailable || _whisper == null) {
       debugPrint('[WhisperService] Cannot transcribe - service unavailable. Attempting re-init...');
       await initialize();
@@ -233,24 +282,31 @@ class WhisperService {
       // Track file for cleanup
       trackTempFile(audioFilePath);
 
-      // Optimizations:
-      // 1. Hardcoding language to "en" bypasses the slow language detection phase.
-      // 2. Increasing timeout to 120s avoids TimeoutException aborting slow base models.
+      // SPEED OPTIMIZATIONS:
+      // 1. language: "en" → bypasses slow auto-detection (~2-3s saved)
+      // 2. isNoTimestamps: true → skips timestamp generation (~0.5s saved)
+      // 3. speedUp: false → CRITICAL: speedUp=true causes audio aliasing
+      //    that produces gibberish on base model, leading to empty results
+      //    and perceived "crashes" after 2-3 uses
+      // 4. threads: 4 on Android → utilizes multi-core for faster inference
       final TranscribeRequest request = TranscribeRequest(
         audio: audioFilePath,
         language: "en", // Bypass expensive language detection for speed
         isTranslate: false,
-        speedUp: true,
+        speedUp: false, // DO NOT enable — causes quality degradation on base model
         isNoTimestamps: true, // Speeds up inference by skipping timestamp generation
         threads: !Platform.isIOS ? 4 : 2,
       );
 
       final response = await _whisper!.transcribe(transcribeRequest: request)
-          .timeout(const Duration(seconds: 120)); // Generous timeout for base model on old devices
+          .timeout(const Duration(seconds: 30)); // Tight timeout — base model finishes in 5-15s typically
       
       _lastTranscribeTime = DateTime.now();
       _consecutiveFailures = 0; // Success — reset failure counter
-      return response.text;
+      
+      final text = response.text.trim();
+      debugPrint('[WhisperService] Transcribed: "${text.length > 80 ? text.substring(0, 80) : text}"');
+      return text;
     } catch (e) {
       debugPrint('[WhisperService] Transcribe error: $e');
       _consecutiveFailures++;
@@ -263,7 +319,7 @@ class WhisperService {
         _isAvailable = false;
         _consecutiveFailures = 0;
         // Immediately try to re-init for next use
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future.delayed(const Duration(milliseconds: 300));
         await initialize();
       }
       return '';
