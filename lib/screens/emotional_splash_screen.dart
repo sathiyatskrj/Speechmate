@@ -176,9 +176,9 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
     try {
       await _ambientPlayer.setVolume(0.0);
       await _ambientPlayer.setReleaseMode(ReleaseMode.loop);
-      await _ambientPlayer.setSource(AssetSource('audio/ambient_child.mp3'));
-      await _ambientPlayer.resume();
+      await _ambientPlayer.setSource(AssetSource('audio/ambient.mp3'));
       await _ambientPlayer.seek(const Duration(seconds: 2));
+      await _ambientPlayer.resume();
       for (int i = 1; i <= 10; i++) {
         await Future.delayed(const Duration(milliseconds: 200));
         if (!mounted) return;
@@ -413,9 +413,9 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
                               child: Column(
                                 children: [
                                   Text(
-                                    'SpeechMate',
+                                    'SPEECHMATE',
                                     style: TextStyle(
-                                      fontSize: 46,
+                                      fontSize: 42,
                                       fontWeight: FontWeight.w900,
                                       color: const Color(0xFF1D3557),
                                       letterSpacing: 2.0,
@@ -430,22 +430,13 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Colors.white.withValues(alpha: 0.35),
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: const Text(
-                                      'Learn Authentic Island Words! 🏝️',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF1D3557),
-                                        letterSpacing: 0.5,
-                                      ),
+                                  Text(
+                                    'Where Language Barriers End',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF1D3557).withValues(alpha: 0.85),
+                                      letterSpacing: 0.8,
                                     ),
                                   ),
                                 ],
