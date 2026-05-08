@@ -18,6 +18,8 @@ import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
 import 'package:speechmate/screens/flora_fauna_screen.dart';
 import 'package:speechmate/screens/omni_translator_screen.dart';
+import 'package:speechmate/screens/document_translation_hub.dart';
+import 'package:speechmate/screens/chat_translate_screen.dart';
 
 import 'package:speechmate/screens/story_radio_screen.dart';
 import 'package:speechmate/screens/dialect_heatmap_screen.dart';
@@ -110,6 +112,20 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)],
           "navigateTo": const ARTranslatorScreen(),
           "icon": Icons.view_in_ar_rounded
+        },
+        {
+          "word": "Document Translator",
+          "emoji": "📄",
+          "colors": [const Color(0xFF00BCD4), const Color(0xFF0097A7)],
+          "navigateTo": const DocumentTranslationHub(),
+          "icon": Icons.auto_stories_rounded
+        },
+        {
+          "word": "Text Translator",
+          "emoji": "✏️",
+          "colors": [const Color(0xFFFF7043), const Color(0xFFE64A19)],
+          "navigateTo": const ChatTranslateScreen(),
+          "icon": Icons.translate_rounded
         },
 
         // ═══════════════════════════════════════════════════
