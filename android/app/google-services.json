@@ -9,7 +9,7 @@
             "client_info": {
                 "mobilesdk_app_id": "1:300078500168:android:32e551cb297697d905cb7d",
                 "android_client_info": {
-                    "package_name": "com.speechmate.speechmate"
+                    "package_name": "com.speechmate.general"
                 }
             },
             "oauth_client": [],

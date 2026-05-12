@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.speechmate.speechmate"
+    namespace = "com.speechmate.general"
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.speechmate.speechmate"
+        applicationId = "com.speechmate.general"
         minSdk = 24
         targetSdk = 34
         versionCode = 2 // Updated to match pubspec (1.2.0+2)
