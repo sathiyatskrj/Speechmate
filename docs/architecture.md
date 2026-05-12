@@ -1,4 +1,4 @@
-# SpeechMate — Architecture Deep Dive
+# SpeechMate — Architecture
 
 ## System Overview
 
@@ -14,7 +14,7 @@ graph TD
         Service --> |ML Kit| Regional[Regional Language Translation]
     end
 
-    subgraph "Local Data (SQLite)"
+    subgraph "Local Data — SQLite"
         Service --> DB[DatabaseManager]
         DB --> Words[2,400+ Nicobarese Words]
         DB --> Phrases[Classroom Phrases]
@@ -35,18 +35,18 @@ graph TD
 
 | Service | Responsibility |
 | :--- | :--- |
-| `WhisperService` | Native C++ Whisper Base inference via NDK 27. Handles audio chunking, VAD, and transcript output. |
-| `NeuralEngine` / `TranslationService` | 10-stage offline translation pipeline (see below). |
-| `DatabaseManager` | SQLite wrapper. Seeds all JSON lexicons on first launch. Indexed for O(1) dictionary lookup. |
+| `WhisperService` | Native C++ Whisper Base inference via NDK 27. Audio chunking, VAD, and transcript output. |
+| `NeuralEngine` | 10-stage offline translation pipeline — deterministic, no generative AI. |
+| `DatabaseManager` | SQLite wrapper. Seeds all JSON lexicons on first launch. Indexed for O(1) lookup. |
 | `ProgressService` | SharedPreferences-backed XP, streak, and level state. |
 | `GamificationService` | Mission generation, XP award logic, level-up thresholds. |
 | `FeedbackService` | Stores user-submitted word corrections locally for elder/teacher review. |
 
 ---
 
-## Offline Translation Pipeline (10 Stages)
+## Offline Translation Pipeline
 
-All translation is **deterministic** — no neural networks, no generative AI.
+All translation is **deterministic** — no neural networks, no generative AI, no cloud dependency.
 
 | Stage | Method | Purpose |
 |:---|:---|:---|
@@ -61,8 +61,6 @@ All translation is **deterministic** — no neural networks, no generative AI.
 | 9 | **Compound Word Decomposition** | Splits compounds (e.g., "rainforest" → "rain" + "forest") |
 | 10 | **Fuzzy Search** | Levenshtein edit-distance matching (max distance: 2) |
 
-> **Note:** Stages 5–10 are implemented but have not been benchmarked for accuracy against a held-out test set. Accuracy metrics are a roadmap item.
-
 ---
 
 ## Regional Translation Flow
@@ -71,7 +69,7 @@ All translation is **deterministic** — no neural networks, no generative AI.
 User input (Hindi / Tamil / Bengali / Telugu / Malayalam)
     │
     ▼
-Google ML Kit / Cloud translator
+Google ML Kit (offline) / Cloud translator (Malayalam only)
     │
     ▼ (English pivot text)
 NeuralEngine (10-stage pipeline)
@@ -86,57 +84,38 @@ Nicobarese output
 | Tamil | Google ML Kit | ✅ Offline |
 | Bengali | Google ML Kit | ✅ Offline |
 | Telugu | Google ML Kit | ✅ Offline |
-| Malayalam | `translator` package (cloud) | 🌐 Online required |
+| Malayalam | `translator` package | 🌐 Online required |
 
-> ML Kit models must be downloaded on first use. After download, they operate fully offline.
+> ML Kit models download on first use, then operate fully offline.
 
 ---
 
 ## Data Layer
 
-All linguistic data lives in `assets/data/` and is seeded to SQLite on first app launch.
+All linguistic data lives in `assets/data/` and is seeded to SQLite on first app launch. See [`LINGUISTIC_SOURCES.md`](LINGUISTIC_SOURCES.md) for academic references and validation methodology.
 
-| File | Category | Approx. Entries |
+| File | Category | Entries |
 | :--- | :--- | :--- |
 | `dictionary.json` | Core Nicobarese | 2,400+ |
-| `dictionary_numbers.json` | Numbers | ~20 |
-| `dictionary_nature.json` | Nature | ~30 |
-| `dictionary_colors.json` | Colors | ~15 |
-| `dictionary_feelings.json` | Emotions | ~20 |
-| `dictionary_things.json` | Everyday objects | ~40 |
-| `dictionary_body_parts.json` | Body parts | ~30 |
-| `dictionary_animals.json` | Animals | ~20 |
-| `dictionary_magic.json` | Greetings / Magic words | ~25 |
-| `dictionary_family.json` | Family | ~20 |
-| `dictionary_phrases.json` | Classroom phrases | ~30 |
-| `dictionary_dialects.json` | 5-dialect comparison | large |
 | `dictionary_great_andamanese.json` | Great Andamanese | 1,000+ |
-
-### Entry Format
-
-```json
-{
-  "english": "Water",
-  "nicobarese": "Mak",
-  "emoji": "💧",
-  "audio": "water.mp3"
-}
-```
+| `dictionary_dialects.json` | 5-dialect comparison | Large |
+| `dictionary_phrases.json` | Classroom phrases | ~30 |
+| + 9 category-specific lexicons | Numbers, Nature, Colors, Feelings, Things, Body Parts, Animals, Greetings, Family | ~220 |
 
 ---
 
 ## Why Offline-First?
 
-- **Accessibility** — Andaman & Nicobar islands have frequent signal dead zones.
-- **Privacy** — Voice recordings never leave the device.
-- **Data sovereignty** — Indigenous linguistic data is stored locally, not by a cloud provider.
-- **Speed** — No server round-trips; dictionary responses are <100ms.
+- **Accessibility** — A&N islands have frequent signal dead zones
+- **Privacy** — Voice recordings never leave the device
+- **Data sovereignty** — Indigenous linguistic data is stored locally, not by a cloud provider
+- **Speed** — No server round-trips; dictionary responses are <100ms
 
 ---
 
-## Adding a New Language
+## Language-Agnostic Design
 
-SpeechMate is language-agnostic by design:
+SpeechMate can support any new language with 4 steps:
 
 1. Create `assets/data/dictionary_<lang>.json`
 2. Add audio to `assets/audio/<lang>/`
