@@ -122,10 +122,5 @@ Community corrections are reviewed before merging. We prioritize corrections fro
 
 ## Sources & References
 
-> The current lexicon is a compiled prototype dataset. Formal linguistic validation with community elders has not yet been conducted — this is a priority for the pilot phase.
+For a complete list of academic sources, validation methodology, and data provenance, see [`LINGUISTIC_SOURCES.md`](LINGUISTIC_SOURCES.md).
 
-Potential reference sources for validation:
-- CIIL (Central Institute of Indian Languages) published materials
-- SIL International's Ethnologue data for Car Nicobarese
-- Published academic wordlists (Man, 1889; Whitehead, 1925 — Great Andamanese)
-- Direct community elder recording sessions (planned for pilot phase)

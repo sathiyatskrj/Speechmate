@@ -49,3 +49,9 @@ tools/
 
 # Offline ML Models
 *.gguf
+
+# Internal dev notes (not for public)
+docs/internal_status.md
+analyze_out.txt
+duplicate_analysis.txt
+doctor_output.txt
