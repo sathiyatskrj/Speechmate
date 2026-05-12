@@ -1,4 +1,4 @@
-package com.speechmate.speechmate
+package com.speechmate.edu
 
 class WhisperBridge {
     companion object {
