@@ -790,13 +790,13 @@ class _AmbientPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Base gradient — clean white-to-ice blue
+     // Base gradient — warm teal explorer palette
     final Rect rect = Offset.zero & size;
     final Paint bgPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Color(0xFFE8F5FE), Color(0xFFF0FFFE), Color(0xFFE0F7FA)],
+        colors: [Color(0xFFF0FDFA), Color(0xFFF5F5F4), Color(0xFFECFDF5)],
       ).createShader(rect);
     canvas.drawRect(rect, bgPaint);
 
@@ -811,26 +811,26 @@ class _AmbientPainter extends CustomPainter {
       canvas.drawRect(rect, paint);
     }
 
-    // Orb 1 — Electric blue (top area)
+    // Orb 1 — Oceanic teal (top area)
     final double x1 =
         size.width * 0.5 + math.sin(progress * math.pi * 2) * size.width * 0.4;
     final double y1 = size.height * 0.25 +
         math.cos(progress * math.pi * 2) * size.height * 0.15;
-    drawFastGlowingOrb(x1, y1, 300, const Color(0xFF00B0FF));
+    drawFastGlowingOrb(x1, y1, 300, const Color(0xFF14B8A6));
 
-    // Orb 2 — Vivid teal (bottom-left)
+    // Orb 2 — Emerald green (bottom-left)
     final double x2 = size.width * 0.2 +
         math.cos(progress * math.pi * 2 + math.pi) * size.width * 0.3;
     final double y2 = size.height * 0.75 +
         math.sin(progress * math.pi * 2 + math.pi) * size.height * 0.2;
-    drawFastGlowingOrb(x2, y2, 320, const Color(0xFF00E5FF));
+    drawFastGlowingOrb(x2, y2, 320, const Color(0xFF34D399));
 
-    // Orb 3 — Bright lime green (right side)
+    // Orb 3 — Warm amber (right side)
     final double x3 = size.width * 0.8 +
         math.sin(progress * math.pi * 2 + math.pi / 2) * size.width * 0.25;
     final double y3 = size.height * 0.5 +
         math.cos(progress * math.pi * 2 + math.pi / 2) * size.height * 0.3;
-    drawFastGlowingOrb(x3, y3, 260, const Color(0xFF69F0AE));
+    drawFastGlowingOrb(x3, y3, 260, const Color(0xFFFBBF24));
   }
 
   @override
@@ -1600,7 +1600,7 @@ class KidsSectionHeader extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: const TextStyle(
-            color: Colors.black87,
+            color: Color(0xFF0F766E),
             fontSize: 13,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.5,
@@ -1612,7 +1612,7 @@ class KidsSectionHeader extends StatelessWidget {
             height: 2,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                  colors: [Colors.black12, Colors.transparent]),
+                  colors: [Color(0x4D0D9488), Colors.transparent]),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

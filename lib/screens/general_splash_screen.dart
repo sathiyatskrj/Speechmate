@@ -260,14 +260,14 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                                 colors: [
-                                  Color(0xFF3B82F6), // Blue 500
-                                  Color(0xFF2563EB), // Blue 600
-                                  Color(0xFF1D4ED8), // Blue 700
+                                  Color(0xFF0D9488), // Teal 600
+                                  Color(0xFF0F766E), // Teal 700
+                                  Color(0xFF115E59), // Teal 800
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF3B82F6).withOpacity(0.4),
+                                  color: const Color(0xFF0D9488).withOpacity(0.4),
                                   blurRadius: 30,
                                   spreadRadius: 5,
                                 ),
@@ -286,7 +286,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
                                     fit: BoxFit.cover,
                                     errorBuilder: (c, o, s) => const Icon(
                                       Icons.language,
-                                      color: Color(0xFF3B82F6),
+                                      color: Color(0xFF0D9488),
                                       size: 50,
                                     ),
                                   ),
@@ -324,7 +324,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
                         child: Transform.translate(
                           offset: Offset(0, _textSlide.value * 1.2),
                           child: const Text(
-                            'DISCOVER  \u2022  SPEAK  \u2022  CONNECT',
+                            'DISCOVER  \u2022  TRANSLATE  \u2022  EXPLORE',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -350,7 +350,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
                                   child: LinearProgressIndicator(
                                     value: _loadProgress,
                                     backgroundColor: const Color(0xFF1E293B),
-                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF3B82F6)),
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0D9488)),
                                     minHeight: 2,
                                   ),
                                 ),
@@ -399,7 +399,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
                       Opacity(
                         opacity: _textOpacity.value * 0.5,
                         child: const Text(
-                          'v2.0.0 \u2022 Community Edition',
+                          'v1.4.8 \u2022 Explorer Edition',
                           style: TextStyle(
                             color: Color(0xFF475569), // Slate 600
                             fontSize: 10,
@@ -451,7 +451,7 @@ class NetworkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final nodePaint = Paint()
-      ..color = const Color(0xFF3B82F6).withOpacity(0.5)
+      ..color = const Color(0xFF0D9488).withOpacity(0.5)
       ..style = PaintingStyle.fill;
       
     final linePaint = Paint()
@@ -476,7 +476,7 @@ class NetworkPainter extends CustomPainter {
         if (dist < maxDist) {
           final p2 = Offset(nodes[j].x * size.width, nodes[j].y * size.height);
           final opacity = 1.0 - (dist / maxDist);
-          linePaint.color = const Color(0xFF3B82F6).withOpacity(0.2 * opacity);
+          linePaint.color = const Color(0xFF0D9488).withOpacity(0.2 * opacity);
           linePaint.strokeWidth = 0.5 + (1.5 * opacity);
           canvas.drawLine(p1, p2, linePaint);
         }
@@ -511,13 +511,13 @@ class GlowOrbPainter extends CustomPainter {
       size.width * (0.8 + 0.1 * math.sin(time)),
       size.height * (0.2 + 0.1 * math.cos(time)),
     );
-    drawOrb(orb1Center, size.width * 0.6, const Color(0xFF2563EB), 0.15);
+    drawOrb(orb1Center, size.width * 0.6, const Color(0xFF0F766E), 0.15);
 
     final orb2Center = Offset(
       size.width * (0.2 + 0.1 * math.cos(time * 0.8)),
       size.height * (0.8 + 0.1 * math.sin(time * 0.8)),
     );
-    drawOrb(orb2Center, size.width * 0.5, const Color(0xFF1E40AF), 0.15);
+    drawOrb(orb2Center, size.width * 0.5, const Color(0xFF115E59), 0.15);
   }
 
   @override
