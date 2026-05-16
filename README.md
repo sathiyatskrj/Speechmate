@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="#">
-    <img src="https://img.shields.io/badge/Version-1.4.8-blue?style=for-the-badge" alt="Version 1.4.8" />
+    <img src="https://img.shields.io/badge/Version-1.4.9-blue?style=for-the-badge" alt="Version 1.4.9" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter 3.29+" />
@@ -76,6 +76,9 @@ SpeechMate is intentionally focused on **one problem**: helping children learn e
 | **📸 Book Scanner** | OCR scanner — point at English text, see Nicobarese translation |
 | **✏️ Dictionary Editor** | Teachers/elders can locally edit, correct, or add vocabulary on-device |
 | **📈 Progress Dashboards** | Class-level learning analytics and SRS review stats |
+| **👥 Class Roster** | Student management with class filtering and performance status |
+| **📊 Quiz Analytics** | Priority alerts, class averages, weak word identification |
+| **✏️ Marks Entry** | Per-student score input with assessment type selection |
 
 ### Great Andamanese Hub
 
@@ -118,14 +121,14 @@ These features extend the core learning platform:
 
 | Spec | Value | Notes |
 | :--- | :--- | :--- |
-| App size | ~250 MB | 141 MB is the bundled Whisper STT model |
+| APK size | **~80 MB** | Whisper model downloaded on first launch (~141 MB) |
+| Total on-device | ~220 MB | After Whisper + ML Kit downloads |
 | STT latency | ~600ms | Benchmarked on Snapdragon 6xx (mid-range) |
 | Translation speed | <100ms | SQLite indexed lookup |
 | Min Android | API 24 (Android 7.0+) | |
 | Framework | Flutter 3.29+ · Dart 3.2+ | |
-| APK optimization | On roadmap | Target: <100 MB via on-demand model download |
 
-> **On APK size:** The current 250 MB includes a bundled Whisper model for guaranteed offline STT. We are actively working on an on-demand download architecture that would bring the base APK under 100 MB. See the [roadmap](#-roadmap) for timeline.
+> **On APK size:** v1.4.9 moves the Whisper model to on-demand download, reducing the APK from ~250 MB to ~80 MB. The model is downloaded automatically on first launch via the Asset Download Screen.
 
 > See [`/docs/architecture.md`](docs/architecture.md) for the full translation pipeline and system diagram.
 
