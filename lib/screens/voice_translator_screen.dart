@@ -8,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:speechmate/services/neural_engine_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/whisper_service.dart';
+import 'package:speechmate/services/regional_translation_service.dart';
+import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class VoiceTranslatorScreen extends StatefulWidget {
@@ -24,6 +26,17 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
   final WhisperService _whisperService = WhisperService();
   final NeuralEngineService _neuralEngine = NeuralEngineService();
   final TtsService _ttsService = TtsService();
+
+  // P1-02 + P3-01: Input language selection for bidirectional voice translation
+  String _selectedInputLang = 'en';
+  final Map<String, String> _inputLanguages = {
+    'en': 'English',
+    'hi': 'Hindi',
+    'ta': 'Tamil',
+    'bn': 'Bengali',
+    'te': 'Telugu',
+  };
+  final RegionalTranslationService _regionalService = RegionalTranslationService();
 
   // State
   bool _isRecording = false;
@@ -223,9 +236,24 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
 
       if (mounted) setState(() => _inputText = transcription.trim());
 
-      // Step 2: Translate
+      // Step 2: If non-English input, translate to English first via ML Kit
+      String englishText = transcription;
+      if (_selectedInputLang != 'en') {
+        try {
+          final langMap = {'hi': TranslateLanguage.hindi, 'ta': TranslateLanguage.tamil, 'bn': TranslateLanguage.bengali, 'te': TranslateLanguage.telugu};
+          final mlLang = langMap[_selectedInputLang];
+          if (mlLang != null) {
+            await _regionalService.initialize(mlLang);
+            englishText = await _regionalService.translateToEnglish(transcription, fallbackLangCode: _selectedInputLang);
+          }
+        } catch (e) {
+          debugPrint('[VoiceTranslator] Regional→English failed: $e');
+        }
+      }
+
+      // Step 3: Translate English → Nicobarese
       final result = await _neuralEngine
-          .predict(transcription)
+          .predict(englishText)
           .timeout(const Duration(seconds: 10));
 
       if (mounted) {
@@ -235,8 +263,8 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
         });
       }
 
-      // Step 3: Speak
-      _ttsService.speakNicobarese(result.text, englishWord: transcription);
+      // Step 4: Speak
+      _ttsService.speakNicobarese(result.text, englishWord: englishText);
     } catch (e) {
       debugPrint('[VoiceTranslator] Process error: $e');
       // Proactively reset the whisper engine so next attempt works
@@ -392,21 +420,56 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
 
   // ── Main UI ───────────────────────────────────────────────────────────────
   Widget _buildMainUI() {
+    final langLabel = _inputLanguages[_selectedInputLang] ?? 'English';
     return Column(
       children: [
         const SizedBox(height: 8),
 
-        // ── Input panel (English) ──
+        // ── Language selector chip ──
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('INPUT: ', style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2)),
+              ..._inputLanguages.entries.map((e) {
+                final isActive = e.key == _selectedInputLang;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _selectedInputLang = e.key),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isActive ? Colors.cyanAccent.withValues(alpha: 0.2) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isActive ? Colors.cyanAccent.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.1)),
+                      ),
+                      child: Text(e.value.substring(0, 2).toUpperCase(),
+                        style: TextStyle(
+                          color: isActive ? Colors.cyanAccent : Colors.white.withValues(alpha: 0.4),
+                          fontSize: 10, fontWeight: FontWeight.w700,
+                        )),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+
+        // ── Input panel ──
         Expanded(
           flex: 3,
           child: _buildGlassPanel(
-            label: 'ENGLISH',
+            label: langLabel.toUpperCase(),
             labelColor: Colors.cyanAccent,
             icon: Icons.language_rounded,
             text: _isRecording
-                ? null // Show waveform
+                ? null
                 : _isProcessing && _inputText.isEmpty
-                    ? null // Show processing
+                    ? null
                     : _inputText.isEmpty
                         ? 'Tap the orb to start speaking'
                         : _inputText,

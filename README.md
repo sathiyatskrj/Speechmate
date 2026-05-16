@@ -2,7 +2,7 @@
   <img src="assets/icons/banner_hero.png" width="100%" alt="SpeechMate — Andaman & Nicobar Translation Hub">
 </p>
 
-<h1 align="center">SPEECHMATE: General Public & Tourism Edition</h1>
+<h1 align="center">SPEECHMATE: Explorer Edition v1.4.9</h1>
 
 <p align="center">
   <strong>The ultimate offline language and culture companion for the Andaman &amp; Nicobar Islands.</strong><br>
@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="#">
-    <img src="https://img.shields.io/badge/Stage-General_Public_Prototype-blue?style=for-the-badge" alt="General Public Prototype" />
+    <img src="https://img.shields.io/badge/v1.4.9-Explorer_Edition-blue?style=for-the-badge" alt="Explorer Edition v1.4.9" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter 3.29+" />
@@ -81,7 +81,19 @@ This edition strips away the classroom elements of the core app and focuses enti
 | **Community Board** | Connect with other travelers and local guides | 🧪 *Coming Soon* |
 | **AR Translator** | Live object detection with translated overlays | ⚠️ *Experimental* |
 
-> **Note:** This version skips role-selection and dives straight into the unified Dashboard.
+### 🆕 New in v1.4.9
+
+| Feature | Description |
+| :--- | :--- |
+| **Explorer Dashboard** | Bento-grid home screen with quick access to all tools |
+| **Word of the Day** | Daily Nicobarese word on the dashboard |
+| **Survival Phrase Cards** | Quick-access scrollable cards for greetings, food, directions |
+| **Bidirectional Voice** | Speak in Hindi/Tamil/Bengali/Telugu — get Nicobarese output |
+| **Asset Download Screen** | Post-install download for Whisper model (reduces APK to ~80 MB) |
+| **Onboarding Flow** | 3-slide first-launch introduction |
+| **Offline Status Indicator** | Persistent "Fully Offline" chip on dashboard |
+
+> **Note:** This version skips role-selection and dives straight into the Explorer Dashboard.
 
 ---
 
@@ -116,8 +128,9 @@ Flutter UI (Riverpod)
 
 | Metric | Value | Notes |
 | :--- | :--- | :--- |
-| App size | ~250 MB | Includes 141 MB Whisper model |
-| STT latency | ~600ms | Tested on a mid-range Android (Snapdragon 6xx). |
+| APK size | **~80 MB** | Whisper model downloaded post-install (~141 MB) |
+| Total on-device | ~220 MB | After Whisper download |
+| STT latency | ~600ms | Tested on mid-range Android (Snapdragon 6xx) |
 | Translation speed | <100ms | SQLite indexed lookup |
 | Min Android | API 24 | Android 7.0+ |
 
@@ -133,10 +146,7 @@ cd Speechmate
 # 2. Install dependencies
 flutter pub get
 
-# 3. Pull Whisper model (Git LFS — 141 MB)
-git lfs pull
-
-# 4. Run
+# 3. Run — Whisper model will be downloaded on first launch via the app
 flutter run
 ```
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/services/whisper_service.dart';
 import 'dart:math' as math;
 import 'package:audioplayers/audioplayers.dart';
 
@@ -125,20 +126,32 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
 
   Future<void> _preloadData() async {
     try {
-      setState(() => _loadProgress = 0.2);
+      setState(() => _loadProgress = 0.15);
       await DatabaseManager.instance.database;
       if (!mounted) return;
-      setState(() => _loadProgress = 0.5);
+      setState(() => _loadProgress = 0.35);
 
       await DatabaseManager.instance.seedCategoryFromJson('main', 'assets/data/dictionary.json');
       if (!mounted) return;
-      setState(() => _loadProgress = 0.8);
+      setState(() => _loadProgress = 0.55);
+
+      // P1-01: Warm up Whisper engine during splash so voice features
+      // have zero cold-start lag when the user first taps the mic.
+      try {
+        debugPrint('[Splash] Pre-initializing Whisper engine...');
+        await WhisperService().initialize();
+        debugPrint('[Splash] Whisper engine ready.');
+      } catch (e) {
+        debugPrint('[Splash] Whisper warm-up failed (non-fatal): $e');
+      }
+      if (!mounted) return;
+      setState(() => _loadProgress = 0.85);
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('has_seen_splash', true);
       
-      // Simulate extra loading for professional feel
-      await Future.delayed(const Duration(milliseconds: 1500));
+      // Brief pause for professional feel
+      await Future.delayed(const Duration(milliseconds: 800));
       
       if (!mounted) return;
       setState(() {
@@ -147,7 +160,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
       });
 
       // Wait a bit before auto-navigating
-      await Future.delayed(const Duration(milliseconds: 800));
+      await Future.delayed(const Duration(milliseconds: 600));
       _navigateNext();
     } catch (e) {
       debugPrint('[Splash] Preload error: $e');
@@ -399,7 +412,7 @@ class _GeneralSplashScreenState extends State<GeneralSplashScreen> with TickerPr
                       Opacity(
                         opacity: _textOpacity.value * 0.5,
                         child: const Text(
-                          'v1.4.8 \u2022 Explorer Edition',
+                          'v1.4.9 \u2022 Explorer Edition',
                           style: TextStyle(
                             color: Color(0xFF475569), // Slate 600
                             fontSize: 10,

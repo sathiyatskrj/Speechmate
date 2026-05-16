@@ -181,7 +181,7 @@ class WhisperService {
     }
   }
 
-  /// Try to extract a model from assets, checking both multilingual and .en variants
+  /// Try to find or extract a model, checking download dir first then assets
   Future<bool> _tryExtractModel(Directory dir, WhisperModelSize size) async {
     // First try multilingual variant
     final String modelName = _modelFiles[size]!;
@@ -189,10 +189,23 @@ class WhisperService {
     final File modelFile = File(modelPath);
 
     if (modelFile.existsSync() && modelFile.lengthSync() > 1000) {
-      return true; // Already extracted
+      return true; // Already extracted or downloaded
     }
 
-    // Try extracting multilingual from assets
+    // Check if AssetDownloadScreen placed the model in app support dir
+    // (This is the primary path when model is NOT bundled in the APK)
+    try {
+      final supportDir = dir; // getApplicationSupportDirectory is already passed
+      final downloadedModel = File('${supportDir.path}/$modelName');
+      if (downloadedModel.existsSync() && downloadedModel.lengthSync() > 1000) {
+        debugPrint('[WhisperService] Found downloaded model at ${downloadedModel.path}');
+        return true;
+      }
+    } catch (e) {
+      debugPrint('[WhisperService] Download dir check failed: $e');
+    }
+
+    // Try extracting multilingual from bundled assets (if still bundled)
     try {
       final String assetPath = 'assets/models/$modelName';
       final ByteData data = await rootBundle.load(assetPath);
@@ -201,7 +214,7 @@ class WhisperService {
       debugPrint('[WhisperService] Extracted $modelName from assets (multilingual).');
       return true;
     } catch (e) { debugPrint("Silent error caught: $e");
-      debugPrint('[WhisperService] $modelName not found in assets.');
+      debugPrint('[WhisperService] $modelName not found in bundled assets (expected for slim APK).');
     }
 
     // Try .en fallback variant
@@ -215,7 +228,7 @@ class WhisperService {
       debugPrint('[WhisperService] Extracted $fallbackName as $modelName (English-only fallback).');
       return true;
     } catch (e) { debugPrint("Silent error caught: $e");
-      debugPrint('[WhisperService] $fallbackName also not found.');
+      debugPrint('[WhisperService] $fallbackName also not found. Voice features require download.');
     }
 
     return false;
