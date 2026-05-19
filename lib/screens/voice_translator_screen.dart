@@ -9,6 +9,7 @@ import 'package:speechmate/services/neural_engine_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/whisper_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speechmate/services/database_manager.dart';
 
 class VoiceTranslatorScreen extends StatefulWidget {
   const VoiceTranslatorScreen({super.key});
@@ -35,6 +36,9 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
   String _outputText = '';
   double _confidence = 0.0;
   String? _lastAudioPath;
+
+  // Bidirectional: false = English→Nicobarese, true = Nicobarese→English
+  bool _isReversed = false;
 
   // Animation controllers
   late AnimationController _orbPulse;
@@ -223,20 +227,38 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
 
       if (mounted) setState(() => _inputText = transcription.trim());
 
-      // Step 2: Translate
-      final result = await _neuralEngine
-          .predict(transcription)
-          .timeout(const Duration(seconds: 10));
+      // Step 2: Translate based on direction
+      if (_isReversed) {
+        // Nicobarese → English: use DB reverse lookup
+        final match = await DatabaseManager.instance.searchByNicobarese(transcription);
+        if (mounted) {
+          setState(() {
+            _outputText = match != null
+                ? (match['english'] ?? 'No translation found')
+                : 'Word not found in dictionary';
+            _confidence = match != null ? 0.95 : 0.0;
+          });
+        }
+        // Speak the English result
+        if (match != null) {
+          _ttsService.speakEnglish(_outputText);
+        }
+      } else {
+        // English → Nicobarese: use neural engine
+        final result = await _neuralEngine
+            .predict(transcription)
+            .timeout(const Duration(seconds: 10));
 
-      if (mounted) {
-        setState(() {
-          _outputText = result.text;
-          _confidence = result.confidence;
-        });
+        if (mounted) {
+          setState(() {
+            _outputText = result.text;
+            _confidence = result.confidence;
+          });
+        }
+
+        // Step 3: Speak
+        _ttsService.speakNicobarese(result.text, englishWord: transcription);
       }
-
-      // Step 3: Speak
-      _ttsService.speakNicobarese(result.text, englishWord: transcription);
     } catch (e) {
       debugPrint('[VoiceTranslator] Process error: $e');
       // Proactively reset the whisper engine so next attempt works
@@ -396,13 +418,13 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
       children: [
         const SizedBox(height: 8),
 
-        // ── Input panel (English) ──
+        // ── Input panel ──
         Expanded(
           flex: 3,
           child: _buildGlassPanel(
-            label: 'ENGLISH',
-            labelColor: Colors.cyanAccent,
-            icon: Icons.language_rounded,
+            label: _isReversed ? 'NICOBARESE' : 'ENGLISH',
+            labelColor: _isReversed ? Colors.tealAccent : Colors.cyanAccent,
+            icon: _isReversed ? Icons.translate_rounded : Icons.language_rounded,
             text: _isRecording
                 ? null // Show waveform
                 : _isProcessing && _inputText.isEmpty
@@ -415,16 +437,67 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
           ),
         ),
 
+        // ── Direction swap button ──
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: GestureDetector(
+            onTap: () {
+              if (!_isRecording && !_isProcessing) {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _isReversed = !_isReversed;
+                  _inputText = '';
+                  _outputText = '';
+                  _confidence = 0.0;
+                });
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _isReversed ? 'Nicobarese' : 'English',
+                    style: TextStyle(
+                      color: _isReversed ? Colors.tealAccent : Colors.cyanAccent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Icon(Icons.swap_horiz_rounded, color: Colors.white54, size: 20),
+                  ),
+                  Text(
+                    _isReversed ? 'English' : 'Nicobarese',
+                    style: TextStyle(
+                      color: _isReversed ? Colors.cyanAccent : Colors.tealAccent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
         // ── Center orb ──
         _buildOrb(),
 
-        // ── Output panel (Nicobarese) ──
+        // ── Output panel ──
         Expanded(
           flex: 3,
           child: _buildGlassPanel(
-            label: 'NICOBARESE',
-            labelColor: Colors.tealAccent,
-            icon: Icons.translate_rounded,
+            label: _isReversed ? 'ENGLISH' : 'NICOBARESE',
+            labelColor: _isReversed ? Colors.cyanAccent : Colors.tealAccent,
+            icon: _isReversed ? Icons.language_rounded : Icons.translate_rounded,
             text: _isProcessing && _inputText.isNotEmpty && _outputText.isEmpty
                 ? null
                 : _outputText.isEmpty
@@ -433,7 +506,13 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
             isProcessing: _isProcessing && _inputText.isNotEmpty && _outputText.isEmpty,
             confidence: _confidence,
             showSpeaker: _outputText.isNotEmpty && !_isProcessing,
-            onSpeakerTap: () => _ttsService.speakNicobarese(_outputText, englishWord: _inputText),
+            onSpeakerTap: () {
+              if (_isReversed) {
+                _ttsService.speakEnglish(_outputText);
+              } else {
+                _ttsService.speakNicobarese(_outputText, englishWord: _inputText);
+              }
+            },
           ),
         ),
 

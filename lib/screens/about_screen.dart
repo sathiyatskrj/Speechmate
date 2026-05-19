@@ -143,10 +143,15 @@ class AboutScreen extends StatelessWidget {
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Built with ❤️ for Tribal Community by T Sathiya Moorthy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text("Built with ❤️ for Tribal Heritage by T Sathiya Moorthy", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       SizedBox(height: 10),
-                      Text("Special thanks to the tribal communities of Nicobar for their invaluable cultural knowledge and to all educators working to preserve indigenous languages.", 
+                      Text("Special thanks to the tribal communities of Nicobar for their invaluable cultural knowledge, to all educators working to preserve indigenous languages, and to CIIL (Central Institute of Indian Languages) for linguistic research support.", 
                         style: TextStyle(height: 1.5, color: Colors.black87)),
+                      SizedBox(height: 12),
+                      Text("v1.4.9 — Explorer Edition", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0D9488))),
+                      SizedBox(height: 4),
+                      Text("• Bidirectional voice translation (Hindi/Tamil/Bengali/Telugu)\n• Explorer Dashboard with bento-grid layout\n• Word of the Day & survival phrase cards\n• Whisper engine warm-up for instant voice\n• Offline ML Kit model download prompts\n• Database seed optimization\n• Onboarding flow for new users", 
+                        style: TextStyle(height: 1.5, color: Colors.black87, fontSize: 13)),
                     ],
                   ),
                 ),

@@ -5,9 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/screens/emotional_splash_screen.dart';
 import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/core/app_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
+
+/// Current data version — bump this when lexicon files change
+/// so the DB re-seeds on upgrade instead of every cold start.
+const String _dataVersion = '1.4.9';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,54 +69,68 @@ void main() async {
   //     debugPrint("Firebase init failed: $e");
   // }
 
+  // P1-05: Version-hash seed check — only re-seed when data version changes
+  final prefs = await SharedPreferences.getInstance();
+  final lastSeedVersion = prefs.getString('last_seed_version') ?? '';
+  final needsSeed = lastSeedVersion != _dataVersion;
+
   // Database initialization
   try {
       await DatabaseManager.instance.database;
-      await DatabaseManager.instance.seedExtraFromJson('phrases', 'assets/data/dictionary_phrases.json', (item) {
-        final audio = item['audio'];
-        return {
+
+      if (needsSeed) {
+        debugPrint('[main] Data version changed ($lastSeedVersion → $_dataVersion), re-seeding...');
+        await DatabaseManager.instance.seedExtraFromJson('phrases', 'assets/data/dictionary_phrases.json', (item) {
+          final audio = item['audio'];
+          return {
+            'english': item['english']?.toString() ?? '',
+            'nicobarese': item['nicobarese']?.toString() ?? '',
+            'text': item['text']?.toString() ?? '',
+            'audio_category': audio is Map ? (audio['category']?.toString() ?? '') : '',
+            'audio_file': audio is Map ? (audio['file']?.toString() ?? '') : '',
+          };
+        });
+        await DatabaseManager.instance.seedExtraFromJson('dialects', 'assets/data/dictionary_dialects.json', (item) => {
           'english': item['english']?.toString() ?? '',
-          'nicobarese': item['nicobarese']?.toString() ?? '',
-          'text': item['text']?.toString() ?? '',
-          'audio_category': audio is Map ? (audio['category']?.toString() ?? '') : '',
-          'audio_file': audio is Map ? (audio['file']?.toString() ?? '') : '',
+          'car': item['car']?.toString() ?? '',
+          'central': item['central']?.toString() ?? '',
+          'coast': item['coast']?.toString() ?? '',
+          'teressa': item['teressa']?.toString() ?? '',
+          'chowra': item['chowra']?.toString() ?? '',
+        });
+        await DatabaseManager.instance.seedExtraFromJson('ga_dictionary', 'assets/data/dictionary_great_andamanese.json', (item) => {
+          'english': item['english']?.toString() ?? '',
+          'great_andamanese': item['great_andamanese']?.toString() ?? '',
+          'pos': item['pos']?.toString() ?? '',
+          'audio': item['audio']?.toString() ?? '',
+        });
+        await DatabaseManager.instance.seedExtraFromJson('ga_phrases', 'assets/data/phrases_great_andamanese.json', (item) => {
+          'english': item['english']?.toString() ?? '',
+          'great_andamanese': item['great_andamanese']?.toString() ?? '',
+          'audio': item['audio']?.toString() ?? '',
+        });
+        
+        // Seed ALL category word data from JSON files
+        final categoryJsonFiles = {
+          'words': 'assets/data/dictionary.json',
+          'animals': 'assets/data/dictionary_animals.json',
+          'family': 'assets/data/dictionary_family.json',
+          'magic': 'assets/data/dictionary_magic.json',
+          'body_parts': 'assets/data/dictionary_body_parts.json',
+          'numbers': 'assets/data/dictionary_numbers.json',
+          'nature': 'assets/data/dictionary_nature.json',
+          'colors': 'assets/data/dictionary_colors.json',
+          'things': 'assets/data/dictionary_things.json',
+          'feelings': 'assets/data/dictionary_feelings.json',
         };
-      });
-      await DatabaseManager.instance.seedExtraFromJson('dialects', 'assets/data/dictionary_dialects.json', (item) => {
-        'english': item['english']?.toString() ?? '',
-        'car': item['car']?.toString() ?? '',
-        'central': item['central']?.toString() ?? '',
-        'coast': item['coast']?.toString() ?? '',
-        'teressa': item['teressa']?.toString() ?? '',
-        'chowra': item['chowra']?.toString() ?? '',
-      });
-      await DatabaseManager.instance.seedExtraFromJson('ga_dictionary', 'assets/data/dictionary_great_andamanese.json', (item) => {
-        'english': item['english']?.toString() ?? '',
-        'great_andamanese': item['great_andamanese']?.toString() ?? '',
-        'pos': item['pos']?.toString() ?? '',
-        'audio': item['audio']?.toString() ?? '',
-      });
-      await DatabaseManager.instance.seedExtraFromJson('ga_phrases', 'assets/data/phrases_great_andamanese.json', (item) => {
-        'english': item['english']?.toString() ?? '',
-        'great_andamanese': item['great_andamanese']?.toString() ?? '',
-        'audio': item['audio']?.toString() ?? '',
-      });
-      
-      // Seed ALL category word data from JSON files
-      final categoryJsonFiles = {
-        'words': 'assets/data/dictionary.json',
-        'animals': 'assets/data/dictionary_animals.json',
-        'family': 'assets/data/dictionary_family.json',
-        'magic': 'assets/data/dictionary_magic.json',
-        'body_parts': 'assets/data/dictionary_body_parts.json',
-        'numbers': 'assets/data/dictionary_numbers.json',
-        'nature': 'assets/data/dictionary_nature.json',
-        'colors': 'assets/data/dictionary_colors.json',
-        'things': 'assets/data/dictionary_things.json',
-        'feelings': 'assets/data/dictionary_feelings.json',
-      };
-      for (final entry in categoryJsonFiles.entries) {
-        await DatabaseManager.instance.seedCategoryFromJson(entry.key, entry.value);
+        for (final entry in categoryJsonFiles.entries) {
+          await DatabaseManager.instance.seedCategoryFromJson(entry.key, entry.value);
+        }
+
+        await prefs.setString('last_seed_version', _dataVersion);
+        debugPrint('[main] Seed complete for $_dataVersion.');
+      } else {
+        debugPrint('[main] Data already seeded for $_dataVersion, skipping.');
       }
   } catch (e) {
       debugPrint("Database init failed: $e");

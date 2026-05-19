@@ -66,7 +66,7 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
       setState(() {
         _isInitializing = false;
         if (!success) {
-          _errorMsg = "Failed to download offline models. Please check connection.";
+          _errorMsg = "Language pack not yet downloaded. Please connect to Wi-Fi briefly to download the ${widget.config.name} offline model, then you can use it without internet.";
         } else {
           _messages.add({
             "text": "👋 Namaste! You can now speak or type in ${widget.config.name}. I will translate it directly to Nicobarese for you. Try typing '${widget.config.sampleWord}'!",
@@ -275,7 +275,7 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
         actions: [
           Row(
             children: [
-              Text("Teacher", style: TextStyle(color: _isNicobareseMode ? Colors.white54 : Colors.cyanAccent, fontSize: 12)),
+              Text("${widget.config.name}", style: TextStyle(color: _isNicobareseMode ? Colors.white54 : Colors.cyanAccent, fontSize: 12)),
               Switch(
                 value: _isNicobareseMode,
                 activeColor: Colors.amberAccent,
@@ -287,7 +287,7 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
                   });
                 },
               ),
-              Text("Student", style: TextStyle(color: _isNicobareseMode ? Colors.amberAccent : Colors.white54, fontSize: 12)),
+              Text("Reverse", style: TextStyle(color: _isNicobareseMode ? Colors.amberAccent : Colors.white54, fontSize: 12)),
               const SizedBox(width: 10),
             ],
           )
@@ -313,7 +313,29 @@ class _RegionalTranslatorScreenState extends State<RegionalTranslatorScreen> {
             else if (_errorMsg.isNotEmpty)
               Expanded(
                 child: Center(
-                  child: Text(_errorMsg, style: const TextStyle(color: Colors.redAccent)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.download_rounded, color: Colors.amberAccent, size: 48),
+                        const SizedBox(height: 16),
+                        Text(_errorMsg, style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5), textAlign: TextAlign.center),
+                        const SizedBox(height: 20),
+                        OutlinedButton.icon(
+                          onPressed: _initTranslation,
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: const Text('Retry Download'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.cyanAccent,
+                            side: const BorderSide(color: Colors.cyanAccent),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               )
             else

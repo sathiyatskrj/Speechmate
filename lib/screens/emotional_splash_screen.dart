@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'dart:math' as math;
 import 'package:audioplayers/audioplayers.dart';
+import 'package:speechmate/services/whisper_service.dart';
 
 /// Premium splash screen for SpeechMate Educational Edition.
 /// Deep ocean-twilight theme with organic firefly particles.
@@ -221,6 +222,13 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
       debugPrint('[Splash] Preload error: $e');
       if (mounted) setState(() => _isPreloading = false);
     }
+
+    // Fire-and-forget Whisper warm-up so voice features have zero cold-start
+    WhisperService().initialize().then((_) {
+      debugPrint('[Splash] Whisper warm-up complete.');
+    }).catchError((e) {
+      debugPrint('[Splash] Whisper warm-up skipped: $e');
+    });
   }
 
   void _navigateNext() async {
@@ -384,7 +392,7 @@ class _EmotionalSplashScreenState extends State<EmotionalSplashScreen>
                   opacity: _badgeFade.value * 0.4,
                   child: Center(
                     child: Text(
-                      'v1.4.8  •  Educational Edition',
+                      'v1.4.9  •  Educational Edition',
                       style: TextStyle(
                         color: _textSecondary.withValues(alpha: 0.5),
                         fontSize: 10,

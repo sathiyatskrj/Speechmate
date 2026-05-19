@@ -27,43 +27,43 @@ mixin SearchableDashboardMixin<T extends StatefulWidget> on State<T> {
     setState(() => isSearchLoading = true);
 
     try {
-    // 1. Direct Search (Exact/Fuzzy from Dictionary)
-    var found = await dashSearchDictService.searchEverywhere(query);
+      // 1. Direct Search (Exact/Fuzzy from Dictionary)
+      var found = await dashSearchDictService.searchEverywhere(query);
 
-    // 2. Neural Engine Fallback
-    if (found == null) {
-      final neuralResult = await dashSearchNeuralEngine.predict(query);
-      if (neuralResult.text.isNotEmpty) {
-        found = {
-          'english': query,
-          'nicobarese': neuralResult.text,
-          '_isGenerated': true,
-          '_confidence': neuralResult.confidence,
-        };
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        searchResult = found;
-        hasSearched = true;
-
-        if (found != null) {
-          if (found.containsKey('_searchedNicobarese')) {
-            searchedNicobarese = found['_searchedNicobarese'];
-          } else if (found.containsKey('_isGenerated')) {
-            searchedNicobarese = false;
-          } else {
-            final q = query.trim().toLowerCase();
-            searchedNicobarese =
-                found['nicobarese'].toString().toLowerCase() == q;
-          }
-        } else {
-          searchedNicobarese = false;
+      // 2. Neural Engine Fallback
+      if (found == null) {
+        final neuralResult = await dashSearchNeuralEngine.predict(query);
+        if (neuralResult.text.isNotEmpty) {
+          found = {
+            'english': query,
+            'nicobarese': neuralResult.text,
+            '_isGenerated': true,
+            '_confidence': neuralResult.confidence,
+          };
         }
-        isSearchLoading = false;
-      });
-    }
+      }
+
+      if (mounted) {
+        setState(() {
+          searchResult = found;
+          hasSearched = true;
+
+          if (found != null) {
+            if (found.containsKey('_searchedNicobarese')) {
+              searchedNicobarese = found['_searchedNicobarese'];
+            } else if (found.containsKey('_isGenerated')) {
+              searchedNicobarese = false;
+            } else {
+              final q = query.trim().toLowerCase();
+              searchedNicobarese =
+                  found['nicobarese'].toString().toLowerCase() == q;
+            }
+          } else {
+            searchedNicobarese = false;
+          }
+          isSearchLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint('[SearchMixin] performMixinSearch error (non-fatal): $e');
       if (mounted) {

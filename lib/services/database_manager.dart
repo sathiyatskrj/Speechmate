@@ -393,6 +393,22 @@ class DatabaseManager {
     return await db.query(table, where: qCol, whereArgs: args);
   }
 
+  /// Reverse lookup — search by Nicobarese word to get English translation.
+  /// Returns the first match found across all word categories.
+  Future<Map<String, dynamic>?> searchByNicobarese(String nicobareseQuery) async {
+    final db = await instance.database;
+    final q = nicobareseQuery.trim().toLowerCase();
+    // Try exact match first
+    var results = await db.query('words',
+      where: 'LOWER(nicobarese) = ?', whereArgs: [q], limit: 1);
+    if (results.isNotEmpty) return results.first;
+    // Try LIKE match
+    results = await db.query('words',
+      where: 'LOWER(nicobarese) LIKE ?', whereArgs: ['%$q%'], limit: 5);
+    if (results.isNotEmpty) return results.first;
+    return null;
+  }
+
   Future<void> seedCategoryFromJson(String categoryId, String path) async {
       final db = await instance.database;
       // Check if already seeded

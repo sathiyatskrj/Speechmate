@@ -72,6 +72,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
@@ -110,6 +111,7 @@ class _VoiceVaultScreenState extends State<VoiceVaultScreen> {
     );
 
     Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
       Navigator.pop(context); // Close loading
       _saveContribution("Recording #${_contributions.length + 1} - ${DateTime.now().toString().substring(0, 16)}");
       
