@@ -3,7 +3,13 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../services/progress_service.dart';
 import '../services/tts_service.dart';
 import '../services/dictionary_service.dart';
+import '../services/whisper_service.dart';
+import '../services/pronunciation_scorer.dart';
 import '../widgets/background.dart';
+import 'package:flutter/services.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 import 'dart:math';
 
 class LevelLearningScreen extends StatefulWidget {
@@ -14,7 +20,7 @@ class LevelLearningScreen extends StatefulWidget {
   State<LevelLearningScreen> createState() => _LevelLearningScreenState();
 }
 
-enum LearningStep { learn, quiz }
+enum LearningStep { learn, pronounce, quiz }
 
 class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerProviderStateMixin {
   final DictionaryService _dictionaryService = DictionaryService();
@@ -35,6 +41,15 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
 
+  // Pronunciation State
+  final WhisperService _whisperService = WhisperService();
+  AudioRecorder? _audioRecorder;
+  bool _isPronounceRecording = false;
+  bool _isPronounceProcessing = false;
+  int _pronounceScore = -1; // -1 = not scored yet
+  String _pronounceLabel = '';
+  String _pronounceTranscription = '';
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +63,7 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
   void dispose() {
     _shakeController.dispose();
     _ttsService.dispose();
+    _audioRecorder?.dispose();
     super.dispose();
   }
 
@@ -104,9 +120,85 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
     setState(() {
        _currentStep = LearningStep.learn;
        _quizAnswered = false;
+       _pronounceScore = -1;
+       _pronounceLabel = '';
+       _pronounceTranscription = '';
     });
     if (_currentIndex < _words.length) {
         _playWordAudio(_words[_currentIndex]['english'] ?? '');
+    }
+  }
+
+  void _startPronounceStep() {
+    setState(() {
+      _currentStep = LearningStep.pronounce;
+      _pronounceScore = -1;
+      _pronounceLabel = '';
+      _pronounceTranscription = '';
+      _isPronounceRecording = false;
+      _isPronounceProcessing = false;
+    });
+  }
+
+  Future<void> _togglePronounceRecording() async {
+    if (_isPronounceProcessing) return;
+
+    if (_isPronounceRecording) {
+      // Stop and score
+      String? path;
+      try {
+        path = await _audioRecorder!.stop();
+      } catch (e) {
+        debugPrint('[Pronunciation] Stop error: $e');
+      }
+
+      HapticFeedback.lightImpact();
+      if (mounted) setState(() { _isPronounceRecording = false; _isPronounceProcessing = true; });
+
+      if (path != null && File(path).existsSync()) {
+        try {
+          final transcription = await _whisperService.transcribe(path);
+          final expected = _words[_currentIndex]['nicobarese']?.toString() ?? '';
+          final score = PronunciationScorer.score(transcription.trim(), expected);
+          final label = PronunciationScorer.label(score);
+
+          if (mounted) {
+            setState(() {
+              _pronounceScore = score;
+              _pronounceLabel = label;
+              _pronounceTranscription = transcription.trim();
+              _isPronounceProcessing = false;
+            });
+          }
+        } catch (e) {
+          debugPrint('[Pronunciation] Transcribe error: $e');
+          if (mounted) setState(() { _isPronounceProcessing = false; _pronounceLabel = 'Could not process. Try again.'; });
+        }
+        // Clean up temp file
+        try { File(path).deleteSync(); } catch (_) {}
+      } else {
+        if (mounted) setState(() => _isPronounceProcessing = false);
+      }
+    } else {
+      // Start recording
+      _audioRecorder?.dispose();
+      _audioRecorder = AudioRecorder();
+
+      if (!await _audioRecorder!.hasPermission()) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Microphone permission required')));
+        return;
+      }
+
+      final dir = await getTemporaryDirectory();
+      final path = '${dir.path}/pronounce_${DateTime.now().millisecondsSinceEpoch}.wav';
+
+      await _audioRecorder!.start(
+        const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000, numChannels: 1),
+        path: path,
+      );
+
+      HapticFeedback.mediumImpact();
+      if (mounted) setState(() => _isPronounceRecording = true);
     }
   }
 
@@ -271,9 +363,11 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
                                switchInCurve: Curves.elasticOut,
                                switchOutCurve: Curves.easeIn,
                                transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                               child: _currentStep == LearningStep.learn 
-                                   ? _buildLearnCard() 
-                                   : _buildQuizCard(),
+                               child: _currentStep == LearningStep.learn
+                                   ? _buildLearnCard()
+                                   : _currentStep == LearningStep.pronounce
+                                       ? _buildPronounceCard()
+                                       : _buildQuizCard(),
                            ),
                        ),
                     ],
@@ -335,7 +429,7 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
                       SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                              onPressed: _startQuizStep,
+                              onPressed: _startPronounceStep,
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.indigo,
                                   foregroundColor: Colors.white,
@@ -343,7 +437,145 @@ class _LevelLearningScreenState extends State<LevelLearningScreen> with TickerPr
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                                   elevation: 5
                               ),
-                              child: const Text("Test Yourself", style: TextStyle(fontSize: 18)),
+                              child: const Text("Practice Speaking", style: TextStyle(fontSize: 18)),
+                          ),
+                      ),
+                  ],
+              ),
+          ),
+      );
+  }
+
+  Widget _buildPronounceCard() {
+      if (_words.isEmpty || _currentIndex >= _words.length) {
+        return const Center(child: Text("Loading...", style: TextStyle(color: Colors.white)));
+      }
+      final word = _words[_currentIndex];
+      final nicWord = word['nicobarese']?.toString() ?? '';
+
+      // Score color
+      Color scoreColor = Colors.grey;
+      if (_pronounceScore >= 90) scoreColor = Colors.greenAccent;
+      else if (_pronounceScore >= 70) scoreColor = Colors.lightGreen;
+      else if (_pronounceScore >= 50) scoreColor = Colors.amber;
+      else if (_pronounceScore >= 0) scoreColor = Colors.redAccent;
+
+      return Center(
+          key: const ValueKey('pronounce'),
+          child: Container(
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.95),
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 30, offset: const Offset(0, 15))
+                  ],
+              ),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                      const Icon(Icons.mic, size: 36, color: Colors.deepPurple),
+                      const SizedBox(height: 8),
+                      Text("PRONOUNCE", style: TextStyle(color: Colors.grey[700], letterSpacing: 2, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 16),
+                      Text("Say this word:", style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                      const SizedBox(height: 8),
+                      Text(nicWord, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.deepPurple), textAlign: TextAlign.center)
+                        .animate().fadeIn(duration: 400.ms),
+                      const SizedBox(height: 6),
+                      Text("(${word['english'] ?? ''})", style: TextStyle(color: Colors.grey[500], fontSize: 14)),
+                      const SizedBox(height: 8),
+
+                      // Listen button
+                      TextButton.icon(
+                        onPressed: () => _playWordAudio(word['english'] ?? ''),
+                        icon: const Icon(Icons.volume_up_rounded, size: 20),
+                        label: const Text("Listen first"),
+                        style: TextButton.styleFrom(foregroundColor: Colors.indigo),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Mic button
+                      GestureDetector(
+                          onTap: _isPronounceProcessing ? null : _togglePronounceRecording,
+                          child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: _isPronounceRecording
+                                        ? [Colors.red, Colors.redAccent]
+                                        : _isPronounceProcessing
+                                            ? [Colors.grey, Colors.grey.shade400]
+                                            : [Colors.deepPurple, Colors.purpleAccent],
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: (_isPronounceRecording ? Colors.red : Colors.deepPurple).withValues(alpha: 0.4),
+                                      blurRadius: 20, spreadRadius: 3,
+                                    )
+                                  ],
+                              ),
+                              child: Icon(
+                                _isPronounceRecording ? Icons.stop_rounded
+                                    : _isPronounceProcessing ? Icons.hourglass_top_rounded
+                                    : Icons.mic_rounded,
+                                size: 40, color: Colors.white,
+                              ),
+                          ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _isPronounceRecording ? "Tap to stop" : _isPronounceProcessing ? "Scoring..." : "Tap to record",
+                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                      ),
+
+                      // Score result
+                      if (_pronounceScore >= 0) ...[
+                        const SizedBox(height: 20),
+                        // Score ring
+                        SizedBox(
+                          width: 80, height: 80,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CircularProgressIndicator(
+                                value: _pronounceScore / 100,
+                                strokeWidth: 6,
+                                backgroundColor: Colors.grey.shade200,
+                                valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
+                              ),
+                              Text("$_pronounceScore", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: scoreColor)),
+                            ],
+                          ),
+                        ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
+                        const SizedBox(height: 8),
+                        Text(_pronounceLabel, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        if (_pronounceTranscription.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text("You said: \"$_pronounceTranscription\"", style: TextStyle(color: Colors.grey[500], fontSize: 12, fontStyle: FontStyle.italic)),
+                          ),
+                      ],
+
+                      const SizedBox(height: 24),
+                      SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              onPressed: _startQuizStep,
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: _pronounceScore >= 0 ? Colors.green : Colors.indigo,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 15),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  elevation: 5,
+                              ),
+                              child: Text(
+                                _pronounceScore >= 0 ? "Continue to Quiz" : "Skip to Quiz",
+                                style: const TextStyle(fontSize: 18),
+                              ),
                           ),
                       ),
                   ],

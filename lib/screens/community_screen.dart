@@ -490,7 +490,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SafeStateMixin {
       final TextEditingController textController = TextEditingController();
       showDialog(
           context: context,
-          builder: (dialogContext) => AlertDialog(
+          builder: (context) => AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               title: Text(_isAdmin ? "Admin Announcement 📢" : "Contribute to Hub ✍️"),
               content: TextField(
@@ -502,11 +502,11 @@ class _CommunityScreenState extends State<CommunityScreen> with SafeStateMixin {
                   ),
               ),
               actions: [
-                  TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text("Cancel")),
+                  TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
                   ElevatedButton.icon(
                       onPressed: () async {
                           if (textController.text.isNotEmpty) {
-                              Navigator.pop(dialogContext);
+                              Navigator.pop(context);
                               await _communityService.addPost(
                                   author: _isAdmin ? "SpeechMate Admin" : "Guest User",
                                   role: _isAdmin ? "Administrator" : "Community Member",
