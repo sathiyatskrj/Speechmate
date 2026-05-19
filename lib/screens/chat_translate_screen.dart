@@ -300,7 +300,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                               final nicobarese = word['nicobarese'];
                                               if (english != null && nicobarese != null) {
                                                   await DatabaseManager.instance.saveFlashcard(english.toString(), nicobarese.toString());
-                                                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to your Flashcards! 📚')));
+                                                  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to your Flashcards! 📚')));
                                               }
                                             },
                                           )

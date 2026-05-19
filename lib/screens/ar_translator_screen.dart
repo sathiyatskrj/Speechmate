@@ -1151,7 +1151,7 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
                       onTap: () async {
                         await DatabaseManager.instance
                             .saveToVault(item.english, item.nicobarese);
-                        if (!context.mounted) return;
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Saved "${item.english}" to Vault',
                               style: const TextStyle(color: Colors.black)),

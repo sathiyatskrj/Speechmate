@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:speechmate/screens/landing_page.dart';
+import 'package:speechmate/screens/student_dash.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
 import 'package:speechmate/screens/mock_language_screen.dart';
+import 'package:speechmate/screens/document_translation_hub.dart';
+import 'package:speechmate/screens/chat_translate_screen.dart';
+import 'package:speechmate/screens/beta_chat_screen.dart';
+import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/core/app_colors.dart';
+import 'package:speechmate/services/progress_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 
@@ -20,14 +25,24 @@ class _LanguagesState extends State<Languages> {
   double? get buttonWidth => 280;
   double? get buttonHeight => 70;
 
+  int _xp = 0;
+  int _streak = 0;
 
   @override
   void initState() {
     super.initState();
+    _loadProgress();
   }
 
-
-
+  Future<void> _loadProgress() async {
+    final stats = await ProgressService().getProgressStats();
+    if (mounted) {
+      setState(() {
+        _xp = stats['studentXP'] ?? 0;
+        _streak = stats['dayStreak'] ?? 0;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +64,56 @@ class _LanguagesState extends State<Languages> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                // ────── GAMIFICATION TOP BAR ──────
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Streak Counter
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.local_fire_department, color: Colors.orange, size: 20),
+                            const SizedBox(width: 6),
+                            Text(
+                              "$_streak Day${_streak == 1 ? '' : 's'}",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn().slideX(begin: -0.2),
+                      
+                      // XP Counter
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.purple.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.purple.withValues(alpha: 0.5)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.star_rounded, color: Colors.purpleAccent, size: 20),
+                            const SizedBox(width: 6),
+                            Text(
+                              "$_xp XP",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn().slideX(begin: 0.2),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
                 Text(
                   AppStrings.get('selectLanguage'),
                   textAlign: TextAlign.center,
@@ -72,7 +136,7 @@ class _LanguagesState extends State<Languages> {
                           langCode: "nc", 
                           colors: [const Color(0xFFE91E63), const Color(0xFFFF6F00)], 
                           icon: Icons.map,
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LandingPage())),
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentDash())),
                         ),
                         _buildLanguageButton(
                           label: "Aka-Jeru (Great Andamanese)", 
@@ -90,12 +154,70 @@ class _LanguagesState extends State<Languages> {
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MockLanguageScreen(languageName: "Onges"))),
                         ),
 
+                        const SizedBox(height: 30),
+
+                        // ────── TRANSLATION TOOLS SECTION ──────
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: Row(
+                            children: [
+                              const Expanded(child: Divider(color: Colors.white24)),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                child: Text(
+                                  "🛠️ Translation Tools",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ),
+                              const Expanded(child: Divider(color: Colors.white24)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Document Translator Hub
+                        _buildToolButton(
+                          label: "Document Translator",
+                          icon: Icons.auto_stories_rounded,
+                          colors: [const Color(0xFF00BCD4), const Color(0xFF0097A7)],
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentTranslationHub())),
+                        ),
+
+                        // Text Translator (Chat & Translate)
+                        _buildToolButton(
+                          label: "Text Translator",
+                          icon: Icons.translate_rounded,
+                          colors: [const Color(0xFFFF7043), const Color(0xFFE64A19)],
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())),
+                        ),
+
+                        // Voice Translator
+                        _buildToolButton(
+                          label: "Voice Translator",
+                          icon: Icons.record_voice_over_rounded,
+                          colors: [const Color(0xFFEC407A), const Color(0xFFAD1457)],
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen())),
+                        ),
+
+                        // Dialect Radar (Beta Chat)
+                        _buildToolButton(
+                          label: "Dialect Radar (βeta)",
+                          icon: Icons.forum_rounded,
+                          colors: [const Color(0xFF7C4DFF), const Color(0xFF536DFE)],
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))),
+                        ),
 
                         const SizedBox(height: 20),
                         const Text(
-                          "*More languages coming soon to the hub.",
+                          "*More languages and tools coming soon.",
                           style: TextStyle(fontSize: 12, color: Colors.white54, fontStyle: FontStyle.italic),
                         ),
+                        const SizedBox(height: 30),
                       ],
                     ),
                   ),
@@ -140,6 +262,38 @@ class _LanguagesState extends State<Languages> {
         ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 15),
       ],
+    );
+  }
+
+  Widget _buildToolButton({required String label, required IconData icon, required List<Color> colors, required VoidCallback onTap}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+      child: TapScale(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          height: 54,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: colors),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: colors.first.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 3))],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.white, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+            ],
+          ),
+        ),
+      ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.1, end: 0),
     );
   }
 }

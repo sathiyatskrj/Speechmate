@@ -3,37 +3,38 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTheme {
-  // --- Student Theme (Playful & Rounded) ---
+  // --- General Public Theme (Explorer / Travel-Focused) ---
   static ThemeData get studentTheme {
     return ThemeData(
       brightness: Brightness.light,
-      primaryColor: AppColors.studentPrimary,
+      primaryColor: const Color(0xFF0F766E), // Teal 700
       scaffoldBackgroundColor: Colors.transparent, // For gradients
       
-      // Typography: Bubblegum Sans / Fredoka
+      // Typography: Clean, modern, adult-appropriate
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.bubblegumSans(
+        displayLarge: GoogleFonts.outfit(
           fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: AppColors.teacherPrimary, // Contrast
-          letterSpacing: 1.5,
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF0F172A),
+          letterSpacing: -0.5,
         ),
-        headlineMedium: GoogleFonts.fredoka(
+        headlineMedium: GoogleFonts.outfit(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: Colors.purple.shade900,
+          color: const Color(0xFF1E293B),
         ),
-        bodyLarge: GoogleFonts.fredoka(
+        bodyLarge: GoogleFonts.inter(
           fontSize: 18,
-          color: Colors.black87,
+          color: const Color(0xFF334155),
+          height: 1.5,
         ),
-        bodyMedium: GoogleFonts.fredoka(
+        bodyMedium: GoogleFonts.inter(
           fontSize: 16,
-          color: Colors.black87,
+          color: const Color(0xFF475569),
         ),
       ),
       
-      iconTheme: const IconThemeData(color: Colors.purpleAccent, size: 28),
+      iconTheme: const IconThemeData(color: Color(0xFF0D9488), size: 24),
       
       useMaterial3: true,
     );
@@ -81,24 +82,24 @@ class AppTheme {
   static ThemeData get studentDarkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      primaryColor: AppColors.studentDarkAccent,
+      primaryColor: const Color(0xFF2DD4BF), // Teal 400
       scaffoldBackgroundColor: Colors.transparent,
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.bubblegumSans(
+        displayLarge: GoogleFonts.outfit(
           fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: AppColors.studentDarkAccent,
-          letterSpacing: 1.5,
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF2DD4BF),
+          letterSpacing: -0.5,
         ),
-        headlineMedium: GoogleFonts.fredoka(
+        headlineMedium: GoogleFonts.outfit(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: Colors.white70,
         ),
-        bodyLarge: GoogleFonts.fredoka(fontSize: 18, color: Colors.white70),
-        bodyMedium: GoogleFonts.fredoka(fontSize: 16, color: Colors.white60),
+        bodyLarge: GoogleFonts.inter(fontSize: 18, color: Colors.white70),
+        bodyMedium: GoogleFonts.inter(fontSize: 16, color: Colors.white60),
       ),
-      iconTheme: const IconThemeData(color: AppColors.studentDarkAccent, size: 28),
+      iconTheme: const IconThemeData(color: Color(0xFF2DD4BF), size: 24),
       useMaterial3: true,
     );
   }
