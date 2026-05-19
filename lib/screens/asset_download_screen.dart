@@ -38,7 +38,7 @@ class _AssetDownloadScreenState extends State<AssetDownloadScreen> {
   // Hugging Face direct download URL for Whisper Base multilingual GGML
   static const String _whisperModelUrl =
       'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin';
-  static const int _expectedSizeBytes = 141_000_000; // ~141 MB
+  static const int _expectedSizeBytes = 141000000; // ~141 MB
 
   @override
   void initState() {
