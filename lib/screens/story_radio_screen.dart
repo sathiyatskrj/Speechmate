@@ -112,9 +112,9 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) {
+      builder: (context) {
         return StatefulBuilder(
-          builder: (statefulContext, setDialogState) {
+          builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: const Color(0xFF2C3E50),
               title: const Text("Record Oral History 🎙️", style: TextStyle(color: Colors.white)),
@@ -148,7 +148,7 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
                         setDialogState(() => _isRecording = false);
                         
                         if (path != null && titleController.text.isNotEmpty) {
-                          Navigator.pop(statefulContext); // Close dialog
+                          Navigator.pop(context); // Close dialog
                           
                           // Save to DB
                           final db = await _db.database;
@@ -161,8 +161,8 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
                           });
                           
                           _loadStories();
-                          if (statefulContext.mounted) {
-                            ScaffoldMessenger.of(statefulContext).showSnackBar(const SnackBar(content: Text("Story preserved for future generations!")));
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Story preserved for future generations!")));
                           }
                         }
                       } else {
@@ -195,7 +195,7 @@ class _StoryRadioScreenState extends State<StoryRadioScreen> {
               actions: [
                 if (!_isRecording)
                   TextButton(
-                    onPressed: () => Navigator.pop(statefulContext),
+                    onPressed: () => Navigator.pop(context),
                     child: const Text("Cancel", style: TextStyle(color: Colors.white54)),
                   )
               ],

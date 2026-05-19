@@ -29,6 +29,17 @@ class _BodyPartsScreenState extends State<BodyPartsScreen> {
     if (mounted) setState(() => _bodyParts = data);
   }
 
+  Map<String, dynamic>? _findByName(String name) {
+    try {
+      return _bodyParts.firstWhere(
+        (p) => (p['english'] ?? '').toString().toLowerCase() == name.toLowerCase() ||
+               (p['text'] ?? '').toString().toLowerCase() == name.toLowerCase(),
+      );
+    } catch (e) { debugPrint("Silent error caught: $e");
+      return null;
+    }
+  }
+
 
 
   @override
@@ -122,6 +133,8 @@ class _BodyPartsScreenState extends State<BodyPartsScreen> {
                             aspectRatio: 1920 / 2208,
                             child: LayoutBuilder(
                               builder: (context, constraints) {
+                                final imgW = constraints.maxWidth;
+                                final imgH = constraints.maxHeight;
                                 return Stack(
                                   children: [
                                     // Body image

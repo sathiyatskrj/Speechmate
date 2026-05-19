@@ -4,30 +4,40 @@ import 'package:flutter/material.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/widgets/translation_card.dart';
+import 'package:speechmate/widgets/gamification_header.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
 import 'package:speechmate/core/app_theme.dart';
+import 'package:speechmate/core/app_config.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
+import 'package:speechmate/widgets/tap_scale.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 // Screens
+import 'package:speechmate/screens/games/games_hub_screen.dart';
 import 'package:speechmate/screens/community_screen.dart';
+import 'package:speechmate/screens/voice_vault_screen.dart';
 import 'package:speechmate/screens/dynamic_category_screen.dart';
 import 'package:speechmate/screens/feedback_screen.dart';
 import 'package:speechmate/screens/beta_chat_screen.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
 import 'package:speechmate/screens/flora_fauna_screen.dart';
 import 'package:speechmate/screens/omni_translator_screen.dart';
-import 'package:speechmate/screens/document_translation_hub.dart';
-import 'package:speechmate/screens/chat_translate_screen.dart';
 
 import 'package:speechmate/screens/story_radio_screen.dart';
+import 'package:speechmate/screens/kinship_mapper_screen.dart';
 import 'package:speechmate/screens/dialect_heatmap_screen.dart';
+import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/screens/ar_translator_screen.dart';
+import 'package:speechmate/screens/body_parts_screen.dart';
+import 'package:speechmate/screens/ai_setup_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/screens/regional_translator_screen.dart';
+import 'package:speechmate/screens/classroom_leaderboard_screen.dart';
+import 'package:speechmate/screens/achievement_badges_screen.dart';
+import 'package:speechmate/screens/cultural_calendar_screen.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
 class StudentDash extends StatefulWidget {
@@ -75,15 +85,20 @@ class _StudentDashState extends State<StudentDash>
   void _onClear() => clearMixinSearch(searchController);
 
   List<Map<String, dynamic>> get learningTiles => [
-        // ═══════════════════════════════════════════════════
-        // 🌐 TRANSLATION TOOLS (Top Priority for Public)
-        // ═══════════════════════════════════════════════════
+        // --- Premium Interactive Features (Moved to Top) ---
         {
-          "word": AppStrings.get('voiceTranslate'),
+          "word": AppStrings.get('arTranslator'),
+          "emoji": "📷",
+          "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)],
+          "navigateTo": const ARTranslatorScreen(),
+          "icon": Icons.view_in_ar_rounded
+        },
+        {
+          "word": AppStrings.get('voiceVault'),
           "emoji": "🎙️",
-          "colors": [const Color(0xFFff0844), const Color(0xFFffb199)],
-          "navigateTo": const VoiceTranslatorScreen(),
-          "icon": Icons.record_voice_over_rounded
+          "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)],
+          "navigateTo": const VoiceVaultScreen(),
+          "icon": Icons.mic_external_on_rounded,
         },
         {
           "word": AppStrings.get('bookScanner'),
@@ -93,11 +108,32 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.document_scanner_rounded
         },
         {
-          "word": AppStrings.get('omniBroadcast'),
-          "emoji": "📡",
-          "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
-          "navigateTo": const OmniTranslatorScreen(),
-          "icon": Icons.cell_tower_rounded
+          "word": AppStrings.get('games'),
+          "emoji": "🎲",
+          "colors": [const Color(0xFFF09819), const Color(0xFFEDDE5D)],
+          "navigateTo": const GamesHubScreen(),
+          "icon": Icons.sports_esports_rounded
+        },
+        {
+          "word": 'Leaderboard',
+          "emoji": "🏆",
+          "colors": [const Color(0xFFDAA520), const Color(0xFFFF8C00)],
+          "navigateTo": const ClassroomLeaderboardScreen(),
+          "icon": Icons.leaderboard_rounded
+        },
+        {
+          "word": 'Achievements',
+          "emoji": "🏅",
+          "colors": [const Color(0xFF7C3AED), const Color(0xFFA78BFA)],
+          "navigateTo": const AchievementBadgesScreen(),
+          "icon": Icons.emoji_events_rounded
+        },
+        {
+          "word": 'Cultural Calendar',
+          "emoji": "🎭",
+          "colors": [const Color(0xFFEC4899), const Color(0xFFF472B6)],
+          "navigateTo": const CulturalCalendarScreen(),
+          "icon": Icons.calendar_month_rounded
         },
         {
           "word": AppStrings.get('chatTranslate'),
@@ -107,30 +143,94 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.chat_bubble_rounded,
         },
         {
-          "word": AppStrings.get('arTranslator'),
-          "emoji": "📷",
-          "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)],
-          "navigateTo": const ARTranslatorScreen(),
-          "icon": Icons.view_in_ar_rounded
-        },
-        {
-          "word": "Document Translator",
-          "emoji": "📄",
-          "colors": [const Color(0xFF00BCD4), const Color(0xFF0097A7)],
-          "navigateTo": const DocumentTranslationHub(),
-          "icon": Icons.auto_stories_rounded
-        },
-        {
-          "word": "Text Translator",
-          "emoji": "✏️",
-          "colors": [const Color(0xFFFF7043), const Color(0xFFE64A19)],
-          "navigateTo": const ChatTranslateScreen(),
-          "icon": Icons.translate_rounded
+          "word": AppStrings.get('voiceTranslate'),
+          "emoji": "🎙️",
+          "colors": [const Color(0xFFff0844), const Color(0xFFffb199)],
+          "navigateTo": const VoiceTranslatorScreen(),
+          "icon": Icons.record_voice_over_rounded
         },
 
-        // ═══════════════════════════════════════════════════
-        // 🇮🇳 REGIONAL LANGUAGE TRANSLATORS
-        // ═══════════════════════════════════════════════════
+        // --- Core Learning Categories ---
+        {
+          "word": AppStrings.get('numbers'),
+          "emoji": "123",
+          "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'numbers', title: 'Numbers'),
+          "icon": Icons.format_list_numbered_rounded
+        },
+        {
+          "word": AppStrings.get('nature'),
+          "emoji": "🌱",
+          "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'nature', title: 'Nature'),
+          "icon": Icons.eco_rounded
+        },
+        {
+          "word": AppStrings.get('feelings'),
+          "emoji": "🎭",
+          "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'feelings', title: 'Feelings'),
+          "icon": Icons.emoji_emotions_rounded
+        },
+        {
+          "word": AppStrings.get('colors'),
+          "emoji": "🎨",
+          "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'colors', title: 'Colors'),
+          "icon": Icons.palette_rounded
+        },
+        {
+          "word": AppStrings.get('things'),
+          "emoji": "🏡",
+          "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'things', title: 'Things'),
+          "icon": Icons.chair_rounded
+        },
+        {
+          "word": AppStrings.get('bodyParts'),
+          "emoji": "🦴",
+          "colors": [const Color(0xFF8E2DE2), const Color(0xFF4A00E0)],
+          "navigateTo": const BodyPartsScreen(),
+          "icon": Icons.accessibility_new_rounded
+        },
+        {
+          "word": AppStrings.get('animals'),
+          "emoji": "🐶",
+          "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'animals', title: 'Animals'),
+          "icon": Icons.pets_rounded
+        },
+        {
+          "word": AppStrings.get('magicWords'),
+          "emoji": "🔮",
+          "colors": [const Color(0xFFCC2B5E), const Color(0xFF753A88)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'magic', title: 'Magic Words'),
+          "icon": Icons.auto_fix_high_rounded
+        },
+        {
+          "word": AppStrings.get('family'),
+          "emoji": "👨‍👩‍👧",
+          "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)],
+          "navigateTo": const DynamicCategoryScreen(
+              categoryId: 'family', title: 'Family'),
+          "icon": Icons.family_restroom_rounded
+        },
+
+        // --- Regional Translations ---
+        {
+          "word": AppStrings.get('omniBroadcast'),
+          "emoji": "📡",
+          "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
+          "navigateTo": const OmniTranslatorScreen(),
+          "icon": Icons.cell_tower_rounded
+        },
         {
           "word": AppStrings.get('hindiTranslator'),
           "emoji": "🇮🇳",
@@ -177,9 +277,7 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.g_translate_rounded
         },
 
-        // ═══════════════════════════════════════════════════
-        // 🏝️ TRIBAL LANGUAGE HUBS
-        // ═══════════════════════════════════════════════════
+        // --- Advanced / Discovery ---
         {
           "word": AppStrings.get('andamaneseBeta'),
           "emoji": "🏝️",
@@ -187,10 +285,6 @@ class _StudentDashState extends State<StudentDash>
           "navigateTo": const GAHubScreen(),
           "icon": Icons.language_rounded
         },
-
-        // ═══════════════════════════════════════════════════
-        // 🌿 CULTURAL DISCOVERY & TOURISM
-        // ═══════════════════════════════════════════════════
         {
           "word": AppStrings.get('natureHub'),
           "emoji": "🌿",
@@ -206,6 +300,13 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.radio_rounded
         },
         {
+          "word": AppStrings.get('tuhetKinship'),
+          "emoji": "🌳",
+          "colors": [const Color(0xFF5D4037), const Color(0xFF3E2723)],
+          "navigateTo": const KinshipMapperScreen(),
+          "icon": Icons.account_tree_rounded
+        },
+        {
           "word": AppStrings.get('islandExplorer'),
           "emoji": "🧭",
           "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)],
@@ -213,76 +314,27 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.explore_rounded,
         },
         {
+          "word": AppStrings.get('memoryPalace'),
+          "emoji": "🏠",
+          "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)],
+          "navigateTo": const MemoryPalaceScreen(),
+          "icon": Icons.map_rounded,
+        },
+        {
           "word": AppStrings.get('community'),
           "emoji": "🌍",
           "colors": [const Color(0xFF302B63), const Color(0xFF24243E)],
           "navigateTo": const CommunityScreen(),
+          "isSecret": true,
           "icon": Icons.public_rounded,
         },
-
-        // ═══════════════════════════════════════════════════
-        // 📚 QUICK DICTIONARY (Explore Vocabulary)
-        // ═══════════════════════════════════════════════════
         {
-          "word": AppStrings.get('numbers'),
-          "emoji": "123",
-          "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'numbers', title: 'Numbers'),
-          "icon": Icons.format_list_numbered_rounded
+          "word": AppStrings.get('aiSetup'),
+          "emoji": "🧠",
+          "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)],
+          "navigateTo": const AISetupScreen(),
+          "icon": Icons.psychology_rounded,
         },
-        {
-          "word": AppStrings.get('animals'),
-          "emoji": "🐶",
-          "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'animals', title: 'Animals'),
-          "icon": Icons.pets_rounded
-        },
-        {
-          "word": AppStrings.get('nature'),
-          "emoji": "🌱",
-          "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'nature', title: 'Nature'),
-          "icon": Icons.eco_rounded
-        },
-        {
-          "word": AppStrings.get('family'),
-          "emoji": "👨‍👩‍👧",
-          "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'family', title: 'Family'),
-          "icon": Icons.family_restroom_rounded
-        },
-        {
-          "word": AppStrings.get('things'),
-          "emoji": "🏡",
-          "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'things', title: 'Things'),
-          "icon": Icons.chair_rounded
-        },
-        {
-          "word": AppStrings.get('feelings'),
-          "emoji": "🎭",
-          "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'feelings', title: 'Feelings'),
-          "icon": Icons.emoji_emotions_rounded
-        },
-        {
-          "word": AppStrings.get('colors'),
-          "emoji": "🎨",
-          "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'colors', title: 'Colors'),
-          "icon": Icons.palette_rounded
-        },
-
-        // ═══════════════════════════════════════════════════
-        // ⚙️ UTILITIES
-        // ═══════════════════════════════════════════════════
         {
           "word": AppStrings.get('feedback'),
           "emoji": "⭐",
@@ -413,14 +465,51 @@ class _StudentDashState extends State<StudentDash>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 🎯 Daily Mission Card
+          const DailyMissionCard()
+              .animate()
+              .fadeIn(duration: 700.ms)
+              .slideY(begin: 0.15),
+          const SizedBox(height: 20),
+
+          // ⚡ Quick Stats Row (Stars, Streak, Level)
+          const QuickStatsRow()
+              .animate()
+              .fadeIn(duration: 600.ms)
+              .slideX(begin: -0.1),
+          const SizedBox(height: 20),
+
           // 🎙️ Voice Waveform Visualizer
           KidsSectionHeader(emoji: '🎙️', label: AppStrings.get('sectionSoundWave')),
           const SizedBox(height: 8),
           const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
           const SizedBox(height: 20),
 
-          // 🧭 Explore
-          KidsSectionHeader(emoji: '🧭', label: 'Explore'),
+          // 🏆 My Progress
+          KidsSectionHeader(emoji: '🏆', label: AppStrings.get('sectionMyProgress')),
+          const SizedBox(height: 10),
+          const GamificationHeader()
+              .animate()
+              .fadeIn(duration: 600.ms)
+              .slideY(begin: 0.1),
+          const SizedBox(height: 20),
+          const ProgressRadarChartWidget()
+              .animate()
+              .fadeIn(duration: 900.ms)
+              .scale(),
+          const SizedBox(height: 20),
+
+          // 🥇 My Badges
+          KidsSectionHeader(emoji: '🥇', label: AppStrings.get('sectionMyBadges')),
+          const SizedBox(height: 10),
+          const AchievementShowcaseWidget()
+              .animate()
+              .fadeIn(duration: 800.ms)
+              .slideX(begin: 0.1),
+          const SizedBox(height: 28),
+
+          // 🚀 Let's Learn!
+          KidsSectionHeader(emoji: '🚀', label: AppStrings.get('sectionLetsLearn')),
           const SizedBox(height: 14),
           _buildBentoGrid(),
           const SizedBox(height: 110),
@@ -790,47 +879,45 @@ class _AmbientPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-     // Base gradient — warm teal explorer palette
+    // Base gradient
     final Rect rect = Offset.zero & size;
     final Paint bgPaint = Paint()
       ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFFF0FDFA), Color(0xFFF5F5F4), Color(0xFFECFDF5)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFFE0C3FC), Color(0xFF8EC5FC), Color(0xFFE0C3FC)],
       ).createShader(rect);
     canvas.drawRect(rect, bgPaint);
 
-    // FAST HARDWARE ACCELERATED GRADIENTS
+    // FAST HARDWARE ACCELERATED GRADIENTS (FIXES HANGING ON PHONES)
+    // Replaced MaskFilter.blur which kills mobile performance with RadialGradients.
     void drawFastGlowingOrb(double x, double y, double radius, Color color) {
       final rect = Rect.fromCircle(center: Offset(x, y), radius: radius);
       final paint = Paint()
         ..shader = RadialGradient(
-          colors: [color.withValues(alpha: 0.45), color.withValues(alpha: 0.0)],
+          colors: [color.withValues(alpha: 0.5), color.withValues(alpha: 0.0)],
           stops: const [0.1, 1.0],
         ).createShader(rect);
       canvas.drawRect(rect, paint);
     }
 
-    // Orb 1 — Oceanic teal (top area)
     final double x1 =
         size.width * 0.5 + math.sin(progress * math.pi * 2) * size.width * 0.4;
-    final double y1 = size.height * 0.25 +
-        math.cos(progress * math.pi * 2) * size.height * 0.15;
-    drawFastGlowingOrb(x1, y1, 300, const Color(0xFF14B8A6));
+    final double y1 = size.height * 0.3 +
+        math.cos(progress * math.pi * 2) * size.height * 0.2;
+    drawFastGlowingOrb(x1, y1, 300, Colors.cyanAccent);
 
-    // Orb 2 — Emerald green (bottom-left)
     final double x2 = size.width * 0.2 +
         math.cos(progress * math.pi * 2 + math.pi) * size.width * 0.3;
-    final double y2 = size.height * 0.75 +
-        math.sin(progress * math.pi * 2 + math.pi) * size.height * 0.2;
-    drawFastGlowingOrb(x2, y2, 320, const Color(0xFF34D399));
+    final double y2 = size.height * 0.8 +
+        math.sin(progress * math.pi * 2 + math.pi) * size.height * 0.3;
+    drawFastGlowingOrb(x2, y2, 350, Colors.pinkAccent);
 
-    // Orb 3 — Warm amber (right side)
     final double x3 = size.width * 0.8 +
-        math.sin(progress * math.pi * 2 + math.pi / 2) * size.width * 0.25;
+        math.sin(progress * math.pi * 2 + math.pi / 2) * size.width * 0.3;
     final double y3 = size.height * 0.5 +
-        math.cos(progress * math.pi * 2 + math.pi / 2) * size.height * 0.3;
-    drawFastGlowingOrb(x3, y3, 260, const Color(0xFFFBBF24));
+        math.cos(progress * math.pi * 2 + math.pi / 2) * size.height * 0.4;
+    drawFastGlowingOrb(x3, y3, 280, Colors.purpleAccent);
   }
 
   @override
@@ -1326,6 +1413,7 @@ class _DailyMissionCardState extends State<DailyMissionCard>
   late AnimationController _shimmer;
   double _progress = 0.0;
   late Map<String, dynamic> _todaysMission;
+  bool _loadingProgress = true;
 
   @override
   void initState() {
@@ -1345,6 +1433,7 @@ class _DailyMissionCardState extends State<DailyMissionCard>
     if (mounted) {
       setState(() {
         _progress = (wordsLearned / target).clamp(0.0, 1.0);
+        _loadingProgress = false;
       });
     }
   }
@@ -1600,7 +1689,7 @@ class KidsSectionHeader extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: const TextStyle(
-            color: Color(0xFF0F766E),
+            color: Colors.black87,
             fontSize: 13,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.5,
@@ -1612,7 +1701,7 @@ class KidsSectionHeader extends StatelessWidget {
             height: 2,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                  colors: [Color(0x4D0D9488), Colors.transparent]),
+                  colors: [Colors.black12, Colors.transparent]),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -1787,7 +1876,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
 
   /// Feed the pet (long press)
   void _feedPet() {
-    _ttsService.speakEnglish('Yummy!');
+    _ttsService.speakEnglish('Yummy!', pitch: 1.6);
     setState(() {
       _hunger = (_hunger + 25).clamp(0, 100);
       _happiness = (_happiness + 10).clamp(0, 100);
@@ -1818,11 +1907,11 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
 
       if (evolved) {
         _speechText = '🎉 I EVOLVED!';
-        _ttsService.speakEnglish('I evolved! Look at me!');
+        _ttsService.speakEnglish('I evolved! Look at me!', pitch: 1.6);
       } else {
         final lines = _moodSpeechLines;
         _speechText = lines[_rng.nextInt(lines.length)];
-        _ttsService.speakEnglish(_speechText);
+        _ttsService.speakEnglish(_speechText, pitch: 1.6);
       }
       _showSpeech = true;
       _showHearts = true;

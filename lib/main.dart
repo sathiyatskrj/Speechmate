@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
+import 'package:speechmate/services/crash_reporter.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Current data version — bump this when lexicon files change
 /// so the DB re-seeds on upgrade instead of every cold start.
@@ -21,13 +23,21 @@ void main() async {
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
     debugPrint('FlutterError: ${details.exceptionAsString()}');
+    CrashReporter.log(details.exceptionAsString(), stack: details.stack);
   };
 
   // Catch errors outside the Flutter framework
   PlatformDispatcher.instance.onError = (error, stack) {
     debugPrint('PlatformError: $error');
+    CrashReporter.log('$error', stack: stack);
     return true;
   };
+
+  // Init crash reporter
+  try {
+    final dir = await getApplicationSupportDirectory();
+    await CrashReporter.init(dir.path);
+  } catch (_) {}
 
   // Global fallback UI for widget build errors
   ErrorWidget.builder = (FlutterErrorDetails details) {

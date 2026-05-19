@@ -31,6 +31,11 @@ import 'package:speechmate/screens/dialect_heatmap_screen.dart';
 import 'package:speechmate/screens/memory_palace_screen.dart';
 import 'package:speechmate/screens/dialect_comparison_screen.dart';
 import 'package:speechmate/screens/srs_dashboard_screen.dart';
+import 'package:speechmate/screens/class_roster_screen.dart';
+import 'package:speechmate/screens/quiz_analytics_screen.dart';
+import 'package:speechmate/screens/marks_entry_screen.dart';
+import 'package:speechmate/screens/teacher_word_lists_screen.dart';
+import 'package:speechmate/screens/cultural_calendar_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
@@ -213,6 +218,38 @@ class _TeacherDashState extends State<TeacherDash>
                           StaggeredGridTile.count(
                             crossAxisCellCount: 2, mainAxisCellCount: 2,
                             child: _buildFeatureCard(context, 7, title: AppStrings.get('culture'), icon: Icons.account_balance, color: Colors.tealAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen()))),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      // ────── EDUAI CLASSROOM MANAGEMENT (from EduAI) ──────
+                      _buildSectionHeader('CLASSROOM MANAGEMENT', Icons.school_rounded, Colors.cyan),
+                      const SizedBox(height: 12),
+                      StaggeredGrid.count(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
+                        children: [
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 0, title: 'Class Roster', icon: Icons.people_alt_rounded, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClassRosterScreen()))),
+                          ),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 1, title: 'Quiz Analytics', icon: Icons.analytics_rounded, color: const Color(0xFF10B981), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizAnalyticsScreen()))),
+                          ),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 4, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 2, title: 'Marks Entry', icon: Icons.edit_note_rounded, color: const Color(0xFFF59E0B), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MarksEntryScreen()))),
+                          ),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 3, title: 'Word Lists', icon: Icons.playlist_add_rounded, color: const Color(0xFF8B5CF6), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherWordListsScreen()))),
+                          ),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 4, title: 'Cultural Calendar', icon: Icons.calendar_month_rounded, color: const Color(0xFFEC4899), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CulturalCalendarScreen()))),
                           ),
                         ],
                       ),

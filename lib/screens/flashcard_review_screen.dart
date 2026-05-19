@@ -134,7 +134,7 @@ class _FlashcardReviewScreenState extends State<FlashcardReviewScreen> {
                                    await ProgressService().recordQuizTaken();
                                    await GamificationService.refresh();
                                    
-                                   if (context.mounted) {
+                                   if (mounted) {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(builder: (context) => const ProgressScreen()),

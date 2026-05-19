@@ -32,7 +32,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     await AppStrings.load();
 
     if (!context.mounted) return;
-    // General edition: skip role selection, go directly to language hub
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const Languages()),
@@ -106,13 +105,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               children: [
                 const SizedBox(height: 40),
                 const Text(
-                  "Choose Your Language",
+                  "Choose Your Mother Tongue",
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  "Select the language you'd like to explore.",
+                  "Help us adapt to your community.",
                   style: TextStyle(fontSize: 14, color: Colors.white70),
                 ),
                 const SizedBox(height: 40),

@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whisper_flutter_new/whisper_flutter_new.dart';
 import 'pronunciation_scorer.dart';
 
@@ -49,6 +51,116 @@ class WhisperService {
     WhisperModelSize.base: 'ggml-base.en.bin',
     WhisperModelSize.small: 'ggml-small.en.bin',
   };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ON-DEMAND MODEL DOWNLOAD — For lean APK builds without bundled model
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// HuggingFace URLs for on-demand Whisper model download.
+  /// Used when the model is NOT bundled inside the APK (lean build mode).
+  static const Map<WhisperModelSize, String> _modelDownloadUrls = {
+    WhisperModelSize.tiny: 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin',
+    WhisperModelSize.base: 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin',
+    WhisperModelSize.small: 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin',
+  };
+
+  /// Expected file sizes for integrity verification after download.
+  static const Map<WhisperModelSize, int> _modelExpectedMinBytes = {
+    WhisperModelSize.tiny: 70 * 1024 * 1024,   // ~75 MB
+    WhisperModelSize.base: 130 * 1024 * 1024,  // ~141 MB
+    WhisperModelSize.small: 450 * 1024 * 1024, // ~466 MB
+  };
+
+  /// Whether the model needs to be downloaded (not bundled in APK).
+  bool _needsDownload = false;
+  bool get needsModelDownload => _needsDownload;
+
+  /// Download progress (0.0 to 1.0) — observable by UI
+  double _downloadProgress = 0.0;
+  double get downloadProgress => _downloadProgress;
+  bool _isDownloading = false;
+  bool get isDownloading => _isDownloading;
+
+  /// Check if the model exists on disk (either extracted from assets or downloaded)
+  Future<bool> isModelReady() async {
+    final Directory dir = await getApplicationSupportDirectory();
+    for (final size in [_currentSize, WhisperModelSize.tiny]) {
+      final String modelName = _modelFiles[size]!;
+      final File modelFile = File('${dir.path}/$modelName');
+      if (modelFile.existsSync() && modelFile.lengthSync() > 1000) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Download the Whisper model on-demand.
+  /// Call this when the model is not bundled in the APK.
+  /// [onProgress] receives values from 0.0 to 1.0.
+  Future<bool> downloadModel({
+    WhisperModelSize? size,
+    Function(double progress)? onProgress,
+  }) async {
+    final targetSize = size ?? _currentSize;
+    final url = _modelDownloadUrls[targetSize];
+    if (url == null) return false;
+
+    final Directory dir = await getApplicationSupportDirectory();
+    final String modelName = _modelFiles[targetSize]!;
+    final String modelPath = '${dir.path}/$modelName';
+
+    // Already downloaded?
+    final File existing = File(modelPath);
+    if (existing.existsSync() && existing.lengthSync() > (_modelExpectedMinBytes[targetSize] ?? 0)) {
+      debugPrint('[WhisperService] Model $modelName already downloaded.');
+      _needsDownload = false;
+      return true;
+    }
+
+    _isDownloading = true;
+    _downloadProgress = 0.0;
+
+    try {
+      final dio = Dio();
+      await dio.download(
+        url,
+        modelPath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            _downloadProgress = received / total;
+            onProgress?.call(_downloadProgress);
+          }
+        },
+      );
+
+      // Verify download integrity
+      final downloaded = File(modelPath);
+      final minExpected = _modelExpectedMinBytes[targetSize] ?? 0;
+      if (!downloaded.existsSync() || downloaded.lengthSync() < minExpected) {
+        debugPrint('[WhisperService] Downloaded model is too small — corrupt. Deleting.');
+        if (downloaded.existsSync()) await downloaded.delete();
+        return false;
+      }
+
+      // Mark as downloaded
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('whisper_model_downloaded', true);
+      await prefs.setString('whisper_model_size', targetSize.name);
+
+      _needsDownload = false;
+      _currentSize = targetSize;
+      debugPrint('[WhisperService] Model $modelName downloaded successfully (${downloaded.lengthSync() ~/ (1024 * 1024)} MB).');
+      return true;
+    } catch (e) {
+      debugPrint('[WhisperService] Model download failed: $e');
+      // Clean up partial download
+      final partial = File(modelPath);
+      if (partial.existsSync()) await partial.delete();
+      return false;
+    } finally {
+      _isDownloading = false;
+    }
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // NOISE FILTERING & GIBBERISH DETECTION CONSTANTS
@@ -117,7 +229,8 @@ class WhisperService {
   WhisperModelSize get currentSize => _currentSize;
 
   /// Initialize the service by ensuring the default model is extracted.
-  /// Tries base first, falls back to tiny if base is not bundled.
+  /// Tries: 1) bundled asset extraction, 2) previously downloaded model,
+  /// 3) marks as needing download (for lean APK builds).
   /// Now safe to call multiple times — will skip if already initialized.
   Future<bool> initialize({int retryCount = 2}) async {
     // Already initialized and ready — skip re-init
@@ -144,7 +257,7 @@ class WhisperService {
         try {
           final Directory dir = await getApplicationSupportDirectory();
           
-          // Try to extract the preferred model
+          // Strategy 1: Try to extract model from bundled assets
           bool extracted = await _tryExtractModel(dir, _currentSize);
           
           // If preferred model not found, try fallback sizes
@@ -154,8 +267,24 @@ class WhisperService {
             extracted = await _tryExtractModel(dir, _currentSize);
           }
           
+          // Strategy 2: Check if model was previously downloaded (lean APK mode)
           if (!extracted) {
-            debugPrint('[WhisperService] No whisper model found in assets.');
+            for (final size in [WhisperModelSize.base, WhisperModelSize.tiny]) {
+              final String modelName = _modelFiles[size]!;
+              final File modelFile = File('${dir.path}/$modelName');
+              if (modelFile.existsSync() && modelFile.lengthSync() > 1000) {
+                debugPrint('[WhisperService] Found previously downloaded $modelName.');
+                _currentSize = size;
+                extracted = true;
+                break;
+              }
+            }
+          }
+
+          // Strategy 3: No model available — mark as needing download
+          if (!extracted) {
+            debugPrint('[WhisperService] No whisper model found — download required.');
+            _needsDownload = true;
             _isAvailable = false;
             return false;
           }
@@ -166,6 +295,7 @@ class WhisperService {
           );
 
           _isAvailable = true;
+          _needsDownload = false;
           _consecutiveFailures = 0;
           debugPrint('[WhisperService] Initialized with $_currentSize model.');
           return true;
@@ -181,7 +311,7 @@ class WhisperService {
     }
   }
 
-  /// Try to find or extract a model, checking download dir first then assets
+  /// Try to extract a model from assets, checking both multilingual and .en variants
   Future<bool> _tryExtractModel(Directory dir, WhisperModelSize size) async {
     // First try multilingual variant
     final String modelName = _modelFiles[size]!;
@@ -189,23 +319,10 @@ class WhisperService {
     final File modelFile = File(modelPath);
 
     if (modelFile.existsSync() && modelFile.lengthSync() > 1000) {
-      return true; // Already extracted or downloaded
+      return true; // Already extracted
     }
 
-    // Check if AssetDownloadScreen placed the model in app support dir
-    // (This is the primary path when model is NOT bundled in the APK)
-    try {
-      final supportDir = dir; // getApplicationSupportDirectory is already passed
-      final downloadedModel = File('${supportDir.path}/$modelName');
-      if (downloadedModel.existsSync() && downloadedModel.lengthSync() > 1000) {
-        debugPrint('[WhisperService] Found downloaded model at ${downloadedModel.path}');
-        return true;
-      }
-    } catch (e) {
-      debugPrint('[WhisperService] Download dir check failed: $e');
-    }
-
-    // Try extracting multilingual from bundled assets (if still bundled)
+    // Try extracting multilingual from assets
     try {
       final String assetPath = 'assets/models/$modelName';
       final ByteData data = await rootBundle.load(assetPath);
@@ -214,7 +331,7 @@ class WhisperService {
       debugPrint('[WhisperService] Extracted $modelName from assets (multilingual).');
       return true;
     } catch (e) { debugPrint("Silent error caught: $e");
-      debugPrint('[WhisperService] $modelName not found in bundled assets (expected for slim APK).');
+      debugPrint('[WhisperService] $modelName not found in assets.');
     }
 
     // Try .en fallback variant
@@ -228,7 +345,7 @@ class WhisperService {
       debugPrint('[WhisperService] Extracted $fallbackName as $modelName (English-only fallback).');
       return true;
     } catch (e) { debugPrint("Silent error caught: $e");
-      debugPrint('[WhisperService] $fallbackName also not found. Voice features require download.');
+      debugPrint('[WhisperService] $fallbackName also not found.');
     }
 
     return false;
