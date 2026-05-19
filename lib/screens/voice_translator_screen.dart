@@ -35,6 +35,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
     'ta': 'Tamil',
     'bn': 'Bengali',
     'te': 'Telugu',
+    'ml': 'Malayalam',
   };
   final RegionalTranslationService _regionalService = RegionalTranslationService();
 
@@ -240,7 +241,13 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
       String englishText = transcription;
       if (_selectedInputLang != 'en') {
         try {
-          final langMap = {'hi': TranslateLanguage.hindi, 'ta': TranslateLanguage.tamil, 'bn': TranslateLanguage.bengali, 'te': TranslateLanguage.telugu};
+          final langMap = {
+            'hi': TranslateLanguage.hindi,
+            'ta': TranslateLanguage.tamil,
+            'bn': TranslateLanguage.bengali,
+            'te': TranslateLanguage.telugu,
+            'ml': TranslateLanguage.malayalam
+          };
           final mlLang = langMap[_selectedInputLang];
           if (mlLang != null) {
             await _regionalService.initialize(mlLang);

@@ -173,7 +173,7 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF00695C), const Color(0xFF26A69A)],
           "navigateTo": RegionalTranslatorScreen(
               config: RegionalLanguageConfig(
-                  'Malayalam', null, 'ml', 'ml-IN', 'നമസ്കാരം')),
+                  'Malayalam', TranslateLanguage.malayalam, 'ml', 'ml-IN', 'നമസ്കാരം')),
           "icon": Icons.g_translate_rounded
         },
 

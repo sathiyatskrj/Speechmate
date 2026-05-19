@@ -86,7 +86,7 @@ Nicobarese output
 | Tamil | Google ML Kit | ✅ Offline |
 | Bengali | Google ML Kit | ✅ Offline |
 | Telugu | Google ML Kit | ✅ Offline |
-| Malayalam | `translator` package (cloud) | 🌐 Online required |
+| Malayalam | Google ML Kit | ✅ Offline |
 
 > ML Kit models must be downloaded on first use. After download, they operate fully offline.
 

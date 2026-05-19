@@ -31,7 +31,7 @@
 | :--- | :--- | :--- |
 | **12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — loaded from Nicobarese JSON lexicons | ✅ |
 | **Chat Translator** | Conversational translation via offline dictionary + NLP | ✅ |
-| **Regional Translators** | Bidirectional: Nicobarese ↔ Hindi, Tamil, Bengali, Telugu (offline); Malayalam (online) | ✅ / ⚠️ |
+| **Regional Translators** | Bidirectional: Nicobarese ↔ Hindi, Tamil, Bengali, Telugu, Malayalam (fully offline) | ✅ |
 | **Multilingual Search** | Type in any regional language script — auto-translates to English before Nicobarese lookup | ✅ |
 | **Voice Translator** | On-device Whisper Base STT → 10-stage NeuralEngine → Nicobarese output with multi-language input | ✅ |
 | **AR Translator** | Camera-based object detection with Nicobarese overlay via ML Kit. 3 lens modes (Auto/Objects/Text). | ⚠️ |

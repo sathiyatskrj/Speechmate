@@ -22,7 +22,7 @@
 
 ### Known Issues
 - APK is ~250 MB (141 MB Whisper model). Need lean build.
-- Malayalam requires internet (cloud fallback).
+- Malayalam requires one-time download (local ML Kit model).
 - No user testing conducted.
 - No accuracy benchmarks for translation pipeline stages 5-10.
 - No school deployment yet.

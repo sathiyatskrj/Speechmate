@@ -37,7 +37,7 @@ class _OmniTranslatorScreenState extends State<OmniTranslatorScreen> {
     RegionalLanguageConfig('Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', ''),
     RegionalLanguageConfig('Bengali', TranslateLanguage.bengali, 'bn', 'bn-IN', ''),
     RegionalLanguageConfig('Telugu', TranslateLanguage.telugu, 'te', 'te-IN', ''),
-    RegionalLanguageConfig('Malayalam', null, 'ml', 'ml-IN', ''),
+    RegionalLanguageConfig('Malayalam', TranslateLanguage.malayalam, 'ml', 'ml-IN', ''),
   ];
 
   final Map<String, String> _translations = {};
