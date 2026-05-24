@@ -55,3 +55,7 @@ docs/internal_status.md
 analyze_out.txt
 duplicate_analysis.txt
 doctor_output.txt
+
+# Local Model Pre-fetch Assets
+downloaded_models/
+download_models.py

@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/services/native_library_service.dart';
 
 class P2PSyncService {
   static Future<String> generateDictionaryPayload() async {
@@ -20,9 +21,15 @@ class P2PSyncService {
     };
     final jsonString = jsonEncode(combinedMap);
 
+    // Encrypt sync payload natively using standard offline C++ FFI
+    final secureService = NativeLibraryService();
+    final String processedPayload = secureService.isAvailable
+        ? secureService.encryptSyncPayload(jsonString, 'speechmate_secure_key_2026')
+        : jsonString;
+
     // Create Archive
     final archive = Archive();
-    final file = ArchiveFile('dictionary_update.json', jsonString.length, utf8.encode(jsonString));
+    final file = ArchiveFile('dictionary_update.json', processedPayload.length, utf8.encode(processedPayload));
     archive.addFile(file);
 
     // Encode to ZIP
@@ -84,7 +91,14 @@ class P2PSyncService {
       if (archiveFile.isFile && archiveFile.name == 'dictionary_update.json') {
         final data = archiveFile.content as List<int>;
         final jsonString = utf8.decode(data);
-        final Map<String, dynamic> dataMap = jsonDecode(jsonString);
+        
+        // Decrypt sync payload natively using C++ FFI
+        final secureService = NativeLibraryService();
+        final String decryptedPayload = secureService.isAvailable
+            ? secureService.decryptSyncPayload(jsonString, 'speechmate_secure_key_2026')
+            : jsonString;
+            
+        final Map<String, dynamic> dataMap = jsonDecode(decryptedPayload);
         
         final db = await DatabaseManager.instance.database;
         final batch = db.batch();

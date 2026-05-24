@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:translator/translator.dart';
+import 'package:speechmate/services/native_library_service.dart';
 
 enum DictionaryType { words, phrases, nature, numbers, animals, magic, family, dialects }
 
@@ -11,6 +12,33 @@ class DictionaryService {
   DictionaryService._internal();
 
   final DatabaseManager _db = DatabaseManager.instance;
+
+  /// Runs a high-performance offline semantic vector match via C++ FFI
+  Future<Map<String, dynamic>?> searchSemanticOffline(List<double> queryVector) async {
+    final nativeService = NativeLibraryService();
+    if (!nativeService.isAvailable) return null;
+
+    final index = nativeService.findClosestSemanticIndex(queryVector);
+    if (index == -1) return null;
+
+    // Map semantic indexes to local vocabulary groups
+    final List<String> categories = ['ocean', 'fishing', 'forest', 'hunting', 'family'];
+    if (index >= 0 && index < categories.length) {
+      final category = categories[index];
+      // Retrieve local vocabulary items belonging to this category
+      final words = await loadDictionary(DictionaryType.words);
+      final matched = words.where((w) => w['category_id']?.toString().toLowerCase() == category).toList();
+      if (matched.isNotEmpty) {
+        return {
+          'english': 'Semantic Match: ${category.toUpperCase()}',
+          'nicobarese': matched.map((w) => w['nicobarese']).take(3).join(', '),
+          '_type': 'semantic_group',
+          '_results': matched,
+        };
+      }
+    }
+    return null;
+  }
 
   Future<List<Map<String, dynamic>>> loadDictionary(DictionaryType type) async {
     final String category = type.name;
