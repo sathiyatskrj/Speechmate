@@ -1,8 +1,10 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:speechmate/services/tts_service.dart';
+import 'package:speechmate/services/native_edge_service.dart';
 import 'package:speechmate/widgets/nicobarese_inapp_keyboard.dart';
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/widgets/translation_card.dart';
