@@ -169,9 +169,7 @@ class WhisperService {
   /// Minimum RMS energy threshold for audio to be considered speech.
   /// Audio below this is likely silence or very faint background noise.
   /// WAV 16-bit samples range from -32768 to 32767.
-  static const double _minRmsThreshold = 300.0;
-
-  /// Maximum RMS energy — if audio exceeds this, the mic is clipping or
+  static const double _minRmsThreshold = 50.0;
   /// there's extreme environmental noise (construction, wind, etc.)
   static const double _maxRmsThreshold = 28000.0;
 
@@ -547,10 +545,8 @@ class WhisperService {
     // Too short — single-word outputs on noise are hallucinations
     final words = cleaned.split(RegExp(r'\s+'));
     if (words.length < _minWordCount) {
-      // Exception: allow single words that are at least 4 characters
-      // (genuine single-word responses like "hello" are rare but valid)
-      if (words.length == 1 && words[0].length < 4) {
-        debugPrint('[WhisperService] Rejected single short word: "$cleaned"');
+      // Allow all non-empty single words to support tribal vocabulary (e.g. 'Mak', 'Hā', 'Chö')
+      if (words.length == 1 && words[0].isEmpty) {
         return true;
       }
     }
