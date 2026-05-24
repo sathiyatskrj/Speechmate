@@ -8,9 +8,11 @@ import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:speechmate/providers/service_providers.dart';
 import 'package:speechmate/widgets/ar_overlay_controller.dart';
 import 'package:speechmate/data/object_encyclopedia.dart';
+import 'package:speechmate/services/native_edge_service.dart';
 
 class CameraTranslationScreen extends ConsumerStatefulWidget {
   const CameraTranslationScreen({super.key});
@@ -31,6 +33,7 @@ class _CameraTranslationScreenState
   // using ref.read(...) instead of direct instantiation.
 
   bool _isProcessing = false;
+  bool _highAccuracyBinarization = false;
   List<Map<String, String>> _translationResults = [];
   String _detectedObject = "";
 
@@ -339,7 +342,17 @@ class _CameraTranslationScreenState
     });
 
     try {
-      final inputImage = InputImage.fromFilePath(path);
+      String targetPath = path;
+      if (_highAccuracyBinarization) {
+        final dir = await getTemporaryDirectory();
+        final outputPath = '${dir.path}/binarized_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final nativeService = NativeEdgeService();
+        final success = await nativeService.ocrOtsuThreshold(path, outputPath);
+        if (success) {
+          targetPath = outputPath;
+        }
+      }
+      final inputImage = InputImage.fromFilePath(targetPath);
 
       // Decode image to get size for AR overlay
       final bytes = await File(path).readAsBytes();
@@ -893,6 +906,55 @@ class _CameraTranslationScreenState
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+
+            // High-Accuracy Binarization Filter Toggle
+            Positioned(
+              top: 160,
+              right: 16,
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _highAccuracyBinarization = !_highAccuracyBinarization;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(_highAccuracyBinarization
+                          ? '✨ High-Accuracy Native Binarization Filter Enabled'
+                          : 'Standard OCR Scan Active'),
+                      duration: const Duration(seconds: 2),
+                      backgroundColor: Colors.cyan,
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _highAccuracyBinarization ? Colors.cyan.withValues(alpha: 0.85) : Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.cyanAccent),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _highAccuracyBinarization ? Icons.bolt : Icons.filter_alt_outlined,
+                        color: _highAccuracyBinarization ? Colors.black : Colors.cyanAccent,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        "HD Filter",
+                        style: TextStyle(
+                          color: _highAccuracyBinarization ? Colors.black : Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -7,6 +7,7 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import '../services/database_manager.dart';
 import '../services/tts_service.dart';
 import '../services/whisper_service.dart';
+import '../services/native_edge_service.dart';
 
 /// Standalone Great Andamanese Hub
 /// Contains: Dictionary, Text Translator, Voice (STT/TTS), OCR Scanner
@@ -49,6 +50,7 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
   String _ocrText = '';
   String _ocrTranslation = '';
   bool _isProcessingOCR = false;
+  bool _highAccuracyOCR = false;
 
   @override
   void initState() {
@@ -201,7 +203,17 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
       final image = await picker.pickImage(source: ImageSource.camera);
       if (image == null) { setState(() => _isProcessingOCR = false); return; }
 
-      final inputImage = InputImage.fromFilePath(image.path);
+      String targetPath = image.path;
+      if (_highAccuracyOCR) {
+        final dir = await getTemporaryDirectory();
+        final outputPath = '${dir.path}/ga_binarized_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        final success = await NativeEdgeService().ocrOtsuThreshold(image.path, outputPath);
+        if (success) {
+          targetPath = outputPath;
+        }
+      }
+
+      final inputImage = InputImage.fromFilePath(targetPath);
       final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
       final result = await recognizer.processImage(inputImage);
       await recognizer.close();
@@ -592,6 +604,41 @@ class _GAHubScreenState extends State<GAHubScreen> with SingleTickerProviderStat
                 const SizedBox(height: 8),
                 const Text('Take a photo of any English text to translate it to Great Andamanese', style: TextStyle(color: Colors.white54, fontSize: 13), textAlign: TextAlign.center),
                 const SizedBox(height: 25),
+                // Native Binarization HD toggle
+                Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: const [
+                          Icon(Icons.bolt, color: Colors.amberAccent, size: 20),
+                          SizedBox(width: 10),
+                          Text(
+                            "HD Pre-Processing Filter",
+                            style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Switch(
+                        value: _highAccuracyOCR,
+                        activeColor: Colors.amberAccent,
+                        activeTrackColor: Colors.amberAccent.withValues(alpha: 0.3),
+                        onChanged: (val) {
+                          setState(() {
+                            _highAccuracyOCR = val;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
                 ElevatedButton.icon(
                   onPressed: _isProcessingOCR ? null : _scanImage,
                   icon: _isProcessingOCR
