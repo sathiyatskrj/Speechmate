@@ -35,7 +35,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
     'ta': 'Tamil',
     'bn': 'Bengali',
     'te': 'Telugu',
-    'ml': 'Malayalam',
+    'kn': 'Kannada',
   };
   final RegionalTranslationService _regionalService = RegionalTranslationService();
 
@@ -246,7 +246,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
             'ta': TranslateLanguage.tamil,
             'bn': TranslateLanguage.bengali,
             'te': TranslateLanguage.telugu,
-            'ml': TranslateLanguage.malayalam
+            'kn': TranslateLanguage.kannada
           };
           final mlLang = langMap[_selectedInputLang];
           if (mlLang != null) {

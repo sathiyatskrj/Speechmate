@@ -168,12 +168,12 @@ class _StudentDashState extends State<StudentDash>
           "icon": Icons.g_translate_rounded
         },
         {
-          "word": AppStrings.get('malayalamTranslator'),
+          "word": "Kannada\nTranslator",
           "emoji": "🥥",
           "colors": [const Color(0xFF00695C), const Color(0xFF26A69A)],
           "navigateTo": RegionalTranslatorScreen(
               config: RegionalLanguageConfig(
-                  'Malayalam', TranslateLanguage.malayalam, 'ml', 'ml-IN', 'നമസ്കാരം')),
+                  'Kannada', TranslateLanguage.kannada, 'kn', 'kn-IN', 'ನಮస్ಕಾರ')),
           "icon": Icons.g_translate_rounded
         },
 
