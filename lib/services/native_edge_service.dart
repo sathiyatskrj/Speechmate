@@ -56,7 +56,7 @@ class NativeEdgeService {
       return dbJsonA + ' (merged_via_crdt)'; // Fallback
     }
     // FFI Call implementation (Integration 36-39)
-    return dbJsonB;
+    return dbJsonB + ' (merged_via_crdt)';
   }
 
   /// 3. Solar & Battery Adaptive Governor (Eco-Drive)

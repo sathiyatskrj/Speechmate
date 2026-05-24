@@ -49,3 +49,5 @@ tools/
 
 # Offline ML Models
 *.gguf
+*.bin
+downloaded_models/

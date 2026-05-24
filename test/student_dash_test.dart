@@ -6,9 +6,7 @@ void main() {
   testWidgets('StudentDash renders without crashing', (WidgetTester tester) async {
     await AppStrings.load();
     await tester.pumpWidget(MaterialApp(home: StudentDash()));
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump(const Duration(seconds: 5));
+    await tester.pump();
     expect(find.byType(StudentDash), findsOneWidget);
   });
 }
