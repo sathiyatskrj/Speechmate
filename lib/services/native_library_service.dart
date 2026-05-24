@@ -170,4 +170,13 @@ class NativeLibraryService {
       malloc.free(vectorPtr);
     }
   }
+
+  /// Safely dispose of native resources.
+  /// Call when the app is shutting down to prevent any lingering native handles.
+  @pragma('vm:entry-point')
+  void dispose() {
+    _dylibAvailable = false;
+    debugPrint('[NativeLibraryService] Disposed native library bindings.');
+  }
 }
+

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:speechmate/screens/student_dash.dart';
+import 'package:speechmate/screens/student_dash_engines.dart';
 
 void main() {
   group('SmartMissionEngine Tests', () {

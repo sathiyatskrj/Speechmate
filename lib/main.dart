@@ -4,12 +4,14 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speechmate/screens/emotional_splash_screen.dart';
 import 'package:speechmate/screens/app_language_select.dart';
+import 'package:speechmate/screens/onboarding_screen.dart';
 import 'package:speechmate/core/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/services/crash_reporter.dart';
+import 'package:speechmate/services/analytics_service.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Current data version — bump this when lexicon files change
@@ -37,6 +39,12 @@ void main() async {
   try {
     final dir = await getApplicationSupportDirectory();
     await CrashReporter.init(dir.path);
+  } catch (_) {}
+
+  // Init offline analytics
+  try {
+    await AnalyticsService.instance.init();
+    await AnalyticsService.instance.trackEvent('app_open');
   } catch (_) {}
 
   // Global fallback UI for widget build errors
@@ -149,16 +157,25 @@ void main() async {
   await AppStrings.load();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  runApp(const ProviderScope(
-    child: MyApp(),
+  // Check if user has seen onboarding
+  final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+
+  runApp(ProviderScope(
+    child: MyApp(showOnboarding: !hasSeenOnboarding),
   ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool showOnboarding;
+  const MyApp({super.key, this.showOnboarding = false});
 
   @override
   Widget build(BuildContext context) {
+    // Route: Splash → Onboarding (first time) → Language Selection
+    final Widget destination = showOnboarding
+        ? const OnboardingScreen(nextScreen: LanguageSelectionScreen())
+        : const LanguageSelectionScreen();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SpeechMate - Nicobarese Language Learning',
@@ -170,7 +187,7 @@ class MyApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: const EmotionalSplashScreen(nextScreen: LanguageSelectionScreen()),
+      home: EmotionalSplashScreen(nextScreen: destination),
     );
   }
 }

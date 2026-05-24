@@ -6,6 +6,10 @@ import 'package:speechmate/services/model_downloader_service.dart';
 /// Local LLM Service designed specifically for SmolLM2 135M.
 /// This service loads the model via an FFI bridge (like llama_cpp_dart)
 /// and uses `dictionary.json` as In-Context Knowledge (RAG).
+///
+/// **Status**: GGUF inference is not yet integrated. The three public
+/// methods provide dictionary-powered fallback logic so callers receive
+/// meaningful results instead of hardcoded stubs.
 class LocalLlmService {
   bool _isInitialized = false;
   List<dynamic> _dictionaryCache = [];
@@ -24,12 +28,12 @@ class LocalLlmService {
       
       if (isDownloaded) {
         final localPath = await downloader.getModelPath();
-        // Example: _llm = LlamaCpp(modelPath: localPath);
         debugPrint('[LocalLlmService] Loaded Local AI Tutor (TinyLlama) from: $localPath');
         _isInitialized = true;
       } else {
         debugPrint('[LocalLlmService] Model not found locally. Awaiting user download.');
-        // We do not set _isInitialized to true if the model isn't downloaded yet.
+        // Dictionary-powered fallbacks will still work without the GGUF model.
+        _isInitialized = true;
       }
     } catch (e) {
       debugPrint('[LocalLlmService] Initialization failed: $e');
@@ -40,8 +44,6 @@ class LocalLlmService {
   /// so the 135M model acts as a localized linguistic engine.
   // ignore: unused_element
   String _buildSystemPrompt(String taskType) {
-    // To prevent exceeding context limits (SmolLM2 supports 2k-8k tokens),
-    // we take a relevant sample or the core grammar rules from the dictionary.
     final int sampleSize = _dictionaryCache.length > 50 ? 50 : _dictionaryCache.length;
     final List<dynamic> coreVocab = _dictionaryCache.sublist(0, sampleSize);
     
@@ -69,46 +71,135 @@ class LocalLlmService {
     return prompt.toString();
   }
 
-  /// Translates a full sentence while strictly adhering to the offline dictionary to avoid "trash" translations.
+  /// Translates an English sentence to Nicobarese using the offline dictionary.
+  ///
+  /// Performs word-by-word dictionary lookup. Words without a match are kept
+  /// in English to avoid hallucination. Returns null only if the dictionary
+  /// is empty or the sentence is blank.
   Future<String?> translateSentence(String sentence) async {
     if (!_isInitialized) await initialize();
+    if (sentence.trim().isEmpty || _dictionaryCache.isEmpty) return null;
 
-    // Prompts prepared for GGUF integration:
-    // final systemPrompt = _buildSystemPrompt('translation');
-    // final userPrompt = "Translate this: '$sentence'";
+    // Build a fast lookup map: english → nicobarese
+    final Map<String, String> lookupMap = {};
+    for (final entry in _dictionaryCache) {
+      final eng = (entry['english'] ?? entry['text'] ?? '').toString().toLowerCase().trim();
+      final nic = (entry['nicobarese'] ?? '').toString().trim();
+      if (eng.isNotEmpty && nic.isNotEmpty) {
+        lookupMap[eng] = nic;
+      }
+    }
 
-    debugPrint('[LocalLlmService] translateSentence: stub — GGUF not yet integrated');
-    return null; // Stub — Neural Engine will use its dictionary-based fallback
+    // Tokenize the input sentence and translate word-by-word
+    final words = sentence.trim().split(RegExp(r'\s+'));
+    final translated = words.map((word) {
+      final clean = word.toLowerCase().replaceAll(RegExp(r'[^\w]'), '');
+      return lookupMap[clean] ?? word; // Keep original if no match
+    }).toList();
+
+    final result = translated.join(' ');
+    debugPrint('[LocalLlmService] translateSentence: ${words.length} words → ${translated.where((w) => lookupMap.containsKey(w.toLowerCase())).length} matched');
+    return result;
   }
 
-  /// Evaluates a sentence for the Contextual Sentence Builder Game.
+  /// Evaluates a user's Nicobarese sentence against the dictionary.
+  ///
+  /// Checks how many words in the sentence are valid Nicobarese entries.
+  /// Returns a validity score and specific feedback about unrecognized words.
   Future<Map<String, dynamic>> evaluateSentence(String userSentence) async {
     if (!_isInitialized) await initialize();
+    if (userSentence.trim().isEmpty) {
+      return {"isValid": false, "feedback": "Please enter a sentence to evaluate."};
+    }
 
-    // Prompts prepared for GGUF integration:
-    // final systemPrompt = _buildSystemPrompt('sentence_builder');
-    // final userPrompt = "Evaluate this sentence based on the vocabulary: '$userSentence'";
+    // Build a set of known Nicobarese words for fast lookup
+    final Set<String> knownNicobarese = {};
+    for (final entry in _dictionaryCache) {
+      final nic = (entry['nicobarese'] ?? '').toString().toLowerCase().trim();
+      if (nic.isNotEmpty) {
+        // Add individual words from multi-word entries
+        for (final word in nic.split(RegExp(r'\s+'))) {
+          knownNicobarese.add(word.replaceAll(RegExp(r'[^\w]'), ''));
+        }
+      }
+    }
 
-    debugPrint('[LocalLlmService] evaluateSentence: stub — GGUF not yet integrated');
-    final bool isLikelyValid = userSentence.trim().isNotEmpty;
-    
-    return {
-      "isValid": isLikelyValid,
-      "feedback": isLikelyValid 
-        ? "Good job! The structure makes sense based on the vocabulary." 
-        : "Try checking the word order.",
-    };
+    final words = userSentence.trim().split(RegExp(r'\s+'));
+    final unrecognized = <String>[];
+    int matchCount = 0;
+
+    for (final word in words) {
+      final clean = word.toLowerCase().replaceAll(RegExp(r'[^\w]'), '');
+      if (clean.isEmpty) continue;
+      if (knownNicobarese.contains(clean)) {
+        matchCount++;
+      } else {
+        unrecognized.add(word);
+      }
+    }
+
+    final double ratio = words.isEmpty ? 0 : matchCount / words.length;
+    final bool isValid = ratio >= 0.5; // At least half the words should be recognized
+
+    String feedback;
+    if (ratio >= 0.8) {
+      feedback = "Excellent! Most words are valid Nicobarese vocabulary.";
+    } else if (ratio >= 0.5) {
+      feedback = "Good attempt! These words were not recognized: ${unrecognized.join(', ')}";
+    } else if (matchCount > 0) {
+      feedback = "Keep trying! Only $matchCount of ${words.length} words matched. Unrecognized: ${unrecognized.take(5).join(', ')}";
+    } else {
+      feedback = "No Nicobarese words detected. Try using vocabulary from the dictionary.";
+    }
+
+    return {"isValid": isValid, "feedback": feedback, "matchRatio": ratio};
   }
 
-  /// Suggests the next 3 lessons based on the student's recent score map.
+  /// Suggests the next 3 learning focus areas based on the student's category scores.
+  ///
+  /// Analyzes the score map to find the weakest categories and recommends
+  /// specific learning paths. Categories scoring below 50% are prioritized.
   Future<List<String>> generateAdaptivePath(Map<String, int> categoryScores) async {
     if (!_isInitialized) await initialize();
+    if (categoryScores.isEmpty) {
+      return ["Start with Basic Vocabulary", "Try the Numbers Module", "Explore Animal Words"];
+    }
 
-    // Prompts prepared for GGUF integration:
-    // final systemPrompt = _buildSystemPrompt('adaptive_path');
-    // final userPrompt = "Student scores: $categoryScores. What should they study next?";
+    // Sort categories by score (ascending = weakest first)
+    final sorted = categoryScores.entries.toList()
+      ..sort((a, b) => a.value.compareTo(b.value));
 
-    debugPrint('[LocalLlmService] generateAdaptivePath: stub — GGUF not yet integrated');
-    return ["Review Basic Pronouns", "Practice Colors", "Listen to Flora Audio"];
+    // Map category keys to human-readable learning suggestions
+    const categoryLabels = {
+      'animals': 'Practice Animal Words',
+      'nature': 'Explore Nature Vocabulary',
+      'numbers': 'Review Number Words',
+      'colors': 'Learn More Color Terms',
+      'family': 'Study Family Relationships',
+      'things': 'Master Everyday Objects',
+      'feelings': 'Express Emotions in Nicobarese',
+      'body_parts': 'Learn Body Part Names',
+      'magic': 'Discover Magic Words',
+      'vocabulary': 'Expand General Vocabulary',
+    };
+
+    final suggestions = <String>[];
+    for (final entry in sorted) {
+      if (suggestions.length >= 3) break;
+      final label = categoryLabels[entry.key] ?? 'Review ${entry.key}';
+      if (entry.value < 50) {
+        suggestions.add('$label (needs work — ${entry.value}%)');
+      } else {
+        suggestions.add(label);
+      }
+    }
+
+    // Pad if less than 3 categories have scores
+    while (suggestions.length < 3) {
+      suggestions.add('Explore a new category');
+    }
+
+    debugPrint('[LocalLlmService] Adaptive path: ${suggestions.join(', ')}');
+    return suggestions;
   }
 }
