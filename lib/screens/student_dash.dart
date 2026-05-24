@@ -1177,7 +1177,7 @@ class _StudentDashState extends State<StudentDash>
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFFBBF24),
-                    side: Border.all(color: const Color(0xFFFBBF24).withOpacity(0.3)),
+                    side: BorderSide(color: const Color(0xFFFBBF24).withOpacity(0.3)),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
@@ -1207,8 +1207,9 @@ class _StudentDashState extends State<StudentDash>
                     shadowColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
-                      side: Border.all(color: const Color(0xFF38BDF8).withOpacity(0.4)),
+                      side: BorderSide(color: const Color(0xFF38BDF8).withOpacity(0.4)),
                     ),
+
                     padding: const EdgeInsets.symmetric(vertical: 10),
                   ),
                   icon: Icon(_batSyncListening ? Icons.stop_rounded : Icons.play_arrow_rounded, size: 16),
