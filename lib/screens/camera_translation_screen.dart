@@ -719,8 +719,8 @@ class _CameraTranslationScreenState
             if (_isLiveMode && _liveBlocks.isNotEmpty)
               AROverlayController(
                 liveBlocks: _liveBlocks,
-                imageSize: Size(_cameraController!.value.previewSize!.height,
-                    _cameraController!.value.previewSize!.width),
+                imageSize: Size(_cameraController!.value.previewSize!.width,
+                    _cameraController!.value.previewSize!.height),
                 screenSize: screenSize,
               ),
 

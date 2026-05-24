@@ -666,6 +666,8 @@ class _ARTranslatorScreenState extends ConsumerState<ARTranslatorScreen>
                           child: CustomPaint(
                             painter: _BoxOverlayPainter(
                               items: _items,
+                              imageSize: Size(_cameraController!.value.previewSize!.width,
+                                  _cameraController!.value.previewSize!.height),
                             ),
                           ),
                         ),
@@ -1387,18 +1389,47 @@ class _DetectedItem {
 
 class _BoxOverlayPainter extends CustomPainter {
   final List<_DetectedItem> items;
+  final Size imageSize;
 
   const _BoxOverlayPainter({
     required this.items,
+    required this.imageSize,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    final double imgW = imageSize.width;
+    final double imgH = imageSize.height;
+    final bool isLandscapeImage = imgW > imgH;
+
+    final double scaleX = isLandscapeImage
+        ? size.width / imgH
+        : size.width / imgW;
+    final double scaleY = isLandscapeImage
+        ? size.height / imgW
+        : size.height / imgH;
+
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
       if (item.boundingBox == null) continue;
 
-      final scaled = item.boundingBox!;
+      double left, top, width, height;
+
+      if (isLandscapeImage) {
+        // Back camera 90 degree clockwise rotation mapping
+        left = (imgH - item.boundingBox!.bottom) * scaleX;
+        top = item.boundingBox!.left * scaleY;
+        width = math.max(item.boundingBox!.height * scaleX, 60.0);
+        height = math.max(item.boundingBox!.width * scaleY, 30.0);
+      } else {
+        // Normal scale mapping
+        left = item.boundingBox!.left * scaleX;
+        top = item.boundingBox!.top * scaleY;
+        width = math.max(item.boundingBox!.width * scaleX, 60.0);
+        height = math.max(item.boundingBox!.height * scaleY, 30.0);
+      }
+
+      final scaled = Rect.fromLTWH(left, top, width, height);
 
       final color = i == 0 ? Colors.cyanAccent : Colors.white54;
 

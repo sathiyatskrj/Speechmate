@@ -28,16 +28,35 @@ class LiveTextOverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double scaleX = screenSize.width / imageSize.width;
-    final double scaleY = screenSize.height / imageSize.height;
+    final double imgW = imageSize.width;
+    final double imgH = imageSize.height;
+    final bool isLandscapeImage = imgW > imgH;
+
+    final double scaleX = isLandscapeImage
+        ? screenSize.width / imgH
+        : screenSize.width / imgW;
+    final double scaleY = isLandscapeImage
+        ? screenSize.height / imgW
+        : screenSize.height / imgH;
 
     for (int i = 0; i < blocks.length; i++) {
       final block = blocks[i];
-      // Scale bounding box to screen dimensions
-      final double left = block.rect.left * scaleX;
-      final double top = block.rect.top * scaleY;
-      final double width = max(block.rect.width * scaleX, 60);
-      final double height = max(block.rect.height * scaleY, 30);
+      
+      double left, top, width, height;
+
+      if (isLandscapeImage) {
+        // Back camera 90 degree clockwise rotation mapping
+        left = (imgH - block.rect.bottom) * scaleX;
+        top = block.rect.left * scaleY;
+        width = max(block.rect.height * scaleX, 60.0);
+        height = max(block.rect.width * scaleY, 30.0);
+      } else {
+        // Normal scale mapping
+        left = block.rect.left * scaleX;
+        top = block.rect.top * scaleY;
+        width = max(block.rect.width * scaleX, 60.0);
+        height = max(block.rect.height * scaleY, 30.0);
+      }
       
       final Rect scaledRect = Rect.fromLTWH(left, top, width, height);
 
