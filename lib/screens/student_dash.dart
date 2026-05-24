@@ -1,6 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:speechmate/services/tts_service.dart';
+import 'package:speechmate/widgets/nicobarese_inapp_keyboard.dart';
+import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/widgets/translation_card.dart';
 import 'package:speechmate/widgets/gamification_header.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
@@ -339,6 +342,107 @@ class _StudentDashState extends State<StudentDash>
           "navigateTo": const AISetupScreen(),
           "icon": Icons.psychology_rounded,
         },
+        // ═══════════════════════════════════════════════════
+        // ⚙️ UTILITIES
+        // ═══════════════════════════════════════════════════
+        {
+          "word": "System Keyboard",
+          "emoji": "⚙️",
+          "colors": [const Color(0xFF8A2387), const Color(0xFFE94057)],
+          "icon": Icons.keyboard_double_arrow_right_rounded,
+          "onTap": (BuildContext context) async {
+            try {
+              const platform = MethodChannel("com.speechmate.general/keyboard");
+              await platform.invokeMethod("enableSystemKeyboard");
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Error opening keyboard settings: $e")),
+              );
+            }
+          }
+        },
+        {
+          "word": "Test Custom Keyboard",
+          "emoji": "⌨️",
+          "colors": [const Color(0xFF00B0FF), const Color(0xFF00E5FF)],
+          "icon": Icons.keyboard_alt_rounded,
+          "onTap": (BuildContext context) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) {
+                return StatefulBuilder(
+                  builder: (context, setModalState) {
+                    return Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0C1D24),
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 12),
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.white24,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                const Text(
+                                  "Test Nicobarese Keyboard",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: searchController,
+                                  style: const TextStyle(color: Colors.white),
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    hintText: "Tap keys below to write...",
+                                    hintStyle: const TextStyle(color: Colors.white38),
+                                    filled: true,
+                                    fillColor: Colors.white.withValues(alpha: 0.05),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.clear, color: Colors.white54),
+                                      onPressed: () {
+                                        setModalState(() {
+                                          searchController.clear();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          NicobareseInAppKeyboard(
+                            controller: searchController,
+                            onClose: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                );
+              },
+            );
+          }
+        },
         {
           "word": AppStrings.get('feedback'),
           "emoji": "⭐",
@@ -573,9 +677,11 @@ class _StudentDashState extends State<StudentDash>
 
     return PremiumTiltCard(
       onTap: () {
-        if (tile['isSecret'] == true) {
+        if (tile['onTap'] != null) {
+          tile['onTap'](context);
+        } else if (tile['isSecret'] == true) {
           _showSecretAccessDialog(context, tile['navigateTo']);
-        } else {
+        } else if (tile['navigateTo'] != null) {
           Navigator.push(
               context, MaterialPageRoute(builder: (_) => tile['navigateTo']));
         }
