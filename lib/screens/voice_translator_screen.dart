@@ -11,6 +11,7 @@ import 'package:speechmate/services/whisper_service.dart';
 import 'package:speechmate/services/regional_translation_service.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class VoiceTranslatorScreen extends StatefulWidget {
   const VoiceTranslatorScreen({super.key});
@@ -26,6 +27,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
   final WhisperService _whisperService = WhisperService();
   final NeuralEngineService _neuralEngine = NeuralEngineService();
   final TtsService _ttsService = TtsService();
+  final stt.SpeechToText _speechToText = stt.SpeechToText();
 
   // P1-02 + P3-01: Input language selection for bidirectional voice translation
   String _selectedInputLang = 'en';
@@ -33,10 +35,50 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
     'en': 'English',
     'hi': 'Hindi',
     'ta': 'Tamil',
+    'ml': 'Malayalam',
     'bn': 'Bengali',
     'te': 'Telugu',
-    'kn': 'Kannada',
   };
+
+  final Map<String, Map<String, dynamic>> _languageConfigs = {
+    'en': {
+      'name': 'English',
+      'mlLang': TranslateLanguage.english,
+      'localeId': 'en-US',
+      'useML': false,
+    },
+    'hi': {
+      'name': 'Hindi',
+      'mlLang': TranslateLanguage.hindi,
+      'localeId': 'hi-IN',
+      'useML': true,
+    },
+    'ta': {
+      'name': 'Tamil',
+      'mlLang': TranslateLanguage.tamil,
+      'localeId': 'ta-IN',
+      'useML': true,
+    },
+    'ml': {
+      'name': 'Malayalam',
+      'mlLang': null,
+      'localeId': 'ml-IN',
+      'useML': true,
+    },
+    'bn': {
+      'name': 'Bengali',
+      'mlLang': TranslateLanguage.bengali,
+      'localeId': 'bn-IN',
+      'useML': true,
+    },
+    'te': {
+      'name': 'Telugu',
+      'mlLang': TranslateLanguage.telugu,
+      'localeId': 'te-IN',
+      'useML': true,
+    },
+  };
+
   final RegionalTranslationService _regionalService = RegionalTranslationService();
 
   // State
@@ -86,6 +128,9 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
       // Init whisper last (heavy — model extraction)
       final ok = await _whisperService.initialize();
 
+      // Pre-download / initialize Google ML Translation packs for English, Hindi, Tamil, Malayalam, Bengali, Telugu
+      _preDownloadMLKitPacks();
+
       if (mounted) {
         setState(() {
           _isModelReady = ok;
@@ -103,6 +148,28 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
           _isModelReady = false;
           _modelError = 'Engine init failed: $e';
         });
+      }
+    }
+  }
+
+  Future<void> _preDownloadMLKitPacks() async {
+    final modelManager = OnDeviceTranslatorModelManager();
+    final languages = [
+      TranslateLanguage.english,
+      TranslateLanguage.hindi,
+      TranslateLanguage.tamil,
+      TranslateLanguage.bengali,
+      TranslateLanguage.telugu,
+    ];
+    for (final lang in languages) {
+      try {
+        final isDownloaded = await modelManager.isModelDownloaded(lang.bcpCode);
+        if (!isDownloaded) {
+          debugPrint('[VoiceTranslator] Pre-downloading ${lang.name} ML translation pack...');
+          await modelManager.downloadModel(lang.bcpCode);
+        }
+      } catch (e) {
+        debugPrint('[VoiceTranslator] Pre-download failed for ${lang.name}: $e');
       }
     }
   }
@@ -132,19 +199,30 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
   // ────────────────────────────────────────────────────────────────────────────
   Future<void> _toggleRecording() async {
     if (_isProcessing) return;
-    if (!_isModelReady) {
-      _showSnack('Speech engine not ready yet');
-      return;
-    }
 
-    if (_isRecording) {
-      await _stopAndTranslate();
+    final config = _languageConfigs[_selectedInputLang];
+    final useML = config?['useML'] ?? false;
+
+    if (useML) {
+      if (_isRecording) {
+        await _stopAndTranslateML();
+      } else {
+        await _startListeningML();
+      }
     } else {
-      await _startRecording();
+      if (!_isModelReady) {
+        _showSnack('Speech engine not ready yet');
+        return;
+      }
+      if (_isRecording) {
+        await _stopAndTranslateWhisper();
+      } else {
+        await _startRecordingWhisper();
+      }
     }
   }
 
-  Future<void> _startRecording() async {
+  Future<void> _startRecordingWhisper() async {
     try {
       // Stop any playing audio
       await _ttsService.stop();
@@ -183,20 +261,20 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
         _recordingRipple.repeat();
       }
     } catch (e) {
-      debugPrint('[VoiceTranslator] Start error: $e');
+      debugPrint('[VoiceTranslator] Whisper start error: $e');
       _showSnack('Could not start recording');
       if (mounted) setState(() => _isRecording = false);
     }
   }
 
-  Future<void> _stopAndTranslate() async {
+  Future<void> _stopAndTranslateWhisper() async {
     if (!_isRecording) return;
 
     String? path;
     try {
       path = await _audioRecorder!.stop();
     } catch (e) {
-      debugPrint('[VoiceTranslator] Stop error: $e');
+      debugPrint('[VoiceTranslator] Whisper stop error: $e');
     }
 
     HapticFeedback.lightImpact();
@@ -221,8 +299,7 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
     _lastAudioPath = path;
 
     try {
-      // Step 1: Transcribe — WhisperService has its own 30s timeout,
-      // no extra timeout here to avoid premature abort race conditions.
+      // Transcribe via Whisper
       final transcription = await _whisperService.transcribe(path);
 
       if (transcription.trim().isEmpty) {
@@ -237,28 +314,133 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
 
       if (mounted) setState(() => _inputText = transcription.trim());
 
-      // Step 2: If non-English input, translate to English first via ML Kit
-      String englishText = transcription;
-      if (_selectedInputLang != 'en') {
-        try {
-          final langMap = {
-            'hi': TranslateLanguage.hindi,
-            'ta': TranslateLanguage.tamil,
-            'bn': TranslateLanguage.bengali,
-            'te': TranslateLanguage.telugu,
-            'kn': TranslateLanguage.kannada
-          };
-          final mlLang = langMap[_selectedInputLang];
-          if (mlLang != null) {
-            await _regionalService.initialize(mlLang);
-            englishText = await _regionalService.translateToEnglish(transcription, fallbackLangCode: _selectedInputLang);
-          }
-        } catch (e) {
-          debugPrint('[VoiceTranslator] Regional→English failed: $e');
-        }
+      // English to Nicobarese
+      final result = await _neuralEngine
+          .predict(transcription.trim())
+          .timeout(const Duration(seconds: 10));
+
+      if (mounted) {
+        setState(() {
+          _outputText = result.text;
+          _confidence = result.confidence;
+        });
       }
 
-      // Step 3: Translate English → Nicobarese
+      // Speak result
+      _ttsService.speakNicobarese(result.text, englishWord: transcription.trim());
+    } catch (e) {
+      debugPrint('[VoiceTranslator] Whisper process error: $e');
+      _whisperService.reset();
+      if (mounted) {
+        setState(() {
+          _inputText = _inputText.isEmpty ? 'Processing failed' : _inputText;
+          _outputText = 'Error — try again';
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _startListeningML() async {
+    try {
+      await _ttsService.stop();
+      final config = _languageConfigs[_selectedInputLang];
+      final localeId = config?['localeId'] ?? 'en-US';
+
+      bool available = await _speechToText.initialize(
+        onStatus: (status) {
+          debugPrint('[VoiceTranslator] ML STT Status: $status');
+        },
+        onError: (error) {
+          debugPrint('[VoiceTranslator] ML STT Error: $error');
+          _showSnack('Speech recognition error: ${error.errorMsg}');
+          if (mounted) {
+            setState(() {
+              _isRecording = false;
+              _isProcessing = false;
+            });
+            _recordingRipple.stop();
+            _recordingRipple.reset();
+          }
+        },
+      );
+
+      if (available) {
+        HapticFeedback.mediumImpact();
+        if (mounted) {
+          setState(() {
+            _isRecording = true;
+            _inputText = '';
+            _outputText = '';
+            _confidence = 0.0;
+          });
+          _recordingRipple.repeat();
+        }
+
+        await _speechToText.listen(
+          onResult: (result) {
+            if (mounted) {
+              setState(() {
+                _inputText = result.recognizedWords;
+              });
+            }
+          },
+          localeId: localeId,
+        );
+      } else {
+        _showSnack('Speech recognition not available');
+      }
+    } catch (e) {
+      debugPrint('[VoiceTranslator] ML STT start error: $e');
+      _showSnack('Could not start speech recognition');
+      if (mounted) {
+        setState(() => _isRecording = false);
+        _recordingRipple.stop();
+        _recordingRipple.reset();
+      }
+    }
+  }
+
+  Future<void> _stopAndTranslateML() async {
+    if (!_isRecording) return;
+
+    HapticFeedback.lightImpact();
+    _recordingRipple.stop();
+    _recordingRipple.reset();
+
+    if (mounted) {
+      setState(() {
+        _isRecording = false;
+        _isProcessing = true;
+      });
+    }
+
+    try {
+      await _speechToText.stop();
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      final text = _inputText.trim();
+      if (text.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _inputText = 'Could not understand. Try speaking clearly.';
+            _isProcessing = false;
+          });
+        }
+        return;
+      }
+
+      final config = _languageConfigs[_selectedInputLang];
+      final mlLang = config?['mlLang'] as TranslateLanguage?;
+      String englishText = text;
+
+      if (mlLang != null && mlLang != TranslateLanguage.english) {
+        await _regionalService.initialize(mlLang);
+        englishText = await _regionalService.translateToEnglish(text, fallbackLangCode: _selectedInputLang);
+      }
+
+      // Translate English -> Nicobarese
       final result = await _neuralEngine
           .predict(englishText)
           .timeout(const Duration(seconds: 10));
@@ -270,12 +452,9 @@ class _VoiceTranslatorScreenState extends State<VoiceTranslatorScreen>
         });
       }
 
-      // Step 4: Speak
       _ttsService.speakNicobarese(result.text, englishWord: englishText);
     } catch (e) {
-      debugPrint('[VoiceTranslator] Process error: $e');
-      // Proactively reset the whisper engine so next attempt works
-      _whisperService.reset();
+      debugPrint('[VoiceTranslator] ML process error: $e');
       if (mounted) {
         setState(() {
           _inputText = _inputText.isEmpty ? 'Processing failed' : _inputText;

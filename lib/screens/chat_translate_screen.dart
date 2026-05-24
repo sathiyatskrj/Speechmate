@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
-import '../services/dictionary_service.dart';
-import '../services/neural_engine_service.dart';
-import '../services/database_manager.dart';
-import '../widgets/nicobarese_keyboard.dart';
-import '../widgets/anim/confetti_overlay.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:speechmate/services/dictionary_service.dart';
+import 'package:speechmate/services/neural_engine_service.dart';
+import 'package:speechmate/services/database_manager.dart';
+import 'package:speechmate/services/tts_service.dart';
+import 'package:speechmate/widgets/nicobarese_keyboard.dart';
+import 'package:speechmate/widgets/anim/confetti_overlay.dart';
+
+// ────── DUOLINGO-STYLE VIBRANT LIGHT PALETTE ──────
+class _DuoColors {
+  static const bg = Color(0xFFF7F7F7);
+  static const white = Color(0xFFFFFFFF);
+  static const green = Color(0xFF58CC02);
+  static const blue = Color(0xFF1CB0F6);
+  static const orange = Color(0xFFFF9600);
+  static const yellow = Color(0xFFFFC800);
+  static const teal = Color(0xFF00CD9C);
+  static const textDark = Color(0xFF3C3C3C);
+  static const textMuted = Color(0xFF777777);
+  static const border = Color(0xFFE5E5E5);
+  static const cardShadow = Color(0x0A000000);
+}
 
 class ChatTranslateScreen extends StatefulWidget {
   const ChatTranslateScreen({super.key});
@@ -15,35 +33,31 @@ class ChatTranslateScreen extends StatefulWidget {
 
 class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerProviderStateMixin {
   final DictionaryService dictionaryService = DictionaryService();
-  final NeuralEngineService neuralEngine = NeuralEngineService(); // [NEW] Added Neural Engine
+  final NeuralEngineService neuralEngine = NeuralEngineService();
+  final TtsService _ttsService = TtsService();
+  
   final TextEditingController controller = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
   
   final List<Map<String, dynamic>> messages = [];
   bool isTyping = false;
   int messageCount = 0;
-  
-  // Magic Easter egg
   bool showConfetti = false;
-  // Removed local confettiController to use ConfettiOverlay state management
-  
-  // Custom Keyboard
   bool _showCustomKeyboard = false;
-  final FocusNode _focusNode = FocusNode();
   
   @override
   void initState() {
     super.initState();
     dictionaryService.loadDictionary(DictionaryType.words);
-    
-    // Removed local confettiController initialization
+    _ttsService.init();
     
     // Welcome message
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         setState(() {
           messages.add({
-            "text": "👋 Hello! I'm your Nicobarese translator. Type any word to translate!",
+            "text": "👋 Hello! I'm your SpeechMate translation assistant. Type any word, phrase, or sentence to translate!",
             "type": "bot",
             "timestamp": DateTime.now(),
           });
@@ -67,12 +81,12 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       isTyping = true;
       messageCount++;
       controller.clear();
-      _showCustomKeyboard = false; // Hide keyboard on send
+      _showCustomKeyboard = false; // Hide custom keyboard on send
     });
 
     _scrollToBottom();
 
-    // Easter egg: Every 10th message triggers confetti
+    // Surprise confetti every 10th message
     if (messageCount % 10 == 0) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
@@ -84,7 +98,6 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       });
     }
 
-    // Simulate typing delay
     await Future.delayed(const Duration(milliseconds: 800));
 
     // 1. Try Direct Lookup
@@ -93,7 +106,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
     String responseText;
     String emoji = "💬";
 
-    // 2. Fallback to Neural Engine (for sentences or fuzzy words)
+    // 2. Fallback to Neural Engine for sentences/phrases
     if (result == null) {
       final neuralResult = await neuralEngine.predict(input);
       if (neuralResult.text.isNotEmpty) {
@@ -109,18 +122,17 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       final isNicobarese = result['nicobarese'].toString().toLowerCase() == input.toLowerCase();
       
       if (result.containsKey('generated')) {
-          // Neural Engine Result
-          responseText = "✨ ${result['nicobarese']}\n\n🤖 AI Translation";
+          responseText = "✨ ${result['nicobarese']}\n\n🤖 AI Phrase Translation";
           emoji = "🤖";
       } else if (isNicobarese) {
-        responseText = "✨ ${result['english']}\n\n🔤 English translation";
+        responseText = "✨ ${result['english']}\n\n🔤 English Translation";
         emoji = "🌴";
       } else {
-        responseText = "✨ ${result['nicobarese']}\n\n🌴 Nicobarese translation";
+        responseText = "✨ ${result['nicobarese']}\n\n🌴 Nicobarese Translation";
         emoji = "📚";
       }
     } else {
-      responseText = "🤔 Hmm, I couldn't find that word in my dictionary. Try another one!";
+      responseText = "🤔 Hmm, I couldn't find a direct translation in the offline dictionary. Try phrasing it differently!";
       emoji = "❓";
     }
 
@@ -132,9 +144,15 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
           "type": "bot",
           "emoji": emoji,
           "timestamp": DateTime.now(),
-          "word_data": result, // Important for flashcards
+          "word_data": result,
         });
       });
+
+      // Auto TTS play for translation
+      if (result != null) {
+        final speechText = result['nicobarese'] ?? result['english'];
+        _ttsService.speakNicobarese(speechText.toString(), englishWord: result['english']?.toString());
+      }
     }
 
     _scrollToBottom();
@@ -154,6 +172,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
 
   @override
   void dispose() {
+    _ttsService.dispose();
     scrollController.dispose();
     controller.dispose();
     _focusNode.dispose();
@@ -169,37 +188,45 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
         final isMediumScreen = screenWidth < 400;
         
         final messageFontSize = isSmallScreen ? 14.0 : (isMediumScreen ? 15.0 : 16.0);
-        final messageMaxWidth = screenWidth * 0.75;
+        final messageMaxWidth = screenWidth * 0.70;
         final messagePadding = isSmallScreen ? 12.0 : 14.0;
         
         return Scaffold(
+          backgroundColor: _DuoColors.bg,
           appBar: AppBar(
+            backgroundColor: _DuoColors.white,
+            foregroundColor: _DuoColors.textDark,
+            elevation: 0,
+            shape: const Border(bottom: BorderSide(color: _DuoColors.border, width: 2)),
+            centerTitle: true,
             title: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 8,
-                  height: 8,
+                  width: 8, height: 8,
                   decoration: const BoxDecoration(
-                    color: Colors.greenAccent,
+                    color: _DuoColors.green,
                     shape: BoxShape.circle,
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text("Chat Translator"),
+                Text("Chat Translator", style: GoogleFonts.outfit(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                  color: _DuoColors.textDark,
+                )),
               ],
             ),
-            backgroundColor: const Color(0xFF1E1E2C),
-            foregroundColor: Colors.white,
-            elevation: 0,
             actions: [
               IconButton(
-                icon: const Icon(Icons.info_outline),
-                tooltip: 'Tip: Every 10th message has a surprise! 🎉',
+                icon: const Icon(Icons.info_outline_rounded, color: _DuoColors.textMuted),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('💡 Tip: Keep chatting for surprises!'),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      backgroundColor: _DuoColors.textDark,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      content: Text('💡 Tip: Try writing full sentences in English!', style: GoogleFonts.inter(fontSize: 13, color: Colors.white)),
                     ),
                   );
                 },
@@ -208,223 +235,262 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
           ),
           body: ConfettiOverlay(
             isPlaying: showConfetti,
-            child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFF121212),
-                ),
-                child: SafeArea(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          controller: scrollController,
-                          padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-                          itemCount: messages.length + (isTyping ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index == messages.length && isTyping) {
-                              return _buildTypingIndicator();
-                            }
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+                      itemCount: messages.length + (isTyping ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == messages.length && isTyping) {
+                          return _buildTypingIndicator();
+                        }
 
-                            final msg = messages[index];
-                            final isUser = msg['type'] == 'user';
-                            final emoji = msg['emoji'] ?? (isUser ? '👤' : '🤖');
+                        final msg = messages[index];
+                        final isUser = msg['type'] == 'user';
+                        final emoji = msg['emoji'] ?? (isUser ? '👤' : '🤖');
 
-                            return TweenAnimationBuilder(
-                              duration: const Duration(milliseconds: 300),
-                              tween: Tween<double>(begin: 0, end: 1),
-                              builder: (context, double value, child) {
-                                return Transform.scale(
-                                  scale: value,
-                                  child: Opacity(
-                                    opacity: value,
-                                    child: child,
+                        return Align(
+                          alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: isSmallScreen ? 6 : 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                if (!isUser) ...[
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      color: _DuoColors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(emoji, style: const TextStyle(fontSize: 18)),
                                   ),
-                                );
-                              },
-                              child: Align(
-                                alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 6),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (!isUser) ...[
-                                        Text(emoji, style: const TextStyle(fontSize: 20)),
-                                        const SizedBox(width: 8),
-                                      ],
-                                      Container(
-                                        constraints: BoxConstraints(maxWidth: messageMaxWidth),
-                                        padding: EdgeInsets.all(messagePadding),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: isUser
-                                                ? [Colors.cyan.shade600, Colors.blue.shade700]
-                                                : [const Color(0xFF1E1E2C), const Color(0xFF2A2A3D)],
-                                          ),
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: const Radius.circular(16),
-                                            topRight: const Radius.circular(16),
-                                            bottomLeft: Radius.circular(isUser ? 16 : 4),
-                                            bottomRight: Radius.circular(isUser ? 4 : 16),
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.1),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Text(
-                                          msg['text']!,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: messageFontSize,
-                                            height: 1.4,
-                                          ),
-                                          softWrap: true,
-                                        ),
+                                  const SizedBox(width: 8),
+                                ],
+                                Flexible(
+                                  child: Container(
+                                    constraints: BoxConstraints(maxWidth: messageMaxWidth),
+                                    padding: EdgeInsets.all(messagePadding),
+                                    decoration: BoxDecoration(
+                                      color: isUser ? _DuoColors.blue : _DuoColors.white,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: const Radius.circular(18),
+                                        topRight: const Radius.circular(18),
+                                        bottomLeft: Radius.circular(isUser ? 18 : 4),
+                                        bottomRight: Radius.circular(isUser ? 4 : 18),
                                       ),
-                                      if (!isUser && msg.containsKey('word_data') && msg['word_data'] != null && !msg['word_data'].containsKey('generated')) ...[
-                                        const SizedBox(width: 4),
-                                        Container(
-                                          decoration: const BoxDecoration(color: Color(0xFF2A2A3D), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)]),
-                                          child: IconButton(
-                                            icon: const Icon(Icons.bookmark_add_rounded, size: 20, color: Colors.orangeAccent),
-                                            padding: const EdgeInsets.all(6),
-                                            constraints: const BoxConstraints(),
-                                            tooltip: 'Save to Flashcards',
-                                            onPressed: () async {
-                                              final word = msg['word_data'];
-                                              final english = word['english'] ?? word['text'];
-                                              final nicobarese = word['nicobarese'];
-                                              if (english != null && nicobarese != null) {
-                                                  await DatabaseManager.instance.saveFlashcard(english.toString(), nicobarese.toString());
-                                                  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Saved to your Flashcards! 📚')));
-                                              }
-                                            },
-                                          )
-                                        )
+                                      border: Border.all(
+                                        color: isUser ? Colors.transparent : _DuoColors.border,
+                                        width: 2,
+                                      ),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: _DuoColors.cardShadow,
+                                          blurRadius: 6,
+                                          offset: Offset(0, 3),
+                                        ),
                                       ],
-                                      if (isUser) ...[
-                                        const SizedBox(width: 8),
-                                        Text(emoji, style: const TextStyle(fontSize: 20)),
-                                      ],
-                                    ],
+                                    ),
+                                    child: Text(
+                                      msg['text']!,
+                                      style: GoogleFonts.inter(
+                                        color: isUser ? Colors.white : _DuoColors.textDark,
+                                        fontSize: messageFontSize,
+                                        fontWeight: isUser ? FontWeight.w700 : FontWeight.w600,
+                                        height: 1.4,
+                                      ),
+                                      softWrap: true,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-
-                      // Input Bar
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isSmallScreen ? 8 : 12,
-                          vertical: isSmallScreen ? 8 : 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E2C),
-                          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                child: TextField(
-                                  controller: controller,
-                                  focusNode: _focusNode,
-                                  readOnly: _showCustomKeyboard,
-                                  showCursor: true,
-                                  decoration: InputDecoration(
-                                    hintText: "Type a word...",
-                                    hintStyle: TextStyle(
-                                      fontSize: isSmallScreen ? 14 : 16,
-                                      color: Colors.grey.shade600,
+                                if (!isUser && msg.containsKey('word_data') && msg['word_data'] != null) ...[
+                                  const SizedBox(width: 6),
+                                  // Speak Audio Button
+                                  Container(
+                                    width: 32, height: 32,
+                                    decoration: BoxDecoration(
+                                      color: _DuoColors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: _DuoColors.border, width: 2),
                                     ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isSmallScreen ? 16 : 18,
-                                      vertical: 12,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.volume_up_rounded, size: 16, color: _DuoColors.blue),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        final word = msg['word_data'];
+                                        final speechText = word['nicobarese'] ?? word['english'];
+                                        _ttsService.speakNicobarese(speechText.toString(), englishWord: word['english']?.toString());
+                                      },
                                     ),
-                                    suffixIcon: controller.text.isNotEmpty
-                                        ? IconButton(
-                                            icon: const Icon(Icons.clear, size: 20, color: Colors.white54),
-                                            onPressed: () {
-                                              setState(() => controller.clear());
-                                            },
-                                          )
-                                        : null,
                                   ),
-                                  style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
-                                  onChanged: (value) {
-                                    setState(() {}); // Rebuild for clear button
-                                  },
-                                  onSubmitted: (_) => translateText(),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.teal.shade600, Colors.teal.shade700],
-                                ),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.teal.withValues(alpha: 0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                                  const SizedBox(width: 4),
+                                  // Save to Flashcards Button
+                                  Container(
+                                    width: 32, height: 32,
+                                    decoration: BoxDecoration(
+                                      color: _DuoColors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: _DuoColors.border, width: 2),
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(Icons.bookmark_add_rounded, size: 16, color: _DuoColors.orange),
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () async {
+                                        final word = msg['word_data'];
+                                        final english = word['english'] ?? word['text'];
+                                        final nicobarese = word['nicobarese'];
+                                        if (english != null && nicobarese != null) {
+                                            await DatabaseManager.instance.saveFlashcard(english.toString(), nicobarese.toString());
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Saved to your Flashcards! 📚'),
+                                                  behavior: SnackBarBehavior.floating,
+                                                ),
+                                              );
+                                            }
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ],
-                              ),
-                              child: IconButton(
-                                icon: Icon(Icons.send_rounded, size: isSmallScreen ? 20 : 22),
-                                color: Colors.white,
-                                onPressed: translateText,
-                                padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
-                              ),
+                                if (isUser) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: const BoxDecoration(
+                                      color: _DuoColors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(emoji, style: const TextStyle(fontSize: 18)),
+                                  ),
+                                ],
+                              ],
                             ),
-                            // [NEW] Toggle custom keyboard
-                            IconButton(
-                              icon: Icon(_showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, color: Colors.cyanAccent),
-                              onPressed: () {
-                                 setState(() {
-                                   _showCustomKeyboard = !_showCustomKeyboard;
-                                   if (_showCustomKeyboard) {
-                                      _focusNode.unfocus(); // hide system keyboard
-                                   } else {
-                                      _focusNode.requestFocus(); // show system keyboard
-                                   }
-                                 });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      if (_showCustomKeyboard)
-                         NicobareseKeyboard(
-                            controller: controller,
-                            onSubmitted: translateText,
-                            onClose: () => setState(() {
-                                _showCustomKeyboard = false;
-                                _focusNode.requestFocus();
-                            })
-                         ),
-                    ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
+
+                  // Input Bar
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isSmallScreen ? 8 : 12,
+                      vertical: isSmallScreen ? 8 : 10,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: _DuoColors.white,
+                      border: Border(top: BorderSide(color: _DuoColors.border, width: 2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _DuoColors.bg,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(color: _DuoColors.border, width: 2),
+                            ),
+                            child: TextField(
+                              controller: controller,
+                              focusNode: _focusNode,
+                              readOnly: _showCustomKeyboard,
+                              showCursor: true,
+                              cursorColor: _DuoColors.blue,
+                              decoration: InputDecoration(
+                                hintText: "Type a word, phrase, or sentence...",
+                                hintStyle: GoogleFonts.inter(
+                                  fontSize: isSmallScreen ? 13 : 14,
+                                  color: _DuoColors.textMuted,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: isSmallScreen ? 14 : 16,
+                                  vertical: 10,
+                                ),
+                                suffixIcon: controller.text.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear_rounded, size: 18, color: _DuoColors.textMuted),
+                                        onPressed: () {
+                                          setState(() => controller.clear());
+                                        },
+                                      )
+                                    : null,
+                              ),
+                              style: GoogleFonts.inter(
+                                fontSize: isSmallScreen ? 14 : 15,
+                                color: _DuoColors.textDark,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              onChanged: (value) {
+                                setState(() {}); // Rebuild for clear button
+                              },
+                              onSubmitted: (_) => translateText(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: _DuoColors.green,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x2258CC02),
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.send_rounded, size: isSmallScreen ? 18 : 20),
+                            color: Colors.white,
+                            onPressed: translateText,
+                            padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        // Keyboard toggle button
+                        IconButton(
+                          icon: Icon(
+                            _showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, 
+                            color: _DuoColors.blue,
+                          ),
+                          onPressed: () {
+                             setState(() {
+                               _showCustomKeyboard = !_showCustomKeyboard;
+                               if (_showCustomKeyboard) {
+                                  _focusNode.unfocus(); // hide system keyboard
+                               } else {
+                                  _focusNode.requestFocus(); // show system keyboard
+                               }
+                             });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  if (_showCustomKeyboard)
+                     NicobareseKeyboard(
+                        controller: controller,
+                        onSubmitted: translateText,
+                        onClose: () => setState(() {
+                            _showCustomKeyboard = false;
+                            _focusNode.requestFocus();
+                        })
+                     ),
+                ],
               ),
             ),
-          );
+          ),
+        );
       },
     );
   }
@@ -436,8 +502,9 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF2A2A3D),
+          color: _DuoColors.white,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: _DuoColors.border, width: 2),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -465,7 +532,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
             width: 8,
             height: 8,
             decoration: const BoxDecoration(
-              color: Colors.cyanAccent,
+              color: _DuoColors.blue,
               shape: BoxShape.circle,
             ),
           ),

@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/screens/chat_translate_screen.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
-import 'package:speechmate/screens/ar_translator_screen.dart';
+import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/screens/dialect_comparison_screen.dart';
 import 'package:speechmate/screens/culture_screen.dart';
 import 'package:speechmate/screens/document_translation_hub.dart';
@@ -368,8 +368,8 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
       _ToolItem('GA Hub', Icons.terrain_rounded, _DuoColors.orange, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const GAHubScreen()));
       }),
-      _ToolItem('AR Scan', Icons.camera_alt_rounded, _DuoColors.purple, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const ARTranslatorScreen()));
+      _ToolItem('Image\nScanner', Icons.document_scanner_rounded, _DuoColors.purple, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraTranslationScreen()));
       }),
       _ToolItem('Dialects', Icons.compare_arrows_rounded, _DuoColors.yellow, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen()));
