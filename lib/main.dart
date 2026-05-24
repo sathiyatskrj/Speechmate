@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speechmate/screens/general_splash_screen.dart';
-import 'package:speechmate/screens/explorer_dashboard.dart';
+import 'package:speechmate/screens/app_language_select.dart';
 import 'package:speechmate/screens/onboarding_screen.dart';
 import 'package:speechmate/screens/asset_download_screen.dart';
 import 'package:speechmate/core/app_theme.dart';
@@ -146,11 +146,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine the screen after splash
-    // The download screen checks if assets exist and auto-skips if ready
+    // Route: Splash → Onboarding (first time) → Download → Language Select
+    // Language Select navigates to Languages hub, which navigates to the dashboards.
     final Widget destination = showOnboarding
-        ? OnboardingScreen(nextScreen: const AssetDownloadScreen(nextScreen: ExplorerDashboard()))
-        : const AssetDownloadScreen(nextScreen: ExplorerDashboard());
+        ? OnboardingScreen(nextScreen: const AssetDownloadScreen(nextScreen: LanguageSelectionScreen()))
+        : const AssetDownloadScreen(nextScreen: LanguageSelectionScreen());
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

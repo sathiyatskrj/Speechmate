@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
 import 'package:speechmate/screens/chat_translate_screen.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
@@ -17,9 +16,26 @@ import 'package:speechmate/screens/voice_vault_screen.dart';
 import 'package:speechmate/screens/community_screen.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/native_edge_service.dart';
+import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
-import 'dart:math' as math;
 
+// ────── DUOLINGO-STYLE VIBRANT LIGHT PALETTE ──────
+class _DuoColors {
+  static const bg = Color(0xFFF7F7F7);
+  static const white = Color(0xFFFFFFFF);
+  static const green = Color(0xFF58CC02);
+  static const greenDark = Color(0xFF4CAD00);
+  static const blue = Color(0xFF1CB0F6);
+  static const purple = Color(0xFFCE82FF);
+  static const red = Color(0xFFFF4B4B);
+  static const orange = Color(0xFFFF9600);
+  static const yellow = Color(0xFFFFC800);
+  static const teal = Color(0xFF00CD9C);
+  static const textDark = Color(0xFF3C3C3C);
+  static const textMuted = Color(0xFF777777);
+  static const border = Color(0xFFE5E5E5);
+  static const cardShadow = Color(0x14000000);
+}
 
 class ExplorerDashboard extends StatefulWidget {
   const ExplorerDashboard({super.key});
@@ -28,13 +44,11 @@ class ExplorerDashboard extends StatefulWidget {
   State<ExplorerDashboard> createState() => _ExplorerDashboardState();
 }
 
-class _ExplorerDashboardState extends State<ExplorerDashboard>
-    with TickerProviderStateMixin {
-  late AnimationController _bgController;
+class _ExplorerDashboardState extends State<ExplorerDashboard> {
   Map<String, dynamic>? _wordOfDay;
-  bool _isOnline = false;
+  final TtsService _ttsService = TtsService();
 
-  // VC control dashboard state variables
+  // VC control dashboard state (moved to settings dialog)
   bool _teeVaultSealed = true;
   bool _batSyncListening = false;
   int _meshNodeCount = 3;
@@ -43,23 +57,19 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
   double _signalStrength = -42.5;
   double _ambientLux = 120.0;
 
-
-  // Survival phrase categories for quick cards
   final List<Map<String, dynamic>> _quickPhrases = [
-    {'emoji': '👋', 'label': 'Greetings', 'english': 'Hello', 'nicobarese': 'Musté'},
-    {'emoji': '🍚', 'label': 'Food', 'english': 'Water', 'nicobarese': 'Mak'},
-    {'emoji': '🗺️', 'label': 'Directions', 'english': 'Where', 'nicobarese': 'Inta'},
-    {'emoji': '🆘', 'label': 'Emergency', 'english': 'Help', 'nicobarese': 'Takanam'},
-    {'emoji': '🙏', 'label': 'Thanks', 'english': 'Thank you', 'nicobarese': 'Asé'},
-    {'emoji': '🏠', 'label': 'Shelter', 'english': 'House', 'nicobarese': 'Hīn'},
+    {'emoji': '👋', 'label': 'Hello', 'nicobarese': 'Musté', 'english': 'Hello'},
+    {'emoji': '🍚', 'label': 'Water', 'nicobarese': 'Mak', 'english': 'Water'},
+    {'emoji': '🗺️', 'label': 'Where', 'nicobarese': 'Inta', 'english': 'Where'},
+    {'emoji': '🆘', 'label': 'Help', 'nicobarese': 'Takanam', 'english': 'Help'},
+    {'emoji': '🙏', 'label': 'Thanks', 'nicobarese': 'Asé', 'english': 'Thank you'},
+    {'emoji': '🏠', 'label': 'House', 'nicobarese': 'Hīn', 'english': 'House'},
   ];
 
   @override
   void initState() {
     super.initState();
-    _bgController = AnimationController(
-      vsync: this, duration: const Duration(seconds: 20),
-    )..repeat();
+    _ttsService.init();
     _loadWordOfDay();
   }
 
@@ -67,7 +77,6 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
     try {
       final words = await DatabaseManager.instance.getWordsByCategory('main');
       if (words.isNotEmpty) {
-        // Deterministic daily pick based on day-of-year
         final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
         final index = dayOfYear % words.length;
         if (mounted) setState(() => _wordOfDay = words[index]);
@@ -78,77 +87,48 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
   }
 
   @override
-  void dispose() {
-    _bgController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
-      body: Stack(
-        children: [
-          // Animated background
-          AnimatedBuilder(
-            animation: _bgController,
-            builder: (context, _) {
-              return CustomPaint(
-                size: Size.infinite,
-                painter: _ExplorerBgPainter(time: _bgController.value * math.pi * 2),
-              );
-            },
-          ),
-          SafeArea(
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                // Header
-                SliverToBoxAdapter(child: _buildHeader()),
-                // Offline chip
-                SliverToBoxAdapter(child: _buildConnectivityChip()),
-                // Word of the Day
-                if (_wordOfDay != null)
-                  SliverToBoxAdapter(child: _buildWordOfDay()),
-                // Quick Phrases
-                SliverToBoxAdapter(child: _buildQuickPhrases()),
-                // VC Control Console
-                SliverToBoxAdapter(child: _buildVCDashboardConsole()),
-                // Section: Core Tools
-                SliverToBoxAdapter(child: _buildSectionLabel('EXPLORER TOOLS')),
-                SliverToBoxAdapter(child: _buildBentoGrid()),
-
-                // Section: More
-                SliverToBoxAdapter(child: _buildSectionLabel('DISCOVER')),
-                SliverToBoxAdapter(child: _buildDiscoverGrid()),
-                const SliverToBoxAdapter(child: SizedBox(height: 40)),
-              ],
-            ),
-          ),
-        ],
+      backgroundColor: _DuoColors.bg,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeader()),
+            SliverToBoxAdapter(child: _buildStreakBar()),
+            if (_wordOfDay != null)
+              SliverToBoxAdapter(child: _buildWordOfDay()),
+            SliverToBoxAdapter(child: _buildQuickPhrases()),
+            SliverToBoxAdapter(child: _buildSectionLabel('EXPLORER TOOLS')),
+            SliverToBoxAdapter(child: _buildToolsGrid()),
+            SliverToBoxAdapter(child: _buildSectionLabel('DISCOVER')),
+            SliverToBoxAdapter(child: _buildDiscoverGrid()),
+            const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          ],
+        ),
       ),
     );
   }
 
+  // ────── HEADER ──────
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       child: Row(
         children: [
+          // Logo
           Container(
-            width: 44, height: 44,
+            width: 48, height: 48,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [Color(0xFF0D9488), Color(0xFF0F766E)],
-              ),
+              color: _DuoColors.green,
               boxShadow: [
-                BoxShadow(color: const Color(0xFF0D9488).withOpacity(0.3), blurRadius: 12),
+                BoxShadow(color: _DuoColors.green.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4)),
               ],
             ),
             child: ClipOval(
               child: Image.asset('assets/icons/logo_main.png', fit: BoxFit.cover,
-                errorBuilder: (c, o, s) => const Icon(Icons.language, color: Colors.white, size: 22)),
+                errorBuilder: (c, o, s) => const Icon(Icons.language, color: Colors.white, size: 24)),
             ),
           ),
           const SizedBox(width: 14),
@@ -157,167 +137,208 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('SpeechMate', style: GoogleFonts.outfit(
-                  fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 1.5,
+                  fontSize: 24, fontWeight: FontWeight.w800, color: _DuoColors.textDark,
                 )),
                 Text('Explorer Edition', style: GoogleFonts.inter(
-                  fontSize: 11, fontWeight: FontWeight.w500, color: const Color(0xFF94A3B8), letterSpacing: 2,
+                  fontSize: 11, fontWeight: FontWeight.w600, color: _DuoColors.textMuted, letterSpacing: 1.5,
                 )),
               ],
             ),
           ),
-          _buildHeaderIcon(Icons.info_outline_rounded, () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
-          }),
+          // Settings gear (contains VC Command Center)
+          _buildHeaderButton(Icons.settings_rounded, () => _showSettingsDialog()),
           const SizedBox(width: 8),
-          _buildHeaderIcon(Icons.feedback_outlined, () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen()));
+          _buildHeaderButton(Icons.info_outline_rounded, () {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
           }),
         ],
       ),
     ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1);
   }
 
-  Widget _buildHeaderIcon(IconData icon, VoidCallback onTap) {
+  Widget _buildHeaderButton(IconData icon, VoidCallback onTap) {
     return TapScale(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: _DuoColors.white,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: _DuoColors.border, width: 2),
+          boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 2))],
         ),
-        child: Icon(icon, color: const Color(0xFF94A3B8), size: 20),
+        child: Icon(icon, color: _DuoColors.textMuted, size: 20),
       ),
     );
   }
 
-  Widget _buildConnectivityChip() {
+  // ────── STREAK / GAMIFICATION BAR ──────
+  Widget _buildStreakBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xFF10B981).withOpacity(0.15),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
+      child: Row(
+        children: [
+          // Offline badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _DuoColors.green.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: _DuoColors.green.withOpacity(0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(width: 8, height: 8,
+                  decoration: const BoxDecoration(color: _DuoColors.green, shape: BoxShape.circle)),
+                const SizedBox(width: 6),
+                Text('Fully Offline', style: GoogleFonts.outfit(
+                  fontSize: 11, fontWeight: FontWeight.w700, color: _DuoColors.green,
+                )),
+              ],
+            ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(width: 6, height: 6,
-                decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
-              const SizedBox(width: 6),
-              Text('Fully Offline', style: GoogleFonts.inter(
-                fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF10B981), letterSpacing: 1,
-              )),
-            ],
+          const Spacer(),
+          // Nicobarese tag
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [_DuoColors.orange, _DuoColors.yellow]),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🌴', style: TextStyle(fontSize: 14)),
+                const SizedBox(width: 4),
+                Text('Nicobarese', style: GoogleFonts.outfit(
+                  fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white,
+                )),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
-    ).animate().fadeIn(delay: 200.ms);
+    ).animate().fadeIn(delay: 100.ms);
   }
 
+  // ────── WORD OF THE DAY ──────
   Widget _buildWordOfDay() {
     final word = _wordOfDay!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
+      child: TapScale(
+        onTap: () {
+          _ttsService.speakNicobarese(
+            word['nicobarese'] ?? '',
+            englishWord: word['english'] ?? '',
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: _DuoColors.white,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: _DuoColors.border, width: 2),
+            boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 12, offset: Offset(0, 4))],
           ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF0D9488).withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(color: const Color(0xFF0D9488).withOpacity(0.08), blurRadius: 20),
-          ],
-        ),
-        child: Row(
-          children: [
-            Text(word['emoji'] ?? '🌊', style: const TextStyle(fontSize: 36)),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('WORD OF THE DAY', style: GoogleFonts.inter(
-                    fontSize: 9, fontWeight: FontWeight.w700, color: const Color(0xFF0D9488), letterSpacing: 2,
-                  )),
-                  const SizedBox(height: 4),
-                  Text(word['english'] ?? '', style: GoogleFonts.outfit(
-                    fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white,
-                  )),
-                  Text(word['nicobarese'] ?? '', style: GoogleFonts.inter(
-                    fontSize: 15, fontWeight: FontWeight.w500, color: const Color(0xFF2DD4BF),
-                  )),
-                ],
+          child: Row(
+            children: [
+              Text(word['emoji'] ?? '🌊', style: const TextStyle(fontSize: 40)),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _DuoColors.yellow.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text('WORD OF THE DAY', style: GoogleFonts.outfit(
+                        fontSize: 9, fontWeight: FontWeight.w800, color: _DuoColors.orange, letterSpacing: 1.5,
+                      )),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(word['english'] ?? '', style: GoogleFonts.outfit(
+                      fontSize: 22, fontWeight: FontWeight.w800, color: _DuoColors.textDark,
+                    )),
+                    Text(word['nicobarese'] ?? '', style: GoogleFonts.inter(
+                      fontSize: 16, fontWeight: FontWeight.w600, color: _DuoColors.teal,
+                    )),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0D9488).withOpacity(0.15),
-                shape: BoxShape.circle,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _DuoColors.blue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.volume_up_rounded, color: _DuoColors.blue, size: 24),
               ),
-              child: const Icon(Icons.volume_up_rounded, color: Color(0xFF2DD4BF), size: 22),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.05);
+    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.05);
   }
 
+  // ────── QUICK SURVIVAL PHRASES ──────
   Widget _buildQuickPhrases() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
-          child: Text('SURVIVAL PHRASES', style: GoogleFonts.inter(
-            fontSize: 10, fontWeight: FontWeight.w700, color: const Color(0xFF64748B), letterSpacing: 2,
+          child: Text('SURVIVAL PHRASES', style: GoogleFonts.outfit(
+            fontSize: 12, fontWeight: FontWeight.w800, color: _DuoColors.textMuted, letterSpacing: 2,
           )),
         ),
         SizedBox(
-          height: 80,
+          height: 90,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: _quickPhrases.length,
             itemBuilder: (context, i) {
               final p = _quickPhrases[i];
+              final colors = [
+                _DuoColors.green, _DuoColors.blue, _DuoColors.purple,
+                _DuoColors.red, _DuoColors.orange, _DuoColors.teal,
+              ];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: TapScale(
-                  onTap: () {},
+                  onTap: () {
+                    _ttsService.speakNicobarese(p['nicobarese'], englishWord: p['english']);
+                  },
                   child: Container(
-                    width: 110,
-                    padding: const EdgeInsets.all(10),
+                    width: 115,
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.08)),
+                      color: _DuoColors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: colors[i % colors.length].withOpacity(0.3), width: 2),
+                      boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 3))],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('${p['emoji']} ${p['label']}', style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white,
+                        Text('${p['emoji']} ${p['label']}', style: GoogleFonts.outfit(
+                          fontSize: 13, fontWeight: FontWeight.w700, color: _DuoColors.textDark,
                         )),
                         const SizedBox(height: 4),
-                        Text('${p['nicobarese']}', style: TextStyle(
-                          fontSize: 11, color: const Color(0xFF2DD4BF).withOpacity(0.8),
+                        Text('${p['nicobarese']}', style: GoogleFonts.inter(
+                          fontSize: 12, fontWeight: FontWeight.w600, color: colors[i % colors.length],
                         )),
                       ],
                     ),
                   ),
                 ),
-              ).animate().fadeIn(delay: (200 + i * 80).ms).slideX(begin: 0.1);
+              ).animate().fadeIn(delay: (150 + i * 60).ms).slideX(begin: 0.1);
             },
           ),
         ),
@@ -325,33 +346,35 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
     );
   }
 
+  // ────── SECTION LABEL ──────
   Widget _buildSectionLabel(String label) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-      child: Text(label, style: GoogleFonts.inter(
-        fontSize: 11, fontWeight: FontWeight.w800, color: const Color(0xFF64748B), letterSpacing: 3,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 10),
+      child: Text(label, style: GoogleFonts.outfit(
+        fontSize: 13, fontWeight: FontWeight.w800, color: _DuoColors.textMuted, letterSpacing: 2.5,
       )),
     );
   }
 
-  Widget _buildBentoGrid() {
+  // ────── TOOLS BENTO GRID (Duolingo-style) ──────
+  Widget _buildToolsGrid() {
     final tools = [
-      _BentoItem('Voice\nTranslate', Icons.mic_rounded, [const Color(0xFF0D9488), const Color(0xFF115E59)], 2, () {
+      _ToolItem('Voice\nTranslate', Icons.mic_rounded, _DuoColors.green, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen()));
       }),
-      _BentoItem('Text\nTranslate', Icons.translate_rounded, [const Color(0xFF3B82F6), const Color(0xFF1D4ED8)], 1, () {
+      _ToolItem('Text\nTranslate', Icons.translate_rounded, _DuoColors.blue, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen()));
       }),
-      _BentoItem('GA Hub', Icons.terrain_rounded, [const Color(0xFFE64A19), const Color(0xFFD84315)], 1, () {
+      _ToolItem('GA Hub', Icons.terrain_rounded, _DuoColors.orange, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const GAHubScreen()));
       }),
-      _BentoItem('AR Scan', Icons.camera_alt_rounded, [const Color(0xFF7C3AED), const Color(0xFF5B21B6)], 1, () {
+      _ToolItem('AR Scan', Icons.camera_alt_rounded, _DuoColors.purple, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const ARTranslatorScreen()));
       }),
-      _BentoItem('Dialects', Icons.compare_arrows_rounded, [const Color(0xFFF59E0B), const Color(0xFFD97706)], 1, () {
+      _ToolItem('Dialects', Icons.compare_arrows_rounded, _DuoColors.yellow, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen()));
       }),
-      _BentoItem('Documents', Icons.auto_stories_rounded, [const Color(0xFF06B6D4), const Color(0xFF0891B2)], 2, () {
+      _ToolItem('Documents', Icons.auto_stories_rounded, _DuoColors.teal, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentTranslationHub()));
       }),
     ];
@@ -362,49 +385,56 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
         children: [
           // Row 1: Voice (wide) + Text
           Row(children: [
-            Expanded(flex: 2, child: _buildBentoTile(tools[0], height: 130)),
-            const SizedBox(width: 8),
-            Expanded(flex: 1, child: _buildBentoTile(tools[1], height: 130)),
+            Expanded(flex: 2, child: _buildToolCard(tools[0], height: 130)),
+            const SizedBox(width: 10),
+            Expanded(flex: 1, child: _buildToolCard(tools[1], height: 130)),
           ]),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           // Row 2: GA + AR + Dialects
           Row(children: [
-            Expanded(child: _buildBentoTile(tools[2], height: 100)),
-            const SizedBox(width: 8),
-            Expanded(child: _buildBentoTile(tools[3], height: 100)),
-            const SizedBox(width: 8),
-            Expanded(child: _buildBentoTile(tools[4], height: 100)),
+            Expanded(child: _buildToolCard(tools[2], height: 110)),
+            const SizedBox(width: 10),
+            Expanded(child: _buildToolCard(tools[3], height: 110)),
+            const SizedBox(width: 10),
+            Expanded(child: _buildToolCard(tools[4], height: 110)),
           ]),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           // Row 3: Documents (wide)
-          _buildBentoTile(tools[5], height: 80, fullWidth: true),
+          _buildToolCard(tools[5], height: 85, fullWidth: true),
         ],
       ),
-    ).animate().fadeIn(delay: 400.ms);
+    ).animate().fadeIn(delay: 300.ms);
   }
 
-  Widget _buildBentoTile(_BentoItem item, {required double height, bool fullWidth = false}) {
+  Widget _buildToolCard(_ToolItem item, {required double height, bool fullWidth = false}) {
     return TapScale(
       onTap: item.onTap,
       child: Container(
         height: height,
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: item.colors, begin: Alignment.topLeft, end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(18),
+          color: _DuoColors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: item.color.withOpacity(0.25), width: 2.5),
           boxShadow: [
-            BoxShadow(color: item.colors.first.withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 4)),
+            BoxShadow(color: item.color.withOpacity(0.12), blurRadius: 14, offset: const Offset(0, 5)),
+            const BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 2)),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(item.icon, color: Colors.white.withOpacity(0.9), size: 28),
-            Text(item.label, style: GoogleFonts.inter(
-              fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white, height: 1.2,
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: item.color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(item.icon, color: item.color, size: 26),
+            ),
+            Text(item.label, style: GoogleFonts.outfit(
+              fontSize: 14, fontWeight: FontWeight.w700, color: _DuoColors.textDark, height: 1.2,
             )),
           ],
         ),
@@ -412,18 +442,19 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
     );
   }
 
+  // ────── DISCOVER GRID ──────
   Widget _buildDiscoverGrid() {
     final items = [
-      _DiscoverItem('Culture Hub', Icons.auto_awesome, const Color(0xFFEC4899), () {
+      _DiscoverItem('Culture Hub', Icons.auto_awesome, _DuoColors.red, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen()));
       }),
-      _DiscoverItem('Voice Vault', Icons.record_voice_over, const Color(0xFF8B5CF6), () {
+      _DiscoverItem('Voice Vault', Icons.record_voice_over, _DuoColors.purple, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen()));
       }),
-      _DiscoverItem('All Languages', Icons.language_rounded, const Color(0xFF0EA5E9), () {
+      _DiscoverItem('Languages', Icons.language_rounded, _DuoColors.blue, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const Languages()));
       }),
-      _DiscoverItem('Feedback', Icons.chat_bubble_outline, const Color(0xFF10B981), () {
+      _DiscoverItem('Feedback', Icons.chat_bubble_outline, _DuoColors.green, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen()));
       }),
     ];
@@ -437,20 +468,28 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
             child: TapScale(
               onTap: item.onTap,
               child: Container(
-                height: 85,
+                height: 95,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: item.color.withOpacity(0.2)),
+                  color: _DuoColors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: item.color.withOpacity(0.2), width: 2),
+                  boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 3))],
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(item.icon, color: item.color, size: 24),
-                    const SizedBox(height: 6),
-                    Text(item.label, style: GoogleFonts.inter(
-                      fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white70,
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: item.color.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(item.icon, color: item.color, size: 22),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(item.label, style: GoogleFonts.outfit(
+                      fontSize: 11, fontWeight: FontWeight.w700, color: _DuoColors.textDark,
                     ), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
@@ -459,322 +498,239 @@ class _ExplorerDashboardState extends State<ExplorerDashboard>
           ),
         )).toList(),
       ),
-    ).animate().fadeIn(delay: 500.ms);
+    ).animate().fadeIn(delay: 400.ms);
   }
 
-  Widget _buildVCDashboardConsole() {
+  // ────── SETTINGS DIALOG (VC Command Center moved here) ──────
+  void _showSettingsDialog() {
     final nativeService = NativeEdgeService();
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E293B).withOpacity(0.55),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFF38BDF8).withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF38BDF8).withOpacity(0.04),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 10, height: 10,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF10B981),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: Color(0xFF10B981), blurRadius: 8),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.75),
+              decoration: const BoxDecoration(
+                color: _DuoColors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Drag Handle
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Container(
+                      width: 40, height: 4,
+                      decoration: BoxDecoration(
+                        color: _DuoColors.border,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.settings_rounded, color: _DuoColors.textDark, size: 24),
+                        const SizedBox(width: 10),
+                        Text('Settings & System', style: GoogleFonts.outfit(
+                          fontSize: 20, fontWeight: FontWeight.w800, color: _DuoColors.textDark,
+                        )),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: _DuoColors.bg,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.close_rounded, size: 18, color: _DuoColors.textMuted),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(color: _DuoColors.border),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // General settings
+                          _settingsTile(Icons.info_outline_rounded, 'About SpeechMate', 'Version, credits & licenses', () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
+                          }),
+                          _settingsTile(Icons.feedback_outlined, 'Send Feedback', 'Report bugs or suggest features', () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen()));
+                          }),
+                          _settingsTile(Icons.language_rounded, 'Change Language', 'Switch heritage language', () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const Languages()));
+                          }),
+                          const SizedBox(height: 16),
+                          // VC Command Center — collapsed expandable
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0F172A),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Theme(
+                              data: ThemeData(dividerColor: Colors.transparent),
+                              child: ExpansionTile(
+                                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                leading: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF38BDF8).withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.developer_board_rounded, color: Color(0xFF38BDF8), size: 18),
+                                ),
+                                title: Text('Off-Grid VC Command Center', style: GoogleFonts.inter(
+                                  fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white,
+                                )),
+                                subtitle: Text('v2.0 • Advanced system controls', style: GoogleFonts.inter(
+                                  fontSize: 10, color: const Color(0xFF64748B),
+                                )),
+                                iconColor: const Color(0xFF64748B),
+                                collapsedIconColor: const Color(0xFF64748B),
+                                children: [
+                                  _vcInfoRow('GPGPU', _gpuComputeAccelerated ? 'Vulkan Cores: OK' : 'CPU Fallback', const Color(0xFF2DD4BF)),
+                                  _vcInfoRow('TEE VAULT', _teeVaultSealed ? 'AES: SEALED' : 'Vault Open', const Color(0xFFFBBF24)),
+                                  _vcInfoRow('BAT-SYNC', _batSyncListening ? 'Tx: 19.5kHz' : 'Idle', const Color(0xFF38BDF8)),
+                                  _vcInfoRow('CRDT MESH', '$_meshNodeCount Nodes Active', const Color(0xFFEC4899)),
+                                  _vcInfoRow('ECO-DRIVE', 'Beam Width: $_beamWidth • ${_ambientLux}Lux', const Color(0xFFFBBF24)),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            HapticFeedback.lightImpact();
+                                            final testKey = 'test_hsm_alias';
+                                            await nativeService.teeGenerateKey(testKey);
+                                            final cipher = await nativeService.teeEncryptData(testKey, 'Offgrid VC Node');
+                                            final decrypted = await nativeService.teeDecryptData(testKey, cipher);
+                                            await nativeService.teeDeleteKey(testKey);
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                backgroundColor: const Color(0xFF1E293B),
+                                                behavior: SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                content: Text('TEE Cycle OK: "$decrypted"', style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFFFBBF24))),
+                                              ));
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFFFBBF24).withOpacity(0.15),
+                                            foregroundColor: const Color(0xFFFBBF24),
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            padding: const EdgeInsets.symmetric(vertical: 10),
+                                          ),
+                                          child: Text('TEST CRYPTO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            HapticFeedback.mediumImpact();
+                                            final width = await nativeService.ecoCalculateBeamWidth(_ambientLux, 15.0);
+                                            setModalState(() {
+                                              _beamWidth = width;
+                                              _ambientLux = _ambientLux > 500 ? 120.0 : 8000.0;
+                                            });
+                                            setState(() {});
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF38BDF8).withOpacity(0.15),
+                                            foregroundColor: const Color(0xFF38BDF8),
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            padding: const EdgeInsets.symmetric(vertical: 10),
+                                          ),
+                                          child: Text('ADJUST ECO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text('OFF-GRID VC COMMAND CENTER', style: GoogleFonts.inter(
-                      fontSize: 10, fontWeight: FontWeight.w800, color: const Color(0xFF38BDF8), letterSpacing: 2,
-                    )),
-                  ],
-                ),
-                Text('v2.0-SECURE', style: GoogleFonts.ibmPlexMono(
-                  fontSize: 10, color: const Color(0xFF64748B), fontWeight: FontWeight.w600,
-                )),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // GPGPU compute + TEE Keystore
-            Row(
-              children: [
-                // GPU ACCEL
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.developer_board_rounded, color: _gpuComputeAccelerated ? const Color(0xFF2DD4BF) : Colors.grey, size: 18),
-                            const SizedBox(width: 6),
-                            Text('GPGPU', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(_gpuComputeAccelerated ? 'Vulkan Cores: OK' : 'CPU Thread Fallback', style: GoogleFonts.ibmPlexMono(
-                          fontSize: 9, color: _gpuComputeAccelerated ? const Color(0xFF2DD4BF) : const Color(0xFF64748B),
-                        )),
-                        const SizedBox(height: 2),
-                        Text('Shared Unified Mem: 1024B', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // TEE VAULT
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(_teeVaultSealed ? Icons.lock_outline_rounded : Icons.lock_open_rounded, color: const Color(0xFFFBBF24), size: 18),
-                            const SizedBox(width: 6),
-                            Text('TEE VAULT', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(_teeVaultSealed ? 'Hardware AES: SEALED' : 'Vault Open', style: GoogleFonts.ibmPlexMono(
-                          fontSize: 9, color: const Color(0xFFFBBF24),
-                        )),
-                        const SizedBox(height: 2),
-                        Text('Keystore Bound Ed25519', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Bat-Sync + CRDT Mesh
-            Row(
-              children: [
-                // BAT-SYNC
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.sensors_rounded, color: _batSyncListening ? const Color(0xFF38BDF8) : Colors.grey, size: 18),
-                            const SizedBox(width: 6),
-                            Text('BAT-SYNC v2', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(_batSyncListening ? 'Ultrasonic Tx: 19.5kHz' : 'Ultrasonic Idle', style: GoogleFonts.ibmPlexMono(
-                          fontSize: 9, color: _batSyncListening ? const Color(0xFF38BDF8) : const Color(0xFF64748B),
-                        )),
-                        const SizedBox(height: 2),
-                        Text('Acoustic Amplitude: ${_signalStrength}dB', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // CRDT MESH
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.hub_outlined, color: Color(0xFFEC4899), size: 18),
-                            const SizedBox(width: 6),
-                            Text('CRDT MESH', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text('Network Nodes: $_meshNodeCount Ring', style: GoogleFonts.ibmPlexMono(
-                          fontSize: 9, color: const Color(0xFFEC4899),
-                        )),
-                        const SizedBox(height: 2),
-                        Text('Sliding XOR Shield Active', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Eco-Drive governor
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.03),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.05)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.wb_sunny_rounded, color: Color(0xFFFBBF24), size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('ECO-DRIVE BATTERY GOVERNOR', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white)),
-                        const SizedBox(height: 2),
-                        Text('Ambient Solar: ${_ambientLux}Lux  •  Whisper Search Beam Width: $_beamWidth', style: GoogleFonts.ibmPlexMono(
-                          fontSize: 9, color: const Color(0xFF94A3B8),
-                        )),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      // Call native_edge_service calculations dynamically
-                      final width = await nativeService.ecoCalculateBeamWidth(_ambientLux, 15.0);
-                      setState(() {
-                        _beamWidth = width;
-                        _ambientLux = _ambientLux > 500 ? 120.0 : 8000.0;
-                      });
-                      HapticFeedback.mediumImpact();
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        backgroundColor: const Color(0xFF0F172A),
-                        content: Text('Eco-Drive Re-Calibrated: Beam width set to $width based on Light curves.', style: GoogleFonts.inter(color: const Color(0xFF2DD4BF))),
-                      ));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0D9488).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFF0D9488).withOpacity(0.4)),
-                      ),
-                      child: Text('ADJUST', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w700, color: const Color(0xFF2DD4BF))),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 12),
-            // Command Actions Row
-            Row(
-              children: [
-                // Cryptography Test
-                Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFFBBF24),
-                      side: BorderSide(color: const Color(0xFFFBBF24).withOpacity(0.3)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    icon: const Icon(Icons.vpn_key_rounded, size: 16),
-                    label: Text('TEST TEE CRYPTO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
-                    onPressed: () async {
-                      HapticFeedback.lightImpact();
-                      final testKey = 'test_hsm_alias';
-                      await nativeService.teeGenerateKey(testKey);
-                      final cipher = await nativeService.teeEncryptData(testKey, 'Offgrid VC Node');
-                      final decrypted = await nativeService.teeDecryptData(testKey, cipher);
-                      await nativeService.teeDeleteKey(testKey);
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        backgroundColor: const Color(0xFF1E293B),
-                        content: Text('TEE Secure Cycle Passed:\nPlaintext: "Offgrid VC Node"\nDecrypted: "$decrypted"', style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFFFBBF24))),
-                      ));
-                    },
-                  ),
-                ),
-                const SizedBox(width: 8),
-                // Ultrasonic modulate
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF38BDF8).withOpacity(0.2),
-                      foregroundColor: const Color(0xFF38BDF8),
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: BorderSide(color: const Color(0xFF38BDF8).withOpacity(0.4)),
-                      ),
+            );
+          },
+        );
+      },
+    );
+  }
 
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    icon: Icon(_batSyncListening ? Icons.stop_rounded : Icons.play_arrow_rounded, size: 16),
-                    label: Text(_batSyncListening ? 'HALT ACOUSTIC' : 'ACOUSTIC SYNCPING', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
-                    onPressed: () async {
-                      HapticFeedback.heavyImpact();
-                      if (_batSyncListening) {
-                        await nativeService.ultrasonicClearBuffers();
-                        setState(() => _batSyncListening = false);
-                      } else {
-                        final payload = [0x53, 0x59, 0x4E, 0x43]; // SYNC
-                        final modulated = await nativeService.ultrasonicModulateManchester(payload);
-                        await nativeService.ultrasonicSetCarrierFrequency(19500.0);
-                        setState(() {
-                          _batSyncListening = true;
-                          _signalStrength = -15.4;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: const Color(0xFF1E293B),
-                          content: Text('Acoustic Manchester Sync Transmitter Active: playing modulated 19.5kHz tones (Payload: $modulated)', style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF38BDF8))),
-                        ));
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
+  Widget _settingsTile(IconData icon, String title, String subtitle, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: _DuoColors.bg,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: _DuoColors.textDark, size: 20),
         ),
+        title: Text(title, style: GoogleFonts.outfit(
+          fontSize: 15, fontWeight: FontWeight.w700, color: _DuoColors.textDark,
+        )),
+        subtitle: Text(subtitle, style: GoogleFonts.inter(
+          fontSize: 12, color: _DuoColors.textMuted,
+        )),
+        trailing: const Icon(Icons.chevron_right_rounded, color: _DuoColors.border, size: 22),
       ),
-    ).animate().fadeIn(delay: 350.ms).slideY(begin: 0.05);
+    );
+  }
+
+  Widget _vcInfoRow(String label, String value, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          const SizedBox(width: 8),
+          Text(label, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white70)),
+          const Spacer(),
+          Text(value, style: GoogleFonts.ibmPlexMono(fontSize: 9, color: color)),
+        ],
+      ),
+    );
   }
 }
 
+// ────── DATA CLASSES ──────
 
-class _BentoItem {
+class _ToolItem {
   final String label;
   final IconData icon;
-  final List<Color> colors;
-  final int span;
+  final Color color;
   final VoidCallback onTap;
-  _BentoItem(this.label, this.icon, this.colors, this.span, this.onTap);
+  _ToolItem(this.label, this.icon, this.color, this.onTap);
 }
 
 class _DiscoverItem {
@@ -783,31 +739,4 @@ class _DiscoverItem {
   final Color color;
   final VoidCallback onTap;
   _DiscoverItem(this.label, this.icon, this.color, this.onTap);
-}
-
-class _ExplorerBgPainter extends CustomPainter {
-  final double time;
-  _ExplorerBgPainter({required this.time});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-    void drawOrb(Offset center, double radius, Color color, double alpha) {
-      paint.shader = RadialGradient(
-        colors: [color.withOpacity(alpha), color.withOpacity(0.0)],
-      ).createShader(Rect.fromCircle(center: center, radius: radius));
-      canvas.drawCircle(center, radius, paint);
-    }
-    drawOrb(
-      Offset(size.width * (0.8 + 0.1 * math.sin(time)), size.height * 0.15),
-      size.width * 0.5, const Color(0xFF0F766E), 0.12,
-    );
-    drawOrb(
-      Offset(size.width * (0.2 + 0.1 * math.cos(time * 0.7)), size.height * 0.7),
-      size.width * 0.4, const Color(0xFF115E59), 0.10,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
