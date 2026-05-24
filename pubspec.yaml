@@ -102,7 +102,7 @@ flutter:
     - assets/icons/branding.png
     # Whisper STT model — UNCOMMENT to bundle in APK for guaranteed offline STT.
     # COMMENT OUT for lean APK build (~100 MB smaller). Model downloads on first use.
-    # - assets/models/ggml-base.bin
+    - assets/models/ggml-base.bin
     - assets/data/dictionary_dialects.json
     - assets/data/dictionary_great_andamanese.json
     - assets/data/phrases_great_andamanese.json
