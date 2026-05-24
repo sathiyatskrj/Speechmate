@@ -5,6 +5,7 @@ import '../../services/database_manager.dart';
 import '../../services/progress_service.dart';
 import '../../widgets/tap_scale.dart';
 import '../student_dash.dart';
+import '../student_dash_engines.dart';
 import 'games_hub_screen.dart';
 
 class WordMatchGame extends StatefulWidget {
