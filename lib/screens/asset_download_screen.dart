@@ -34,11 +34,11 @@ class _AssetDownloadScreenState extends State<AssetDownloadScreen> {
   String _errorText = '';
 
   // Asset definitions
-  static const String _whisperModelName = 'ggml-base.bin';
-  // Hugging Face direct download URL for Whisper Base multilingual GGML
+  static const String _whisperModelName = 'ggml-tiny.bin';
+  // Hugging Face direct download URL for Whisper Tiny multilingual GGML
   static const String _whisperModelUrl =
-      'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin';
-  static const int _expectedSizeBytes = 141000000; // ~141 MB
+      'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin';
+  static const int _expectedSizeBytes = 73000000; // ~73 MB
 
   @override
   void initState() {
@@ -243,7 +243,7 @@ class _AssetDownloadScreenState extends State<AssetDownloadScreen> {
               Text(
                 _isComplete
                     ? 'Voice engine is ready. You can use all features offline.'
-                    : 'The voice translation engine (~141 MB) needs to be downloaded once. After that, everything works offline.',
+                    : 'The voice translation engine (~73 MB) needs to be downloaded once. After that, everything works offline.',
                 style: GoogleFonts.inter(
                   fontSize: 14, color: const Color(0xFF94A3B8), height: 1.6,
                 ),
@@ -342,7 +342,7 @@ class _AssetDownloadScreenState extends State<AssetDownloadScreen> {
 
               // Size info
               Text(
-                'Requires ~141 MB storage • Wi-Fi recommended',
+                'Requires ~73 MB storage • Wi-Fi recommended',
                 style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF475569)),
               ),
               const SizedBox(height: 20),
