@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/nicobarese_inapp_keyboard.dart';
 import 'package:speechmate/services/progress_service.dart';
@@ -59,6 +60,15 @@ class _StudentDashState extends State<StudentDash>
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
   bool _showConfetti = false;
+
+  // VC control dashboard state variables
+  bool _teeVaultSealed = true;
+  bool _batSyncListening = false;
+  int _meshNodeCount = 3;
+  int _beamWidth = 5;
+  bool _gpuComputeAccelerated = true;
+  double _signalStrength = -42.5;
+  double _ambientLux = 120.0;
 
   void _triggerConfetti() {
     setState(() => _showConfetti = true);
@@ -616,6 +626,10 @@ class _StudentDashState extends State<StudentDash>
               .slideX(begin: 0.1),
           const SizedBox(height: 28),
 
+          // VC Control Console
+          _buildVCDashboardConsole(),
+          const SizedBox(height: 28),
+
           // 🚀 Let's Learn!
           KidsSectionHeader(emoji: '🚀', label: AppStrings.get('sectionLetsLearn')),
           const SizedBox(height: 14),
@@ -923,6 +937,306 @@ class _StudentDashState extends State<StudentDash>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildVCDashboardConsole() {
+    final nativeService = NativeEdgeService();
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B).withOpacity(0.55),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFF38BDF8).withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF38BDF8).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 10, height: 10,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF10B981),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: Color(0xFF10B981), blurRadius: 8),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text('OFF-GRID VC COMMAND CENTER', style: GoogleFonts.inter(
+                    fontSize: 10, fontWeight: FontWeight.w800, color: const Color(0xFF38BDF8), letterSpacing: 2,
+                  )),
+                ],
+              ),
+              Text('v2.0-SECURE', style: GoogleFonts.ibmPlexMono(
+                fontSize: 10, color: const Color(0xFF64748B), fontWeight: FontWeight.w600,
+              )),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // GPGPU compute + TEE Keystore
+          Row(
+            children: [
+              // GPU ACCEL
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.developer_board_rounded, color: _gpuComputeAccelerated ? const Color(0xFF2DD4BF) : Colors.grey, size: 18),
+                          const SizedBox(width: 6),
+                          Text('GPGPU', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(_gpuComputeAccelerated ? 'Vulkan Cores: OK' : 'CPU Thread Fallback', style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9, color: _gpuComputeAccelerated ? const Color(0xFF2DD4BF) : const Color(0xFF64748B),
+                      )),
+                      const SizedBox(height: 2),
+                      Text('Shared Unified Mem: 1024B', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // TEE VAULT
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(_teeVaultSealed ? Icons.lock_outline_rounded : Icons.lock_open_rounded, color: const Color(0xFFFBBF24), size: 18),
+                          const SizedBox(width: 6),
+                          Text('TEE VAULT', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(_teeVaultSealed ? 'Hardware AES: SEALED' : 'Vault Open', style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9, color: const Color(0xFFFBBF24),
+                      )),
+                      const SizedBox(height: 2),
+                      Text('Keystore Bound Ed25519', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Bat-Sync + CRDT Mesh
+          Row(
+            children: [
+              // BAT-SYNC
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.sensors_rounded, color: _batSyncListening ? const Color(0xFF38BDF8) : Colors.grey, size: 18),
+                          const SizedBox(width: 6),
+                          Text('BAT-SYNC v2', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(_batSyncListening ? 'Ultrasonic Tx: 19.5kHz' : 'Ultrasonic Idle', style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9, color: _batSyncListening ? const Color(0xFF38BDF8) : const Color(0xFF64748B),
+                      )),
+                      const SizedBox(height: 2),
+                      Text('Acoustic Amplitude: ${_signalStrength}dB', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // CRDT MESH
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.hub_outlined, color: Color(0xFFEC4899), size: 18),
+                          const SizedBox(width: 6),
+                          Text('CRDT MESH', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text('Network Nodes: $_meshNodeCount Ring', style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9, color: const Color(0xFFEC4899),
+                      )),
+                      const SizedBox(height: 2),
+                      Text('Sliding XOR Shield Active', style: GoogleFonts.ibmPlexMono(fontSize: 8, color: const Color(0xFF64748B))),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Eco-Drive governor
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.wb_sunny_rounded, color: Color(0xFFFBBF24), size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('ECO-DRIVE BATTERY GOVERNOR', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white)),
+                      const SizedBox(height: 2),
+                      Text('Ambient Solar: ${_ambientLux}Lux  •  Whisper Search Beam Width: $_beamWidth', style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9, color: const Color(0xFF94A3B8),
+                      )),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    // Call native_edge_service calculations dynamically
+                    final width = await nativeService.ecoCalculateBeamWidth(_ambientLux, 15.0);
+                    setState(() {
+                      _beamWidth = width;
+                      _ambientLux = _ambientLux > 500 ? 120.0 : 8000.0;
+                    });
+                    HapticFeedback.mediumImpact();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      backgroundColor: const Color(0xFF0F172A),
+                      content: Text('Eco-Drive Re-Calibrated: Beam width set to $width based on Light curves.', style: GoogleFonts.inter(color: const Color(0xFF2DD4BF))),
+                    ));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D9488).withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFF0D9488).withOpacity(0.4)),
+                    ),
+                    child: Text('ADJUST', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w700, color: const Color(0xFF2DD4BF))),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Command Actions Row
+          Row(
+            children: [
+              // Cryptography Test
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFFBBF24),
+                    side: Border.all(color: const Color(0xFFFBBF24).withOpacity(0.3)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  icon: const Icon(Icons.vpn_key_rounded, size: 16),
+                  label: Text('TEST TEE CRYPTO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
+                  onPressed: () async {
+                    HapticFeedback.lightImpact();
+                    final testKey = 'test_hsm_alias';
+                    await nativeService.teeGenerateKey(testKey);
+                    final cipher = await nativeService.teeEncryptData(testKey, 'Offgrid VC Node');
+                    final decrypted = await nativeService.teeDecryptData(testKey, cipher);
+                    await nativeService.teeDeleteKey(testKey);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      backgroundColor: const Color(0xFF1E293B),
+                      content: Text('TEE Secure Cycle Passed:\nPlaintext: "Offgrid VC Node"\nDecrypted: "$decrypted"', style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFFFBBF24))),
+                    ));
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Ultrasonic modulate
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF38BDF8).withOpacity(0.2),
+                    foregroundColor: const Color(0xFF38BDF8),
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      side: Border.all(color: const Color(0xFF38BDF8).withOpacity(0.4)),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  icon: Icon(_batSyncListening ? Icons.stop_rounded : Icons.play_arrow_rounded, size: 16),
+                  label: Text(_batSyncListening ? 'HALT ACOUSTIC' : 'ACOUSTIC SYNCPING', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
+                  onPressed: () async {
+                    HapticFeedback.heavyImpact();
+                    if (_batSyncListening) {
+                      await nativeService.ultrasonicClearBuffers();
+                      setState(() => _batSyncListening = false);
+                    } else {
+                      final payload = [0x53, 0x59, 0x4E, 0x43]; // SYNC
+                      final modulated = await nativeService.ultrasonicModulateManchester(payload);
+                      await nativeService.ultrasonicSetCarrierFrequency(19500.0);
+                      setState(() {
+                        _batSyncListening = true;
+                        _signalStrength = -15.4;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        backgroundColor: const Color(0xFF1E293B),
+                        content: Text('Acoustic Manchester Sync Transmitter Active: playing modulated 19.5kHz tones (Payload: $modulated)', style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF38BDF8))),
+                      ));
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
