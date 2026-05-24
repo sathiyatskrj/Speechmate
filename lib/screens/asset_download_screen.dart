@@ -36,6 +36,7 @@ class _AssetDownloadScreenState extends State<AssetDownloadScreen> {
   // Asset definitions
   static const String _whisperModelName = 'ggml-tiny.bin';
   // Hugging Face direct download URL for Whisper Tiny multilingual GGML
+  static const String _whisperModelUrl =
       'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.bin';
   static const int _expectedSizeBytes = 73000000; // ~73 MB
 
