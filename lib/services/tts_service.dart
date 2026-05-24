@@ -58,10 +58,15 @@ class TtsService {
     }
   }
 
-  /// Speak English text
-  Future<void> speakEnglish(String text) async {
+  /// Speak English text with optional custom pitch morphing
+  Future<void> speakEnglish(String text, {double? pitch}) async {
     await _tts.stop();
     await _tts.setLanguage("en-US");
+    if (pitch != null) {
+      await _tts.setPitch(pitch);
+    } else {
+      await _tts.setPitch(1.0);
+    }
     await _tts.speak(text);
   }
 

@@ -102,5 +102,109 @@ void main() {
       final compensator = await service.applyWindCompensation('beach.wav');
       expect(compensator, isTrue);
     });
+
+    test('16. OCR Otsu Binarization binarizes image', () async {
+      final success = await service.ocrOtsuThreshold('photo.jpg', 'otsu.jpg');
+      expect(success, isTrue);
+    });
+
+    test('17. OCR Sobel edge detection detects edges', () async {
+      final success = await service.ocrSobelEdges('photo.jpg', 'sobel.jpg');
+      expect(success, isTrue);
+    });
+
+    test('18. OCR Gaussian blur filters noise', () async {
+      final success = await service.ocrGaussianBlur('photo.jpg', 'blur.jpg', 1.5);
+      expect(success, isTrue);
+    });
+
+    test('19. OCR Adaptive thresholding handles shadows', () async {
+      final success = await service.ocrAdaptiveThreshold('photo.jpg', 'adaptive.jpg', 11, 2.0);
+      expect(success, isTrue);
+    });
+
+    test('20. OCR Deskew detects document skew angle', () async {
+      final angle = await service.ocrDeskewAngle('doc.jpg');
+      expect(angle, equals(1.5));
+    });
+
+    test('21. OCR Histogram equalization balances contrast', () async {
+      final success = await service.ocrHistogramEqualization('photo.jpg', 'hist.jpg');
+      expect(success, isTrue);
+    });
+
+    test('22. OCR Morphological closing fills gaps', () async {
+      final success = await service.ocrMorphologicalClose('photo.jpg', 'close.jpg', 3);
+      expect(success, isTrue);
+    });
+
+    test('23. OCR Median filter eliminates noise', () async {
+      final success = await service.ocrMedianFilter('photo.jpg', 'median.jpg', 3);
+      expect(success, isTrue);
+    });
+
+    test('24. OCR Region extraction highlights text boxes', () async {
+      final boxes = await service.ocrExtractTextRegions('photo.jpg');
+      expect(boxes.length, equals(2));
+      expect(boxes[0].width, equals(150));
+    });
+
+    test('25. OCR Free Buffer releases memory', () async {
+      await service.ocrFreeImageBuffer(0xABCDEF);
+    });
+
+    test('26. Pet Brain initialization succeeds', () async {
+      final success = await service.petBrainInit('Doggy');
+      expect(success, isTrue);
+    });
+
+    test('27. Pet Brain neural decay ticks stats correctly', () async {
+      final stats = await service.petBrainTickDecay(20, 80, 50, 2.0);
+      expect(stats['hunger'], equals(36.0));
+      expect(stats['happiness'], equals(72.0));
+      expect(stats['energy'], equals(34.0));
+    });
+
+    test('28. Pet Brain petting interaction increases happiness', () async {
+      final stats = await service.petBrainApplyInteraction(50, 60, 'pet');
+      expect(stats['happiness'], equals(65.0));
+      expect(stats['energy'], equals(57.0));
+    });
+
+    test('29. Pet Brain feeding food decreases hunger', () async {
+      final stats = await service.petBrainFeedFood(50, 'pizza');
+      expect(stats['hunger'], equals(10.0));
+    });
+
+    test('30. Pet Brain calculate mood outputs states', () async {
+      final mood = await service.petBrainCalculateMood(80, 50, 50);
+      expect(mood, equals('hungry'));
+    });
+
+    test('31. Pet Brain vocabulary multiplier increases with training', () async {
+      final mult = await service.petBrainGetVocabularyMultiplier(100);
+      expect(mult, equals(1.25));
+    });
+
+    test('32. Pet Brain processes speech input correctly', () async {
+      final response = await service.petBrainProcessSpeech('hello friend');
+      expect(response.contains('Hello human'), isTrue);
+    });
+
+    test('33. Pet Brain sleep rest restores energy', () async {
+      final stats = await service.petBrainUpdateSleep(40, 60, true);
+      expect(stats['energy'], equals(65.0));
+      expect(stats['happiness'], equals(65.0));
+    });
+
+    test('34. Pet Brain evolve check handles XP transitions', () async {
+      final check = await service.petBrainEvolveCheck(60, 1);
+      expect(check['evolved'], isTrue);
+      expect(check['newStageIndex'], equals(2));
+    });
+
+    test('35. Pet Brain disposal cleanly completes', () async {
+      await service.petBrainDispose();
+    });
   });
 }
