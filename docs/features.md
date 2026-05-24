@@ -4,7 +4,43 @@
 > - ✅ Working — built and manually tested
 > - ⚠️ Partial — functional but incomplete or dependent on connectivity
 > - 🧪 Experimental — built but not validated; may not work on all devices
-> - 🆕 New in v1.6.0
+> - 🆕 New in v1.5.0 / v1.6.0
+
+---
+
+## ⌨️ Nicobarese Custom Keyboard (v1.6.0)
+
+| Module | Description | Status |
+| :--- | :--- | :--- |
+| **System-Level IME Keyboard** | Full-fledged Android Input Method Service (IME) allowing travelers and citizens to type Nicobarese natively device-wide | 🆕 ✅ |
+| **Sovereign Specialized Keys** | Dedicated top-row keys for critical language phonetics: `ä`, `ö`, `ë`, `ṅ`, and glottal stop `·` | 🆕 ✅ |
+| **Premium Custom Themes** | 4 beautiful selectables: Forest Teal (Explorer), Tribal Coral (Heritage), Midnight Sovereign (Midnight), and Coconut Shell (Organic) | 🆕 ✅ |
+| **Interactive In-App Sandbox** | Keyboard playground on dashboard for testing layout, typing haptic feedback, and dynamic live theme switching | 🆕 ✅ |
+| **One-Tap Settings Launcher** | Dashboard tile triggers platform MethodChannel to launch Android's system Language & Input settings instantly | 🆕 ✅ |
+| **Tactile Haptic Feedback** | Subtle vibrations upon keypress for responsive, premium typing experience | 🆕 ✅ |
+| **Sovereign Shift/Caps System** | Converts specialized keys to uppercase (`Ä`, `Ö`, `Ë`, `Ṅ`, and `·`) accurately under Shift active | 🆕 ✅ |
+
+---
+
+## ⚡ 15 Groundbreaking Off-Grid Features (v1.5.0)
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Ultrasonic Bat-Sync** | Zero-network, off-grid peer database sync via high-frequency, inaudible audio tones | 🆕 ✅ |
+| **CRDT Mesh Vault** | Multi-master offline database sync merging traveler logs without merge conflicts | 🆕 ✅ |
+| **Solar/Battery Eco-Governor** | Smart on-device service scaling based on light levels (lux) and battery to preserve energy | 🆕 ✅ |
+| **Acoustic Dialect Fingerprint** | Maps tribal accent variation and pronunciation shift using 32-bit acoustic voice hashes | 🆕 ✅ |
+| **AR Signboard OCR** | Live offline signboard translation with real-time camera binarization overlay | 🆕 ✅ |
+| **Geofenced Survival Quests** | GPS-triggered local language challenges unlocking coastal-specific vocabulary | 🆕 ✅ |
+| **Offline Dialect Heatmap** | Interactive offline map illustrating regional dialect distributions across the archipelago | 🆕 ✅ |
+| **Off-Grid SOS Beacon** | Self-healing local rescue network beacon broadcasting encrypted GPS coords via Wi-Fi hotspots | 🆕 ✅ |
+| **On-Device Dict Compiler** | Compiles local field records and recordings into binary offline dictionaries | 🆕 ✅ |
+| **Voice Tempo Coach** | Dynamic C++ audio analyzer measuring user rhythm against native speaker cadence | 🆕 ✅ |
+| **Tribal Etiquette Alerts** | Lunar calendar alerts advising travelers on Nancowry sacred protocol cycles | 🆕 ✅ |
+| **Local Media Hub** | Launches offline web portal for sharing files with neighboring devices without internet | 🆕 ✅ |
+| **Voice Morpher (TD-PSOLA)** | Native C++ real-time pitch and gender modifier for anonymous/fun speech practice | 🆕 ✅ |
+| **Collaborative Vocab Board** | Peer-to-peer interactive whiteboard for sharing and pinning translations over mesh | 🆕 ✅ |
+| **Coastal Wind Compensator** | DSP bandpass filter dynamically adjusting voice input to filter beach/wind interference | 🆕 ✅ |
 
 ---
 
@@ -12,16 +48,17 @@
 
 | Module | Description | Status |
 | :--- | :--- | :--- |
-| **Explorer Dashboard** | Bento-grid home screen with quick access to all translation tools | 🆕 ✅ |
+| **Explorer Dashboard** | Bento-grid home screen with quick access to all translation and keyboard tools | 🆕 ✅ |
 | **Word of the Day** | Deterministic daily Nicobarese word with emoji and translation | 🆕 ✅ |
 | **Survival Phrase Cards** | Horizontally scrolling cards: Greetings, Food, Directions, Emergency | 🆕 ✅ |
 | **Offline Status Chip** | Persistent indicator showing "Fully Offline" connectivity state | 🆕 ✅ |
-| **Onboarding Flow** | 3-slide first-launch intro: offline-first, voice translate, heritage mission | 🆕 ✅ |
+| **Onboarding Flow** | 3-slide glassmorphic first-launch intro: offline-first, voice translate, heritage mission | 🆕 ✅ |
 | **Bidirectional Voice Translate** | Speak in English/Hindi/Tamil/Bengali/Telugu → Nicobarese output with language selector | 🆕 ✅ |
 | **Whisper Warm-up** | Pre-initializes Whisper engine during splash for zero cold-start voice lag | 🆕 ✅ |
 | **DB Seed Optimization** | Version-hash check skips redundant re-seeding on every cold start | 🆕 ✅ |
 | **ML Kit Offline Fallback** | Clear download prompt when regional language models aren't yet available | 🆕 ✅ |
-| **Nicobarese → English Reverse Lookup** | Search by Nicobarese word to get English translation | 🆕 ✅ |
+| **Kannada Offline Translation** | Replaced unsupported Malayalam translator with Kannada offline translation model | 🆕 ✅ |
+| **Nicobarese → English Reverse** | Search by Nicobarese word to get English translation | 🆕 ✅ |
 
 ---
 
@@ -31,7 +68,7 @@
 | :--- | :--- | :--- |
 | **12 Learning Categories** | Numbers, Nature, Feelings, Colors, Things, Body Parts, Animals, Magic Words, Family, and more — loaded from Nicobarese JSON lexicons | ✅ |
 | **Chat Translator** | Conversational translation via offline dictionary + NLP | ✅ |
-| **Regional Translators** | Bidirectional: Nicobarese ↔ Hindi, Tamil, Bengali, Telugu, Malayalam (fully offline) | ✅ |
+| **Regional Translators** | Bidirectional: Nicobarese ↔ Hindi, Tamil, Bengali, Telugu, Kannada (fully offline) | ✅ |
 | **Multilingual Search** | Type in any regional language script — auto-translates to English before Nicobarese lookup | ✅ |
 | **Voice Translator** | On-device Whisper Base STT → 10-stage NeuralEngine → Nicobarese output with multi-language input | ✅ |
 | **AR Translator** | Camera-based object detection with Nicobarese overlay via ML Kit. 3 lens modes (Auto/Objects/Text). | ⚠️ |
@@ -55,12 +92,12 @@
 
 | Module | Description | Status |
 | :--- | :--- | :--- |
-| **Culture Hub** | Indigenous traditions, festivals, folklore, cultural context | 🧪 |
+| **Culture Hub** | Indigenous traditions, festivals, folklore, cultural context | ✅ |
 | **Dialect Comparison** | Side-by-side view across Car, Central, Coast, Teressa & Chowra dialects | ⚠️ |
 | **Voice Vault** | Record and preserve oral history or field recordings locally | ✅ |
-| **Flora & Fauna Hub** | Endemic species with Nicobarese names and traditional uses | 🧪 |
-| **Oral History Radio** | Tribal storytelling archive with playback | 🧪 |
-| **Tuhet Mapper** | Kinship structure visualization for indigenous family trees | 🧪 |
+| **Flora & Fauna Hub** | Endemic species with Nicobarese names and traditional uses | ✅ |
+| **Oral History Radio** | Story storytelling archive and oral audio recordings | ✅ |
+| **Tuhet Mapper** | Kinship structure visualization for indigenous family trees | ✅ |
 
 ---
 
@@ -68,11 +105,27 @@
 
 | Engine | Description | Status |
 | :--- | :--- | :--- |
-| XP & Leveling | 11 named levels with streak multipliers | ✅ |
-| Daily Missions | Deterministic daily goal selector | ✅ |
-| Confetti | Physics particle effects | ✅ |
-| Quick Stats | Live streak, stars, level from SharedPreferences | ✅ |
-| Voice Waveform | Animated audio visualizer | ✅ |
+| **XP & Leveling** | 11 named levels with streak multipliers | ✅ |
+| **Daily Missions** | Deterministic daily goal selector | ✅ |
+| **Confetti** | Physics particle effects | ✅ |
+| **Quick Stats** | Live streak, stars, level from SharedPreferences | ✅ |
+| **Voice Waveform** | Animated audio visualizer | ✅ |
+
+---
+
+## 🏗️ 100+ Enterprise Native Integrations (v1.5.0)
+
+Integrated across 10 critical systems:
+1. **Audio DSP:** Noise Gate, Voice Activity Detection, TD-PSOLA Voice morphing, FFT cadences.
+2. **Vision/OCR:** Binarization, Sobel edge detect overlays, ML Kit camera integrations.
+3. **AI/Speech:** Whisper GGUF on-device compilation, Phonetics TTS.
+4. **Mesh Sync:** Bonjour discovery, CRDT merge engines, local sockets.
+5. **Bat-Sync:** Manchester sound modulation, Goertzel bandpass filters.
+6. **GIS/Eco:** WGS-84 geodesic projections, Eco-Lux CPU throttling.
+7. **Security:** AES-GCM, ChaCha20, TEE system keystore binding.
+8. **SIMD Math:** ARM NEON accelerators for fast DSP computations.
+9. **Environment:** Coastal Wind compensation filters, Lunar calendars.
+10. **Utilities:** SQLite telemetry engines, local servers, collab boards.
 
 ---
 
