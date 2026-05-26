@@ -181,6 +181,7 @@ class QuickStatsRow extends StatefulWidget {
 class _QuickStatsRowState extends State<QuickStatsRow> {
   int _streak = 0;
   int _stars = 0;
+  int _freezes = 0;
   String _levelName = 'Seedling';
   bool _isLoading = true;
 
@@ -199,10 +200,73 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
       setState(() {
         _streak = stats['dayStreak'] ?? 0;
         _stars = stats['studentStars'] ?? 0;
+        _freezes = stats['streakFreezes'] ?? 0;
         _levelName = xpInfo['name'];
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _showPurchaseDialog() async {
+    final progressService = ProgressService();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('🛡️ Streak Shield'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Streak Shield protects your daily fire streak if you miss a day of practice!',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Current Shields: $_freezes',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Price: 5 ⭐ Stars',
+              style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final success = await progressService.purchaseStreakFreeze();
+              if (success) {
+                _loadStats();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('🛡️ Streak Shield purchased successfully!')),
+                  );
+                }
+              } else {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('❌ Insufficient stars to purchase shield!')),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orangeAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Buy 1 Shield'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -216,11 +280,15 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
 
     return Row(
       children: [
-        _buildStatBubble(
-            emoji: '🔥',
-            label: AppStrings.get('streakLabel'),
-            value: '$_streak ${AppStrings.get('days')}',
-            color: const Color(0xFFFF6B35)),
+        GestureDetector(
+          onTap: _showPurchaseDialog,
+          child: _buildStatBubble(
+              emoji: '🔥',
+              label: AppStrings.get('streakLabel'),
+              value: '$_streak ${AppStrings.get('days')}',
+              color: const Color(0xFFFF6B35),
+              extra: _freezes > 0 ? '🛡️ $_freezes' : '🛡️ Buy'),
+        ),
         const SizedBox(width: 12),
         _buildStatBubble(
             emoji: '⭐',
@@ -241,7 +309,8 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
       {required String emoji,
       required String label,
       required String value,
-      required Color color}) {
+      required Color color,
+      String? extra}) {
     // NO BackdropFilter here — 3 stacked blurs destroy mobile perf
     return Expanded(
       child: Container(
@@ -271,6 +340,24 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
                     color: Colors.black54,
                     fontSize: 11,
                     fontWeight: FontWeight.w600)),
+            if (extra != null) ...[
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orangeAccent.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  extra,
+                  style: const TextStyle(
+                    color: Colors.orange,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 9,
+                  ),
+                ),
+              ),
+            ]
           ],
         ),
       ),

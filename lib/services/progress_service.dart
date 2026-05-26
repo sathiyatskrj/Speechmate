@@ -7,6 +7,10 @@ class ProgressService {
   static const String _keyQuizScores = 'quiz_scores';
   static const String _keyCommunityPosts = 'community_posts';
 
+  // --- Streak Freeze Power-Up ---
+  static const String _keyStreakFreezes = 'streak_freeze_count';
+  static const int streakFreezeCost = 5; // Stars per freeze
+
   // --- Student Gamification Stats ---
   static const String _keyStudentXP = 'student_xp';
   static const String _keyStudentStars = 'student_stars';
@@ -31,6 +35,33 @@ class ProgressService {
     final prefs = await SharedPreferences.getInstance();
     int current = prefs.getInt(_keyStudentStars) ?? 0;
     await prefs.setInt(_keyStudentStars, current + amount);
+  }
+
+  // --- Streak Freeze Methods ---
+  Future<int> getStreakFreezes() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyStreakFreezes) ?? 0;
+  }
+
+  /// Purchase a streak freeze for [streakFreezeCost] stars.
+  /// Returns true if purchase succeeded, false if insufficient stars.
+  Future<bool> purchaseStreakFreeze() async {
+    final prefs = await SharedPreferences.getInstance();
+    final stars = prefs.getInt(_keyStudentStars) ?? 0;
+    if (stars < streakFreezeCost) return false;
+    await prefs.setInt(_keyStudentStars, stars - streakFreezeCost);
+    final freezes = prefs.getInt(_keyStreakFreezes) ?? 0;
+    await prefs.setInt(_keyStreakFreezes, freezes + 1);
+    return true;
+  }
+
+  /// Consume one streak freeze. Returns true if one was available.
+  Future<bool> _useStreakFreeze() async {
+    final prefs = await SharedPreferences.getInstance();
+    final freezes = prefs.getInt(_keyStreakFreezes) ?? 0;
+    if (freezes <= 0) return false;
+    await prefs.setInt(_keyStreakFreezes, freezes - 1);
+    return true;
   }
 
   Future<int> getSearchCount() async {
@@ -74,8 +105,16 @@ class ProgressService {
         int currentStreak = prefs.getInt(_keyStreakCount) ?? 0;
         await prefs.setInt(_keyStreakCount, currentStreak + 1);
       } else if (today.difference(lastDate).inDays > 1) {
-        // Reset streak
-        await prefs.setInt(_keyStreakCount, 1);
+        // Gap detected — try to use a streak freeze first
+        final froze = await _useStreakFreeze();
+        if (froze) {
+          // Freeze consumed — streak is preserved, increment it
+          int currentStreak = prefs.getInt(_keyStreakCount) ?? 0;
+          await prefs.setInt(_keyStreakCount, currentStreak + 1);
+        } else {
+          // No freeze available — reset streak
+          await prefs.setInt(_keyStreakCount, 1);
+        }
       }
     } else {
       await prefs.setInt(_keyStreakCount, 1);
@@ -133,6 +172,7 @@ class ProgressService {
       'communityPosts': prefs.getInt(_keyCommunityPosts) ?? 0,
       'studentXP': prefs.getInt(_keyStudentXP) ?? 0,
       'studentStars': prefs.getInt(_keyStudentStars) ?? 0,
+      'streakFreezes': prefs.getInt(_keyStreakFreezes) ?? 0,
     };
   }
 }

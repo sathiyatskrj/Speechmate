@@ -2,6 +2,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:speechmate/services/coqui_tts_service.dart';
 
 class TtsService {
   static final TtsService _instance = TtsService._internal();
@@ -146,6 +147,21 @@ class TtsService {
     String? audioFile,
   }) async {
     await stop(); // Stop any current audio
+
+    // 0. CoquiTTS model (if available) → synthesize and play
+    try {
+      final coqui = CoquiTtsService();
+      if (coqui.isModelAvailable && coqui.canSynthesize(text)) {
+        final audioBytes = await coqui.synthesize(text);
+        if (audioBytes != null && audioBytes.isNotEmpty) {
+          await _audioPlayer.stop();
+          await _audioPlayer.play(BytesSource(audioBytes));
+          return; // Success!
+        }
+      }
+    } catch (e) {
+      debugPrint('[TTS] CoquiTTS synthesis/play failed, falling back: $e');
+    }
 
     // 1. If a specific audio category+file is provided, use that directly
     if (audioCategory != null && audioFile != null && audioFile.isNotEmpty) {
