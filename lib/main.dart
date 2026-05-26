@@ -54,7 +54,6 @@ void main() async {
   try {
     final notif = NotificationService();
     await notif.init();
-    await notif.scheduleRetentionNotifications();
   } catch (e) {
     debugPrint('[main] Offline notification init failed: $e');
   }
