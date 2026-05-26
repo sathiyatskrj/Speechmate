@@ -45,6 +45,7 @@ import 'package:speechmate/screens/sos_phrases_screen.dart';
 import 'package:speechmate/screens/kahoot_quiz_screen.dart';
 import 'package:speechmate/screens/conversation_mode_screen.dart';
 import 'package:speechmate/services/delta_update_service.dart';
+import 'package:speechmate/services/kahoot_service.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -227,7 +228,7 @@ class _TeacherDashState extends State<TeacherDash>
                           ),
                           StaggeredGridTile.count(
                             crossAxisCellCount: 4, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 8, title: "Live Kahoot Quiz 🎯", icon: Icons.quiz_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KahootQuizScreen(isTeacher: true)))),
+                            child: _buildFeatureCard(context, 8, title: "Live Kahoot Quiz 🎯", icon: Icons.quiz_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KahootQuizScreen(role: QuizRole.teacher)))),
                           ),
                           StaggeredGridTile.count(
                             crossAxisCellCount: 2, mainAxisCellCount: 2,
