@@ -616,6 +616,75 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                     currentStars: currentStars,
                     setSheetState: setSheetState,
                   ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'CONSUMABLE POWER-UPS:',
+                    style: TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 0.5, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Card(
+                    color: Colors.white.withValues(alpha: 0.06),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Row(
+                        children: [
+                          const Text('🛡️', style: TextStyle(fontSize: 28)),
+                          const SizedBox(width: 14),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Streak Shield',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Cost: 5 Stars',
+                                  style: TextStyle(
+                                    color: Colors.amberAccent,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: currentStars >= 5 ? Colors.orangeAccent : Colors.white10,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            ),
+                            onPressed: () async {
+                              HapticFeedback.mediumImpact();
+                              if (currentStars >= 5) {
+                                final progressService = ProgressService();
+                                final success = await progressService.purchaseStreakFreeze();
+                                if (success) {
+                                  Navigator.pop(context);
+                                  _showTempSpeech('🛡️ Purchased Streak Shield!');
+                                  _ttsService.speakEnglish('Awesome! You bought a Streak Shield!', pitch: 1.4);
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Not enough Stars! Learn more words to earn Stars.")),
+                                );
+                              }
+                            },
+                            child: const Text(
+                              'Buy',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             );

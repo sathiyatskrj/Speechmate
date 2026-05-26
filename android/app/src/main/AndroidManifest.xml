@@ -61,6 +61,16 @@
                 android:name="android.view.im"
                 android:resource="@xml/method"/>
         </service>
+
+        <!-- Home Screen Word of the Day Widget Receiver (Feature 9) -->
+        <receiver android:name="com.speechmate.edu.WordOfDayWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/word_of_day_widget_info" />
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
