@@ -13,6 +13,8 @@ import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/services/crash_reporter.dart';
 import 'package:speechmate/services/analytics_service.dart';
+import 'package:speechmate/services/notification_service.dart';
+import 'package:speechmate/services/delta_update_service.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Current data version — bump this when lexicon files change
@@ -47,6 +49,15 @@ void main() async {
     await AnalyticsService.instance.init();
     await AnalyticsService.instance.trackEvent('app_open');
   } catch (_) {}
+
+  // Init offline push notifications (Feature 3)
+  try {
+    final notif = NotificationService();
+    await notif.init();
+    await notif.scheduleRetentionNotifications();
+  } catch (e) {
+    debugPrint('[main] Offline notification init failed: $e');
+  }
 
   // Global fallback UI for widget build errors
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -150,6 +161,13 @@ void main() async {
         debugPrint('[main] Seed complete for $_dataVersion.');
       } else {
         debugPrint('[main] Data already seeded for $_dataVersion, skipping.');
+      }
+      
+      // Auto-check and apply delta updates on app launch (Feature 8)
+      try {
+        await DeltaUpdateService.checkAndApplyUpdates();
+      } catch (e) {
+        debugPrint('[main] Delta updates check failed: $e');
       }
   } catch (e) {
       debugPrint("Database init failed: $e");

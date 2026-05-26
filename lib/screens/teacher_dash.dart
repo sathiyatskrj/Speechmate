@@ -40,6 +40,12 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 
+// New features
+import 'package:speechmate/screens/sos_phrases_screen.dart';
+import 'package:speechmate/screens/kahoot_quiz_screen.dart';
+import 'package:speechmate/services/delta_update_service.dart';
+import 'package:speechmate/services/kahoot_service.dart';
+
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
 
@@ -219,6 +225,21 @@ class _TeacherDashState extends State<TeacherDash>
                             crossAxisCellCount: 2, mainAxisCellCount: 2,
                             child: _buildFeatureCard(context, 7, title: AppStrings.get('culture'), icon: Icons.account_balance, color: Colors.tealAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen()))),
                           ),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 4, mainAxisCellCount: 2,
+                            child: _buildFeatureCard(context, 8, title: "Live Kahoot Quiz 🎯", icon: Icons.quiz_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KahootQuizScreen(role: QuizRole.teacher)))),
+                          ),
+                          StaggeredGridTile.count(
+                            crossAxisCellCount: 2, mainAxisCellCount: 1,
+                            child: _buildFeatureCard(context, 10, title: "Export Delta Update 📦", icon: Icons.upload_file_rounded, color: Colors.indigoAccent, onTap: () async {
+                              try {
+                                final path = await DeltaUpdateService.exportDeltaFile();
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ Delta exported to: $path')));
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ Export failed: $e')));
+                              }
+                            }),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -298,6 +319,7 @@ class _TeacherDashState extends State<TeacherDash>
                           StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: AppStrings.get('betaChat'), icon: Icons.forum, color: Colors.indigoAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))))),
                           StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: AppStrings.get('exportVocab'), icon: Icons.share_rounded, color: Colors.lightGreenAccent, onTap: () async { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...'))); await P2PSyncService.exportAndShare(); })),
                           StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: AppStrings.get('feedback'), icon: Icons.rate_review, color: Colors.pinkAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())))),
+                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: "Emergency SOS Phrases ⛑️", icon: Icons.emergency_rounded, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SOSPhrasesScreen())))),
                         ],
                       ),
                       const SizedBox(height: 40),

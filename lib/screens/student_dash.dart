@@ -42,6 +42,11 @@ import 'package:speechmate/screens/achievement_badges_screen.dart';
 import 'package:speechmate/screens/cultural_calendar_screen.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
+// New features
+import 'package:speechmate/screens/sos_phrases_screen.dart';
+import 'package:speechmate/screens/league_screen.dart';
+import 'package:speechmate/screens/pronunciation_challenge_screen.dart';
+
 // ============================================================================
 // DECOMPOSED COMPONENTS (extracted for maintainability — was 2,536 lines)
 // ============================================================================
@@ -137,7 +142,7 @@ class _StudentDashState extends State<StudentDash>
           "word": 'Leaderboard',
           "emoji": "🏆",
           "colors": [const Color(0xFFDAA520), const Color(0xFFFF8C00)],
-          "navigateTo": const ClassroomLeaderboardScreen(),
+          "navigateTo": const LeagueScreen(),
           "icon": Icons.leaderboard_rounded
         },
         {
@@ -167,6 +172,20 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFFff0844), const Color(0xFFffb199)],
           "navigateTo": const VoiceTranslatorScreen(),
           "icon": Icons.record_voice_over_rounded
+        },
+        {
+          "word": 'Pronunciation Practice',
+          "emoji": "🎤",
+          "colors": [const Color(0xFF00FF87), const Color(0xFF60EFFF)],
+          "navigateTo": const PronunciationChallengeScreen(),
+          "icon": Icons.mic_external_on_rounded
+        },
+        {
+          "word": 'Emergency SOS Phrases',
+          "emoji": "⛑️",
+          "colors": [const Color(0xFFE52D27), const Color(0xFFB31217)],
+          "navigateTo": const SOSPhrasesScreen(),
+          "icon": Icons.emergency_rounded
         },
 
         // --- Core Learning Categories ---
