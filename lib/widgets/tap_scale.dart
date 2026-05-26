@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class TapScale extends StatefulWidget {
   final Widget child;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final double scaleFactor;
   final Duration duration;
 
   const TapScale({
     super.key,
     required this.child,
-    required this.onTap,
+    this.onTap,
     this.scaleFactor = 0.92,
     this.duration = const Duration(milliseconds: 120),
   });
@@ -27,13 +27,13 @@ class _TapScaleState extends State<TapScale>
     setState(() => _scale = widget.scaleFactor);
     await Future.delayed(widget.duration);
     setState(() => _scale = 1);
-    widget.onTap();
+    widget.onTap?.call();
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _animate,
+      onTap: widget.onTap == null ? null : _animate,
       child: AnimatedScale(
         scale: _scale,
         duration: widget.duration,
