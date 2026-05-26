@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     
     <application
-        android:label="SpeechMate"
+        android:label="SpeechMate Edu"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -40,29 +40,37 @@
             android:value="2"/>
 
         <!--
-            ML Kit: Force bundle all required models inside the APK.
-            "ica"  = Image Classification / Labeling model
-            "ocr"  = Text Recognition (Latin)
-            "ocr_dn" = Text Recognition (Devanagari — Hindi, Bengali, Sanskrit)
-            This prevents any runtime model download and makes the app
-            100% offline from first launch.
+            ML Kit model bundling strategy:
+            - "ocr" + "ocr_dn" = Text Recognition (Latin + Devanagari) — BUNDLED for offline OCR
+            - Image labeling and object detection download on first use (saves ~20 MB from APK)
         -->
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
-            android:value="ica,objd,ocr,ocr_dn"/>
+            android:value="ocr,ocr_dn"/>
 
-        <!-- Custom Sovereign Nicobarese Keyboard IME Service -->
+        <!-- Custom sovereign Nicobarese QWERTY Keyboard IME Service -->
         <service
-            android:name="com.speechmate.general.NicobareseInputMethodService"
+            android:name="com.speechmate.edu.NicobareseInputMethodService"
+            android:label="SpeechMate Keyboard"
             android:permission="android.permission.BIND_INPUT_METHOD"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.view.InputMethod" />
+                <action android:name="android.view.InputMethod"/>
             </intent-filter>
             <meta-data
                 android:name="android.view.im"
-                android:resource="@xml/method" />
+                android:resource="@xml/method"/>
         </service>
+
+        <!-- Home Screen Word of the Day Widget Receiver (Feature 9) -->
+        <receiver android:name="com.speechmate.general.WordOfDayWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/word_of_day_widget_info" />
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
