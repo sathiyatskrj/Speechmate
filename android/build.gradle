@@ -57,6 +57,9 @@ subprojects {
             project.android.compileOptions {
                 sourceCompatibility = JavaVersion.VERSION_17
                 targetCompatibility = JavaVersion.VERSION_17
+                if (project.name == 'app') {
+                    coreLibraryDesugaringEnabled true
+                }
             }
             if (project.hasProperty('kotlinOptions')) {
                 project.kotlinOptions {
