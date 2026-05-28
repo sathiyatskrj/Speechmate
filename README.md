@@ -249,8 +249,8 @@ Flutter UI (Riverpod)
 
 | Metric | Value | Notes |
 | :--- | :--- | :--- |
-| APK size | **~80 MB** | Whisper model downloaded post-install (~141 MB) |
-| Total on-device | ~220 MB | After Whisper download |
+| APK size | **~80 MB** | Whisper model downloaded post-install (ggml-tiny.bin ~73 MB) |
+| Total on-device | ~153 MB | After Whisper Tiny download |
 | STT latency | ~600ms | Tested on mid-range Android (Snapdragon 6xx) |
 | Translation speed | <100ms | SQLite indexed lookup |
 | Min Android | API 24 | Android 7.0+ |
@@ -269,7 +269,7 @@ cd Speechmate
 # 2. Install dependencies
 flutter pub get
 
-# 3. Pull Whisper model (Git LFS — 141 MB)
+# 3. Pull Whisper model (73 MB)
 git lfs pull
 
 # 4. Run
