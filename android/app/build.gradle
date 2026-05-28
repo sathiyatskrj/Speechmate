@@ -24,8 +24,8 @@ android {
         applicationId = "com.speechmate.general"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2 // Updated to match pubspec (1.2.0+2)
-        versionName = "1.4.8" // Updated to match pubspec
+        versionCode = 10 // Updated to match pubspec (1.5.0+10)
+        versionName = "1.5.0" // Updated to match pubspec
     }
 
     buildTypes {

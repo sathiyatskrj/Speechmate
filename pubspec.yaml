@@ -1,7 +1,7 @@
 name: speechmate
 description: "A bilingual Dictionary for Nicobarian translation"
 publish_to: 'none'
-version: 1.4.9+9
+version: 1.5.0+10
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
