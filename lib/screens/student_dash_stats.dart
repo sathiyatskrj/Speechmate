@@ -280,15 +280,13 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
 
     return Row(
       children: [
-        GestureDetector(
-          onTap: _showPurchaseDialog,
-          child: _buildStatBubble(
-              emoji: '🔥',
-              label: AppStrings.get('streakLabel'),
-              value: '$_streak ${AppStrings.get('days')}',
-              color: const Color(0xFFFF6B35),
-              extra: _freezes > 0 ? '🛡️ $_freezes' : '🛡️ Buy'),
-        ),
+        _buildStatBubble(
+            emoji: '🔥',
+            label: AppStrings.get('streakLabel'),
+            value: '$_streak ${AppStrings.get('days')}',
+            color: const Color(0xFFFF6B35),
+            extra: _freezes > 0 ? '🛡️ $_freezes' : '🛡️ Buy',
+            onTap: _showPurchaseDialog),
         const SizedBox(width: 12),
         _buildStatBubble(
             emoji: '⭐',
@@ -310,55 +308,59 @@ class _QuickStatsRowState extends State<QuickStatsRow> {
       required String label,
       required String value,
       required Color color,
-      String? extra}) {
+      String? extra,
+      VoidCallback? onTap}) {
     // NO BackdropFilter here — 3 stacked blurs destroy mobile perf
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withValues(alpha: 0.45), width: 1.5),
-          boxShadow: [
-            BoxShadow(
-                color: color.withValues(alpha: 0.10),
-                blurRadius: 8,
-                offset: const Offset(0, 3))
-          ],
-        ),
-        child: Column(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
-            const SizedBox(height: 4),
-            Text(value,
-                style: TextStyle(
-                    color: color, fontWeight: FontWeight.w900, fontSize: 14),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis),
-            Text(label,
-                style: const TextStyle(
-                    color: Colors.black54,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600)),
-            if (extra != null) ...[
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withValues(alpha: 0.45), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                  color: color.withValues(alpha: 0.10),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3))
+            ],
+          ),
+          child: Column(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 28)),
               const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.orangeAccent.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  extra,
+              Text(value,
+                  style: TextStyle(
+                      color: color, fontWeight: FontWeight.w900, fontSize: 14),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+              Text(label,
                   style: const TextStyle(
-                    color: Colors.orange,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 9,
+                      color: Colors.black54,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600)),
+              if (extra != null) ...[
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.orangeAccent.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    extra,
+                    style: const TextStyle(
+                      color: Colors.orange,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 9,
+                    ),
                   ),
                 ),
-              ),
-            ]
-          ],
+              ]
+            ],
+          ),
         ),
       ),
     );

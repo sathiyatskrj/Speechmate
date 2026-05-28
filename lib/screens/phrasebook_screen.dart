@@ -495,7 +495,7 @@ class _PhrasebookScreenState extends State<PhrasebookScreen> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, py: 4),
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                               decoration: BoxDecoration(
                                                 color: catColor.withValues(alpha: 0.15),
                                                 borderRadius: BorderRadius.circular(10),
