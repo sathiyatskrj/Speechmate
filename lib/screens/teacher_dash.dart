@@ -39,6 +39,7 @@ import 'package:speechmate/screens/cultural_calendar_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // New features
 import 'package:speechmate/screens/sos_phrases_screen.dart';
@@ -46,6 +47,7 @@ import 'package:speechmate/screens/kahoot_quiz_screen.dart';
 import 'package:speechmate/screens/conversation_mode_screen.dart';
 import 'package:speechmate/services/delta_update_service.dart';
 import 'package:speechmate/services/kahoot_service.dart';
+import 'package:speechmate/screens/level_learning_screen.dart';
 
 class TeacherDash extends StatefulWidget {
   const TeacherDash({super.key});
@@ -58,6 +60,7 @@ class _TeacherDashState extends State<TeacherDash>
     with SearchableDashboardMixin {
   final TextEditingController _searchController = TextEditingController();
   final TtsService _ttsService = TtsService();
+  int _currentTab = 0;
   
   Map<String, dynamic>? _dailyWord;
 
@@ -89,12 +92,20 @@ class _TeacherDashState extends State<TeacherDash>
     super.dispose();
   }
 
+  // ── Time-aware greeting ──────────────────────────────────────────────────
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning ☀️';
+    if (hour < 17) return 'Good Afternoon 🌤️';
+    return 'Good Evening 🌙';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
       data: AppTheme.teacherTheme,
       child: Scaffold(
-        backgroundColor: const Color(0xFFE2E8F0), // Cool gray background for sharp contrast
+        backgroundColor: const Color(0xFFE2E8F0),
         body: Stack(
           children: [
             // Elegant Light Background Gradients
@@ -143,202 +154,448 @@ class _TeacherDashState extends State<TeacherDash>
                     onClear: _clearSearch,
                   ),
                   Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                            if (_dailyWord != null) ...[
-                              _buildDailyWordCard(_dailyWord!),
-                              const SizedBox(height: 25),
-                            ],
-                            if (isSearchLoading)
-                               const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
-                            
-                            if (!isSearchLoading && hasSearched)
-                               Padding(
-                                 padding: const EdgeInsets.only(bottom: 25),
-                                 child: TranslationCard(
-                                    nicobarese: searchResult != null ? searchResult!['nicobarese'] : "No match found",
-                                    english: searchResult != null ? (searchResult!['english'] ?? searchResult!['text'] ?? "") : "",
-                                    searchedNicobarese: searchedNicobarese,
-                                    isError: searchResult == null,
-                                    showSpeaker: searchResult != null, 
-                                    onSpeak: () {
-                                        if (searchResult == null) return;
-                                        if (searchedNicobarese) {
-                                            _ttsService.speakEnglish(searchResult!['english'] ?? searchResult!['text'] ?? "");
-                                        } else {
-                                            final audio = searchResult!['audio'];
-                                            _ttsService.speakNicobarese(
-                                              searchResult!['nicobarese'] ?? "",
-                                              englishWord: searchResult!['english'] ?? searchResult!['text'],
-                                              audioCategory: audio is Map ? audio['category']?.toString() : null,
-                                              audioFile: audio is Map ? audio['file']?.toString() : null,
-                                            );
-                                        }
-                                    },
-                                 ).animate().fadeIn().scale(curve: Curves.easeOutBack),
-                               ),
-
-                      // ────── CLASSROOM TOOLS SECTION (Bento Grid) ──────
-                      _buildSectionHeader(AppStrings.get('classroomTools'), Icons.class_rounded, Colors.orangeAccent),
-                      const SizedBox(height: 12),
-                      StaggeredGrid.count(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        children: [
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 4, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 0, title: "Document Translator Hub", icon: Icons.auto_stories_rounded, color: Colors.cyanAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentTranslationHub()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 4, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 1, title: AppStrings.get('generateReport'), icon: Icons.analytics_outlined, color: Colors.deepOrangeAccent, onTap: () async => await ReportGenerator.generateAndPrintReport("Student")),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 3,
-                            child: _buildFeatureCard(context, 1, title: AppStrings.get('bookScanner'), icon: Icons.document_scanner_rounded, color: Colors.cyanAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraTranslationScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 2, title: AppStrings.get('dictEditor'), icon: Icons.edit_note_rounded, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DictionaryEditorScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 1,
-                            child: _buildFeatureCard(context, 3, title: AppStrings.get('importVocab'), icon: Icons.download_rounded, color: Colors.cyan, onTap: () => _showImportDialog()),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 4, title: AppStrings.get('voiceTranslate'), icon: Icons.record_voice_over_rounded, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 5, title: AppStrings.get('textTranslator'), icon: Icons.translate, color: Colors.orangeAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 6, title: AppStrings.get('voiceVault'), icon: Icons.mic, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 7, title: AppStrings.get('culture'), icon: Icons.account_balance, color: Colors.tealAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 4, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 8, title: "Live Kahoot Quiz 🎯", icon: Icons.quiz_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KahootQuizScreen(role: QuizRole.teacher)))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 9, title: "Conversation Mode 🗣️", icon: Icons.forum_rounded, color: Colors.purpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConversationModeScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 1,
-                            child: _buildFeatureCard(context, 10, title: "Export Delta Update 📦", icon: Icons.upload_file_rounded, color: Colors.indigoAccent, onTap: () async {
-                              try {
-                                final path = await DeltaUpdateService.exportDeltaFile();
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ Delta exported to: $path')));
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ Export failed: $e')));
-                              }
-                            }),
-                          ),
-                        ],
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      child: SingleChildScrollView(
+                        key: ValueKey(_currentTab),
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                        child: _buildTabContent(),
                       ),
-                      const SizedBox(height: 24),
-
-                      // ────── EDUAI CLASSROOM MANAGEMENT (from EduAI) ──────
-                      _buildSectionHeader('CLASSROOM MANAGEMENT', Icons.school_rounded, Colors.cyan),
-                      const SizedBox(height: 12),
-                      StaggeredGrid.count(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        children: [
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 0, title: 'Class Roster', icon: Icons.people_alt_rounded, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClassRosterScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 1, title: 'Quiz Analytics', icon: Icons.analytics_rounded, color: const Color(0xFF10B981), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizAnalyticsScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 4, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 2, title: 'Marks Entry', icon: Icons.edit_note_rounded, color: const Color(0xFFF59E0B), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MarksEntryScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 3, title: 'Word Lists', icon: Icons.playlist_add_rounded, color: const Color(0xFF8B5CF6), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherWordListsScreen()))),
-                          ),
-                          StaggeredGridTile.count(
-                            crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 4, title: 'Cultural Calendar', icon: Icons.calendar_month_rounded, color: const Color(0xFFEC4899), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CulturalCalendarScreen(isTeacher: true)))),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // ────── LEARNING TOOLS SECTION (Bento Grid) ──────
-                      _buildSectionHeader(AppStrings.get('learningTools'), Icons.school_rounded, Colors.purpleAccent),
-                      const SizedBox(height: 12),
-                      StaggeredGrid.count(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        children: [
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: AppStrings.get('certification'), icon: Icons.verified, color: Colors.amberAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: AppStrings.get('quizMode'), icon: Icons.quiz, color: Colors.purpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: AppStrings.get('srsAnalytics'), icon: Icons.bar_chart_rounded, color: Colors.deepPurple, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SRSDashboardScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: AppStrings.get('progress'), icon: Icons.bar_chart, color: Colors.greenAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: AppStrings.get('commonPhrases'), icon: Icons.chat_bubble_outline, color: Colors.pinkAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 5, title: AppStrings.get('andamaneseBeta'), icon: Icons.language_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 6, title: AppStrings.get('natureHub'), icon: Icons.eco_rounded, color: Colors.green, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FloraFaunaScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 7, title: AppStrings.get('oralHistory'), icon: Icons.radio_rounded, color: Colors.brown, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoryRadioScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 8, title: AppStrings.get('dialectComparison'), icon: Icons.compare_arrows_rounded, color: Colors.green, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 9, title: AppStrings.get('islandGis'), icon: Icons.explore_rounded, color: Colors.blueGrey, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectHeatmapScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 10, title: AppStrings.get('tuhetMapper'), icon: Icons.account_tree_rounded, color: Colors.deepOrange, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KinshipMapperScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 11, title: AppStrings.get('villageHub'), icon: Icons.map_rounded, color: Colors.teal, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoryPalaceScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 12, title: AppStrings.get('whisperPro'), icon: Icons.auto_awesome_rounded, color: Colors.cyan, onTap: () async {
-                              final result = await VoiceAssistantDialog.show(context);
-                              if (result != null && result.isNotEmpty) {
-                                  _searchController.text = result;
-                                  _onSearch(result);
-                              }
-                          })),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-
-                      // ────── COMMUNITY & SETTINGS SECTION (Bento Grid) ──────
-                      _buildSectionHeader(AppStrings.get('communitySettings'), Icons.people_alt_rounded, Colors.blueAccent),
-                      const SizedBox(height: 12),
-                      StaggeredGrid.count(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 15,
-                        crossAxisSpacing: 15,
-                        children: [
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: AppStrings.get('community'), icon: Icons.public, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: AppStrings.get('betaChat'), icon: Icons.forum, color: Colors.indigoAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: AppStrings.get('exportVocab'), icon: Icons.share_rounded, color: Colors.lightGreenAccent, onTap: () async { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...'))); await P2PSyncService.exportAndShare(); })),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: AppStrings.get('feedback'), icon: Icons.rate_review, color: Colors.pinkAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())))),
-                          StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: "Emergency SOS Phrases ⛑️", icon: Icons.emergency_rounded, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SOSPhrasesScreen())))),
-                        ],
-                      ),
-                      const SizedBox(height: 40),
-                    ],
+                    ),
                   ),
-                ),
-              ),
                 ],
               ), 
             ),
           ],
         ),
+        // Morning Briefing Bottom Navigation
+        bottomNavigationBar: _buildTeacherBottomNav(),
       ),
     );
+  }
+
+  // ── Tab Content Router ──────────────────────────────────────────────────
+  Widget _buildTabContent() {
+    switch (_currentTab) {
+      case 0:
+        return _buildHomeBriefing();
+      case 1:
+        return _buildClassroomTab();
+      case 2:
+        return _buildToolsTab();
+      case 3:
+        return _buildMoreTab();
+      default:
+        return _buildHomeBriefing();
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // TAB 0: Morning Briefing (Home)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildHomeBriefing() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Greeting
+        Text(
+          _getGreeting(),
+          style: GoogleFonts.outfit(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: Colors.indigo.shade900,
+          ),
+        ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.1),
+        const SizedBox(height: 4),
+        Text(
+          'Here\'s your classroom overview',
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Daily Word
+        if (_dailyWord != null) ...[
+          _buildDailyWordCard(_dailyWord!),
+          const SizedBox(height: 20),
+        ],
+
+        // Search results
+        if (isSearchLoading)
+           const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)),
+        
+        if (!isSearchLoading && hasSearched)
+           Padding(
+             padding: const EdgeInsets.only(bottom: 20),
+             child: TranslationCard(
+                nicobarese: searchResult != null ? searchResult!['nicobarese'] : "No match found",
+                english: searchResult != null ? (searchResult!['english'] ?? searchResult!['text'] ?? "") : "",
+                searchedNicobarese: searchedNicobarese,
+                isError: searchResult == null,
+                showSpeaker: searchResult != null, 
+                onSpeak: () {
+                    if (searchResult == null) return;
+                    if (searchedNicobarese) {
+                        _ttsService.speakEnglish(searchResult!['english'] ?? searchResult!['text'] ?? "");
+                    } else {
+                        final audio = searchResult!['audio'];
+                        _ttsService.speakNicobarese(
+                          searchResult!['nicobarese'] ?? "",
+                          englishWord: searchResult!['english'] ?? searchResult!['text'],
+                          audioCategory: audio is Map ? audio['category']?.toString() : null,
+                          audioFile: audio is Map ? audio['file']?.toString() : null,
+                        );
+                    }
+                },
+             ).animate().fadeIn().scale(curve: Curves.easeOutBack),
+           ),
+
+        // Quick Actions Row
+        _buildSectionHeader('QUICK ACTIONS', Icons.flash_on_rounded, Colors.orangeAccent),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(child: _buildQuickAction('Generate Report', Icons.analytics_outlined, Colors.deepOrangeAccent, () async => await ReportGenerator.generateAndPrintReport("Student"))),
+            const SizedBox(width: 12),
+            Expanded(child: _buildQuickAction('Class Roster', Icons.people_alt_rounded, Colors.blueAccent, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClassRosterScreen())))),
+            const SizedBox(width: 12),
+            Expanded(child: _buildQuickAction('Marks Entry', Icons.edit_note_rounded, const Color(0xFFF59E0B), () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MarksEntryScreen())))),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // Live Classroom
+        _buildSectionHeader('LIVE CLASSROOM', Icons.cast_for_education_rounded, Colors.deepPurpleAccent),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(
+              crossAxisCellCount: 4, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 0, title: "Live Kahoot Quiz 🎯", icon: Icons.quiz_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KahootQuizScreen(role: QuizRole.teacher)))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 1, title: "Conversation Mode 🗣️", icon: Icons.forum_rounded, color: Colors.purpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConversationModeScreen()))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 2, title: 'Quiz Analytics', icon: Icons.analytics_rounded, color: const Color(0xFF10B981), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizAnalyticsScreen()))),
+            ),
+          ],
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // TAB 1: Classroom Management
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildClassroomTab() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('CLASS MANAGEMENT', Icons.school_rounded, Colors.cyan),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 0, title: 'Class Roster', icon: Icons.people_alt_rounded, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClassRosterScreen()))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 1, title: 'Quiz Analytics', icon: Icons.analytics_rounded, color: const Color(0xFF10B981), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizAnalyticsScreen()))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 4, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 2, title: 'Marks Entry', icon: Icons.edit_note_rounded, color: const Color(0xFFF59E0B), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MarksEntryScreen()))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 3, title: 'Word Lists', icon: Icons.playlist_add_rounded, color: const Color(0xFF8B5CF6), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherWordListsScreen()))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 4, title: 'Cultural Calendar', icon: Icons.calendar_month_rounded, color: const Color(0xFFEC4899), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CulturalCalendarScreen(isTeacher: true)))),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        _buildSectionHeader('LIVE ACTIVITIES', Icons.cast_for_education_rounded, Colors.deepPurple),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(
+              crossAxisCellCount: 4, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 5, title: "Live Kahoot Quiz 🎯", icon: Icons.quiz_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KahootQuizScreen(role: QuizRole.teacher)))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 6, title: "Conversation Mode 🗣️", icon: Icons.forum_rounded, color: Colors.purpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConversationModeScreen()))),
+            ),
+            StaggeredGridTile.count(
+              crossAxisCellCount: 2, mainAxisCellCount: 2,
+              child: _buildFeatureCard(context, 7, title: AppStrings.get('generateReport'), icon: Icons.analytics_outlined, color: Colors.deepOrangeAccent, onTap: () async => await ReportGenerator.generateAndPrintReport("Student")),
+            ),
+          ],
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // TAB 2: Tools (Translators, Content, Curriculum)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildToolsTab() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // TRANSLATORS
+        _buildSectionHeader('TRANSLATORS', Icons.translate_rounded, Colors.cyanAccent),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: "Document Translator Hub", icon: Icons.auto_stories_rounded, color: Colors.cyanAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentTranslationHub())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 3, child: _buildFeatureCard(context, 1, title: AppStrings.get('bookScanner'), icon: Icons.document_scanner_rounded, color: Colors.cyanAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraTranslationScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: AppStrings.get('voiceTranslate'), icon: Icons.record_voice_over_rounded, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 1, child: _buildFeatureCard(context, 3, title: AppStrings.get('textTranslator'), icon: Icons.translate, color: Colors.orangeAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen())))),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // CONTENT
+        _buildSectionHeader('CONTENT MANAGEMENT', Icons.library_books_rounded, Colors.blueAccent),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: AppStrings.get('dictEditor'), icon: Icons.edit_note_rounded, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DictionaryEditorScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: AppStrings.get('voiceVault'), icon: Icons.mic, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 1, child: _buildFeatureCard(context, 2, title: AppStrings.get('importVocab'), icon: Icons.download_rounded, color: Colors.cyan, onTap: () => _showImportDialog())),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 1, child: _buildFeatureCard(context, 3, title: "Export Delta 📦", icon: Icons.upload_file_rounded, color: Colors.indigoAccent, onTap: () async {
+              try {
+                final path = await DeltaUpdateService.exportDeltaFile();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('✅ Delta exported to: $path')));
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('❌ Export failed: $e')));
+              }
+            })),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: AppStrings.get('culture'), icon: Icons.account_balance, color: Colors.tealAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen())))),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // CURRICULUM
+        _buildSectionHeader('CURRICULUM & LEARNING', Icons.school_rounded, Colors.purpleAccent),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: AppStrings.get('certification'), icon: Icons.verified, color: Colors.amberAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherLevelsScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: AppStrings.get('quizMode'), icon: Icons.quiz, color: Colors.purpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: AppStrings.get('srsAnalytics'), icon: Icons.bar_chart_rounded, color: Colors.deepPurple, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SRSDashboardScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: AppStrings.get('progress'), icon: Icons.bar_chart, color: Colors.greenAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProgressScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: AppStrings.get('commonPhrases'), icon: Icons.chat_bubble_outline, color: Colors.pinkAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommonPhrasesScreen())))),
+          ],
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // TAB 3: More (Discovery, Community, Settings)
+  // ═══════════════════════════════════════════════════════════════════════
+  Widget _buildMoreTab() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // DISCOVERY
+        _buildSectionHeader('DISCOVERY & EXPLORATION', Icons.explore_rounded, Colors.teal),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: AppStrings.get('andamaneseBeta'), icon: Icons.language_rounded, color: Colors.deepPurpleAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GreatAndamaneseScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: AppStrings.get('natureHub'), icon: Icons.eco_rounded, color: Colors.green, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FloraFaunaScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: AppStrings.get('oralHistory'), icon: Icons.radio_rounded, color: Colors.brown, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StoryRadioScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: AppStrings.get('dialectComparison'), icon: Icons.compare_arrows_rounded, color: Colors.green, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: AppStrings.get('islandGis'), icon: Icons.explore_rounded, color: Colors.blueGrey, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectHeatmapScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 5, title: AppStrings.get('tuhetMapper'), icon: Icons.account_tree_rounded, color: Colors.deepOrange, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KinshipMapperScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 6, title: AppStrings.get('villageHub'), icon: Icons.map_rounded, color: Colors.teal, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoryPalaceScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 4, mainAxisCellCount: 2, child: _buildFeatureCard(context, 7, title: AppStrings.get('whisperPro'), icon: Icons.auto_awesome_rounded, color: Colors.cyan, onTap: () async {
+                final result = await VoiceAssistantDialog.show(context);
+                if (result != null && result.isNotEmpty) {
+                    _searchController.text = result;
+                    _onSearch(result);
+                }
+            })),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // COMMUNITY
+        _buildSectionHeader('COMMUNITY & SETTINGS', Icons.people_alt_rounded, Colors.blueAccent),
+        const SizedBox(height: 12),
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 15,
+          crossAxisSpacing: 15,
+          children: [
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 0, title: AppStrings.get('community'), icon: Icons.public, color: Colors.blueAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 1, title: AppStrings.get('betaChat'), icon: Icons.forum, color: Colors.indigoAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BetaChatScreen(isStudent: false))))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 2, title: AppStrings.get('exportVocab'), icon: Icons.share_rounded, color: Colors.lightGreenAccent, onTap: () async { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating ZIP Payload...'))); await P2PSyncService.exportAndShare(); })),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 3, title: AppStrings.get('feedback'), icon: Icons.rate_review, color: Colors.pinkAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen())))),
+            StaggeredGridTile.count(crossAxisCellCount: 2, mainAxisCellCount: 2, child: _buildFeatureCard(context, 4, title: "Emergency SOS Phrases ⛑️", icon: Icons.emergency_rounded, color: Colors.redAccent, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SOSPhrasesScreen())))),
+          ],
+        ),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // SHARED WIDGETS
+  // ═══════════════════════════════════════════════════════════════════════
+
+  Widget _buildTeacherBottomNav() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(0, Icons.home_rounded, 'Home', Colors.indigo),
+          _buildNavItem(1, Icons.class_rounded, 'Classroom', Colors.cyan),
+          _buildNavItem(2, Icons.build_rounded, 'Tools', Colors.orange),
+          _buildNavItem(3, Icons.more_horiz_rounded, 'More', Colors.purple),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String label, Color activeColor) {
+    final isActive = _currentTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _currentTab = index),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutBack,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isActive ? activeColor.withValues(alpha: 0.12) : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedScale(
+                scale: isActive ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: Icon(icon, color: isActive ? activeColor : Colors.grey.shade500, size: 24),
+              ),
+              const SizedBox(height: 4),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: TextStyle(
+                  color: isActive ? activeColor : Colors.grey.shade500,
+                  fontSize: isActive ? 11 : 10,
+                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                ),
+                child: Text(label),
+              ),
+              const SizedBox(height: 3),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                height: 3,
+                width: isActive ? 16 : 0,
+                decoration: BoxDecoration(
+                  color: activeColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickAction(String title, IconData icon, Color color, VoidCallback onTap) {
+    return TapScale(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white, width: 1.5),
+          boxShadow: [
+            BoxShadow(color: color.withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w700, fontSize: 11),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.9, 0.9));
   }
 
   Widget _buildSectionHeader(String title, IconData icon, Color color) {

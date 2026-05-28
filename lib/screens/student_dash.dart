@@ -11,43 +11,14 @@ import 'package:speechmate/widgets/translation_card.dart';
 import 'package:speechmate/widgets/gamification_header.dart';
 import 'package:speechmate/widgets/smart_dashboard_header.dart';
 import 'package:speechmate/core/app_theme.dart';
+import 'package:speechmate/core/island_zone_data.dart';
 import 'package:speechmate/mixins/searchable_dashboard_mixin.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-// Screens
-import 'package:speechmate/screens/games/games_hub_screen.dart';
+// Screens (only needed for keyboard onTap and secret dialog)
 import 'package:speechmate/screens/community_screen.dart';
-import 'package:speechmate/screens/voice_vault_screen.dart';
-import 'package:speechmate/screens/dynamic_category_screen.dart';
-import 'package:speechmate/screens/feedback_screen.dart';
-import 'package:speechmate/screens/beta_chat_screen.dart';
-import 'package:speechmate/screens/ga_hub_screen.dart';
-import 'package:speechmate/screens/flora_fauna_screen.dart';
-import 'package:speechmate/screens/omni_translator_screen.dart';
-
-import 'package:speechmate/screens/story_radio_screen.dart';
-import 'package:speechmate/screens/kinship_mapper_screen.dart';
-import 'package:speechmate/screens/dialect_heatmap_screen.dart';
-import 'package:speechmate/screens/memory_palace_screen.dart';
-import 'package:speechmate/screens/camera_translation_screen.dart';
-import 'package:speechmate/screens/voice_translator_screen.dart';
-import 'package:speechmate/screens/ar_translator_screen.dart';
-import 'package:speechmate/screens/body_parts_screen.dart';
-import 'package:speechmate/screens/ai_setup_screen.dart';
 import 'package:speechmate/core/app_strings.dart';
-import 'package:speechmate/screens/regional_translator_screen.dart';
-import 'package:speechmate/screens/classroom_leaderboard_screen.dart';
-import 'package:speechmate/screens/achievement_badges_screen.dart';
-import 'package:speechmate/screens/cultural_calendar_screen.dart';
-import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-
-// New features
-import 'package:speechmate/screens/sos_phrases_screen.dart';
-import 'package:speechmate/screens/league_screen.dart';
-import 'package:speechmate/screens/phrasebook_screen.dart';
-import 'package:speechmate/screens/pronunciation_challenge_screen.dart';
-import 'package:speechmate/screens/conversation_mode_screen.dart';
 
 // ============================================================================
 // DECOMPOSED COMPONENTS (extracted for maintainability — was 2,536 lines)
@@ -69,6 +40,10 @@ class _StudentDashState extends State<StudentDash>
   final TextEditingController searchController = TextEditingController();
   final TtsService ttsService = TtsService();
   bool _showConfetti = false;
+  int _currentZone = 0;
+
+  // Island zones data
+  late final List<IslandZone> _zones;
 
   // VC control dashboard state variables
   bool _teeVaultSealed = true;
@@ -78,6 +53,9 @@ class _StudentDashState extends State<StudentDash>
   bool _gpuComputeAccelerated = true;
   double _signalStrength = -42.5;
   double _ambientLux = 120.0;
+
+  // Keyboard utility tiles (not in zone data — they use onTap callbacks)
+  late final List<Map<String, dynamic>> _utilityTiles;
 
   void _triggerConfetti() {
     setState(() => _showConfetti = true);
@@ -92,6 +70,8 @@ class _StudentDashState extends State<StudentDash>
     WidgetsBinding.instance.addObserver(this);
     ttsService.init();
     initSearch();
+    _zones = getIslandZones();
+    _utilityTiles = _buildUtilityTiles();
   }
 
   @override
@@ -110,394 +90,108 @@ class _StudentDashState extends State<StudentDash>
 
   void _onClear() => clearMixinSearch(searchController);
 
-  List<Map<String, dynamic>> get learningTiles => [
-        // --- Premium Interactive Features (Moved to Top) ---
-        {
-          "word": AppStrings.get('arTranslator'),
-          "emoji": "📷",
-          "colors": [const Color(0xFF0F2027), const Color(0xFF2C5364)],
-          "navigateTo": const ARTranslatorScreen(),
-          "icon": Icons.view_in_ar_rounded
-        },
-        {
-          "word": AppStrings.get('voiceVault'),
-          "emoji": "🎙️",
-          "colors": [const Color(0xFF4CA1AF), const Color(0xFF2C3E50)],
-          "navigateTo": const VoiceVaultScreen(),
-          "icon": Icons.mic_external_on_rounded,
-        },
-        {
-          "word": AppStrings.get('bookScanner'),
-          "emoji": "📖",
-          "colors": [const Color(0xFF00B4DB), const Color(0xFF0083B0)],
-          "navigateTo": const CameraTranslationScreen(),
-          "icon": Icons.document_scanner_rounded
-        },
-        {
-          "word": AppStrings.get('games'),
-          "emoji": "🎲",
-          "colors": [const Color(0xFFF09819), const Color(0xFFEDDE5D)],
-          "navigateTo": const GamesHubScreen(),
-          "icon": Icons.sports_esports_rounded
-        },
-        {
-          "word": 'Leaderboard',
-          "emoji": "🏆",
-          "colors": [const Color(0xFFDAA520), const Color(0xFFFF8C00)],
-          "navigateTo": const LeagueScreen(),
-          "icon": Icons.leaderboard_rounded
-        },
-        {
-          "word": 'Achievements',
-          "emoji": "🏅",
-          "colors": [const Color(0xFF7C3AED), const Color(0xFFA78BFA)],
-          "navigateTo": const AchievementBadgesScreen(),
-          "icon": Icons.emoji_events_rounded
-        },
-        {
-          "word": 'Cultural Calendar',
-          "emoji": "🎭",
-          "colors": [const Color(0xFFEC4899), const Color(0xFFF472B6)],
-          "navigateTo": const CulturalCalendarScreen(),
-          "icon": Icons.calendar_month_rounded
-        },
-        {
-          "word": AppStrings.get('chatTranslate'),
-          "emoji": "💬",
-          "colors": [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)],
-          "navigateTo": const BetaChatScreen(isStudent: true),
-          "icon": Icons.chat_bubble_rounded,
-        },
-        {
-          "word": AppStrings.get('voiceTranslate'),
-          "emoji": "🎙️",
-          "colors": [const Color(0xFFff0844), const Color(0xFFffb199)],
-          "navigateTo": const VoiceTranslatorScreen(),
-          "icon": Icons.record_voice_over_rounded
-        },
-        {
-          "word": 'Pronunciation Practice',
-          "emoji": "🎤",
-          "colors": [const Color(0xFF00FF87), const Color(0xFF60EFFF)],
-          "navigateTo": const PronunciationChallengeScreen(),
-          "icon": Icons.mic_external_on_rounded
-        },
-        {
-          "word": 'Conversation Mode',
-          "emoji": "🗣️",
-          "colors": [const Color(0xFFFF416C), const Color(0xFFFF4B2B)],
-          "navigateTo": const ConversationModeScreen(),
-          "icon": Icons.forum_rounded
-        },
-        {
-          "word": 'Situational Phrasebook',
-          "emoji": "🧳",
-          "colors": [const Color(0xFF2E8B57), const Color(0xFF3CB371)],
-          "navigateTo": const PhrasebookScreen(),
-          "icon": Icons.wallet_travel_rounded
-        },
-        {
-          "word": 'Emergency SOS Phrases',
-          "emoji": "⛑️",
-          "colors": [const Color(0xFFE52D27), const Color(0xFFB31217)],
-          "navigateTo": const SOSPhrasesScreen(),
-          "icon": Icons.emergency_rounded
-        },
-
-        // --- Core Learning Categories ---
-        {
-          "word": AppStrings.get('numbers'),
-          "emoji": "123",
-          "colors": [const Color(0xFF6A11CB), const Color(0xFF2575FC)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'numbers', title: 'Numbers'),
-          "icon": Icons.format_list_numbered_rounded
-        },
-        {
-          "word": AppStrings.get('nature'),
-          "emoji": "🌱",
-          "colors": [const Color(0xFF11998E), const Color(0xFF38EF7D)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'nature', title: 'Nature'),
-          "icon": Icons.eco_rounded
-        },
-        {
-          "word": AppStrings.get('feelings'),
-          "emoji": "🎭",
-          "colors": [const Color(0xFFFF512F), const Color(0xFFDD2476)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'feelings', title: 'Feelings'),
-          "icon": Icons.emoji_emotions_rounded
-        },
-        {
-          "word": AppStrings.get('colors'),
-          "emoji": "🎨",
-          "colors": [const Color(0xFFff9a9e), const Color(0xFFfad0c4)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'colors', title: 'Colors'),
-          "icon": Icons.palette_rounded
-        },
-        {
-          "word": AppStrings.get('things'),
-          "emoji": "🏡",
-          "colors": [const Color(0xFFa18cd1), const Color(0xFFfbc2eb)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'things', title: 'Things'),
-          "icon": Icons.chair_rounded
-        },
-        {
-          "word": AppStrings.get('bodyParts'),
-          "emoji": "🦴",
-          "colors": [const Color(0xFF8E2DE2), const Color(0xFF4A00E0)],
-          "navigateTo": const BodyPartsScreen(),
-          "icon": Icons.accessibility_new_rounded
-        },
-        {
-          "word": AppStrings.get('animals'),
-          "emoji": "🐶",
-          "colors": [const Color(0xFFFF8008), const Color(0xFFFFC837)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'animals', title: 'Animals'),
-          "icon": Icons.pets_rounded
-        },
-        {
-          "word": AppStrings.get('magicWords'),
-          "emoji": "🔮",
-          "colors": [const Color(0xFFCC2B5E), const Color(0xFF753A88)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'magic', title: 'Magic Words'),
-          "icon": Icons.auto_fix_high_rounded
-        },
-        {
-          "word": AppStrings.get('family'),
-          "emoji": "👨‍👩‍👧",
-          "colors": [const Color(0xFF2193B0), const Color(0xFF6DD5ED)],
-          "navigateTo": const DynamicCategoryScreen(
-              categoryId: 'family', title: 'Family'),
-          "icon": Icons.family_restroom_rounded
-        },
-
-        // --- Regional Translations ---
-        {
-          "word": AppStrings.get('omniBroadcast'),
-          "emoji": "📡",
-          "colors": [const Color(0xFF1A2980), const Color(0xFF26D0CE)],
-          "navigateTo": const OmniTranslatorScreen(),
-          "icon": Icons.cell_tower_rounded
-        },
-        {
-          "word": AppStrings.get('hindiTranslator'),
-          "emoji": "🇮🇳",
-          "colors": [const Color(0xFFD84315), const Color(0xFFFF7042)],
-          "navigateTo": RegionalTranslatorScreen(
-              config: RegionalLanguageConfig(
-                  'Hindi', TranslateLanguage.hindi, 'hi', 'hi-IN', 'नमस्ते')),
-          "icon": Icons.g_translate_rounded
-        },
-        {
-          "word": AppStrings.get('tamilTranslator'),
-          "emoji": "🛕",
-          "colors": [const Color(0xFF2E7D32), const Color(0xFF66BB6A)],
-          "navigateTo": RegionalTranslatorScreen(
-              config: RegionalLanguageConfig(
-                  'Tamil', TranslateLanguage.tamil, 'ta', 'ta-IN', 'வணக்கம்')),
-          "icon": Icons.g_translate_rounded
-        },
-        {
-          "word": AppStrings.get('bengaliTranslator'),
-          "emoji": "🐅",
-          "colors": [const Color(0xFFC62828), const Color(0xFFEF5350)],
-          "navigateTo": RegionalTranslatorScreen(
-              config: RegionalLanguageConfig('Bengali',
-                  TranslateLanguage.bengali, 'bn', 'bn-IN', 'নমস্কার')),
-          "icon": Icons.g_translate_rounded
-        },
-        {
-          "word": AppStrings.get('teluguTranslator'),
-          "emoji": "🌶️",
-          "colors": [const Color(0xFF283593), const Color(0xFF5C6BC0)],
-          "navigateTo": RegionalTranslatorScreen(
-              config: RegionalLanguageConfig('Telugu', TranslateLanguage.telugu,
-                  'te', 'te-IN', 'నమస్కారం')),
-          "icon": Icons.g_translate_rounded
-        },
-        {
-          "word": AppStrings.get('malayalamTranslator'),
-          "emoji": "🥥",
-          "colors": [const Color(0xFF00695C), const Color(0xFF26A69A)],
-          "navigateTo": RegionalTranslatorScreen(
-              config: RegionalLanguageConfig(
-                  'Malayalam', null, 'ml', 'ml-IN', 'നമസ്കാരം')),
-          "icon": Icons.g_translate_rounded
-        },
-
-        // --- Advanced / Discovery ---
-        {
-          "word": AppStrings.get('andamaneseBeta'),
-          "emoji": "🏝️",
-          "colors": [const Color(0xFF4A148C), const Color(0xFF1A237E)],
-          "navigateTo": const GAHubScreen(),
-          "icon": Icons.language_rounded
-        },
-        {
-          "word": AppStrings.get('natureHub'),
-          "emoji": "🌿",
-          "colors": [const Color(0xFF1B5E20), const Color(0xFF004D40)],
-          "navigateTo": const FloraFaunaScreen(),
-          "icon": Icons.eco_rounded
-        },
-        {
-          "word": AppStrings.get('oralHistory'),
-          "emoji": "📻",
-          "colors": [const Color(0xFF3E2723), const Color(0xFF1B5E20)],
-          "navigateTo": const StoryRadioScreen(),
-          "icon": Icons.radio_rounded
-        },
-        {
-          "word": AppStrings.get('tuhetKinship'),
-          "emoji": "🌳",
-          "colors": [const Color(0xFF5D4037), const Color(0xFF3E2723)],
-          "navigateTo": const KinshipMapperScreen(),
-          "icon": Icons.account_tree_rounded
-        },
-        {
-          "word": AppStrings.get('islandExplorer'),
-          "emoji": "🧭",
-          "colors": [const Color(0xFF0277BD), const Color(0xFF01579B)],
-          "navigateTo": const DialectHeatmapScreen(),
-          "icon": Icons.explore_rounded,
-        },
-        {
-          "word": AppStrings.get('memoryPalace'),
-          "emoji": "🏠",
-          "colors": [const Color(0xFF2E7D32), const Color(0xFF1B5E20)],
-          "navigateTo": const MemoryPalaceScreen(),
-          "icon": Icons.map_rounded,
-        },
-        {
-          "word": AppStrings.get('community'),
-          "emoji": "🌍",
-          "colors": [const Color(0xFF302B63), const Color(0xFF24243E)],
-          "navigateTo": const CommunityScreen(),
-          "isSecret": true,
-          "icon": Icons.public_rounded,
-        },
-        {
-          "word": AppStrings.get('aiSetup'),
-          "emoji": "🧠",
-          "colors": [const Color(0xFF3b8d99), const Color(0xFF6b6b83)],
-          "navigateTo": const AISetupScreen(),
-          "icon": Icons.psychology_rounded,
-        },
-        // ═══════════════════════════════════════════════════
-        // ⚙️ UTILITIES
-        // ═══════════════════════════════════════════════════
-        {
-          "word": "System Keyboard",
-          "emoji": "⚙️",
-          "colors": [const Color(0xFF8A2387), const Color(0xFFE94057)],
-          "icon": Icons.keyboard_double_arrow_right_rounded,
-          "onTap": (BuildContext context) async {
-            try {
-              const platform = MethodChannel("com.speechmate.general/keyboard");
-              await platform.invokeMethod("enableSystemKeyboard");
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Error opening keyboard settings: $e")),
-              );
-            }
-          }
-        },
-        {
-          "word": "Test Custom Keyboard",
-          "emoji": "⌨️",
-          "colors": [const Color(0xFF00B0FF), const Color(0xFF00E5FF)],
-          "icon": Icons.keyboard_alt_rounded,
-          "onTap": (BuildContext context) {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) {
-                return StatefulBuilder(
-                  builder: (context, setModalState) {
-                    return Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF0C1D24),
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 12),
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: Colors.white24,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  "Test Nicobarese Keyboard",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                TextField(
-                                  controller: searchController,
-                                  style: const TextStyle(color: Colors.white),
-                                  readOnly: true,
-                                  decoration: InputDecoration(
-                                    hintText: "Tap keys below to write...",
-                                    hintStyle: const TextStyle(color: Colors.white38),
-                                    filled: true,
-                                    fillColor: Colors.white.withValues(alpha: 0.05),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: const Icon(Icons.clear, color: Colors.white54),
-                                      onPressed: () {
-                                        setModalState(() {
-                                          searchController.clear();
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          NicobareseInAppKeyboard(
-                            controller: searchController,
-                            onClose: () => Navigator.pop(context),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                );
-              },
+  List<Map<String, dynamic>> _buildUtilityTiles() {
+    return [
+      {
+        "word": "System Keyboard",
+        "emoji": "⚙️",
+        "colors": [const Color(0xFF8A2387), const Color(0xFFE94057)],
+        "icon": Icons.keyboard_double_arrow_right_rounded,
+        "onTap": (BuildContext context) async {
+          try {
+            const platform = MethodChannel("com.speechmate.general/keyboard");
+            await platform.invokeMethod("enableSystemKeyboard");
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Error opening keyboard settings: $e")),
             );
           }
-        },
-        {
-          "word": AppStrings.get('feedback'),
-          "emoji": "⭐",
-          "colors": [const Color(0xFFFF00CC), const Color(0xFF333399)],
-          "navigateTo": const FeedbackScreen(),
-          "icon": Icons.feedback_rounded
-        },
-      ];
+        }
+      },
+      {
+        "word": "Test Custom Keyboard",
+        "emoji": "⌨️",
+        "colors": [const Color(0xFF00B0FF), const Color(0xFF00E5FF)],
+        "icon": Icons.keyboard_alt_rounded,
+        "onTap": (BuildContext context) {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) {
+              return StatefulBuilder(
+                builder: (context, setModalState) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0C1D24),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(top: 12),
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.white24,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              const Text(
+                                "Test Nicobarese Keyboard",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: searchController,
+                                style: const TextStyle(color: Colors.white),
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  hintText: "Tap keys below to write...",
+                                  hintStyle: const TextStyle(color: Colors.white38),
+                                  filled: true,
+                                  fillColor: Colors.white.withValues(alpha: 0.05),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(Icons.clear, color: Colors.white54),
+                                    onPressed: () {
+                                      setModalState(() {
+                                        searchController.clear();
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        NicobareseInAppKeyboard(
+                          controller: searchController,
+                          onClose: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              );
+            },
+          );
+        }
+      },
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -524,24 +218,7 @@ class _StudentDashState extends State<StudentDash>
                   ),
                   const SizedBox(height: 10),
                   Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        children: [
-                          if (isSearchLoading)
-                            const Padding(
-                              padding: EdgeInsets.all(20),
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                    color: Colors.cyanAccent),
-                              ),
-                            )
-                          else if (searchController.text.isNotEmpty)
-                            _buildSearchResults(),
-                          _buildDashboardContent(),
-                        ],
-                      ),
-                    ),
+                    child: _buildZoneContent(),
                   ),
                 ],
               ),
@@ -551,6 +228,11 @@ class _StudentDashState extends State<StudentDash>
             VirtualPetCompanion(onPetHappy: _triggerConfetti),
             ConfettiOverlay(trigger: _showConfetti),
           ],
+        ),
+        // Island Journey Bottom Navigation
+        bottomNavigationBar: IslandBottomNavBar(
+          currentIndex: _currentZone,
+          onTap: (index) => setState(() => _currentZone = index),
         ),
       ),
     );
@@ -582,6 +264,157 @@ class _StudentDashState extends State<StudentDash>
     }
   }
 
+  // ── Zone Content Router ──────────────────────────────────────────────────
+  Widget _buildZoneContent() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      child: SingleChildScrollView(
+        key: ValueKey(_currentZone),
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: _currentZone == 0
+              ? _buildHomeBeach()
+              : _buildZoneTileGrid(_zones[_currentZone]),
+        ),
+      ),
+    );
+  }
+
+  // ── Zone 0: Home Beach ───────────────────────────────────────────────────
+  Widget _buildHomeBeach() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Search results
+        if (isSearchLoading)
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: CircularProgressIndicator(color: Colors.cyanAccent),
+            ),
+          )
+        else if (searchController.text.isNotEmpty)
+          _buildSearchResults(),
+
+        // 🎯 Daily Mission Card
+        const DailyMissionCard()
+            .animate()
+            .fadeIn(duration: 700.ms)
+            .slideY(begin: 0.15),
+        const SizedBox(height: 20),
+
+        // ⚡ Quick Stats Row (Stars, Streak, Level)
+        const QuickStatsRow()
+            .animate()
+            .fadeIn(duration: 600.ms)
+            .slideX(begin: -0.1),
+        const SizedBox(height: 20),
+
+        // 🎙️ Voice Waveform Visualizer
+        KidsSectionHeader(emoji: '🎙️', label: AppStrings.get('sectionSoundWave')),
+        const SizedBox(height: 8),
+        const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
+        const SizedBox(height: 20),
+
+        // 🏆 My Progress
+        KidsSectionHeader(emoji: '🏆', label: AppStrings.get('sectionMyProgress')),
+        const SizedBox(height: 10),
+        const GamificationHeader()
+            .animate()
+            .fadeIn(duration: 600.ms)
+            .slideY(begin: 0.1),
+        const SizedBox(height: 20),
+        const ProgressRadarChartWidget()
+            .animate()
+            .fadeIn(duration: 900.ms)
+            .scale(),
+        const SizedBox(height: 20),
+
+        // 🥇 My Badges
+        KidsSectionHeader(emoji: '🥇', label: AppStrings.get('sectionMyBadges')),
+        const SizedBox(height: 10),
+        const AchievementShowcaseWidget()
+            .animate()
+            .fadeIn(duration: 800.ms)
+            .slideX(begin: 0.1),
+        const SizedBox(height: 28),
+
+        // VC Control Console
+        _buildVCDashboardConsole(),
+        const SizedBox(height: 110),
+      ],
+    );
+  }
+
+  // ── Zone Tile Grid (for zones 1-4) ───────────────────────────────────────
+  Widget _buildZoneTileGrid(IslandZone zone) {
+    // Combine zone tiles with utility tiles for Discovery Island (zone 4)
+    final List<Map<String, dynamic>> allTiles = [...zone.tiles];
+    if (_currentZone == 4) {
+      allTiles.addAll(_utilityTiles);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Search results at top if searching
+        if (isSearchLoading)
+          const Padding(
+            padding: EdgeInsets.all(20),
+            child: Center(
+              child: CircularProgressIndicator(color: Colors.cyanAccent),
+            ),
+          )
+        else if (searchController.text.isNotEmpty)
+          _buildSearchResults(),
+
+        // Zone header banner
+        IslandZoneHeader(
+          emoji: zone.emoji,
+          name: zone.name,
+          description: zone.description,
+          gradientColors: zone.gradientColors,
+        ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.1),
+
+        // Feature tile grid
+        StaggeredGrid.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          children: List.generate(allTiles.length, (index) {
+            final tile = allTiles[index];
+
+            // Bento Layout: first tile gets hero width, some get tall
+            int crossAxisCellCount = 2;
+            int mainAxisCellCount = 2;
+
+            if (index == 0) {
+              crossAxisCellCount = 4;
+              mainAxisCellCount = 2;
+            } else if (index == 1) {
+              crossAxisCellCount = 2;
+              mainAxisCellCount = 3;
+            } else if (index % 7 == 0 && index > 5) {
+              crossAxisCellCount = 4;
+              mainAxisCellCount = 2;
+            }
+
+            return StaggeredGridTile.count(
+              crossAxisCellCount: crossAxisCellCount,
+              mainAxisCellCount: mainAxisCellCount,
+              child: _buildPremiumTile(
+                  tile, index, crossAxisCellCount, mainAxisCellCount),
+            );
+          }),
+        ),
+        const SizedBox(height: 110),
+      ],
+    );
+  }
+
   Widget _buildSearchResults() {
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -611,113 +444,6 @@ class _StudentDashState extends State<StudentDash>
           }
         },
       ).animate().fadeIn().scale(curve: Curves.easeOutBack),
-    );
-  }
-
-  Widget _buildDashboardContent() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 🎯 Daily Mission Card
-          const DailyMissionCard()
-              .animate()
-              .fadeIn(duration: 700.ms)
-              .slideY(begin: 0.15),
-          const SizedBox(height: 20),
-
-          // ⚡ Quick Stats Row (Stars, Streak, Level)
-          const QuickStatsRow()
-              .animate()
-              .fadeIn(duration: 600.ms)
-              .slideX(begin: -0.1),
-          const SizedBox(height: 20),
-
-          // 🎙️ Voice Waveform Visualizer
-          KidsSectionHeader(emoji: '🎙️', label: AppStrings.get('sectionSoundWave')),
-          const SizedBox(height: 8),
-          const VoiceWaveformWidget().animate().fadeIn(duration: 500.ms),
-          const SizedBox(height: 20),
-
-          // 🏆 My Progress
-          KidsSectionHeader(emoji: '🏆', label: AppStrings.get('sectionMyProgress')),
-          const SizedBox(height: 10),
-          const GamificationHeader()
-              .animate()
-              .fadeIn(duration: 600.ms)
-              .slideY(begin: 0.1),
-          const SizedBox(height: 20),
-          const ProgressRadarChartWidget()
-              .animate()
-              .fadeIn(duration: 900.ms)
-              .scale(),
-          const SizedBox(height: 20),
-
-          // 🥇 My Badges
-          KidsSectionHeader(emoji: '🥇', label: AppStrings.get('sectionMyBadges')),
-          const SizedBox(height: 10),
-          const AchievementShowcaseWidget()
-              .animate()
-              .fadeIn(duration: 800.ms)
-              .slideX(begin: 0.1),
-          const SizedBox(height: 28),
-
-          // VC Control Console
-          _buildVCDashboardConsole(),
-          const SizedBox(height: 28),
-
-          // 🚀 Let's Learn!
-          KidsSectionHeader(emoji: '🚀', label: AppStrings.get('sectionLetsLearn')),
-          const SizedBox(height: 14),
-          _buildBentoGrid(),
-          const SizedBox(height: 110),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBentoGrid() {
-    return StaggeredGrid.count(
-      crossAxisCount: 4,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      children: List.generate(learningTiles.length, (index) {
-        final tile = learningTiles[index];
-
-        // Define Bento Grid Layout Configuration
-        int crossAxisCellCount = 2; // Default width (half)
-        int mainAxisCellCount = 2; // Default height
-
-        if (index == 0) {
-          // AR Translator gets full width hero tile
-          crossAxisCellCount = 4;
-          mainAxisCellCount = 2;
-        } else if (index == 1) {
-          // Book Scanner
-          crossAxisCellCount = 2;
-          mainAxisCellCount = 3; // Taller
-        } else if (index == 2) {
-          // Games Hub
-          crossAxisCellCount = 2;
-          mainAxisCellCount = 2;
-        } else if (index == 5) {
-          // Nature category — periodic wide banner
-          crossAxisCellCount = 4;
-          mainAxisCellCount = 2;
-        } else if (index % 11 == 0 && index > 10) {
-          // Periodic large banners
-          crossAxisCellCount = 4;
-          mainAxisCellCount = 2;
-        }
-
-        return StaggeredGridTile.count(
-          crossAxisCellCount: crossAxisCellCount,
-          mainAxisCellCount: mainAxisCellCount,
-          child: _buildPremiumTile(
-              tile, index, crossAxisCellCount, mainAxisCellCount),
-        );
-      }),
     );
   }
 
