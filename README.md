@@ -2,16 +2,16 @@
   <img src="assets/icons/banner_hero.png" width="100%" alt="SpeechMate — Andaman & Nicobar Translation Hub">
 </p>
 
-<h1 align="center">SPEECHMATE: Explorer Edition v1.6.0</h1>
+<h1 align="center">SPEECHMATE: Explorer Edition v1.5.0</h1>
 
 <p align="center">
-  <strong>The ultimate offline language, culture & communication companion for the Andaman & Nicobar Islands.</strong><br>
+  <strong>The ultimate offline language, culture &amp; communication companion for the Andaman &amp; Nicobar Islands.</strong><br>
   <em>Built for travelers, researchers, and language enthusiasts bridging the communication gap.</em>
 </p>
 
 <p align="center">
   <a href="#">
-    <img src="https://img.shields.io/badge/v1.6.0-Explorer_Edition-blue?style=for-the-badge" alt="Explorer Edition v1.6.0" />
+    <img src="https://img.shields.io/badge/v1.5.0-Explorer_Edition-blue?style=for-the-badge" alt="Explorer Edition v1.5.0" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter 3.29+" />
@@ -33,6 +33,7 @@
 <p align="center">
   <a href="#-the-problem">🌍 Problem</a> •
   <a href="#-core-value">🎯 Core</a> •
+  <a href="#-whats-new-in-v150">🆕 v1.5.0</a> •
   <a href="#-features-for-travelers">🧳 Features</a> •
   <a href="#-native-integrations--off-grid-features">⚡ Native</a> •
   <a href="#-nicobarese-custom-keyboard">⌨️ Keyboard</a> •
@@ -73,27 +74,7 @@ Everything else in this app is designed to help users explore, understand, and r
 
 ---
 
-## 🧳 Features for Travelers & The Public
-
-This edition strips away classroom elements and focuses entirely on real-world utility for the general public:
-
-| Feature | Use Case for Tourists | Status |
-| :--- | :--- | :--- |
-| **Regional Translators** | Translate Hindi, Tamil, Bengali, Telugu, and Kannada locally | ✅ Working |
-| **Tribal Dictionaries** | Access 2,400+ words in Nicobarese and Great Andamanese | ✅ Working |
-| **On-device Voice STT** | Speak directly into the app for hands-free translation (Whisper) | ✅ Working |
-| **Camera Translator** | Scan local restaurant menus, signs, or documents | ✅ Working |
-| **Common Phrases** | Quick-access to survival phrases (greetings, directions, food) | ✅ Working |
-| **Cultural Hub** | Learn about the heritage, traditions, and history of the tribes | ✅ Working |
-| **Community Board** | Connect with other travelers and local guides | ✅ Working |
-| **AR Translator** | Live object detection with translated overlays | ⚠️ Experimental |
-| **Document Translator** | Upload and translate PDFs and documents offline | ✅ Working |
-| **Text Translator** | Full bidirectional text translation between all supported languages | ✅ Working |
-| **Dialect Heatmap** | Explore geographic distribution of dialects across the islands | ✅ Working |
-| **Story Radio** | Listen to indigenous oral histories and tribal radio narratives | ✅ Working |
-| **Flora & Fauna Hub** | Identify and learn native plants and animals in local language | ✅ Working |
-
-### 🆕 New in v1.5.0 — Enterprise Native Scale
+## 🆕 What's New in v1.5.0 — Enterprise Native Scale
 
 | Feature | Description |
 | :--- | :--- |
@@ -108,21 +89,37 @@ This edition strips away classroom elements and focuses entirely on real-world u
 | **Mesh Sync (CRDT)** | Peer-to-peer offline database merging between travelers |
 | **Ultrasonic Bat-Sync** | Manchester-encoded binary sync over audio frequencies |
 | **Tribal Alert Calendar** | Lunar phase alerts for sacred Nancowry protocols |
-
-### 🆕 New in v1.6.0 — Authentic Nicobarese Custom Keyboard
-
-| Feature | Description |
-| :--- | :--- |
-| **System-Level IME Keyboard** | Authentic Nicobarese QWERTY keyboard available device-wide as default input method |
-| **Specialized Sovereign Keys** | Dedicated keys for `ä`, `ö`, `ë`, `ṅ`, and glottal stop `·` |
-| **4 Premium Visual Themes** | Forest Teal, Tribal Coral, Midnight Sovereign, Coconut Shell |
-| **In-App Keyboard Widget** | Interactive full-featured keyboard inside the app with live theme switching |
-| **One-Tap Settings Launcher** | Single tap on dashboard opens Android Language & Input Settings |
-| **Haptic Feedback** | Tactile key press responses for immersive typing experience |
-| **Shift & Uppercase** | Full shift support converting specialized characters to uppercase variants |
-| **Dashboard Integration** | Two new bento grid tiles: "System Keyboard ⚙️" and "Test Custom Keyboard ⌨️" |
+| **Andaman Coastal UI** | Premium Coastal UI/UX upgrade across all Explorer screens |
+| **Real Dialect Heatmap** | Wired interactive island dialect map and culture screen in Explorer shell |
+| **Situational Phrasebook** | Context-aware survival phrase packs (Emergency, Food, Directions) |
+| **Conversation Mode** | Real-time back-and-forth voice conversation translation |
+| **Word of Day Widget** | Persistent daily Nicobarese word with translation and audio |
+| **Build v1.5.0+10** | Version bumped across pubspec.yaml, build.gradle, and dart.yml |
 
 > **Note:** This version skips role-selection and dives straight into the Explorer Dashboard.
+
+---
+
+## 🧳 Features for Travelers & The Public
+
+This edition strips away classroom elements and focuses entirely on real-world utility for the general public:
+
+| Feature | Use Case for Tourists | Status |
+| :--- | :--- | :--- |
+| **Regional Translators** | Translate Hindi, Tamil, Bengali, Telugu, and Kannada locally | ✅ Working |
+| **Tribal Dictionaries** | Access 2,400+ words in Nicobarese and Great Andamanese | ✅ Working |
+| **On-device Voice STT** | Speak directly into the app for hands-free translation (Whisper) | ✅ Working |
+| **Camera Translator** | Scan local restaurant menus, signs, or documents | ✅ Working |
+| **Situational Phrasebook** | Context-aware survival phrases (Greetings, Food, Directions, Emergency) | ✅ Working |
+| **Cultural Hub** | Learn about the heritage, traditions, and history of the tribes | ✅ Working |
+| **Conversation Mode** | Real-time back-and-forth voice conversation translation | ✅ Working |
+| **AR Translator** | Live object detection with translated overlays | ⚠️ Experimental |
+| **Document Translator** | Upload and translate PDFs and documents offline | ✅ Working |
+| **Text Translator** | Full bidirectional text translation between all supported languages | ✅ Working |
+| **Dialect Heatmap** | Explore geographic distribution of dialects across the islands | ✅ Working |
+| **Story Radio** | Listen to indigenous oral histories and tribal radio narratives | ✅ Working |
+| **Flora & Fauna Hub** | Identify and learn native plants and animals in local language | ✅ Working |
+| **Word of Day Widget** | Deterministic daily Nicobarese word with emoji and translation | ✅ Working |
 
 ---
 
@@ -244,6 +241,7 @@ Flutter UI (Riverpod)
 | STT latency | ~600ms | Tested on mid-range Android (Snapdragon 6xx) |
 | Translation speed | <100ms | SQLite indexed lookup |
 | Min Android | API 24 | Android 7.0+ |
+| Build version | `1.5.0+10` | pubspec.yaml + build.gradle + dart.yml |
 | Native integrations | **100+** | C/C++/Java/Kotlin across 10 subsystems |
 
 ---
@@ -270,8 +268,8 @@ flutter run
 
 | Branch | Edition | Audience | Key Features |
 | :--- | :--- | :--- | :--- |
-| `speechmate_general` | Explorer Edition | Travelers, General Public | 100+ native integrations, Nicobarese keyboard, off-grid tools |
-| `main` | Institutional Edition | Teachers & Students | Classroom dashboards, gamification, progress tracking, custom keyboard |
+| `speechmate_general` | **Explorer Edition** | Travelers, General Public | 100+ native integrations, Nicobarese keyboard, 15 off-grid tools, Situational Phrasebook, Conversation Mode |
+| `main` | Institutional Edition | Teachers & Students | Classroom dashboards, gamification, progress tracking, roster & marks management |
 
 ---
 

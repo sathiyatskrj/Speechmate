@@ -1,24 +1,44 @@
-# SpeechMate — Complete Feature List (v1.6.0 Explorer Edition)
+# SpeechMate — Complete Feature List (Explorer Edition v1.5.0)
 
 > **Status key:**
 > - ✅ Working — built and manually tested
 > - ⚠️ Partial — functional but incomplete or dependent on connectivity
 > - 🧪 Experimental — built but not validated; may not work on all devices
-> - 🆕 New in v1.5.0 / v1.6.0
+> - 🆕 New in v1.5.0
 
 ---
 
-## ⌨️ Nicobarese Custom Keyboard (v1.6.0)
+## 🆕 New in v1.5.0 — Enterprise Native Scale
 
-| Module | Description | Status |
+### General UX & Explorer Shell
+
+| Feature | Description | Status |
 | :--- | :--- | :--- |
-| **System-Level IME Keyboard** | Full-fledged Android Input Method Service (IME) allowing travelers and citizens to type Nicobarese natively device-wide | 🆕 ✅ |
-| **Sovereign Specialized Keys** | Dedicated top-row keys for critical language phonetics: `ä`, `ö`, `ë`, `ṅ`, and glottal stop `·` | 🆕 ✅ |
-| **Premium Custom Themes** | 4 beautiful selectables: Forest Teal (Explorer), Tribal Coral (Heritage), Midnight Sovereign (Midnight), and Coconut Shell (Organic) | 🆕 ✅ |
-| **Interactive In-App Sandbox** | Keyboard playground on dashboard for testing layout, typing haptic feedback, and dynamic live theme switching | 🆕 ✅ |
-| **One-Tap Settings Launcher** | Dashboard tile triggers platform MethodChannel to launch Android's system Language & Input settings instantly | 🆕 ✅ |
-| **Tactile Haptic Feedback** | Subtle vibrations upon keypress for responsive, premium typing experience | 🆕 ✅ |
-| **Sovereign Shift/Caps System** | Converts specialized keys to uppercase (`Ä`, `Ö`, `Ë`, `Ṅ`, and `·`) accurately under Shift active | 🆕 ✅ |
+| **Andaman Coastal UI** | Premium UI/UX upgrade across all Explorer screens with coastal colour palette, animated heroes, and glassmorphic cards | 🆕 ✅ |
+| **Real Dialect Heatmap** | Wired interactive island dialect map into the Explorer shell | 🆕 ✅ |
+| **Real Culture Screen** | Live culture content wired into Explorer hub | 🆕 ✅ |
+| **Situational Phrasebook** | Context-aware survival phrase packs: Emergency, Food, Directions, Greetings | 🆕 ✅ |
+| **Conversation Mode** | Real-time back-and-forth voice conversation translation interface | 🆕 ✅ |
+| **Word of Day Widget** | Persistent daily Nicobarese word with emoji, translation, and audio | 🆕 ✅ |
+| **Dual-Engine STT** | Seamless switch between Whisper (offline) and system STT | 🆕 ✅ |
+| **Language-First Flow** | Streamlined onboarding directing user straight to translation | 🆕 ✅ |
+
+### Native Infrastructure
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **NativeEdgeService** | Unified Dart FFI service layer with graceful PC mock fallback for testing | 🆕 ✅ |
+| **100 Native Integrations** | C/C++, Java & Kotlin bindings across 10 key subsystems | 🆕 ✅ |
+| **Offline Whisper STT** | On-device GGUF model inference with NDK 27 C++ bridge | 🆕 ✅ |
+| **Kannada Offline Translation** | Replaced unsupported Malayalam translator with Kannada offline ML Kit model | 🆕 ✅ |
+| **Voice Morphing (TD-PSOLA)** | Real-time pitch/gender voice morphing using native C++ algorithm | 🆕 ✅ |
+| **Acoustic Fingerprinting** | Dialect variance detection via 32-bit acoustic hash signatures | 🆕 ✅ |
+| **GIS Geofencing** | Offline WGS-84 GPS coordinate unlocks for coastal vocabulary packs | 🆕 ✅ |
+| **Mesh Sync (CRDT)** | Peer-to-peer offline database merging between travelers | 🆕 ✅ |
+| **Ultrasonic Bat-Sync** | Manchester-encoded binary sync over inaudible audio frequencies | 🆕 ✅ |
+| **Tribal Alert Calendar** | Lunar phase alerts for sacred Nancowry protocols | 🆕 ✅ |
+| **Core Library Desugaring** | Enabled for `flutter_local_notifications` Java 8+ compat | 🆕 ✅ |
+| **Build v1.5.0+10** | Version bumped across pubspec.yaml, build.gradle, and dart.yml | 🆕 ✅ |
 
 ---
 
@@ -48,17 +68,16 @@
 
 | Module | Description | Status |
 | :--- | :--- | :--- |
-| **Explorer Dashboard** | Bento-grid home screen with quick access to all translation and keyboard tools | 🆕 ✅ |
+| **Explorer Dashboard** | Bento-grid home screen with quick access to all translation and keyboard tools | ✅ |
 | **Word of the Day** | Deterministic daily Nicobarese word with emoji and translation | 🆕 ✅ |
 | **Survival Phrase Cards** | Horizontally scrolling cards: Greetings, Food, Directions, Emergency | 🆕 ✅ |
-| **Offline Status Chip** | Persistent indicator showing "Fully Offline" connectivity state | 🆕 ✅ |
-| **Onboarding Flow** | 3-slide glassmorphic first-launch intro: offline-first, voice translate, heritage mission | 🆕 ✅ |
-| **Bidirectional Voice Translate** | Speak in English/Hindi/Tamil/Bengali/Telugu → Nicobarese output with language selector | 🆕 ✅ |
-| **Whisper Warm-up** | Pre-initializes Whisper engine during splash for zero cold-start voice lag | 🆕 ✅ |
-| **DB Seed Optimization** | Version-hash check skips redundant re-seeding on every cold start | 🆕 ✅ |
-| **ML Kit Offline Fallback** | Clear download prompt when regional language models aren't yet available | 🆕 ✅ |
-| **Kannada Offline Translation** | Replaced unsupported Malayalam translator with Kannada offline translation model | 🆕 ✅ |
-| **Nicobarese → English Reverse** | Search by Nicobarese word to get English translation | 🆕 ✅ |
+| **Offline Status Chip** | Persistent indicator showing "Fully Offline" connectivity state | ✅ |
+| **Onboarding Flow** | 3-slide glassmorphic first-launch intro: offline-first, voice translate, heritage mission | ✅ |
+| **Bidirectional Voice Translate** | Speak in English/Hindi/Tamil/Bengali/Telugu → Nicobarese output with language selector | ✅ |
+| **Whisper Warm-up** | Pre-initializes Whisper engine during splash for zero cold-start voice lag | ✅ |
+| **DB Seed Optimization** | Version-hash check skips redundant re-seeding on every cold start | ✅ |
+| **ML Kit Offline Fallback** | Clear download prompt when regional language models aren't yet available | ✅ |
+| **Nicobarese → English Reverse** | Search by Nicobarese word to get English translation | ✅ |
 
 ---
 
@@ -96,20 +115,8 @@
 | **Dialect Comparison** | Side-by-side view across Car, Central, Coast, Teressa & Chowra dialects | ⚠️ |
 | **Voice Vault** | Record and preserve oral history or field recordings locally | ✅ |
 | **Flora & Fauna Hub** | Endemic species with Nicobarese names and traditional uses | ✅ |
-| **Oral History Radio** | Story storytelling archive and oral audio recordings | ✅ |
+| **Oral History Radio** | Storytelling archive and oral audio recordings | ✅ |
 | **Tuhet Mapper** | Kinship structure visualization for indigenous family trees | ✅ |
-
----
-
-## Gamification & Engagement
-
-| Engine | Description | Status |
-| :--- | :--- | :--- |
-| **XP & Leveling** | 11 named levels with streak multipliers | ✅ |
-| **Daily Missions** | Deterministic daily goal selector | ✅ |
-| **Confetti** | Physics particle effects | ✅ |
-| **Quick Stats** | Live streak, stars, level from SharedPreferences | ✅ |
-| **Voice Waveform** | Animated audio visualizer | ✅ |
 
 ---
 
@@ -137,3 +144,4 @@ Integrated across 10 critical systems:
 | **10-Stage Translation Pipeline** | Deterministic: phrase match → bigram → trigram → dictionary → context → stemming → synonym → soundex → compound → fuzzy | ✅ |
 | **SQLite Indexed DB** | O(1) dictionary lookup with version-controlled seeding | ✅ |
 | **Offline-First Architecture** | Zero cloud dependency, data sovereignty for indigenous languages | ✅ |
+| **Build v1.5.0+10** | pubspec.yaml + build.gradle + dart.yml | ✅ |
