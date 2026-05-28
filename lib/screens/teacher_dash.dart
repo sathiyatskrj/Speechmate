@@ -275,7 +275,7 @@ class _TeacherDashState extends State<TeacherDash>
                           ),
                           StaggeredGridTile.count(
                             crossAxisCellCount: 2, mainAxisCellCount: 2,
-                            child: _buildFeatureCard(context, 4, title: 'Cultural Calendar', icon: Icons.calendar_month_rounded, color: const Color(0xFFEC4899), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CulturalCalendarScreen()))),
+                            child: _buildFeatureCard(context, 4, title: 'Cultural Calendar', icon: Icons.calendar_month_rounded, color: const Color(0xFFEC4899), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CulturalCalendarScreen(isTeacher: true)))),
                           ),
                         ],
                       ),
