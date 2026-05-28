@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speechmate/screens/student_dash.dart';
 import 'package:speechmate/screens/student_dash_pet.dart';
 import 'package:speechmate/services/native_edge_service.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
 
 void main() {
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
   group('VirtualPetCompanion Component & FFI State Tests', () {
     setUp(() {
       // Mock initial SharedPreferences values before each test run
@@ -160,5 +165,18 @@ void main() {
 
       await tester.pumpWidget(const SizedBox.shrink());
     });
+
+    testWidgets('5. StudentDash builds and renders without throwing', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: StudentDash(),
+        ),
+      );
+
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byType(StudentDash), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
   });
 }
+
