@@ -38,6 +38,13 @@ class _SmartDashboardHeaderState extends State<SmartDashboardHeader> {
        }
   }
 
+  String _getStudentGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning! 🌅';
+    if (hour < 17) return 'Good Afternoon! 🌤️';
+    return 'Good Evening! 🌙';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -62,14 +69,14 @@ class _SmartDashboardHeaderState extends State<SmartDashboardHeader> {
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                     Text(
-                      isTeacher ? "Teacher Panel" : "SpeechMate", 
+                      isTeacher ? "Teacher Panel" : _getStudentGreeting(), 
                       style: theme.textTheme.displayLarge?.copyWith(
-                        fontSize: isTeacher ? 32 : 36,
+                        fontSize: isTeacher ? 32 : 28,
                         color: Colors.white70,
                       )
                     ),
                     Text(
-                      "Where language barriers end.", 
+                      isTeacher ? "Where language barriers end." : "Let's explore today! 🏝️", 
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isTeacher ? AppColors.teacherAccent : Colors.purpleAccent,
                         fontStyle: FontStyle.italic

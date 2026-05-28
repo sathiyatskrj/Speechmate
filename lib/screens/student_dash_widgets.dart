@@ -717,3 +717,193 @@ class _WaveformPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _WaveformPainter old) => old.t != t;
 }
+
+// ----------------------------------------------------------------------------
+// 8. Island Zone Header Banner
+// ----------------------------------------------------------------------------
+/// Colorful banner at the top of each island zone (non-Home zones)
+/// showing the zone emoji, name, and a short description.
+class IslandZoneHeader extends StatelessWidget {
+  final String emoji;
+  final String name;
+  final String description;
+  final List<Color> gradientColors;
+
+  const IslandZoneHeader({
+    super.key,
+    required this.emoji,
+    required this.name,
+    required this.description,
+    required this.gradientColors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            gradientColors[0].withValues(alpha: 0.7),
+            gradientColors[1].withValues(alpha: 0.5),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: gradientColors[0].withValues(alpha: 0.2),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 36)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    shadows: [Shadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))],
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 9. Island Bottom Navigation Bar
+// ----------------------------------------------------------------------------
+/// Custom 5-tab bottom navigation with animated island-themed icons.
+/// Each tab represents an island zone in the student journey.
+class IslandBottomNavBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const IslandBottomNavBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  static const List<_IslandNavItem> _items = [
+    _IslandNavItem(emoji: '🏖️', label: 'Home', activeColor: Color(0xFFFF6B6B)),
+    _IslandNavItem(emoji: '📚', label: 'Learn', activeColor: Color(0xFF6A11CB)),
+    _IslandNavItem(emoji: '🎮', label: 'Play', activeColor: Color(0xFFF09819)),
+    _IslandNavItem(emoji: '🌐', label: 'Translate', activeColor: Color(0xFFff0844)),
+    _IslandNavItem(emoji: '🧭', label: 'Explore', activeColor: Color(0xFF4A148C)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.9), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(_items.length, (index) {
+          final item = _items[index];
+          final isActive = currentIndex == index;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onTap(index),
+              behavior: HitTestBehavior.opaque,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutBack,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? item.activeColor.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AnimatedScale(
+                      scale: isActive ? 1.2 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(
+                        item.emoji,
+                        style: const TextStyle(fontSize: 22),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: TextStyle(
+                        color: isActive ? item.activeColor : Colors.black45,
+                        fontSize: isActive ? 10 : 9,
+                        fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                        letterSpacing: isActive ? 0.3 : 0,
+                      ),
+                      child: Text(item.label),
+                    ),
+                    const SizedBox(height: 3),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      height: 3,
+                      width: isActive ? 18 : 0,
+                      decoration: BoxDecoration(
+                        color: item.activeColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _IslandNavItem {
+  final String emoji;
+  final String label;
+  final Color activeColor;
+  const _IslandNavItem({required this.emoji, required this.label, required this.activeColor});
+}
+
