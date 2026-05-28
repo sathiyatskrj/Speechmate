@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,21 +8,7 @@ import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/nicobarese_keyboard.dart';
 import 'package:speechmate/widgets/anim/confetti_overlay.dart';
-
-// ────── DUOLINGO-STYLE VIBRANT LIGHT PALETTE ──────
-class _DuoColors {
-  static const bg = Color(0xFFF7F7F7);
-  static const white = Color(0xFFFFFFFF);
-  static const green = Color(0xFF58CC02);
-  static const blue = Color(0xFF1CB0F6);
-  static const orange = Color(0xFFFF9600);
-  static const yellow = Color(0xFFFFC800);
-  static const teal = Color(0xFF00CD9C);
-  static const textDark = Color(0xFF3C3C3C);
-  static const textMuted = Color(0xFF777777);
-  static const border = Color(0xFFE5E5E5);
-  static const cardShadow = Color(0x0A000000);
-}
+import 'package:speechmate/core/app_colors.dart';
 
 class ChatTranslateScreen extends StatefulWidget {
   const ChatTranslateScreen({super.key});
@@ -57,7 +43,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       if (mounted) {
         setState(() {
           messages.add({
-            "text": "👋 Hello! I'm your SpeechMate translation assistant. Type any word, phrase, or sentence to translate!",
+            "text": "ðŸ‘‹ Hello! I'm your SpeechMate translation assistant. Type any word, phrase, or sentence to translate!",
             "type": "bot",
             "timestamp": DateTime.now(),
           });
@@ -104,7 +90,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
     var result = await dictionaryService.searchWord(input);
 
     String responseText;
-    String emoji = "💬";
+    String emoji = "ðŸ’¬";
 
     // 2. Fallback to Neural Engine for sentences/phrases
     if (result == null) {
@@ -122,18 +108,18 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
       final isNicobarese = result['nicobarese'].toString().toLowerCase() == input.toLowerCase();
       
       if (result.containsKey('generated')) {
-          responseText = "✨ ${result['nicobarese']}\n\n🤖 AI Phrase Translation";
-          emoji = "🤖";
+          responseText = "âœ¨ ${result['nicobarese']}\n\nðŸ¤– AI Phrase Translation";
+          emoji = "ðŸ¤–";
       } else if (isNicobarese) {
-        responseText = "✨ ${result['english']}\n\n🔤 English Translation";
-        emoji = "🌴";
+        responseText = "âœ¨ ${result['english']}\n\nðŸ”¤ English Translation";
+        emoji = "ðŸŒ´";
       } else {
-        responseText = "✨ ${result['nicobarese']}\n\n🌴 Nicobarese Translation";
-        emoji = "📚";
+        responseText = "âœ¨ ${result['nicobarese']}\n\nðŸŒ´ Nicobarese Translation";
+        emoji = "ðŸ“š";
       }
     } else {
-      responseText = "🤔 Hmm, I couldn't find a direct translation in the offline dictionary. Try phrasing it differently!";
-      emoji = "❓";
+      responseText = "ðŸ¤” Hmm, I couldn't find a direct translation in the offline dictionary. Try phrasing it differently!";
+      emoji = "â“";
     }
 
     if (mounted) {
@@ -192,12 +178,12 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
         final messagePadding = isSmallScreen ? 12.0 : 14.0;
         
         return Scaffold(
-          backgroundColor: _DuoColors.bg,
+          backgroundColor: AndamanPalette.sandWhite,
           appBar: AppBar(
-            backgroundColor: _DuoColors.white,
-            foregroundColor: _DuoColors.textDark,
+            backgroundColor: AndamanPalette.white,
+            foregroundColor: AndamanPalette.stone,
             elevation: 0,
-            shape: const Border(bottom: BorderSide(color: _DuoColors.border, width: 2)),
+            shape: const Border(bottom: BorderSide(color: AndamanPalette.border, width: 2)),
             centerTitle: true,
             title: Row(
               mainAxisSize: MainAxisSize.min,
@@ -205,7 +191,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                 Container(
                   width: 8, height: 8,
                   decoration: const BoxDecoration(
-                    color: _DuoColors.green,
+                    color: AndamanPalette.oceanTeal,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -213,20 +199,20 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                 Text("Chat Translator", style: GoogleFonts.outfit(
                   fontWeight: FontWeight.w800,
                   fontSize: 20,
-                  color: _DuoColors.textDark,
+                  color: AndamanPalette.stone,
                 )),
               ],
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.info_outline_rounded, color: _DuoColors.textMuted),
+                icon: const Icon(Icons.info_outline_rounded, color: AndamanPalette.mist),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      backgroundColor: _DuoColors.textDark,
+                      backgroundColor: AndamanPalette.stone,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      content: Text('💡 Tip: Try writing full sentences in English!', style: GoogleFonts.inter(fontSize: 13, color: Colors.white)),
+                      content: Text('ðŸ’¡ Tip: Try writing full sentences in English!', style: GoogleFonts.inter(fontSize: 13, color: Colors.white)),
                     ),
                   );
                 },
@@ -250,7 +236,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
 
                         final msg = messages[index];
                         final isUser = msg['type'] == 'user';
-                        final emoji = msg['emoji'] ?? (isUser ? '👤' : '🤖');
+                        final emoji = msg['emoji'] ?? (isUser ? 'ðŸ‘¤' : 'ðŸ¤–');
 
                         return Align(
                           alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -264,7 +250,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: const BoxDecoration(
-                                      color: _DuoColors.white,
+                                      color: AndamanPalette.white,
                                       shape: BoxShape.circle,
                                     ),
                                     child: Text(emoji, style: const TextStyle(fontSize: 18)),
@@ -276,7 +262,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                     constraints: BoxConstraints(maxWidth: messageMaxWidth),
                                     padding: EdgeInsets.all(messagePadding),
                                     decoration: BoxDecoration(
-                                      color: isUser ? _DuoColors.blue : _DuoColors.white,
+                                      color: isUser ? AndamanPalette.oceanTeal : AndamanPalette.white,
                                       borderRadius: BorderRadius.only(
                                         topLeft: const Radius.circular(18),
                                         topRight: const Radius.circular(18),
@@ -284,12 +270,12 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                         bottomRight: Radius.circular(isUser ? 4 : 18),
                                       ),
                                       border: Border.all(
-                                        color: isUser ? Colors.transparent : _DuoColors.border,
+                                        color: isUser ? Colors.transparent : AndamanPalette.border,
                                         width: 2,
                                       ),
                                       boxShadow: const [
                                         BoxShadow(
-                                          color: _DuoColors.cardShadow,
+                                          color: AndamanPalette.shadow,
                                           blurRadius: 6,
                                           offset: Offset(0, 3),
                                         ),
@@ -298,7 +284,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                     child: Text(
                                       msg['text']!,
                                       style: GoogleFonts.inter(
-                                        color: isUser ? Colors.white : _DuoColors.textDark,
+                                        color: isUser ? Colors.white : AndamanPalette.stone,
                                         fontSize: messageFontSize,
                                         fontWeight: isUser ? FontWeight.w700 : FontWeight.w600,
                                         height: 1.4,
@@ -313,12 +299,12 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                   Container(
                                     width: 32, height: 32,
                                     decoration: BoxDecoration(
-                                      color: _DuoColors.white,
+                                      color: AndamanPalette.white,
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: _DuoColors.border, width: 2),
+                                      border: Border.all(color: AndamanPalette.border, width: 2),
                                     ),
                                     child: IconButton(
-                                      icon: const Icon(Icons.volume_up_rounded, size: 16, color: _DuoColors.blue),
+                                      icon: const Icon(Icons.volume_up_rounded, size: 16, color: AndamanPalette.oceanTeal),
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
                                         final word = msg['word_data'];
@@ -332,12 +318,12 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                   Container(
                                     width: 32, height: 32,
                                     decoration: BoxDecoration(
-                                      color: _DuoColors.white,
+                                      color: AndamanPalette.white,
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: _DuoColors.border, width: 2),
+                                      border: Border.all(color: AndamanPalette.border, width: 2),
                                     ),
                                     child: IconButton(
-                                      icon: const Icon(Icons.bookmark_add_rounded, size: 16, color: _DuoColors.orange),
+                                      icon: const Icon(Icons.bookmark_add_rounded, size: 16, color: AndamanPalette.amber),
                                       padding: EdgeInsets.zero,
                                       onPressed: () async {
                                         final word = msg['word_data'];
@@ -348,7 +334,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                             if (context.mounted) {
                                               ScaffoldMessenger.of(context).showSnackBar(
                                                 const SnackBar(
-                                                  content: Text('Saved to your Flashcards! 📚'),
+                                                  content: Text('Saved to your Flashcards! ðŸ“š'),
                                                   behavior: SnackBarBehavior.floating,
                                                 ),
                                               );
@@ -363,7 +349,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: const BoxDecoration(
-                                      color: _DuoColors.white,
+                                      color: AndamanPalette.white,
                                       shape: BoxShape.circle,
                                     ),
                                     child: Text(emoji, style: const TextStyle(fontSize: 18)),
@@ -384,29 +370,29 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                       vertical: isSmallScreen ? 8 : 10,
                     ),
                     decoration: const BoxDecoration(
-                      color: _DuoColors.white,
-                      border: Border(top: BorderSide(color: _DuoColors.border, width: 2)),
+                      color: AndamanPalette.white,
+                      border: Border(top: BorderSide(color: AndamanPalette.border, width: 2)),
                     ),
                     child: Row(
                       children: [
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: _DuoColors.bg,
+                              color: AndamanPalette.sandWhite,
                               borderRadius: BorderRadius.circular(24),
-                              border: Border.all(color: _DuoColors.border, width: 2),
+                              border: Border.all(color: AndamanPalette.border, width: 2),
                             ),
                             child: TextField(
                               controller: controller,
                               focusNode: _focusNode,
                               readOnly: _showCustomKeyboard,
                               showCursor: true,
-                              cursorColor: _DuoColors.blue,
+                              cursorColor: AndamanPalette.oceanTeal,
                               decoration: InputDecoration(
                                 hintText: "Type a word, phrase, or sentence...",
                                 hintStyle: GoogleFonts.inter(
                                   fontSize: isSmallScreen ? 13 : 14,
-                                  color: _DuoColors.textMuted,
+                                  color: AndamanPalette.mist,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 border: InputBorder.none,
@@ -416,7 +402,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                                 ),
                                 suffixIcon: controller.text.isNotEmpty
                                     ? IconButton(
-                                        icon: const Icon(Icons.clear_rounded, size: 18, color: _DuoColors.textMuted),
+                                        icon: const Icon(Icons.clear_rounded, size: 18, color: AndamanPalette.mist),
                                         onPressed: () {
                                           setState(() => controller.clear());
                                         },
@@ -425,7 +411,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                               ),
                               style: GoogleFonts.inter(
                                 fontSize: isSmallScreen ? 14 : 15,
-                                color: _DuoColors.textDark,
+                                color: AndamanPalette.stone,
                                 fontWeight: FontWeight.w600,
                               ),
                               onChanged: (value) {
@@ -438,7 +424,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                         const SizedBox(width: 8),
                         Container(
                           decoration: const BoxDecoration(
-                            color: _DuoColors.green,
+                            color: AndamanPalette.oceanTeal,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -460,7 +446,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
                         IconButton(
                           icon: Icon(
                             _showCustomKeyboard ? Icons.keyboard_hide : Icons.keyboard, 
-                            color: _DuoColors.blue,
+                            color: AndamanPalette.oceanTeal,
                           ),
                           onPressed: () {
                              setState(() {
@@ -502,9 +488,9 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: _DuoColors.white,
+          color: AndamanPalette.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _DuoColors.border, width: 2),
+          border: Border.all(color: AndamanPalette.border, width: 2),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -532,7 +518,7 @@ class _ChatTranslateScreenState extends State<ChatTranslateScreen> with TickerPr
             width: 8,
             height: 8,
             decoration: const BoxDecoration(
-              color: _DuoColors.blue,
+              color: AndamanPalette.oceanTeal,
               shape: BoxShape.circle,
             ),
           ),

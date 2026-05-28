@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
-import 'package:speechmate/screens/chat_translate_screen.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
 import 'package:speechmate/screens/camera_translation_screen.dart';
 import 'package:speechmate/screens/dialect_comparison_screen.dart';
@@ -18,24 +17,12 @@ import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/native_edge_service.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
+import 'package:speechmate/core/app_colors.dart';
 
-// ────── DUOLINGO-STYLE VIBRANT LIGHT PALETTE ──────
-class _DuoColors {
-  static const bg = Color(0xFFF7F7F7);
-  static const white = Color(0xFFFFFFFF);
-  static const green = Color(0xFF58CC02);
-  static const greenDark = Color(0xFF4CAD00);
-  static const blue = Color(0xFF1CB0F6);
-  static const purple = Color(0xFFCE82FF);
-  static const red = Color(0xFFFF4B4B);
-  static const orange = Color(0xFFFF9600);
-  static const yellow = Color(0xFFFFC800);
-  static const teal = Color(0xFF00CD9C);
-  static const textDark = Color(0xFF3C3C3C);
-  static const textMuted = Color(0xFF777777);
-  static const border = Color(0xFFE5E5E5);
-  static const cardShadow = Color(0x14000000);
-}
+// ────────────────────────────────────────────────────────────────────────────
+// EXPLORER DASHBOARD — Andaman Coastal Design
+// 6-zone layout: Status → Hero Strip → Quick Phrases → Word of Day → Bento → Nav
+// ────────────────────────────────────────────────────────────────────────────
 
 class ExplorerDashboard extends StatefulWidget {
   const ExplorerDashboard({super.key});
@@ -48,7 +35,7 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
   Map<String, dynamic>? _wordOfDay;
   final TtsService _ttsService = TtsService();
 
-  // VC control dashboard state (moved to settings dialog)
+  // VC control dashboard state (hidden behind developer mode)
   bool _teeVaultSealed = true;
   bool _batSyncListening = false;
   int _meshNodeCount = 3;
@@ -56,14 +43,16 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
   bool _gpuComputeAccelerated = true;
   double _signalStrength = -42.5;
   double _ambientLux = 120.0;
+  int _versionTapCount = 0;
 
   final List<Map<String, dynamic>> _quickPhrases = [
-    {'emoji': '👋', 'label': 'Hello', 'nicobarese': 'Musté', 'english': 'Hello'},
-    {'emoji': '🍚', 'label': 'Water', 'nicobarese': 'Mak', 'english': 'Water'},
-    {'emoji': '🗺️', 'label': 'Where', 'nicobarese': 'Inta', 'english': 'Where'},
-    {'emoji': '🆘', 'label': 'Help', 'nicobarese': 'Takanam', 'english': 'Help'},
-    {'emoji': '🙏', 'label': 'Thanks', 'nicobarese': 'Asé', 'english': 'Thank you'},
-    {'emoji': '🏠', 'label': 'House', 'nicobarese': 'Hīn', 'english': 'House'},
+    {'emoji': '👋', 'label': 'Hello', 'nicobarese': 'Musté', 'english': 'Hello', 'isEmergency': false},
+    {'emoji': '🙏', 'label': 'Thank you', 'nicobarese': 'Asé', 'english': 'Thank you', 'isEmergency': false},
+    {'emoji': '🗺️', 'label': 'Where is...?', 'nicobarese': 'Inta', 'english': 'Where', 'isEmergency': false},
+    {'emoji': '💰', 'label': 'How much?', 'nicobarese': 'Taka-inta', 'english': 'How much', 'isEmergency': false},
+    {'emoji': '🆘', 'label': 'Help!', 'nicobarese': 'Takanam', 'english': 'Help', 'isEmergency': true},
+    {'emoji': '🍚', 'label': 'Water', 'nicobarese': 'Mak', 'english': 'Water', 'isEmergency': false},
+    {'emoji': '🏠', 'label': 'House', 'nicobarese': 'Hīn', 'english': 'House', 'isEmergency': false},
   ];
 
   @override
@@ -89,71 +78,75 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _DuoColors.bg,
+      backgroundColor: AndamanPalette.sandWhite,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
+            // Zone 1: Header + Status
             SliverToBoxAdapter(child: _buildHeader()),
-            SliverToBoxAdapter(child: _buildStreakBar()),
+            SliverToBoxAdapter(child: _buildStatusBar()),
+            // Zone 2: Hero Translate Strip
+            SliverToBoxAdapter(child: _buildHeroStrip()),
+            // Zone 3: Quick Phrases
+            SliverToBoxAdapter(child: _buildQuickPhrases()),
+            // Zone 4: Word of the Day
             if (_wordOfDay != null)
               SliverToBoxAdapter(child: _buildWordOfDay()),
-            SliverToBoxAdapter(child: _buildQuickPhrases()),
-            SliverToBoxAdapter(child: _buildSectionLabel('EXPLORER TOOLS')),
-            SliverToBoxAdapter(child: _buildToolsGrid()),
+            // Zone 5: Bento Grid
+            SliverToBoxAdapter(child: _buildSectionLabel('EXPLORE')),
+            SliverToBoxAdapter(child: _buildBentoGrid()),
             SliverToBoxAdapter(child: _buildSectionLabel('DISCOVER')),
             SliverToBoxAdapter(child: _buildDiscoverGrid()),
-            const SliverToBoxAdapter(child: SizedBox(height: 40)),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
       ),
     );
   }
 
-  // ────── HEADER ──────
+  // ══════════════════════════════════════════════════════════════════════════
+  // ZONE 1: HEADER
+  // ══════════════════════════════════════════════════════════════════════════
+
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
         children: [
           // Logo
           Container(
-            width: 48, height: 48,
+            width: 44, height: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: _DuoColors.green,
+              color: AndamanPalette.oceanTeal,
               boxShadow: [
-                BoxShadow(color: _DuoColors.green.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4)),
+                BoxShadow(color: AndamanPalette.oceanTeal.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 3)),
               ],
             ),
             child: ClipOval(
               child: Image.asset('assets/icons/logo_main.png', fit: BoxFit.cover,
-                errorBuilder: (c, o, s) => const Icon(Icons.language, color: Colors.white, size: 24)),
+                errorBuilder: (c, o, s) => const Icon(Icons.language, color: Colors.white, size: 22)),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('SpeechMate', style: GoogleFonts.outfit(
-                  fontSize: 24, fontWeight: FontWeight.w800, color: _DuoColors.textDark,
+                  fontSize: 22, fontWeight: FontWeight.w600, color: AndamanPalette.stone,
                 )),
                 Text('Explorer Edition', style: GoogleFonts.inter(
-                  fontSize: 11, fontWeight: FontWeight.w600, color: _DuoColors.textMuted, letterSpacing: 1.5,
+                  fontSize: 11, fontWeight: FontWeight.w500, color: AndamanPalette.mist, letterSpacing: 0.5,
                 )),
               ],
             ),
           ),
-          // Settings gear (contains VC Command Center)
           _buildHeaderButton(Icons.settings_rounded, () => _showSettingsDialog()),
-          const SizedBox(width: 8),
-          _buildHeaderButton(Icons.info_outline_rounded, () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
-          }),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1);
+    ).animate().fadeIn(duration: 300.ms);
   }
 
   Widget _buildHeaderButton(IconData icon, VoidCallback onTap) {
@@ -162,57 +155,60 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: _DuoColors.white,
+          color: AndamanPalette.mangrove,
           shape: BoxShape.circle,
-          border: Border.all(color: _DuoColors.border, width: 2),
-          boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 2))],
+          border: Border.all(color: AndamanPalette.border, width: 1),
         ),
-        child: Icon(icon, color: _DuoColors.textMuted, size: 20),
+        child: Icon(icon, color: AndamanPalette.mist, size: 20),
       ),
     );
   }
 
-  // ────── STREAK / GAMIFICATION BAR ──────
-  Widget _buildStreakBar() {
+  // ══════════════════════════════════════════════════════════════════════════
+  // ZONE 1B: STATUS BAR
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildStatusBar() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
       child: Row(
         children: [
-          // Offline badge
+          // Offline ready badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: _DuoColors.green.withOpacity(0.12),
+              color: AndamanPalette.emeraldSoft,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _DuoColors.green.withOpacity(0.3)),
+              border: Border.all(color: AndamanPalette.emerald.withOpacity(0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(width: 8, height: 8,
-                  decoration: const BoxDecoration(color: _DuoColors.green, shape: BoxShape.circle)),
+                Container(width: 6, height: 6,
+                  decoration: const BoxDecoration(color: AndamanPalette.emerald, shape: BoxShape.circle)),
                 const SizedBox(width: 6),
-                Text('Fully Offline', style: GoogleFonts.outfit(
-                  fontSize: 11, fontWeight: FontWeight.w700, color: _DuoColors.green,
+                Text('Offline ready', style: GoogleFonts.inter(
+                  fontSize: 11, fontWeight: FontWeight.w500, color: AndamanPalette.emerald,
                 )),
               ],
             ),
           ),
           const Spacer(),
-          // Nicobarese tag
+          // Language chip
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [_DuoColors.orange, _DuoColors.yellow]),
+              color: AndamanPalette.oceanTealSoft,
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AndamanPalette.borderTeal),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('🌴', style: TextStyle(fontSize: 14)),
+                const Text('🌴', style: TextStyle(fontSize: 12)),
                 const SizedBox(width: 4),
-                Text('Nicobarese', style: GoogleFonts.outfit(
-                  fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white,
+                Text('Nicobarese', style: GoogleFonts.inter(
+                  fontSize: 11, fontWeight: FontWeight.w500, color: AndamanPalette.oceanTeal,
                 )),
               ],
             ),
@@ -222,13 +218,154 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
     ).animate().fadeIn(delay: 100.ms);
   }
 
-  // ────── WORD OF THE DAY ──────
+  // ══════════════════════════════════════════════════════════════════════════
+  // ZONE 2: HERO TRANSLATE STRIP
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildHeroStrip() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+      child: Row(
+        children: [
+          // Speak button — primary action
+          Expanded(
+            child: TapScale(
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen()));
+              },
+              child: Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AndamanPalette.oceanTeal,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(color: AndamanPalette.oceanTeal.withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.mic_rounded, color: Colors.white, size: 22),
+                    const SizedBox(width: 8),
+                    Text('Speak', style: GoogleFonts.outfit(
+                      fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white,
+                    )),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Scan button — secondary action
+          Expanded(
+            child: TapScale(
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraTranslationScreen()));
+              },
+              child: Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AndamanPalette.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AndamanPalette.oceanTeal, width: 1.5),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.document_scanner_rounded, color: AndamanPalette.oceanTeal, size: 22),
+                    const SizedBox(width: 8),
+                    Text('Scan', style: GoogleFonts.outfit(
+                      fontSize: 16, fontWeight: FontWeight.w500, color: AndamanPalette.oceanTeal,
+                    )),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(delay: 150.ms).slideY(begin: 0.05);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ZONE 3: QUICK PHRASES
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildQuickPhrases() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          child: Text('SURVIVAL PHRASES', style: GoogleFonts.inter(
+            fontSize: 11, fontWeight: FontWeight.w600, color: AndamanPalette.mist, letterSpacing: 1.5,
+          )),
+        ),
+        SizedBox(
+          height: 44,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: _quickPhrases.length,
+            itemBuilder: (context, i) {
+              final p = _quickPhrases[i];
+              final isEmergency = p['isEmergency'] == true;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: TapScale(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    _ttsService.speakNicobarese(p['nicobarese'], englishWord: p['english']);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isEmergency ? AndamanPalette.reefCoralSoft : AndamanPalette.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isEmergency ? AndamanPalette.reefCoral.withOpacity(0.4) : AndamanPalette.border,
+                        width: isEmergency ? 1.5 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isEmergency ? Icons.warning_amber_rounded : Icons.volume_up_rounded,
+                          size: 14,
+                          color: isEmergency ? AndamanPalette.reefCoral : AndamanPalette.oceanTeal,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(p['label'], style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: isEmergency ? FontWeight.w600 : FontWeight.w500,
+                          color: isEmergency ? AndamanPalette.reefCoral : AndamanPalette.stone,
+                        )),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    ).animate().fadeIn(delay: 200.ms);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ZONE 4: WORD OF THE DAY
+  // ══════════════════════════════════════════════════════════════════════════
+
   Widget _buildWordOfDay() {
     final word = _wordOfDay!;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       child: TapScale(
         onTap: () {
+          HapticFeedback.lightImpact();
           _ttsService.speakNicobarese(
             word['nicobarese'] ?? '',
             englishWord: word['english'] ?? '',
@@ -237,15 +374,14 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: _DuoColors.white,
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: _DuoColors.border, width: 2),
-            boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 12, offset: Offset(0, 4))],
+            color: AndamanPalette.mangrove,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AndamanPalette.borderTeal, width: 1),
           ),
           child: Row(
             children: [
-              Text(word['emoji'] ?? '🌊', style: const TextStyle(fontSize: 40)),
-              const SizedBox(width: 16),
+              Text(word['emoji'] ?? '🌊', style: const TextStyle(fontSize: 36)),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,172 +389,104 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: _DuoColors.yellow.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
+                        color: AndamanPalette.amberSoft,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text('WORD OF THE DAY', style: GoogleFonts.outfit(
-                        fontSize: 9, fontWeight: FontWeight.w800, color: _DuoColors.orange, letterSpacing: 1.5,
+                      child: Text('WORD OF THE DAY', style: GoogleFonts.inter(
+                        fontSize: 9, fontWeight: FontWeight.w600, color: AndamanPalette.amber, letterSpacing: 1,
                       )),
                     ),
                     const SizedBox(height: 6),
                     Text(word['english'] ?? '', style: GoogleFonts.outfit(
-                      fontSize: 22, fontWeight: FontWeight.w800, color: _DuoColors.textDark,
+                      fontSize: 20, fontWeight: FontWeight.w500, color: AndamanPalette.stone,
                     )),
+                    const SizedBox(height: 2),
                     Text(word['nicobarese'] ?? '', style: GoogleFonts.inter(
-                      fontSize: 16, fontWeight: FontWeight.w600, color: _DuoColors.teal,
+                      fontSize: 15, fontWeight: FontWeight.w500, color: AndamanPalette.oceanTeal,
                     )),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _DuoColors.blue.withOpacity(0.1),
+                  color: AndamanPalette.oceanTealSoft,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.volume_up_rounded, color: _DuoColors.blue, size: 24),
+                child: const Icon(Icons.volume_up_rounded, color: AndamanPalette.oceanTeal, size: 22),
               ),
             ],
           ),
         ),
       ),
-    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.05);
+    ).animate().fadeIn(delay: 250.ms).slideY(begin: 0.03);
   }
 
-  // ────── QUICK SURVIVAL PHRASES ──────
-  Widget _buildQuickPhrases() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
-          child: Text('SURVIVAL PHRASES', style: GoogleFonts.outfit(
-            fontSize: 12, fontWeight: FontWeight.w800, color: _DuoColors.textMuted, letterSpacing: 2,
-          )),
-        ),
-        SizedBox(
-          height: 90,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _quickPhrases.length,
-            itemBuilder: (context, i) {
-              final p = _quickPhrases[i];
-              final colors = [
-                _DuoColors.green, _DuoColors.blue, _DuoColors.purple,
-                _DuoColors.red, _DuoColors.orange, _DuoColors.teal,
-              ];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: TapScale(
-                  onTap: () {
-                    _ttsService.speakNicobarese(p['nicobarese'], englishWord: p['english']);
-                  },
-                  child: Container(
-                    width: 115,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: _DuoColors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: colors[i % colors.length].withOpacity(0.3), width: 2),
-                      boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 3))],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('${p['emoji']} ${p['label']}', style: GoogleFonts.outfit(
-                          fontSize: 13, fontWeight: FontWeight.w700, color: _DuoColors.textDark,
-                        )),
-                        const SizedBox(height: 4),
-                        Text('${p['nicobarese']}', style: GoogleFonts.inter(
-                          fontSize: 12, fontWeight: FontWeight.w600, color: colors[i % colors.length],
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
-              ).animate().fadeIn(delay: (150 + i * 60).ms).slideX(begin: 0.1);
-            },
-          ),
-        ),
-      ],
-    );
-  }
+  // ══════════════════════════════════════════════════════════════════════════
+  // ZONE 5: ASYMMETRIC BENTO GRID
+  // ══════════════════════════════════════════════════════════════════════════
 
-  // ────── SECTION LABEL ──────
   Widget _buildSectionLabel(String label) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 10),
-      child: Text(label, style: GoogleFonts.outfit(
-        fontSize: 13, fontWeight: FontWeight.w800, color: _DuoColors.textMuted, letterSpacing: 2.5,
+      child: Text(label, style: GoogleFonts.inter(
+        fontSize: 11, fontWeight: FontWeight.w600, color: AndamanPalette.mist, letterSpacing: 1.5,
       )),
     );
   }
 
-  // ────── TOOLS BENTO GRID (Duolingo-style) ──────
-  Widget _buildToolsGrid() {
-    final tools = [
-      _ToolItem('Voice\nTranslate', Icons.mic_rounded, _DuoColors.green, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceTranslatorScreen()));
-      }),
-      _ToolItem('Text\nTranslate', Icons.translate_rounded, _DuoColors.blue, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatTranslateScreen()));
-      }),
-      _ToolItem('GA Hub', Icons.terrain_rounded, _DuoColors.orange, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const GAHubScreen()));
-      }),
-      _ToolItem('Image\nScanner', Icons.document_scanner_rounded, _DuoColors.purple, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraTranslationScreen()));
-      }),
-      _ToolItem('Dialects', Icons.compare_arrows_rounded, _DuoColors.yellow, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen()));
-      }),
-      _ToolItem('Documents', Icons.auto_stories_rounded, _DuoColors.teal, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentTranslationHub()));
-      }),
-    ];
-
+  Widget _buildBentoGrid() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
-          // Row 1: Voice (wide) + Text
+          // Row 1: GA Hub (wide) + Dialects
           Row(children: [
-            Expanded(flex: 2, child: _buildToolCard(tools[0], height: 130)),
+            Expanded(flex: 2, child: _buildBentoCard(
+              'GA Hub', 'Great Andamanese', Icons.terrain_rounded, AndamanPalette.bentoAmber, 120,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GAHubScreen())),
+            )),
             const SizedBox(width: 10),
-            Expanded(flex: 1, child: _buildToolCard(tools[1], height: 130)),
+            Expanded(flex: 1, child: _buildBentoCard(
+              'Dialects', null, Icons.compare_arrows_rounded, AndamanPalette.bentoPurple, 120,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DialectComparisonScreen())),
+            )),
           ]),
           const SizedBox(height: 10),
-          // Row 2: GA + AR + Dialects
+          // Row 2: Voice Vault + Documents + Community
           Row(children: [
-            Expanded(child: _buildToolCard(tools[2], height: 110)),
+            Expanded(child: _buildBentoCard(
+              'Voice\nVault', null, Icons.record_voice_over_rounded, AndamanPalette.bentoSky, 100,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen())),
+            )),
             const SizedBox(width: 10),
-            Expanded(child: _buildToolCard(tools[3], height: 110)),
+            Expanded(child: _buildBentoCard(
+              'Documents', null, Icons.auto_stories_rounded, AndamanPalette.bentoEmerald, 100,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentTranslationHub())),
+            )),
             const SizedBox(width: 10),
-            Expanded(child: _buildToolCard(tools[4], height: 110)),
+            Expanded(child: _buildBentoCard(
+              'Community', null, Icons.people_rounded, AndamanPalette.bentoCoral, 100,
+              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CommunityScreen())),
+            )),
           ]),
-          const SizedBox(height: 10),
-          // Row 3: Documents (wide)
-          _buildToolCard(tools[5], height: 85, fullWidth: true),
         ],
       ),
     ).animate().fadeIn(delay: 300.ms);
   }
 
-  Widget _buildToolCard(_ToolItem item, {required double height, bool fullWidth = false}) {
+  Widget _buildBentoCard(String title, String? subtitle, IconData icon, Color accent, double height, VoidCallback onTap) {
     return TapScale(
-      onTap: item.onTap,
+      onTap: onTap,
       child: Container(
         height: height,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: _DuoColors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: item.color.withOpacity(0.25), width: 2.5),
+          color: AndamanPalette.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AndamanPalette.border, width: 1),
           boxShadow: [
-            BoxShadow(color: item.color.withOpacity(0.12), blurRadius: 14, offset: const Offset(0, 5)),
-            const BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 2)),
+            BoxShadow(color: AndamanPalette.shadow, blurRadius: 8, offset: const Offset(0, 2)),
           ],
         ),
         child: Column(
@@ -426,36 +494,48 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: item.color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(14),
+                color: accent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(item.icon, color: item.color, size: 26),
+              child: Icon(icon, color: accent, size: 22),
             ),
-            Text(item.label, style: GoogleFonts.outfit(
-              fontSize: 14, fontWeight: FontWeight.w700, color: _DuoColors.textDark, height: 1.2,
-            )),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: GoogleFonts.outfit(
+                  fontSize: 13, fontWeight: FontWeight.w500, color: AndamanPalette.stone, height: 1.2,
+                )),
+                if (subtitle != null)
+                  Text(subtitle, style: GoogleFonts.inter(
+                    fontSize: 10, color: AndamanPalette.mist,
+                  )),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
-  // ────── DISCOVER GRID ──────
+  // ══════════════════════════════════════════════════════════════════════════
+  // DISCOVER GRID
+  // ══════════════════════════════════════════════════════════════════════════
+
   Widget _buildDiscoverGrid() {
     final items = [
-      _DiscoverItem('Culture Hub', Icons.auto_awesome, _DuoColors.red, () {
+      _DiscoverItem('Culture', Icons.auto_awesome, AndamanPalette.bentoCoral, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const CultureScreen()));
       }),
-      _DiscoverItem('Voice Vault', Icons.record_voice_over, _DuoColors.purple, () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceVaultScreen()));
-      }),
-      _DiscoverItem('Languages', Icons.language_rounded, _DuoColors.blue, () {
+      _DiscoverItem('Languages', Icons.language_rounded, AndamanPalette.bentoSky, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const Languages()));
       }),
-      _DiscoverItem('Feedback', Icons.chat_bubble_outline, _DuoColors.green, () {
+      _DiscoverItem('Feedback', Icons.chat_bubble_outline, AndamanPalette.bentoEmerald, () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => const FeedbackScreen()));
+      }),
+      _DiscoverItem('About', Icons.info_outline_rounded, AndamanPalette.mist, () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
       }),
     ];
 
@@ -468,13 +548,12 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
             child: TapScale(
               onTap: item.onTap,
               child: Container(
-                height: 95,
+                height: 84,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _DuoColors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: item.color.withOpacity(0.2), width: 2),
-                  boxShadow: const [BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 3))],
+                  color: AndamanPalette.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AndamanPalette.border, width: 1),
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -485,11 +564,11 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
                         color: item.color.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(item.icon, color: item.color, size: 22),
+                      child: Icon(item.icon, color: item.color, size: 20),
                     ),
-                    const SizedBox(height: 8),
-                    Text(item.label, style: GoogleFonts.outfit(
-                      fontSize: 11, fontWeight: FontWeight.w700, color: _DuoColors.textDark,
+                    const SizedBox(height: 6),
+                    Text(item.label, style: GoogleFonts.inter(
+                      fontSize: 11, fontWeight: FontWeight.w500, color: AndamanPalette.stone,
                     ), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
@@ -498,12 +577,17 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
           ),
         )).toList(),
       ),
-    ).animate().fadeIn(delay: 400.ms);
+    ).animate().fadeIn(delay: 350.ms);
   }
 
-  // ────── SETTINGS DIALOG (VC Command Center moved here) ──────
+  // ══════════════════════════════════════════════════════════════════════════
+  // SETTINGS DIALOG (VC Console hidden behind 5× version tap)
+  // ══════════════════════════════════════════════════════════════════════════
+
   void _showSettingsDialog() {
     final nativeService = NativeEdgeService();
+    _versionTapCount = 0; // Reset on open
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -514,8 +598,8 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
             return Container(
               constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.75),
               decoration: const BoxDecoration(
-                color: _DuoColors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                color: AndamanPalette.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -524,9 +608,9 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Container(
-                      width: 40, height: 4,
+                      width: 36, height: 4,
                       decoration: BoxDecoration(
-                        color: _DuoColors.border,
+                        color: AndamanPalette.borderStrong,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -535,27 +619,27 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                     child: Row(
                       children: [
-                        const Icon(Icons.settings_rounded, color: _DuoColors.textDark, size: 24),
+                        const Icon(Icons.settings_rounded, color: AndamanPalette.stone, size: 22),
                         const SizedBox(width: 10),
-                        Text('Settings & System', style: GoogleFonts.outfit(
-                          fontSize: 20, fontWeight: FontWeight.w800, color: _DuoColors.textDark,
+                        Text('Settings', style: GoogleFonts.outfit(
+                          fontSize: 20, fontWeight: FontWeight.w500, color: AndamanPalette.stone,
                         )),
                         const Spacer(),
                         GestureDetector(
                           onTap: () => Navigator.pop(context),
                           child: Container(
                             padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: _DuoColors.bg,
+                            decoration: const BoxDecoration(
+                              color: AndamanPalette.mangrove,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.close_rounded, size: 18, color: _DuoColors.textMuted),
+                            child: const Icon(Icons.close_rounded, size: 16, color: AndamanPalette.mist),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Divider(color: _DuoColors.border),
+                  Divider(color: AndamanPalette.border, height: 1),
                   Expanded(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -563,7 +647,6 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // General settings
                           _settingsTile(Icons.info_outline_rounded, 'About SpeechMate', 'Version, credits & licenses', () {
                             Navigator.pop(context);
                             Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
@@ -576,99 +659,34 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
                             Navigator.pop(context);
                             Navigator.push(context, MaterialPageRoute(builder: (_) => const Languages()));
                           }),
-                          const SizedBox(height: 16),
-                          // VC Command Center — collapsed expandable
-                          Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0F172A),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Theme(
-                              data: ThemeData(dividerColor: Colors.transparent),
-                              child: ExpansionTile(
-                                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                                leading: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF38BDF8).withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Icon(Icons.developer_board_rounded, color: Color(0xFF38BDF8), size: 18),
-                                ),
-                                title: Text('Off-Grid VC Command Center', style: GoogleFonts.inter(
-                                  fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white,
-                                )),
-                                subtitle: Text('v2.0 • Advanced system controls', style: GoogleFonts.inter(
-                                  fontSize: 10, color: const Color(0xFF64748B),
-                                )),
-                                iconColor: const Color(0xFF64748B),
-                                collapsedIconColor: const Color(0xFF64748B),
-                                children: [
-                                  _vcInfoRow('GPGPU', _gpuComputeAccelerated ? 'Vulkan Cores: OK' : 'CPU Fallback', const Color(0xFF2DD4BF)),
-                                  _vcInfoRow('TEE VAULT', _teeVaultSealed ? 'AES: SEALED' : 'Vault Open', const Color(0xFFFBBF24)),
-                                  _vcInfoRow('BAT-SYNC', _batSyncListening ? 'Tx: 19.5kHz' : 'Idle', const Color(0xFF38BDF8)),
-                                  _vcInfoRow('CRDT MESH', '$_meshNodeCount Nodes Active', const Color(0xFFEC4899)),
-                                  _vcInfoRow('ECO-DRIVE', 'Beam Width: $_beamWidth • ${_ambientLux}Lux', const Color(0xFFFBBF24)),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () async {
-                                            HapticFeedback.lightImpact();
-                                            final testKey = 'test_hsm_alias';
-                                            await nativeService.teeGenerateKey(testKey);
-                                            final cipher = await nativeService.teeEncryptData(testKey, 'Offgrid VC Node');
-                                            final decrypted = await nativeService.teeDecryptData(testKey, cipher);
-                                            await nativeService.teeDeleteKey(testKey);
-                                            if (context.mounted) {
-                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                backgroundColor: const Color(0xFF1E293B),
-                                                behavior: SnackBarBehavior.floating,
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                content: Text('TEE Cycle OK: "$decrypted"', style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFFFBBF24))),
-                                              ));
-                                            }
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFFFBBF24).withOpacity(0.15),
-                                            foregroundColor: const Color(0xFFFBBF24),
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                            padding: const EdgeInsets.symmetric(vertical: 10),
-                                          ),
-                                          child: Text('TEST CRYPTO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () async {
-                                            HapticFeedback.mediumImpact();
-                                            final width = await nativeService.ecoCalculateBeamWidth(_ambientLux, 15.0);
-                                            setModalState(() {
-                                              _beamWidth = width;
-                                              _ambientLux = _ambientLux > 500 ? 120.0 : 8000.0;
-                                            });
-                                            setState(() {});
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF38BDF8).withOpacity(0.15),
-                                            foregroundColor: const Color(0xFF38BDF8),
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                            padding: const EdgeInsets.symmetric(vertical: 10),
-                                          ),
-                                          child: Text('ADJUST ECO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                          const SizedBox(height: 24),
+                          // Version number — 5× tap to reveal VC Console
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                _versionTapCount++;
+                                if (_versionTapCount >= 5) {
+                                  _versionTapCount = 0;
+                                  setModalState(() {}); // Trigger rebuild to show VC
+                                  HapticFeedback.heavyImpact();
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    backgroundColor: const Color(0xFF0F172A),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    content: Text('🔓 VC Command Center unlocked', style: GoogleFonts.inter(fontSize: 12, color: Colors.white)),
+                                  ));
+                                }
+                              },
+                              child: Text('v1.4.9 · Explorer Edition', style: GoogleFonts.inter(
+                                fontSize: 11, color: AndamanPalette.mistLight,
+                              )),
                             ),
                           ),
+                          // VC Console — only visible after 5× tap
+                          if (_versionTapCount == 0 && _vcUnlocked) ...[
+                            const SizedBox(height: 16),
+                            _buildVCConsole(nativeService, setModalState),
+                          ],
                         ],
                       ),
                     ),
@@ -682,6 +700,103 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
     );
   }
 
+  bool _vcUnlocked = false;
+
+  Widget _buildVCConsole(NativeEdgeService nativeService, StateSetter setModalState) {
+    _vcUnlocked = true;
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Theme(
+        data: ThemeData(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          leading: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF38BDF8).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.developer_board_rounded, color: Color(0xFF38BDF8), size: 18),
+          ),
+          title: Text('Off-Grid VC Command Center', style: GoogleFonts.inter(
+            fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white,
+          )),
+          subtitle: Text('v2.0 • Advanced system controls', style: GoogleFonts.inter(
+            fontSize: 10, color: const Color(0xFF64748B),
+          )),
+          iconColor: const Color(0xFF64748B),
+          collapsedIconColor: const Color(0xFF64748B),
+          children: [
+            _vcInfoRow('GPGPU', _gpuComputeAccelerated ? 'Vulkan Cores: OK' : 'CPU Fallback', const Color(0xFF2DD4BF)),
+            _vcInfoRow('TEE VAULT', _teeVaultSealed ? 'AES: SEALED' : 'Vault Open', const Color(0xFFFBBF24)),
+            _vcInfoRow('BAT-SYNC', _batSyncListening ? 'Tx: 19.5kHz' : 'Idle', const Color(0xFF38BDF8)),
+            _vcInfoRow('CRDT MESH', '$_meshNodeCount Nodes Active', const Color(0xFFEC4899)),
+            _vcInfoRow('ECO-DRIVE', 'Beam Width: $_beamWidth • ${_ambientLux}Lux', const Color(0xFFFBBF24)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      HapticFeedback.lightImpact();
+                      final testKey = 'test_hsm_alias';
+                      await nativeService.teeGenerateKey(testKey);
+                      final cipher = await nativeService.teeEncryptData(testKey, 'Offgrid VC Node');
+                      final decrypted = await nativeService.teeDecryptData(testKey, cipher);
+                      await nativeService.teeDeleteKey(testKey);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          backgroundColor: const Color(0xFF1E293B),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          content: Text('TEE Cycle OK: "$decrypted"', style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFFFBBF24))),
+                        ));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFBBF24).withOpacity(0.15),
+                      foregroundColor: const Color(0xFFFBBF24),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    child: Text('TEST CRYPTO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      HapticFeedback.mediumImpact();
+                      final width = await nativeService.ecoCalculateBeamWidth(_ambientLux, 15.0);
+                      setModalState(() {
+                        _beamWidth = width;
+                        _ambientLux = _ambientLux > 500 ? 120.0 : 8000.0;
+                      });
+                      setState(() {});
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF38BDF8).withOpacity(0.15),
+                      foregroundColor: const Color(0xFF38BDF8),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    child: Text('ADJUST ECO', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _settingsTile(IconData icon, String title, String subtitle, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -691,18 +806,18 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: _DuoColors.bg,
-            borderRadius: BorderRadius.circular(12),
+            color: AndamanPalette.mangrove,
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: _DuoColors.textDark, size: 20),
+          child: Icon(icon, color: AndamanPalette.stone, size: 20),
         ),
         title: Text(title, style: GoogleFonts.outfit(
-          fontSize: 15, fontWeight: FontWeight.w700, color: _DuoColors.textDark,
+          fontSize: 15, fontWeight: FontWeight.w500, color: AndamanPalette.stone,
         )),
         subtitle: Text(subtitle, style: GoogleFonts.inter(
-          fontSize: 12, color: _DuoColors.textMuted,
+          fontSize: 12, color: AndamanPalette.mist,
         )),
-        trailing: const Icon(Icons.chevron_right_rounded, color: _DuoColors.border, size: 22),
+        trailing: const Icon(Icons.chevron_right_rounded, color: AndamanPalette.borderStrong, size: 20),
       ),
     );
   }
@@ -724,14 +839,6 @@ class _ExplorerDashboardState extends State<ExplorerDashboard> {
 }
 
 // ────── DATA CLASSES ──────
-
-class _ToolItem {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-  _ToolItem(this.label, this.icon, this.color, this.onTap);
-}
 
 class _DiscoverItem {
   final String label;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:speechmate/services/tts_service.dart';
+import 'package:speechmate/core/app_colors.dart';
 
 class PhrasebookScreen extends StatefulWidget {
   const PhrasebookScreen({super.key});
@@ -239,12 +241,12 @@ class _PhrasebookScreenState extends State<PhrasebookScreen> {
   ];
 
   final Map<String, Color> _categoryColors = {
-    'Greetings': Colors.purpleAccent,
-    'Directions': Colors.blueAccent,
-    'Market': Colors.orangeAccent,
-    'Medical': Colors.redAccent,
-    'Food': Colors.greenAccent,
-    'Numbers': Colors.tealAccent,
+    'Greetings': AndamanPalette.bentoPurple,
+    'Directions': AndamanPalette.bentoSky,
+    'Market': AndamanPalette.bentoAmber,
+    'Medical': AndamanPalette.bentoCoral,
+    'Food': AndamanPalette.bentoEmerald,
+    'Numbers': AndamanPalette.oceanTeal,
   };
 
   @override
@@ -291,328 +293,332 @@ class _PhrasebookScreenState extends State<PhrasebookScreen> {
     }).toList();
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: AndamanPalette.sandWhite,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'SITUATIONAL PHRASEBOOK',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
+          style: GoogleFonts.outfit(
+            fontWeight: FontWeight.w800,
             letterSpacing: 1.2,
             fontSize: 18,
-            color: Colors.white,
+            color: AndamanPalette.stone,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AndamanPalette.white,
         elevation: 0,
+        shape: const Border(bottom: BorderSide(color: AndamanPalette.border, width: 2)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AndamanPalette.stone),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0F0C1B), // Midnight deep blue
-              Color(0xFF201335), // Royal deep purple
-              Color(0xFF0F0C1B),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Search and Categories Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 0.5),
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (val) {
-                      setState(() {
-                        _searchQuery = val;
-                      });
-                    },
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'Search phrases in Hindi, English, Nicobarese...',
-                      hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 13),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white54),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, color: Colors.white54),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                            )
-                          : null,
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Search and Categories Section
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AndamanPalette.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AndamanPalette.border, width: 2.5),
+                  boxShadow: const [
+                    BoxShadow(color: AndamanPalette.shadow, blurRadius: 10, offset: Offset(0, 3)),
+                  ],
                 ),
-              ),
-
-              // Category Selector (Horizontal Scroll)
-              SizedBox(
-                height: 48,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _categories.length,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  itemBuilder: (context, index) {
-                    final cat = _categories[index];
-                    final isSelected = _selectedCategory == cat;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: ChoiceChip(
-                        label: Text(
-                          cat.toUpperCase(),
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.white70,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        selected: isSelected,
-                        selectedColor: Colors.deepPurpleAccent.withValues(alpha: 0.8),
-                        backgroundColor: Colors.white.withValues(alpha: 0.06),
-                        checkmarkColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(
-                            color: isSelected ? Colors.deepPurpleAccent : Colors.white12,
-                            width: 0.5,
-                          ),
-                        ),
-                        onSelected: (selected) {
-                          if (selected) {
-                            setState(() {
-                              _selectedCategory = cat;
-                            });
-                          }
-                        },
-                      ),
-                    );
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (val) {
+                    setState(() {
+                      _searchQuery = val;
+                    });
                   },
+                  style: GoogleFonts.inter(
+                    color: AndamanPalette.stone,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Search phrases in Hindi, English, Nicobarese...',
+                    hintStyle: GoogleFonts.inter(
+                      color: AndamanPalette.mist,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    prefixIcon: const Icon(Icons.search_rounded, color: AndamanPalette.mist),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, color: AndamanPalette.mist),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                _searchQuery = '';
+                              });
+                            },
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 8),
-
-              // Phrase List
-              Expanded(
-                child: filteredPhrases.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _selectedCategory == 'Favorites' ? Icons.favorite_border : Icons.search_off,
-                              size: 64,
-                              color: Colors.white24,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _selectedCategory == 'Favorites'
-                                  ? 'No bookmarked phrases yet!'
-                                  : 'No matching phrases found.',
-                              style: const TextStyle(color: Colors.white70, fontSize: 16),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _selectedCategory == 'Favorites'
-                                  ? 'Tap the heart icon on any phrase card to save it here.'
-                                  : 'Try adjusting your search criteria.',
-                              style: TextStyle(color: Colors.white30, fontSize: 13),
-                            ),
-                          ],
+            // Category Selector (Horizontal Scroll)
+            SizedBox(
+              height: 56,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _categories.length,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                itemBuilder: (context, index) {
+                  final cat = _categories[index];
+                  final isSelected = _selectedCategory == cat;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: ChoiceChip(
+                      label: Text(
+                        cat.toUpperCase(),
+                        style: GoogleFonts.inter(
+                          color: isSelected ? AndamanPalette.oceanTeal : AndamanPalette.stoneLight,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                          letterSpacing: 0.5,
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: filteredPhrases.length,
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                        itemBuilder: (context, index) {
-                          final phrase = filteredPhrases[index];
-                          final isFav = _favorites.contains(phrase['nicobarese']);
-                          final catColor = _categoryColors[phrase['category']] ?? Colors.deepPurpleAccent;
+                      ),
+                      selected: isSelected,
+                      selectedColor: AndamanPalette.oceanTealSoft,
+                      backgroundColor: AndamanPalette.white,
+                      checkmarkColor: AndamanPalette.oceanTeal,
+                      showCheckmark: false,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: isSelected ? AndamanPalette.borderTeal : AndamanPalette.border,
+                          width: 2,
+                        ),
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            _selectedCategory = cat;
+                          });
+                        }
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
 
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.white.withValues(alpha: 0.05),
-                                  Colors.white.withValues(alpha: 0.02),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.08),
-                                width: 0.8,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.2),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                )
+            const SizedBox(height: 8),
+
+            // Phrase List
+            Expanded(
+              child: filteredPhrases.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _selectedCategory == 'Favorites' ? Icons.favorite_border_rounded : Icons.search_off_rounded,
+                            size: 64,
+                            color: AndamanPalette.mist,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _selectedCategory == 'Favorites'
+                                ? 'No bookmarked phrases yet!'
+                                : 'No matching phrases found.',
+                            style: GoogleFonts.inter(
+                              color: AndamanPalette.stone,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _selectedCategory == 'Favorites'
+                                ? 'Tap the heart icon on any phrase card to save it here.'
+                                : 'Try adjusting your search criteria.',
+                            style: GoogleFonts.inter(
+                              color: AndamanPalette.mist,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: filteredPhrases.length,
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                      itemBuilder: (context, index) {
+                        final phrase = filteredPhrases[index];
+                        final isFav = _favorites.contains(phrase['nicobarese']);
+                        final catColor = _categoryColors[phrase['category']] ?? AndamanPalette.oceanTeal;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: AndamanPalette.white,
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(
+                              color: AndamanPalette.border,
+                              width: 2,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AndamanPalette.shadow,
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              )
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(22),
+                            child: Stack(
+                              children: [
+                                // Colored accent line on the left side
+                                Positioned(
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: 6,
+                                  child: Container(color: catColor),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(22, 16, 16, 16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Header Row: Category Badge + Bookmark
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: catColor.withOpacity(0.12),
+                                              borderRadius: BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: catColor.withOpacity(0.25),
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              phrase['category']!.toUpperCase(),
+                                              style: GoogleFonts.inter(
+                                                color: catColor,
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 9,
+                                                letterSpacing: 0.8,
+                                              ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(
+                                              isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                              color: isFav ? AndamanPalette.reefCoral : AndamanPalette.mistLight,
+                                              size: 22,
+                                            ),
+                                            onPressed: () => _toggleFavorite(phrase['nicobarese']!),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+
+                                      // Nicobarese Phrase
+                                      Text(
+                                        phrase['nicobarese']!,
+                                        style: GoogleFonts.outfit(
+                                          color: AndamanPalette.stone,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 22,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+
+                                      // Phonetic Pronunciation Hint
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '🗣️ "${phrase['phonetic']}"',
+                                        style: GoogleFonts.inter(
+                                          color: AndamanPalette.amber,
+                                          fontStyle: FontStyle.italic,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 12),
+                                      const Divider(color: AndamanPalette.border, thickness: 1.5, height: 1),
+                                      const SizedBox(height: 12),
+
+                                      // Translations Row
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                // English translation
+                                                Text(
+                                                  'EN: ${phrase['english']}',
+                                                  style: GoogleFonts.inter(
+                                                    color: AndamanPalette.stoneLight,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                // Hindi translation
+                                                Text(
+                                                  'HI: ${phrase['hindi']}',
+                                                  style: GoogleFonts.inter(
+                                                    color: AndamanPalette.mist,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // Play Audio Button
+                                          Material(
+                                            color: AndamanPalette.oceanTealSoft,
+                                            shape: const CircleBorder(),
+                                            child: IconButton(
+                                              icon: const Icon(
+                                                Icons.volume_up_rounded,
+                                                color: AndamanPalette.oceanTeal,
+                                                size: 22,
+                                              ),
+                                              onPressed: () {
+                                                _tts.speakNicobarese(
+                                                  phrase['nicobarese']!,
+                                                  englishWord: phrase['english']!,
+                                                  audioCategory: phrase['category']!.toLowerCase() == 'food' ? 'things' : phrase['category']!.toLowerCase(),
+                                                );
+                                              },
+                                            ),
+                                          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
+                                           .shimmer(delay: 5.seconds, duration: 1.5.seconds, color: Colors.white.withOpacity(0.4)),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Stack(
-                                children: [
-                                  // Colored accent line on the left side
-                                  Positioned(
-                                    left: 0,
-                                    top: 0,
-                                    bottom: 0,
-                                    width: 5,
-                                    child: Container(color: catColor),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        // Header Row: Category Badge + Bookmark
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, py: 4),
-                                              decoration: BoxDecoration(
-                                                color: catColor.withValues(alpha: 0.15),
-                                                borderRadius: BorderRadius.circular(10),
-                                                border: Border.all(
-                                                  color: catColor.withValues(alpha: 0.3),
-                                                  width: 0.5,
-                                                ),
-                                              ),
-                                              child: Text(
-                                                phrase['category']!.toUpperCase(),
-                                                style: TextStyle(
-                                                  color: catColor,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 9,
-                                                  letterSpacing: 0.8,
-                                                ),
-                                              ),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(
-                                                isFav ? Icons.favorite : Icons.favorite_border,
-                                                color: isFav ? Colors.redAccent : Colors.white30,
-                                                size: 20,
-                                              ),
-                                              onPressed: () => _toggleFavorite(phrase['nicobarese']!),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 8),
-
-                                        // Nicobarese Phrase
-                                        Text(
-                                          phrase['nicobarese']!,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 22,
-                                            letterSpacing: 0.3,
-                                          ),
-                                        ),
-
-                                        // Phonetic Pronunciation Hint
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '🗣️ "${phrase['phonetic']}"',
-                                          style: TextStyle(
-                                            color: Colors.amberAccent.withValues(alpha: 0.8),
-                                            fontStyle: FontStyle.italic,
-                                            fontSize: 12.5,
-                                          ),
-                                        ),
-
-                                        const SizedBox(height: 12),
-                                        const Divider(color: Colors.white10, height: 1),
-                                        const SizedBox(height: 12),
-
-                                        // Translations Row
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  // English translation
-                                                  Text(
-                                                    'EN: ${phrase['english']}',
-                                                    style: const TextStyle(
-                                                      color: Colors.white70,
-                                                      fontSize: 13.5,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  // Hindi translation
-                                                  Text(
-                                                    'HI: ${phrase['hindi']}',
-                                                    style: const TextStyle(
-                                                      color: Colors.white54,
-                                                      fontSize: 13.5,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            // Play Audio Button
-                                            Material(
-                                              color: Colors.white.withValues(alpha: 0.08),
-                                              shape: const CircleBorder(),
-                                              child: IconButton(
-                                                icon: const Icon(
-                                                  Icons.volume_up_rounded,
-                                                  color: Colors.white,
-                                                  size: 22,
-                                                ),
-                                                onPressed: () {
-                                                  _tts.speakNicobarese(
-                                                    phrase['nicobarese']!,
-                                                    englishWord: phrase['english']!,
-                                                    audioCategory: phrase['category']!.toLowerCase() == 'food' ? 'things' : phrase['category']!.toLowerCase(),
-                                                  );
-                                                },
-                                              ),
-                                            ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                                             .shimmer(delay: 5.seconds, duration: 1.5.seconds, color: Colors.white24),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ).animate().fadeIn(duration: 300.ms, delay: (index * 50).ms).slideY(begin: 0.1, end: 0);
-                        },
-                      ),
-              ),
-            ],
-          ),
+                          ),
+                        ).animate().fadeIn(duration: 300.ms, delay: (index * 50).ms).slideY(begin: 0.1, end: 0);
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );

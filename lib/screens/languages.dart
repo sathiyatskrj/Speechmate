@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:speechmate/screens/explorer_dashboard.dart';
+import 'package:speechmate/screens/explorer_shell.dart';
 import 'package:speechmate/screens/ga_hub_screen.dart';
 import 'package:speechmate/screens/mock_language_screen.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
@@ -132,7 +132,7 @@ class _LanguagesState extends State<Languages> {
                           langCode: "nc", 
                           colors: [const Color(0xFFE91E63), const Color(0xFFFF6F00)], 
                           icon: Icons.map,
-                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ExplorerDashboard())),
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ExplorerShell())),
                         ),
                         _buildLanguageButton(
                           label: "Aka-Jeru (Great Andamanese)", 

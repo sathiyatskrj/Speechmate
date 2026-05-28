@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/linguistics_service.dart';
@@ -98,11 +99,11 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.75,
         padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A1A24),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        decoration: const BoxDecoration(
+          color: AndamanPalette.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           boxShadow: [
-            BoxShadow(color: AppColors.studentAccent.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, -5))
+            BoxShadow(color: AndamanPalette.shadow, blurRadius: 20, offset: Offset(0, -5))
           ],
         ),
         child: Column(
@@ -112,7 +113,7 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
               child: Container(
                 width: 40, height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(color: Colors.white30, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: AndamanPalette.borderStrong, borderRadius: BorderRadius.circular(10)),
               ),
             ),
             Row(
@@ -121,17 +122,37 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(nicobarese, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
-                    Text(english, style: const TextStyle(fontSize: 18, color: Colors.amberAccent, fontStyle: FontStyle.italic)),
+                    Text(
+                      nicobarese,
+                      style: GoogleFonts.outfit(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        color: AndamanPalette.stone,
+                      ),
+                    ),
+                    Text(
+                      english,
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        color: AndamanPalette.oceanTeal,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.volume_up, color: Colors.cyanAccent, size: 32),
-                  onPressed: () => _playAudio(item),
+                Material(
+                  color: AndamanPalette.oceanTealSoft,
+                  shape: const CircleBorder(),
+                  child: IconButton(
+                    icon: const Icon(Icons.volume_up_rounded, color: AndamanPalette.oceanTeal, size: 28),
+                    onPressed: () => _playAudio(item),
+                  ),
                 ).animate().scale(delay: 300.ms, duration: 400.ms),
               ],
             ),
-            const Divider(color: Colors.white24, height: 30),
+            const SizedBox(height: 16),
+            const Divider(color: AndamanPalette.border, thickness: 1.5, height: 30),
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
@@ -170,24 +191,42 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white10)
+          color: AndamanPalette.mangrove,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AndamanPalette.borderTeal.withOpacity(0.5), width: 1.5),
+          boxShadow: const [
+            BoxShadow(color: AndamanPalette.shadow, blurRadius: 10, offset: Offset(0, 4)),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, color: AppColors.studentAccent, size: 20),
+                Icon(icon, color: AndamanPalette.oceanTeal, size: 20),
                 const SizedBox(width: 10),
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  title,
+                  style: GoogleFonts.outfit(
+                    color: AndamanPalette.stone,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 10),
-            Text(content, style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.4)),
+            const SizedBox(height: 12),
+            Text(
+              content,
+              style: GoogleFonts.inter(
+                color: AndamanPalette.stoneLight,
+                fontSize: 14,
+                height: 1.4,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1),
@@ -205,57 +244,61 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: AndamanPalette.sandWhite,
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.white,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.studentAccent.withValues(alpha: 0.8),
-              Colors.black,
-            ],
+        title: Text(
+          widget.title,
+          style: GoogleFonts.outfit(
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
+            color: AndamanPalette.stone,
           ),
         ),
-        child: SafeArea(
-          child: _isLoading 
-            ? const Center(child: CircularProgressIndicator(color: Colors.white))
-            : _items.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.inbox_rounded, size: 64, color: Colors.white30),
-                      const SizedBox(height: 16),
-                      Text(
-                        "No items found in ${widget.title}.\nPlease restart the app.",
-                        style: const TextStyle(color: Colors.white54, fontSize: 16),
-                        textAlign: TextAlign.center,
+        centerTitle: true,
+        backgroundColor: AndamanPalette.white,
+        elevation: 0,
+        shape: const Border(bottom: BorderSide(color: AndamanPalette.border, width: 2)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AndamanPalette.stone),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SafeArea(
+        child: _isLoading 
+          ? const Center(child: CircularProgressIndicator(color: AndamanPalette.oceanTeal))
+          : _items.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.inbox_rounded, size: 64, color: AndamanPalette.mist),
+                    const SizedBox(height: 16),
+                    Text(
+                      "No items found in ${widget.title}.\nPlease restart the app.",
+                      style: GoogleFonts.inter(
+                        color: AndamanPalette.mist,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ],
-                  ),
-                )
-              : GridView.builder(
-            padding: const EdgeInsets.all(20),
-            physics: const BouncingScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.75,
-            ),
-            itemCount: _items.length,
-            itemBuilder: (context, index) {
-              final item = _items[index];
-              return _buildCard(item, index);
-            },
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              )
+            : GridView.builder(
+          padding: const EdgeInsets.all(20),
+          physics: const BouncingScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 0.75,
           ),
+          itemCount: _items.length,
+          itemBuilder: (context, index) {
+            final item = _items[index];
+            return _buildCard(item, index);
+          },
         ),
       ),
     );
@@ -272,14 +315,14 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
       onTap: () => _showLinguisticAnalysis(item),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: Colors.white24),
-          boxShadow: [
+          color: AndamanPalette.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: AndamanPalette.border, width: 2),
+          boxShadow: const [
             BoxShadow(
-              color: AppColors.studentAccent.withValues(alpha: 0.15),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              color: AndamanPalette.shadow,
+              blurRadius: 12,
+              offset: Offset(0, 4),
             )
           ],
         ),
@@ -288,14 +331,14 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
             Expanded(
               flex: 3,
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+                decoration: const BoxDecoration(
+                  color: AndamanPalette.mangrove,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
                 child: Center(
                   child: imagePath != null
                     ? ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                         child: Image.asset(
                           imagePath,
                           fit: BoxFit.cover,
@@ -327,20 +370,20 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                   children: [
                     Text(
                       english,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: GoogleFonts.inter(
+                        color: AndamanPalette.stone,
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 15,
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       nicobarese,
-                      style: const TextStyle(
-                        color: Colors.amberAccent,
+                      style: GoogleFonts.inter(
+                        color: AndamanPalette.oceanTeal,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                         fontStyle: FontStyle.italic
@@ -351,8 +394,8 @@ class _DynamicCategoryScreenState extends State<DynamicCategoryScreen> {
                     ),
                     if (hasAudio)
                       const Padding(
-                        padding: EdgeInsets.only(top: 2),
-                        child: Icon(Icons.volume_up_rounded, color: Colors.cyanAccent, size: 16),
+                        padding: EdgeInsets.only(top: 4),
+                        child: Icon(Icons.volume_up_rounded, color: AndamanPalette.oceanTeal, size: 16),
                       ),
                   ],
                 ),

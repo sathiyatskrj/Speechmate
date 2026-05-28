@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TapScale extends StatefulWidget {
   final Widget child;
@@ -24,6 +25,7 @@ class _TapScaleState extends State<TapScale>
   double _scale = 1;
 
   void _animate() async {
+    HapticFeedback.lightImpact();
     setState(() => _scale = widget.scaleFactor);
     await Future.delayed(widget.duration);
     setState(() => _scale = 1);

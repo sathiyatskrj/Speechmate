@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../services/progress_service.dart';
-import '../widgets/background.dart';
+import 'package:speechmate/core/app_colors.dart';
 import 'package:speechmate/core/app_strings.dart';
 
 class ProgressScreen extends StatefulWidget {
@@ -46,32 +48,52 @@ class _ProgressScreenState extends State<ProgressScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AndamanPalette.sandWhite,
       appBar: AppBar(
-        title: Text(AppStrings.get('yourProgress')),
-        backgroundColor: const Color(0xFF38BDF8),
+        backgroundColor: AndamanPalette.white,
+        foregroundColor: AndamanPalette.stone,
         elevation: 0,
+        shape: const Border(bottom: BorderSide(color: AndamanPalette.border, width: 2)),
+        centerTitle: true,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('📊', style: TextStyle(fontSize: 22)),
+            const SizedBox(width: 8),
+            Text(
+              AppStrings.get('yourProgress'),
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: AndamanPalette.stone,
+              ),
+            ),
+          ],
+        ),
       ),
-      body: Background(
-        colors: const [Color(0xFF38BDF8), Color(0xFF94FFF8)],
-        padding: const EdgeInsets.all(20),
+      body: SafeArea(
         child: isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.white))
+            ? const Center(child: CircularProgressIndicator(color: AndamanPalette.oceanTeal))
             : ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(20),
                 children: [
                   _buildStatCard(
-                    icon: Icons.search,
+                    icon: Icons.search_rounded,
                     title: AppStrings.get('totalSearches'),
                     value: searchCount.toString(),
-                    color: Colors.blue,
-                  ),
+                    iconColor: AndamanPalette.oceanTeal,
+                    bgColor: AndamanPalette.oceanTealSoft,
+                  ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1, end: 0),
                   const SizedBox(height: 16),
                   
                   _buildStatCard(
-                    icon: Icons.local_fire_department,
+                    icon: Icons.local_fire_department_rounded,
                     title: AppStrings.get('currentStreak'),
                     value: "$streak ${AppStrings.get('days')}",
-                    color: Colors.orange,
-                  ),
+                    iconColor: AndamanPalette.amber,
+                    bgColor: AndamanPalette.amberSoft,
+                  ).animate().fadeIn(delay: 100.ms, duration: 300.ms).slideY(begin: 0.1, end: 0),
                   const SizedBox(height: 16),
                   
                   Hero(
@@ -79,51 +101,74 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     child: Material(
                       color: Colors.transparent,
                       child: _buildStatCard(
-                        icon: Icons.school,
+                        icon: Icons.school_rounded,
                         title: AppStrings.get('wordsLearned'),
                         value: wordsLearned.toString(),
-                        color: Colors.green,
+                        iconColor: AndamanPalette.emerald,
+                        bgColor: AndamanPalette.emeraldSoft,
                       ),
                     ),
-                  ),
+                  ).animate().fadeIn(delay: 200.ms, duration: 300.ms).slideY(begin: 0.1, end: 0),
                   const SizedBox(height: 32),
                   
-                  const Text(
-                    "📊 Recent Quiz Performance",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
+                  Row(
+                    children: [
+                      const Text("📈", style: TextStyle(fontSize: 20)),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Recent Quiz Performance",
+                        style: GoogleFonts.outfit(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: AndamanPalette.stone,
+                        ),
+                      ),
+                    ],
+                  ).animate().fadeIn(delay: 300.ms, duration: 300.ms),
                   const SizedBox(height: 16),
                   
                   if (quizScores.isEmpty)
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        color: AndamanPalette.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AndamanPalette.border, width: 2),
                       ),
-                      child: const Text(
+                      child: Text(
                         "No quizzes completed yet. Start learning!",
-                        style: TextStyle(color: Colors.grey),
+                        style: GoogleFonts.inter(
+                          color: AndamanPalette.mist,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                    )
+                    ).animate().fadeIn(delay: 400.ms, duration: 300.ms)
                   else
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10)],
+                        color: AndamanPalette.white,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: AndamanPalette.border, width: 2),
+                        boxShadow: const [
+                          BoxShadow(color: AndamanPalette.shadow, blurRadius: 10, offset: Offset(0, 4)),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
+                          Text(
                             "Quiz Accuracy",
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AndamanPalette.stone,
+                            ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 24),
                           SizedBox(
                             height: 200,
                             child: BarChart(
@@ -133,11 +178,15 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                 barTouchData: BarTouchData(
                                   enabled: true,
                                   touchTooltipData: BarTouchTooltipData(
-                                    getTooltipColor: (_) => Colors.blueAccent,
+                                    getTooltipColor: (_) => AndamanPalette.oceanTeal,
                                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                       return BarTooltipItem(
                                         '${(rod.toY * 100).round()}%',
-                                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                        GoogleFonts.inter(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 12,
+                                        ),
                                       );
                                     },
                                   ),
@@ -150,7 +199,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                       getTitlesWidget: (value, meta) {
                                         return Padding(
                                           padding: const EdgeInsets.only(top: 8),
-                                          child: Text('Q${value.toInt() + 1}', style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                                          child: Text(
+                                            'Q${value.toInt() + 1}',
+                                            style: GoogleFonts.inter(
+                                              color: AndamanPalette.mist,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
                                         );
                                       },
                                     ),
@@ -179,13 +235,16 @@ class _ProgressScreenState extends State<ProgressScreen> {
                                     barRods: [
                                       BarChartRodData(
                                         toY: percentage,
-                                        color: Colors.blueAccent,
+                                        color: AndamanPalette.oceanTeal,
                                         width: 22,
-                                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(6), topRight: Radius.circular(6)),
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(6),
+                                          topRight: Radius.circular(6),
+                                        ),
                                         backDrawRodData: BackgroundBarChartRodData(
                                           show: true,
                                           toY: 1.0,
-                                          color: Colors.blue.withValues(alpha: 0.1),
+                                          color: AndamanPalette.oceanTealSoft,
                                         ),
                                       ),
                                     ],
@@ -196,7 +255,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           ),
                         ],
                       ),
-                    ),
+                    ).animate().fadeIn(delay: 400.ms, duration: 300.ms).slideY(begin: 0.05, end: 0),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -208,32 +267,50 @@ class _ProgressScreenState extends State<ProgressScreen> {
     required IconData icon,
     required String title,
     required String value,
-    required Color color,
+    required Color iconColor,
+    required Color bgColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [BoxShadow(blurRadius: 6, color: Colors.black12)],
+        color: AndamanPalette.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AndamanPalette.border, width: 2),
+        boxShadow: const [
+          BoxShadow(color: AndamanPalette.shadow, blurRadius: 10, offset: Offset(0, 4)),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: bgColor,
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, color: color, size: 32),
+            child: Icon(icon, color: iconColor, size: 30),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-              const SizedBox(height: 4),
-              Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: AndamanPalette.stoneLight,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                value,
+                style: GoogleFonts.outfit(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                  color: AndamanPalette.stone,
+                ),
+              ),
             ],
           ),
         ],

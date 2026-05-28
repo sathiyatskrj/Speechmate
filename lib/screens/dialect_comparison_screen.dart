@@ -1,23 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
-
-// ────── DUOLINGO-STYLE VIBRANT LIGHT PALETTE ──────
-class _DuoColors {
-  static const bg = Color(0xFFF7F7F7);
-  static const white = Color(0xFFFFFFFF);
-  static const green = Color(0xFF58CC02);
-  static const greenDark = Color(0xFF4CAD00);
-  static const blue = Color(0xFF1CB0F6);
-  static const orange = Color(0xFFFF9600);
-  static const textDark = Color(0xFF3C3C3C);
-  static const textMuted = Color(0xFF777777);
-  static const border = Color(0xFFE5E5E5);
-  static const cardShadow = Color(0x0A000000);
-}
+import 'package:speechmate/core/app_colors.dart';
 
 class DialectComparisonScreen extends StatefulWidget {
   const DialectComparisonScreen({super.key});
@@ -36,11 +23,11 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
   // Which dialect columns to show
   final List<String> dialectNames = ['car', 'central', 'coast', 'teressa', 'chowra'];
   final Map<String, String> dialectLabels = {
-    'car': '🏝️ Car',
-    'central': '🌴 Central',
-    'coast': '🌊 Coast',
-    'teressa': '⛰️ Teressa',
-    'chowra': '🐚 Chowra',
+    'car': 'ðŸï¸ Car',
+    'central': 'ðŸŒ´ Central',
+    'coast': 'ðŸŒŠ Coast',
+    'teressa': 'â›°ï¸ Teressa',
+    'chowra': 'ðŸš Chowra',
   };
 
   @override
@@ -82,20 +69,20 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _DuoColors.bg,
+      backgroundColor: AndamanPalette.sandWhite,
       appBar: AppBar(
-        backgroundColor: _DuoColors.white,
-        foregroundColor: _DuoColors.textDark,
+        backgroundColor: AndamanPalette.white,
+        foregroundColor: AndamanPalette.stone,
         elevation: 0,
-        shape: const Border(bottom: BorderSide(color: _DuoColors.border, width: 2)),
+        shape: const Border(bottom: BorderSide(color: AndamanPalette.border, width: 2)),
         centerTitle: true,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('🌏', style: TextStyle(fontSize: 22)),
+            const Text('ðŸŒ', style: TextStyle(fontSize: 22)),
             const SizedBox(width: 8),
             Text('Dialect Comparison', style: GoogleFonts.outfit(
-              fontSize: 20, fontWeight: FontWeight.w800, color: _DuoColors.textDark,
+              fontSize: 20, fontWeight: FontWeight.w800, color: AndamanPalette.stone,
             )),
           ],
         ),
@@ -109,28 +96,28 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: _DuoColors.white,
+                  color: AndamanPalette.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _DuoColors.border, width: 2.5),
+                  border: Border.all(color: AndamanPalette.border, width: 2.5),
                   boxShadow: const [
-                    BoxShadow(color: _DuoColors.cardShadow, blurRadius: 8, offset: Offset(0, 3)),
+                    BoxShadow(color: AndamanPalette.shadow, blurRadius: 8, offset: Offset(0, 3)),
                   ],
                 ),
                 child: TextField(
                   onChanged: _filterDialects,
                   style: GoogleFonts.inter(
-                    color: _DuoColors.textDark,
+                    color: AndamanPalette.stone,
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Search English words...',
                     hintStyle: GoogleFonts.inter(
-                      color: _DuoColors.textMuted,
+                      color: AndamanPalette.mist,
                       fontWeight: FontWeight.w600,
                     ),
                     border: InputBorder.none,
-                    icon: const Icon(Icons.search_rounded, color: _DuoColors.textMuted),
+                    icon: const Icon(Icons.search_rounded, color: AndamanPalette.mist),
                   ),
                 ),
               ).animate().fadeIn(duration: 300.ms),
@@ -140,13 +127,13 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
               // Content
               Expanded(
                 child: isLoading
-                    ? const Center(child: CircularProgressIndicator(color: _DuoColors.green))
+                    ? const Center(child: CircularProgressIndicator(color: AndamanPalette.oceanTeal))
                     : filteredDialects.isEmpty
                         ? Center(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.language_rounded, size: 64, color: _DuoColors.textMuted),
+                                const Icon(Icons.language_rounded, size: 64, color: AndamanPalette.mist),
                                 const SizedBox(height: 12),
                                 Text(
                                   searchQuery.isEmpty
@@ -154,7 +141,7 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
                                       : 'No results found for "$searchQuery"',
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.inter(
-                                    color: _DuoColors.textMuted,
+                                    color: AndamanPalette.mist,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -185,11 +172,11 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _DuoColors.white,
+        color: AndamanPalette.white,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: _DuoColors.border, width: 2),
+        border: Border.all(color: AndamanPalette.border, width: 2),
         boxShadow: const [
-          BoxShadow(color: _DuoColors.cardShadow, blurRadius: 10, offset: Offset(0, 4)),
+          BoxShadow(color: AndamanPalette.shadow, blurRadius: 10, offset: Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -201,7 +188,7 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _DuoColors.blue.withOpacity(0.12),
+                  color: AndamanPalette.oceanTeal.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -209,7 +196,7 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
                   style: GoogleFonts.outfit(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: _DuoColors.blue,
+                    color: AndamanPalette.oceanTeal,
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -220,13 +207,13 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
                 style: GoogleFonts.outfit(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
-                  color: _DuoColors.textDark,
+                  color: AndamanPalette.stone,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(color: _DuoColors.border, height: 1, thickness: 1.5),
+          const Divider(color: AndamanPalette.border, height: 1, thickness: 1.5),
           const SizedBox(height: 16),
 
           // Dialect translations in a grid
@@ -234,9 +221,9 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
             spacing: 10,
             runSpacing: 10,
             children: dialectNames.map((dialect) {
-              final translation = entry[dialect]?.toString() ?? '—';
+              final translation = entry[dialect]?.toString() ?? 'â€”';
               final label = dialectLabels[dialect] ?? dialect;
-              final hasTranslation = translation != '—' && translation.isNotEmpty;
+              final hasTranslation = translation != 'â€”' && translation.isNotEmpty;
 
               return TapScale(
                 onTap: hasTranslation
@@ -248,16 +235,16 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: hasTranslation ? _DuoColors.white : _DuoColors.bg,
+                    color: hasTranslation ? AndamanPalette.white : AndamanPalette.sandWhite,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: hasTranslation ? _DuoColors.green.withOpacity(0.3) : _DuoColors.border,
+                      color: hasTranslation ? AndamanPalette.oceanTeal.withOpacity(0.3) : AndamanPalette.border,
                       width: 2,
                     ),
                     boxShadow: hasTranslation
                         ? [
                             BoxShadow(
-                              color: _DuoColors.green.withOpacity(0.06),
+                              color: AndamanPalette.oceanTeal.withOpacity(0.06),
                               blurRadius: 6,
                               offset: const Offset(0, 3),
                             ),
@@ -275,7 +262,7 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
                             label,
                             style: GoogleFonts.inter(
                               fontSize: 11,
-                              color: _DuoColors.textMuted,
+                              color: AndamanPalette.mist,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -284,7 +271,7 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
                             translation,
                             style: GoogleFonts.inter(
                               fontSize: 14,
-                              color: hasTranslation ? _DuoColors.greenDark : _DuoColors.textMuted.withOpacity(0.5),
+                              color: hasTranslation ? AndamanPalette.oceanTeal : AndamanPalette.mist.withOpacity(0.5),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -295,7 +282,7 @@ class _DialectComparisonScreenState extends State<DialectComparisonScreen> {
                         const Icon(
                           Icons.volume_up_rounded,
                           size: 16,
-                          color: _DuoColors.green,
+                          color: AndamanPalette.oceanTeal,
                         ),
                       ],
                     ],
