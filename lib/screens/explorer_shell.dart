@@ -5,6 +5,9 @@ import 'package:speechmate/screens/explorer_dashboard.dart';
 import 'package:speechmate/screens/chat_translate_screen.dart';
 import 'package:speechmate/screens/voice_translator_screen.dart';
 
+import 'package:speechmate/screens/dialect_heatmap_screen.dart';
+import 'package:speechmate/screens/culture_screen.dart';
+
 // ────────────────────────────────────────────────────────────────────────────
 // EXPLORER SHELL — 5-tab bottom navigation
 // Home · Translate · Speak (elevated) · Map · Explore
@@ -26,8 +29,8 @@ class _ExplorerShellState extends State<ExplorerShell> {
     ExplorerDashboard(),
     ChatTranslateScreen(),
     VoiceTranslatorScreen(),
-    _PlaceholderScreen(title: 'Map', icon: Icons.map_outlined, subtitle: 'Island Explorer coming soon'),
-    _PlaceholderScreen(title: 'Explore', icon: Icons.compass_calibration_outlined, subtitle: 'Culture, Community & more'),
+    DialectHeatmapScreen(),
+    CultureScreen(),
   ];
 
   void _onTabTap(int index) {
