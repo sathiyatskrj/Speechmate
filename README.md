@@ -1,26 +1,29 @@
 <p align="center">
-  <img src="assets/icons/banner_hero.png" width="100%" alt="SpeechMate — Andaman & Nicobar Islands Language Learning">
+  <img src="assets/icons/banner_hero.png" width="100%" alt="SpeechMate — Andaman & Nicobar Institutional Language Platform">
 </p>
 
-<h1 align="center">SPEECHMATE: Institutional Edition v1.6.0</h1>
+<h1 align="center">SPEECHMATE: Institutional Edition v1.5.0</h1>
 
 <p align="center">
-  <strong>The complete offline classroom platform for Nicobarese & Great Andamanese language education.</strong><br>
-  <em>Built for teachers, students, and tribal schools bridging ancient languages with modern pedagogy.</em>
+  <strong>India's first offline-first language learning and classroom management platform for endangered Nicobarese and Great Andamanese languages.</strong><br>
+  <em>Built for teachers and students in tribal primary schools across the Andaman &amp; Nicobar Islands.</em>
 </p>
 
 <p align="center">
   <a href="#">
-    <img src="https://img.shields.io/badge/v1.6.0-Institutional_Edition-6A0DAD?style=for-the-badge" alt="Institutional Edition v1.6.0" />
+    <img src="https://img.shields.io/badge/v1.5.0-Institutional_Edition-6A0DAD?style=for-the-badge" alt="Institutional Edition v1.5.0" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Flutter-3.29+-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter 3.29+" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/Offline--First-Classroom_Ready-00C853?style=for-the-badge" alt="Offline-First" />
+    <img src="https://img.shields.io/badge/Offline--First-100%25_Native-00C853?style=for-the-badge" alt="Offline-First" />
   </a>
   <a href="#">
-    <img src="https://img.shields.io/badge/Audience-Teachers_%26_Students-4A90D9?style=for-the-badge" alt="Teachers & Students" />
+    <img src="https://img.shields.io/badge/Target-Teachers_%26_Students-FF6B6B?style=for-the-badge" alt="Teachers & Students" />
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/Dashboards-Island_Journey_%26_Morning_Briefing-8A2BE2?style=for-the-badge" alt="New Dashboards" />
   </a>
   <a href="#">
     <img src="https://img.shields.io/badge/Keyboard-Custom_Nicobarese-teal?style=for-the-badge" alt="Custom Keyboard" />
@@ -28,166 +31,183 @@
 </p>
 
 <p align="center">
-  <a href="#-the-problem">🌍 Problem</a> •
-  <a href="#-core-value">🎯 Core</a> •
-  <a href="#-features">📚 Features</a> •
-  <a href="#-nicobarese-custom-keyboard">⌨️ Keyboard</a> •
+  <a href="#-the-mission">🌍 Mission</a> •
+  <a href="#-whats-new-in-v150">🆕 v1.5.0</a> •
+  <a href="#-student-dashboard--island-journey">🏝️ Student Dash</a> •
+  <a href="#-teacher-dashboard--morning-briefing">📋 Teacher Dash</a> •
+  <a href="#-core-features">✨ Features</a> •
   <a href="#-architecture">🏗️ Architecture</a> •
   <a href="#-installation">🚀 Install</a> •
-  <a href="#-license">📜 License</a>
+  <a href="#-branch-structure">🗂️ Branches</a> •
+  <a href="#-licensing">📜 License</a>
 </p>
 
 ---
 
-## 🌍 The Problem
+## 🌍 The Mission
 
-> *"Children in the Andaman & Nicobar Islands grow up hearing Nicobarese and Great Andamanese — two critically endangered languages with no standardized educational tools. Without digital classroom support, these ancient languages are disappearing at an accelerating rate."*
+> *"A tribal primary school teacher in Car Nicobar has 30 students, no reliable internet, and a single mobile device. She needs tools to teach Nicobarese vocabulary, track each child's progress, and run quizzes — all offline."*
 
-The Andaman & Nicobar Islands are home to critically endangered indigenous languages like **Car Nicobarese** and **Aka-Jeru (Great Andamanese)**. With zero offline-capable educational platforms, the tribal school system has no modern tools to teach or preserve these languages.
+The Andaman & Nicobar Islands are home to critically endangered indigenous languages like **Car Nicobarese** and **Aka-Jeru (Great Andamanese)**. These languages have **no modern digital learning tools** tailored for classroom use.
 
-**SpeechMate (Institutional Edition)** provides a complete offline classroom ecosystem — from gamified student dashboards to teacher progress monitoring — designed specifically for schools operating in areas with little or no internet connectivity.
+SpeechMate (Institutional Edition) bridges this gap:
+
+- 📵 **Zero connectivity needed** — works entirely offline in remote island schools.
+- 🧑‍🏫 **Teacher-centric design** — real classroom roster, marks entry, quiz analytics, and phrase banks.
+- 🎒 **Student-centric design** — gamified Island Journey with XP, streaks, and 12 learning categories.
+- 🧠 **Deterministic NLP** — no cloud AI; all translation runs on-device, protecting data sovereignty.
 
 ---
 
-## 🎯 Core Value
+## 🆕 What's New in v1.5.0
 
-**One sentence:** A complete offline language learning classroom platform for teachers and students of endangered Andaman & Nicobar tribal languages.
+### 🏝️ Student Dashboard — Island Journey Redesign
 
-**Two features that matter most:**
+The student experience has been completely rebuilt with an **Island Journey** metaphor — a 5-zone immersive layout replacing the old flat card grid.
 
-| Feature | What it does | Status |
+| Zone | Component | Description |
 | :--- | :--- | :--- |
-| **🧑‍🏫 Teacher Dashboard** | Assign lessons, monitor progress, manage dictionary entries, and run classroom sessions | ✅ Working |
-| **🎮 Gamified Student Learning** | XP, levels, daily missions, spaced repetition flashcards, and 4+ games | ✅ Working |
+| **Zone 1** | Hero Header | Animated greeting, current XP level badge, daily streak flame counter |
+| **Zone 2** | Island Map Grid | 12 vocabulary categories as interactive island tiles with emoji & animated borders |
+| **Zone 3** | Activity Strip | Quick-launch row: Games 🎮, Voice 🎙️, Camera 📸, Quiz ⚡ |
+| **Zone 4** | Progress Cove | XP progress bar, star count, level name — live from SharedPreferences |
+| **Zone 5** | Discovery Shelf | Horizontal scroll: Word of Day, Survival Phrases, Cultural Tip cards |
+
+**New Student Features:**
+- 🌅 **Animated hero header** with wave-effect background and pulse badge for level
+- 🗺️ **Island tile grid** — 12 categories (Numbers, Nature, Colors, Feelings, Things, Body Parts, Animals, Magic Words, Family, Phrases, Dialects, Great Andamanese) with hover animations
+- 📊 **Live XP progress bar** with smooth fill animations
+- 🃏 **Horizontal discovery cards** — dynamically generated word-of-day, phrase cards, and cultural tips
+- 🎮 **Activity quick-launch strip** — one tap to voice translator, 4 learning games, AR camera, quiz
+- ✨ **Confetti physics** on XP milestone achievements
+
+### 📋 Teacher Dashboard — Morning Briefing Redesign
+
+The teacher interface has been rebuilt with a **Morning Briefing** layout — a 4-tab professional workspace replacing the legacy tabbed design.
+
+| Tab | Name | Features |
+| :--- | :--- | :--- |
+| **Tab 1** | 📋 Roster | Real student list with attendance toggle, search bar, per-student profile tap |
+| **Tab 2** | 📝 Marks | Grade entry grid with subject columns, auto-save to local SQLite |
+| **Tab 3** | 📊 Analytics | Live quiz performance charts, class average, individual progress sparklines |
+| **Tab 4** | 📅 Calendar | Stateful event CRUD — add/edit/delete school events with date picker |
+
+**New Teacher Features:**
+- 🌄 **Morning Briefing header** with teacher name, date, and class summary chip
+- 👥 **Real roster management** — add/remove students, persistent across app restarts
+- ✅ **Attendance system** with tap-to-toggle per-student presence tracking
+- 📝 **Marks entry** — tap-to-edit grade cells with subject-wise columns
+- 📊 **Analytics tab** — class quiz score trends, highest/lowest performers, subject breakdown
+- 📅 **School calendar** — full CRUD for events (assemblies, exam days, cultural festivals)
+- 🔍 **Search bar** across roster with live filtering
+- 💾 **All data persists offline** — SQLite-backed, no sync required
+
+### 🔧 Other v1.5.0 Changes
+
+| Change | Details |
+| :--- | :--- |
+| **Version bump** | `1.5.0+10` across pubspec.yaml, build.gradle, and CI workflow |
+| **Android workflow** | Updated `dart.yml` to v1.5.0 build matrix |
+| **Build stability** | Core library desugaring enabled for `flutter_local_notifications` |
+| **Crash fixes** | Student dash layout crash, phrasebook padding error resolved |
 
 ---
 
-## 📚 Features
+## 🏝️ Student Dashboard — Island Journey
 
-### Student Dashboard
+The Student Dashboard uses a **5-zone island metaphor** to make vocabulary learning feel like an adventure:
+
+```
+┌─────────────────────────────────────────┐
+│  Zone 1: HERO HEADER                    │
+│  👋 Good Morning, [Name]!               │
+│  🔥 12-day streak  •  ⭐ 340 XP  •  🏆 Level 5 │
+├─────────────────────────────────────────┤
+│  Zone 2: ISLAND MAP GRID (4×3)          │
+│  🔢 Numbers  🌿 Nature  🎨 Colors       │
+│  💭 Feelings  📦 Things  🫀 Body Parts  │
+│  🐾 Animals  ✨ Magic   👨‍👩‍👧 Family    │
+│  📖 Phrases  🗣️ Dialects  🌀 GA Hub    │
+├─────────────────────────────────────────┤
+│  Zone 3: ACTIVITY STRIP                 │
+│  🎮 Games  🎙️ Voice  📸 Camera  ⚡ Quiz │
+├─────────────────────────────────────────┤
+│  Zone 4: PROGRESS COVE                  │
+│  XP ████████░░  Level: Island Explorer  │
+├─────────────────────────────────────────┤
+│  Zone 5: DISCOVERY SHELF (horizontal)   │
+│  [Word of Day] [Phrase Card] [Tip Card] │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 📋 Teacher Dashboard — Morning Briefing
+
+The Teacher Dashboard presents a **professional 4-tab workspace**:
+
+```
+┌─────────────────────────────────────────┐
+│  🌄 Morning Briefing — Ms. Sumitha      │
+│  Wednesday, 28 May · Class 4B · 28 pupils│
+│  [📋 Roster] [📝 Marks] [📊 Analytics] [📅 Calendar] │
+├─────────────────────────────────────────┤
+│  Tab 1: ROSTER                          │
+│  🔍 Search students...                  │
+│  ○ Arjun K.     ✅ Present              │
+│  ○ Meena R.     ❌ Absent               │
+│  [+ Add Student]                        │
+├─────────────────────────────────────────┤
+│  Tab 2: MARKS                           │
+│  Name       | Vocab | Quiz | Speaking   │
+│  Arjun K.   |  85   |  72  |   90       │
+│  Meena R.   |  78   |  81  |   88       │
+├─────────────────────────────────────────┤
+│  Tab 3: ANALYTICS                       │
+│  Class Avg: 82% • Top: Arjun K. (92%)  │
+│  [📈 Quiz trend sparkline chart]        │
+├─────────────────────────────────────────┤
+│  Tab 4: CALENDAR                        │
+│  📅 29 May — Unit Test: Numbers         │
+│  📅 2 Jun  — Cultural Day Celebration   │
+│  [+ Add Event]                          │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## ✨ Core Features
+
+### For Students
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **AR Translator** | Live camera object detection with tribal language overlays | ✅ Working |
-| **Voice Vault** | Record, preserve, and play back native speaker audio | ✅ Working |
-| **Book Scanner** | OCR camera scan of documents and signs for offline translation | ✅ Working |
-| **Games Hub** | Word Match, Memory, Quiz, and more gamified vocabulary exercises | ✅ Working |
-| **Classroom Leaderboard** | Live XP-ranked class standings for competitive motivation | ✅ Working |
-| **Achievement Badges** | Unlockable milestone badges for streaks, mastery, and exploration | ✅ Working |
-| **Cultural Calendar** | Sacred tribal event calendar with etiquette alerts | ✅ Working |
-| **Chat Translator** | Bidirectional conversational translation for all supported languages | ✅ Working |
-| **Voice Translator** | Speak in any regional language; receive Nicobarese audio output | ✅ Working |
-| **Regional Translators** | Hindi, Tamil, Bengali, Telugu, Kannada — all offline via ML Kit | ✅ Working |
-| **Tribal Dictionary** | 2,400+ Nicobarese and 1,000+ Great Andamanese vocabulary entries | ✅ Working |
-| **Great Andamanese Hub** | Dedicated learning hub for Aka-Jeru (Great Andamanese) language | ✅ Working |
-| **Flashcard Review (SRS)** | SM-2 spaced repetition algorithm for optimized vocabulary retention | ✅ Working |
-| **Memory Palace** | Spatial memory technique for abstract word retention | ✅ Working |
-| **Dialect Heatmap** | Visualize geographic spread of dialects across island regions | ✅ Working |
-| **Story Radio** | Oral history recordings and tribal narratives in native languages | ✅ Working |
-| **Kinship Mapper** | Interactive visual map of tribal family relationship terms | ✅ Working |
-| **Body Parts Screen** | Illustrated vocabulary guide for anatomical terms | ✅ Working |
-| **AI Setup Screen** | Configure on-device Whisper STT model and AI preferences | ✅ Working |
-| **System Keyboard ⚙️** | One-tap launcher to activate the Nicobarese system keyboard | ✅ Working |
-| **Test Custom Keyboard ⌨️** | In-app interactive themed Nicobarese keyboard sandbox | ✅ Working |
+| **Island Journey Dashboard** | 5-zone gamified home screen with XP, streak, and exploration | 🆕 ✅ |
+| **12 Vocabulary Categories** | Numbers, Nature, Colors, Feelings, Things, Body Parts, Animals, Magic Words, Family, Phrases, Dialects, GA | ✅ |
+| **4 Learning Games** | Word Match, Flash Cards, Word Scramble, Word Runner | ✅ |
+| **Spaced Repetition (SM-2)** | Long-term retention algorithm for flashcards | ✅ |
+| **Voice Translator** | On-device Whisper STT → 10-stage NeuralEngine → Nicobarese | ✅ |
+| **Camera (AR) Translator** | Point-and-scan text/objects → Nicobarese via ML Kit | ⚠️ |
+| **XP & Leveling** | 11 named levels, streak multipliers, confetti milestones | ✅ |
+| **Daily Missions** | Deterministic goal selector refreshed daily | ✅ |
+| **Offline STT** | Whisper Base on-device via NDK 27 C++ bridge | ✅ |
+| **Regional Translation** | Offline ML Kit: Hindi, Tamil, Bengali, Telugu, Kannada | ✅ |
+| **Great Andamanese Hub** | 1,000+ lexicon, translator, voice, OCR scanner | ✅ |
 
-### Teacher Dashboard
+### For Teachers
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **Student Progress Tracking** | Monitor individual XP, level, streaks, and mastery per student | ✅ Working |
-| **Lesson Management** | Assign vocabulary categories, set daily missions, schedule reviews | ✅ Working |
-| **Dictionary Editor** | Add, correct, or modify vocabulary entries directly on-device | ✅ Working |
-| **Teacher Levels Screen** | Curriculum level management and progression mapping | ✅ Working |
-| **Classroom Analytics** | Aggregate class performance, weak category identification | ✅ Working |
-
-### 🆕 New in v1.5.0 — Student Dashboard Decomposition & Platform Hardening
-
-| Feature | Description |
-| :--- | :--- |
-| **Dashboard Decomposition** | Monolithic `StudentDash` reduced by 69% into focused widget components |
-| **Local NLU Engine** | Genuine dictionary-backed translation replacing all hardcoded LLM stubs |
-| **SQLite Analytics** | Offline session telemetry — feature usage, travel data, learning patterns |
-| **Premium Onboarding** | Glassmorphic 4-slide interactive first-launch introduction |
-| **AOT/FFI Safety** | `try-finally` error boundaries, `dispose` hooks, `@pragma` compiler guards |
-| **Native 25 Integrations** | C/C++/Java/Kotlin native bindings across 4 key platform subsystems |
-| **Leaderboard** | Live classroom XP ranking with animated podium display |
-| **Achievement Badges** | Unlockable milestone system with 20+ badge types |
-| **Cultural Calendar** | Tribal etiquette event calendar with lunar phase awareness |
-
-### 🆕 New in v1.6.0 — Authentic Nicobarese Custom Keyboard
-
-| Feature | Description |
-| :--- | :--- |
-| **System-Level IME Keyboard** | Authentic Nicobarese QWERTY keyboard usable device-wide as default input |
-| **Specialized Sovereign Keys** | Dedicated keys for `ä`, `ö`, `ë`, `ṅ`, and glottal stop `·` |
-| **4 Premium Visual Themes** | Forest Teal, Tribal Coral, Midnight Sovereign, Coconut Shell |
-| **In-App Keyboard Widget** | Interactive keyboard inside the app with live theme switching |
-| **One-Tap Settings Launcher** | Dashboard tile opens Android Language & Input Settings instantly |
-| **Haptic Feedback** | Tactile key press responses for immersive typing |
-| **Full Shift Support** | Uppercase and lowercase for all standard and specialized characters |
-
----
-
-## ⌨️ Nicobarese Custom Keyboard
-
-SpeechMate ships a **first-of-its-kind authentic Nicobarese QWERTY keyboard** — available both inside the app and as a **system-level Android Input Method (IME)** device-wide. Students can type Nicobarese characters in any app on their device.
-
-### Sovereign Character Keys
-
-```
-[ ä ]  [ ö ]  [ ë ]  [ ṅ ]  [ · ]   ← Dedicated top row
-[ q ]  [ w ]  [ e ]  [ r ]  [ t ]  [ y ]  [ u ]  [ i ]  [ o ]  [ p ]
-[ a ]  [ s ]  [ d ]  [ f ]  [ g ]  [ h ]  [ j ]  [ k ]  [ l ]
-[⇧]  [ z ]  [ x ]  [ c ]  [ v ]  [ b ]  [ n ]  [ m ]  [⌫]
-[123] [,] [     Space     ] [.] [↵]
-```
-
-### 4 Premium Visual Themes
-
-| Theme | Colors | Mood |
-| :--- | :--- | :--- |
-| 🌲 **Forest Teal** | Deep teal `#0C1D24` / Teal accent | Explorer |
-| 🏺 **Tribal Coral** | Terracotta `#2C1916` / Orange accent | Cultural |
-| 🌌 **Midnight Sovereign** | Charcoal `#080C14` / Amber accent | Premium |
-| 🥥 **Coconut Shell** | Organic brown `#251F1C` / Sand accent | Natural |
-
-### How to Enable for Students
-
-1. Tap the **"System Keyboard ⚙️"** tile on the Student Dashboard
-2. The Android **Language & Input Settings** opens instantly
-3. Enable **"SpeechMate Keyboard"** from the list
-4. Set as default — now active everywhere on the device!
-
----
-
-## ⚡ Why SpeechMate?
-
-| Capability | Google Translate | Duolingo | Offline Dict Apps | **SpeechMate** |
-| :--- | :--- | :--- | :--- | :--- |
-| **Nicobarese / G. Andamanese** | ❌ Not supported | ❌ Not supported | ❌ Not available | ✅ 2,400+ and 1,000+ entries |
-| **Offline Operation** | ❌ Requires internet | ❌ Requires internet | ✅ Offline | ✅ Offline-first |
-| **Child-Focused (ages 6–14)** | ❌ General audience | ✅ Gamified | ❌ General audience | ✅ Games, XP, daily missions |
-| **Classroom Tools** | ❌ None | ⚠️ Schools edition | ❌ None | ✅ Teacher + Student dashboards |
-| **On-Device Voice** | ✅ Cloud-based | ✅ Cloud-based | ❌ None | ✅ On-device Whisper STT |
-| **Indigenous Data Sovereignty** | ❌ Cloud-processed | ❌ Cloud-processed | ⚠️ Varies | ✅ All data stays on device |
-| **Custom Nicobarese Keyboard** | ❌ None | ❌ None | ❌ None | ✅ Full IME with 4 themes |
-
-> To our knowledge, no existing commercial or academic tool supports Nicobarese or Great Andamanese vocabulary learning for children. If you know of one, please [open an issue](https://github.com/sathiyatskrj/Speechmate/issues) — we want to collaborate, not compete.
-
----
-
-## 📐 Pedagogical Approach
-
-SpeechMate's learning methodology draws from established second-language acquisition research:
-
-| Method | Implementation | Research Basis |
-| :--- | :--- | :--- |
-| **Spaced Repetition** | SM-2 flashcard algorithm | Pimsleur (1967), Leitner system |
-| **Gamified Practice** | XP, levels, daily missions, 4 game types | Deterding et al. (2011) |
-| **Multi-Modal Input** | Audio + visual + text + emoji cues | Mayer's Multimedia Learning Theory (2001) |
-| **Active Recall** | Quiz mode with missed-word re-injection | Roediger & Karpicke (2006) |
-| **Teacher-Mediated Learning** | Dedicated teacher dashboard + progress tracking | Vygotsky's Zone of Proximal Development |
-| **Authentic Script Practice** | Custom Nicobarese IME keyboard for real typing | Immersive language acquisition |
+| **Morning Briefing Dashboard** | 4-tab professional classroom workspace | 🆕 ✅ |
+| **Real Roster Management** | Add/remove students, persistent SQLite storage | 🆕 ✅ |
+| **Attendance Tracking** | Per-student tap-to-toggle presence with daily log | 🆕 ✅ |
+| **Marks Entry** | Editable grade grid with subject columns, auto-save | 🆕 ✅ |
+| **Quiz Analytics** | Class average, top/bottom performers, trend charts | 🆕 ✅ |
+| **School Calendar CRUD** | Add/edit/delete events with date picker | 🆕 ✅ |
+| **Classroom Phrase Bank** | Teacher-curated phrases pushed to student devices | ✅ |
+| **Adaptive Quiz Mode** | Generates quizzes from vocabulary categories | ✅ |
+| **OCR Book Scanner** | Scan physical textbooks → add words to lesson plans | ✅ |
+| **Dictionary Editor** | Add/edit Nicobarese vocabulary entries locally | ✅ |
 
 ---
 
@@ -196,79 +216,54 @@ SpeechMate's learning methodology draws from established second-language acquisi
 ```
 Flutter UI (Riverpod)
     │
-    ├── TeacherDash — Lesson management, progress monitoring, analytics
-    ├── StudentDash (Decomposed Components)
-    │       ├── GamificationHeader — XP bar, level, streak
-    │       ├── SmartDashboardHeader — Daily word, greeting
-    │       ├── BentoGrid — 35+ feature tiles with premium animations
-    │       └── SearchableDashboardMixin — Live full-text search
+    ├── StudentDash (Island Journey — 5 zones)
+    │       ├── HeroHeader — XP, streak, level badge
+    │       ├── IslandMapGrid — 12 category tiles
+    │       ├── ActivityStrip — quick-launch actions
+    │       ├── ProgressCove — XP bar, stars, level
+    │       └── DiscoveryShelf — word of day, phrase cards
+    │
+    ├── TeacherDash (Morning Briefing — 4 tabs)
+    │       ├── RosterTab — student list, attendance
+    │       ├── MarksTab — grade entry grid
+    │       ├── AnalyticsTab — performance charts
+    │       └── CalendarTab — event CRUD
     │
     ├── NativeEdgeService (Dart FFI → C++ NDK 27)
-    │       └── Audio DSP, GIS, Security, SIMD integrations
+    │       ├── Audio DSP (VAD, PCM, Mel, PSOLA)
+    │       ├── CRDT Mesh Sync & XOR Encryption
+    │       ├── GIS Geofencing & WGS-84 Math
+    │       └── ARM NEON SIMD Accelerators
     │
-    ├── LocalLlmService — Dictionary-backed adaptive learning path NLU
-    ├── WhisperService (NDK 27 C++) — On-device speech-to-text
-    ├── ML Kit (Kannada, Hindi, Tamil, Bengali, Telugu) — Offline translation
-    ├── NicobareseInputMethodService — System-level IME keyboard (com.speechmate.edu)
-    ├── SQLiteAnalytics — Offline telemetry & session tracking
-    └── DatabaseManager (SQLite) — All linguistic data, locally stored
+    ├── WhisperService (NDK 27 C++) — On-device STT
+    ├── NeuralEngine — 10-stage offline translation pipeline
+    ├── ML Kit (Hindi, Tamil, Bengali, Telugu, Kannada) — Offline
+    ├── GamificationService — XP, missions, levels
+    ├── ProgressService — SharedPreferences state
+    └── DatabaseManager (SQLite) — All data, locally stored
 ```
 
-### Technical Specifications
+> No generative AI or cloud LLMs. All translation is deterministic dictionary + algorithmic NLP — zero data privacy leaks.
 
-| Spec | Value | Notes |
+### Technical Specs
+
+| Metric | Value | Notes |
 | :--- | :--- | :--- |
-| APK size | **~80 MB** | Whisper model downloaded on first launch (~141 MB) |
-| Total on-device | ~220 MB | After Whisper + ML Kit downloads |
-| STT latency | ~600ms | Benchmarked on Snapdragon 6xx (mid-range) |
+| APK size | **~80 MB** | Whisper model downloaded post-install (~141 MB) |
+| Total on-device | ~220 MB | After Whisper download |
+| STT latency | ~600ms | Tested on mid-range Android (Snapdragon 6xx) |
 | Translation speed | <100ms | SQLite indexed lookup |
-| Min Android | API 24 (Android 7.0+) | |
-| Framework | Flutter 3.29+ · Dart 3.2+ | |
-
----
-
-## 🛡️ Governance & Data Sovereignty
-
-### Licensing Model
-
-SpeechMate uses a **split-licensing model** specifically designed for indigenous language projects:
-
-| Layer | License | Protection |
-| :--- | :--- | :--- |
-| **Application Code** | Apache 2.0 | Open source — community contribution encouraged |
-| **Linguistic Data** | CC BY-NC 4.0 + TK Protocols | Protected indigenous knowledge |
-
-- 🚫 Linguistic data **cannot** be used commercially without tribal council consent
-- 🚫 Data **cannot** be used to train commercial AI or LLMs
-- ✅ Free for education, research, and language preservation
-
-### Tribal Governance Commitment
-
-| Governance Principle | Implementation |
-| :--- | :--- |
-| **Community consent** | Formal tribal council engagement planned before any school deployment |
-| **Data ownership** | All linguistic data stays on-device; no cloud collection |
-| **Correction authority** | In-app Dictionary Editor allows teachers and elders to modify entries |
-| **Non-extractive** | CC BY-NC 4.0 prevents commercial exploitation of language data |
-| **Transparent sourcing** | All academic references documented in [`LINGUISTIC_SOURCES.md`](docs/LINGUISTIC_SOURCES.md) |
-
----
-
-## 🛤️ Roadmap
-
-| Phase | Focus | Key Milestones |
-| :--- | :--- | :--- |
-| **Current (v1.6.0)** | Custom keyboard + platform hardening | Nicobarese IME, 100+ native integrations, decomposed dashboard, SQLite analytics |
-| **Phase 2 — Pilot** | Classroom validation | School deployment in A&N, teacher feedback, learning outcome measurement, tribal council engagement |
-| **Phase 3 — Scale** | Expansion | Community recording program, Onge language module, curriculum integration, institutional partnerships |
+| Min Android | API 24 | Android 7.0+ |
+| Build version | `1.5.0+10` | pubspec.yaml + build.gradle |
+| NDK | 27 | Required for Whisper C++ bridge |
 
 ---
 
 ## 🚀 Installation
 
 ```bash
-# 1. Clone
-git clone https://github.com/sathiyatskrj/Speechmate.git
+# 1. Clone the Institutional (main) branch
+git clone -b main https://github.com/sathiyatskrj/Speechmate.git
 cd Speechmate
 
 # 2. Install dependencies
@@ -289,37 +284,29 @@ flutter run
 
 | Branch | Edition | Audience | Key Features |
 | :--- | :--- | :--- | :--- |
-| `main` | Institutional Edition | Teachers & Students | Classroom dashboards, gamification, progress tracking, custom keyboard |
-| `speechmate_general` | Explorer Edition | Travelers, General Public | 100+ native integrations, Nicobarese keyboard, off-grid tools |
-
----
-
-## 📂 Documentation
-
-| Document | Contents |
-| :--- | :--- |
-| [`/docs/architecture.md`](docs/architecture.md) | System architecture, service layer, translation pipeline |
-| [`/docs/features.md`](docs/features.md) | Complete feature inventory |
-| [`/docs/data.md`](docs/data.md) | Lexicon structure, JSON format, language-agnostic design |
-| [`/docs/LINGUISTIC_SOURCES.md`](docs/LINGUISTIC_SOURCES.md) | Academic sources, references, validation methodology |
+| `main` | **Institutional Edition** | Teachers & Students | Island Journey student dash, Morning Briefing teacher dash, classroom management, gamification, progress tracking |
+| `speechmate_general` | Explorer Edition | Travelers, General Public | 100+ native integrations, Nicobarese keyboard, off-grid tools, explorer bento dashboard |
 
 ---
 
 ## 📜 Licensing
 
+SpeechMate uses a **split-licensing model** to keep the source code open while strictly protecting indigenous data sovereignty.
+
 ### 1. Software Code: Apache 2.0
-All source code is licensed under the [Apache License 2.0](LICENSE).
+All source code in this repository is licensed under the [Apache License 2.0](LICENSE). You are free to use, modify, and distribute the software for commercial and non-commercial purposes.
 
 ### 2. Linguistic Data: CC BY-NC 4.0
-All dictionary entries, audio recordings, and cultural content are licensed under **CC BY-NC 4.0** with Traditional Knowledge (TK) protocols. See [DATA_TERMS.txt](DATA_TERMS.txt).
+All dictionary entries, audio recordings, and cultural content (located in `assets/data/` and `assets/audio/`) are licensed under **Creative Commons Attribution-NonCommercial 4.0 (CC BY-NC 4.0)**, combined with Traditional Knowledge (TK) protocols. See [DATA_TERMS.txt](DATA_TERMS.txt) for details.
 
-- 🚫 **No Commercial Use** without tribal council consent
-- 🚫 **No AI Training** on this data
-- ✅ **Educational/Research Use** with proper attribution
+**Key rules for the data:**
+- 🚫 **No Commercial Use:** You may not sell, monetize, or use the data in commercial products without written consent from the relevant tribal council.
+- 🚫 **No AI Training:** You may not use this data to train commercial AI or LLMs.
+- ✅ **Educational Use:** You may use the data freely for non-commercial research, classroom teaching, and respectful educational tools with proper attribution.
 
 ---
 
 <p align="center">
-  Built for the tribal communities of the Andaman &amp; Nicobar Islands.<br>
-  <em>100% offline · 100% on-device · 100% for the community</em>
+  Preserving endangered languages of the Andaman &amp; Nicobar Islands — one classroom at a time.<br>
+  <em>100% offline · 100% on-device · built for tribal schools</em>
 </p>
