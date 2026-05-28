@@ -436,7 +436,7 @@ class _PhrasebookScreenState extends State<PhrasebookScreen> {
                               _selectedCategory == 'Favorites'
                                   ? 'Tap the heart icon on any phrase card to save it here.'
                                   : 'Try adjusting your search criteria.',
-                              style: TextStyle(color: Colors.white30, fontSize: 13),
+                              style: const TextStyle(color: Colors.white30, fontSize: 13),
                             ),
                           ],
                         ),
@@ -495,7 +495,7 @@ class _PhrasebookScreenState extends State<PhrasebookScreen> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, py: 4),
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                               decoration: BoxDecoration(
                                                 color: catColor.withValues(alpha: 0.15),
                                                 borderRadius: BorderRadius.circular(10),
