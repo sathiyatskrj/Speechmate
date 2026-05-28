@@ -45,7 +45,9 @@ import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 // New features
 import 'package:speechmate/screens/sos_phrases_screen.dart';
 import 'package:speechmate/screens/league_screen.dart';
+import 'package:speechmate/screens/phrasebook_screen.dart';
 import 'package:speechmate/screens/pronunciation_challenge_screen.dart';
+import 'package:speechmate/screens/conversation_mode_screen.dart';
 
 // ============================================================================
 // DECOMPOSED COMPONENTS (extracted for maintainability — was 2,536 lines)
@@ -179,6 +181,20 @@ class _StudentDashState extends State<StudentDash>
           "colors": [const Color(0xFF00FF87), const Color(0xFF60EFFF)],
           "navigateTo": const PronunciationChallengeScreen(),
           "icon": Icons.mic_external_on_rounded
+        },
+        {
+          "word": 'Conversation Mode',
+          "emoji": "🗣️",
+          "colors": [const Color(0xFFFF416C), const Color(0xFFFF4B2B)],
+          "navigateTo": const ConversationModeScreen(),
+          "icon": Icons.forum_rounded
+        },
+        {
+          "word": 'Situational Phrasebook',
+          "emoji": "🧳",
+          "colors": [const Color(0xFF2E8B57), const Color(0xFF3CB371)],
+          "navigateTo": const PhrasebookScreen(),
+          "icon": Icons.wallet_travel_rounded
         },
         {
           "word": 'Emergency SOS Phrases',
