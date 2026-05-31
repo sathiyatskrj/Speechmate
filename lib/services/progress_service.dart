@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:speechmate/services/sound_service.dart';
 class ProgressService {
   static const String _keySearchCount = 'search_count';
   static const String _keyWordsLearned = 'words_learned';
@@ -84,6 +85,7 @@ class ProgressService {
     final prefs = await SharedPreferences.getInstance();
     int current = prefs.getInt(_keyWordsLearned) ?? 0;
     await prefs.setInt(_keyWordsLearned, current + 1);
+    SoundService.instance.play(SoundCue.xpGain);
     await _updateStreak();
   }
 
@@ -104,6 +106,7 @@ class ProgressService {
         // Increment streak
         int currentStreak = prefs.getInt(_keyStreakCount) ?? 0;
         await prefs.setInt(_keyStreakCount, currentStreak + 1);
+        SoundService.instance.play(SoundCue.streakIncrement);
       } else if (today.difference(lastDate).inDays > 1) {
         // Gap detected — try to use a streak freeze first
         final froze = await _useStreakFreeze();

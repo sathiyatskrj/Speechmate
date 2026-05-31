@@ -14,6 +14,8 @@ void main() {
     setUp(() {
       // Mock initial SharedPreferences values before each test run
       SharedPreferences.setMockInitialValues({
+        'pet_configured': true,
+        'pet_species': 'pigeon',
         'pet_name': 'CognitiveSpeechBuddy',
         'pet_happiness': 80.0,
         'pet_hunger': 40.0,
@@ -44,8 +46,8 @@ void main() {
       // Check pet name rendering
       expect(find.text('CognitiveSpeechBuddy'), findsOneWidget);
 
-      // Check current stage badge (XP is 5, so it should be BABY)
-      expect(find.text('BABY'), findsOneWidget);
+      // Check current stage badge (XP is 15, so it should be HATCHLING)
+      expect(find.text('HATCHLING'), findsOneWidget);
 
       // Check that accessory sunglasses are rendered in the overlay
       expect(find.text('🕶️'), findsOneWidget);
