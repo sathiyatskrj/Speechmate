@@ -111,8 +111,9 @@ class NotificationService {
         final lastDate = DateTime.parse(lastStreakDate);
         final daysSince = DateTime.now().difference(lastDate).inDays;
         if (daysSince >= 3) {
-          // In production: show immediate notification
-          debugPrint('[NotificationService] Dormant alert: $daysSince days since last activity.');
+          final petName = prefs.getString('pet_name') ?? 'Your pet';
+          // In production: show immediate notification with pet name
+          debugPrint('[NotificationService] Dormant alert: $daysSince days since last activity. $petName misses you!');
         }
       }
     } catch (e) {

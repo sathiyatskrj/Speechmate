@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:speechmate/services/tts_service.dart';
 import 'package:speechmate/services/native_edge_service.dart';
 import 'package:speechmate/services/progress_service.dart';
+import 'package:speechmate/services/sound_service.dart';
 import 'package:speechmate/services/whisper_service.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
@@ -25,7 +26,7 @@ import 'package:speechmate/widgets/tap_scale.dart';
 // - Mood Ambient Glow & Thinking Dots Indicators
 // ============================================================================
 
-enum PetMood { happy, neutral, hungry, sleepy, excited, sick }
+enum PetMood { happy, neutral, hungry, sleepy, excited, sick, sad }
 enum PetStage { egg, baby, teen, adult, legendary }
 
 class VirtualPetCompanion extends StatefulWidget {
@@ -75,6 +76,10 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
   Timer? _lifecycleTimer;
   Timer? _speechTimer;
 
+  // ── Dormancy / Emotional Dependency State ──
+  bool _isDormant = false;  // true if ≥3 days since last activity
+  int _dormantDays = 0;     // how many days since last activity
+
   // Vocabulary Quest Data
   static const Map<String, String> _vocabQuests = {
     'Water': 'röt',
@@ -115,6 +120,8 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
         return ['🚀 Let\'s GO!', '⚡ ZOOMIES!', '🎮 Play time!'];
       case PetMood.sick:
         return ['🤒 Not great...', '💊 Need rest...'];
+      case PetMood.sad:
+        return ['😢 I missed you...', '🥺 Where were you?', '😿 Please stay...', '💔 So lonely...'];
       case PetMood.neutral:
         return [AppStrings.get('petHappySpeech'), '👋 Hi there!', '🌈 Nice day!'];
     }
@@ -137,6 +144,22 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
     final prefs = await SharedPreferences.getInstance();
     final stats = await ProgressService().getProgressStats();
 
+    // ── Dormancy detection: check days since last streak activity ──
+    final lastStreakDate = prefs.getString('streak_last_date');
+    if (lastStreakDate != null) {
+      try {
+        final lastDate = DateTime.parse(lastStreakDate);
+        _dormantDays = DateTime.now().difference(lastDate).inDays;
+        _isDormant = _dormantDays >= 3;
+      } catch (_) {
+        _isDormant = false;
+        _dormantDays = 0;
+      }
+    } else {
+      _isDormant = false;
+      _dormantDays = 0;
+    }
+
     if (mounted) {
       setState(() {
         _petName = prefs.getString('pet_name') ?? 'CognitiveSpeechBuddy';
@@ -151,7 +174,17 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
         _petXP = prefs.getInt('pet_xp') ?? fallbackXP;
         _stage = _calculateStage(_petXP);
 
-        if (_isSleeping) {
+        // ── Emotional dependency: force sad mood if dormant ≥3 days ──
+        if (_isDormant) {
+          _mood = PetMood.sad;
+          _happiness = (_happiness * 0.3).clamp(5.0, 30.0); // Wilted happiness
+          _energy = (_energy * 0.5).clamp(10.0, 50.0);
+          _currentBehavior = 'idle';
+          _showZzz = false;
+          // Show sad speech on load
+          _speechText = '😢 I missed you so much... ($_dormantDays days)';
+          _showSpeech = true;
+        } else if (_isSleeping) {
           _currentBehavior = 'sleeping';
           _showZzz = true;
           _mood = PetMood.sleepy;
@@ -162,6 +195,18 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
         }
       });
       await _nativeService.petBrainInit(_petName);
+
+      // Auto-hide the sad speech after a longer delay
+      if (_isDormant) {
+        _speechTimer?.cancel();
+        _speechTimer = Timer(const Duration(seconds: 6), () {
+          if (mounted) {
+            setState(() {
+              _showSpeech = false;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -281,6 +326,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
   /// Feed the pet FFI handler
   void _feedPet() async {
     HapticFeedback.heavyImpact();
+    SoundService.instance.play(SoundCue.feedPet);
 
     final fedStats = await _nativeService.petBrainFeedFood(_hunger, 'pizza');
     final computedMood = await _nativeService.petBrainCalculateMood(
@@ -298,6 +344,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
       _currentBehavior = 'eating';
       _speechText = '😋 Yummy!';
       _showSpeech = true;
+      _isDormant = false; // Clear dormancy on any interaction
       _updateMoodFromState(computedMood);
       _savePetState();
     });
@@ -310,8 +357,35 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
       _showTempSpeech("💤 Sshh... I'm sleeping!");
       return;
     }
+
+    // ── Comeback celebration after dormancy ──
+    if (_isDormant) {
+      SoundService.instance.play(SoundCue.achievement);
+      HapticFeedback.heavyImpact();
+      setState(() {
+        _isDormant = false;
+        _dormantDays = 0;
+        _happiness = 85.0;  // Full happiness restore
+        _energy = 80.0;
+        _mood = PetMood.excited;
+        _currentBehavior = 'zoomies';
+        _speechText = '🎉 YOU CAME BACK! I\'m SO happy!';
+        _showSpeech = true;
+        _showHearts = true;
+        _savePetState();
+      });
+      _ttsService.speakEnglish('You came back! I missed you so much!', pitch: 1.6);
+      if (widget.onPetHappy != null) widget.onPetHappy!(); // Confetti blast
+      _heartController.forward(from: 0);
+      _bounceController.duration = const Duration(milliseconds: 200);
+      _bounceController.repeat(reverse: true);
+      _hideSpeechAfterDelay();
+      return;
+    }
+
     _tapCount++;
     HapticFeedback.mediumImpact();
+    SoundService.instance.play(SoundCue.buttonTap);
     if (widget.onPetHappy != null) widget.onPetHappy!();
 
     final playStats = await _nativeService.petBrainApplyInteraction(_happiness, _energy, 'pet');
@@ -340,6 +414,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
 
       if (evolved) {
         _speechText = '🎉 I EVOLVED!';
+        SoundService.instance.play(SoundCue.levelUp);
         _ttsService.speakEnglish('I evolved! Look at me!', pitch: 1.8);
         if (widget.onPetHappy != null) widget.onPetHappy!(); // Double confetti blast
       } else {
@@ -962,6 +1037,8 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
         return Colors.redAccent;
       case PetMood.hungry:
         return Colors.orangeAccent;
+      case PetMood.sad:
+        return const Color(0xFF5C6BC0); // Muted indigo — desaturated, melancholy
       case PetMood.neutral:
         return _stageColors[_stage.index];
     }
@@ -1043,8 +1120,8 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
   Widget build(BuildContext context) {
     final stageColor = _stageColors[_stage.index];
     final animals = _stageAnimals[_stage.index];
-    final currentAnimal = _isSleeping ? '😴' : animals[_petIndex % animals.length];
-    final bounceHeight = _currentBehavior == 'zoomies' ? 25.0 : 15.0;
+    final currentAnimal = _isSleeping ? '😴' : (_isDormant ? '🥺' : animals[_petIndex % animals.length]);
+    final bounceHeight = _isDormant ? 5.0 : (_currentBehavior == 'zoomies' ? 25.0 : 15.0);
 
     return Positioned(
       bottom: 20,
@@ -1130,6 +1207,17 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                 child: const Text('💤', style: TextStyle(fontSize: 20))
                     .animate(onPlay: (c) => c.repeat())
                     .fadeIn(duration: 600.ms).then().fadeOut(duration: 600.ms),
+              ),
+
+            // ── Tear drop for sad/dormant pet ──
+            if (_isDormant)
+              Positioned(
+                top: 55,
+                right: 25,
+                child: const Text('💧', style: TextStyle(fontSize: 14))
+                    .animate(onPlay: (c) => c.repeat())
+                    .slideY(begin: 0, end: 1.5, duration: 1200.ms, curve: Curves.easeIn)
+                    .fadeOut(begin: 0.8, duration: 400.ms),
               ),
 
             // ── Flying Food Animation Overlay ──

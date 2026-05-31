@@ -14,6 +14,7 @@ import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/services/crash_reporter.dart';
 import 'package:speechmate/services/analytics_service.dart';
 import 'package:speechmate/services/notification_service.dart';
+import 'package:speechmate/services/sound_service.dart';
 import 'package:speechmate/services/delta_update_service.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -56,6 +57,13 @@ void main() async {
     await notif.init();
   } catch (e) {
     debugPrint('[main] Offline notification init failed: $e');
+  }
+
+  // Init Pavlovian sound cues (xylophone dings, chimes, etc.)
+  try {
+    await SoundService.instance.init();
+  } catch (e) {
+    debugPrint('[main] Sound service init failed: $e');
   }
 
   // Global fallback UI for widget build errors
