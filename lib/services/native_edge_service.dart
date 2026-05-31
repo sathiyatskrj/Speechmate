@@ -1004,4 +1004,82 @@ class NativeEdgeService {
     // Real FFI: run VITS inference, return WAV bytes
     return null;
   }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 🧠 TUHET-GUARDIAN V2.0 VIRTUAL PET BRAIN (Feature 12)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Evaluates learning behaviors (games vs flashcards ratio) to compute 
+  /// playful/studious/musical/adventurous scores natively.
+  Future<Map<String, double>> petBrainPersonality(List<double> interactionLogs) async {
+    if (!_isLibLoaded) {
+      debugPrint('[Pet Brain MOCK] Evaluating personality from logs: $interactionLogs');
+      if (interactionLogs.isEmpty) {
+        return {'playful': 0.25, 'studious': 0.25, 'musical': 0.25, 'adventurous': 0.25};
+      }
+      double total = interactionLogs.reduce((a, b) => a + b);
+      if (total == 0) total = 1.0;
+      return {
+        'playful': (interactionLogs.length > 0 ? interactionLogs[0] : 0.0) / total,
+        'studious': (interactionLogs.length > 1 ? interactionLogs[1] : 0.0) / total,
+        'musical': (interactionLogs.length > 2 ? interactionLogs[2] : 0.0) / total,
+        'adventurous': (interactionLogs.length > 3 ? interactionLogs[3] : 0.0) / total,
+      };
+    }
+    // Placeholder for real C++ petBrainPersonality binding
+    return {'playful': 0.3, 'studious': 0.4, 'musical': 0.1, 'adventurous': 0.2};
+  }
+
+  /// Resolves daily structured data to template markers, returning the localized story string.
+  Future<String> petBrainGenerateDiary(int dayCount, double happiness, double hunger, int wordsLearned) async {
+    if (!_isLibLoaded) {
+      debugPrint('[Pet Brain MOCK] Generating diary narrative for day $dayCount');
+      if (happiness > 0.8 && hunger > 0.8) {
+        return "Tö-kā-ö! Day $dayCount: Today was an extraordinary adventure! We learned $wordsLearned words. My tummy is full of fresh coconuts, and I feel so loved in our beautiful beach home!";
+      } else if (happiness < 0.3) {
+        return "😢 Day $dayCount: I felt a bit lonely today... We only reviewed $wordsLearned words. I hope we can spend more time playing and learning together tomorrow.";
+      } else if (hunger < 0.3) {
+        return "😋 Day $dayCount: My tummy is rumbling! I need some yummy food, but learning $wordsLearned words with you made me smile.";
+      } else {
+        return "Day $dayCount: We had a nice, quiet day. Learning $wordsLearned words was fun, and I feel peaceful watching the ocean waves.";
+      }
+    }
+    // Placeholder for real C++ petBrainGenerateDiary binding
+    return "Natively computed localized diary for day $dayCount.";
+  }
+
+  /// Computes the gradual emotional decay curve offline based on duration since last open.
+  Future<Map<String, dynamic>> petBrainMoodDecay({
+    required double lastOpenTimeMs,
+    required double currentHappiness,
+    required double currentHunger,
+  }) async {
+    final double now = DateTime.now().millisecondsSinceEpoch.toDouble();
+    final double durationHours = (now - lastOpenTimeMs) / (1000 * 60 * 60);
+
+    if (!_isLibLoaded) {
+      debugPrint('[Pet Brain MOCK] Computing decay over $durationHours hours.');
+      // Happiness decays 0.04 per hour, hunger decays 0.06 per hour
+      double decayedHappiness = currentHappiness - (0.04 * durationHours);
+      double decayedHunger = currentHunger - (0.06 * durationHours);
+
+      decayedHappiness = decayedHappiness.clamp(0.0, 1.0);
+      decayedHunger = decayedHunger.clamp(0.0, 1.0);
+
+      // Sickness triggers if hunger < 0.15
+      bool isSick = decayedHunger < 0.15;
+
+      return {
+        'happiness': decayedHappiness,
+        'hunger': decayedHunger,
+        'isSick': isSick,
+      };
+    }
+    // Real FFI call placeholder
+    return {
+      'happiness': (currentHappiness - 0.1).clamp(0.0, 1.0),
+      'hunger': (currentHunger - 0.15).clamp(0.0, 1.0),
+      'isSick': currentHunger < 0.2,
+    };
+  }
 }

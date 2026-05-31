@@ -34,7 +34,7 @@ class DatabaseManager {
 
     return await openDatabase(
       path,
-      version: 9,
+      version: 10,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: _createIndexes,
@@ -189,6 +189,78 @@ class DatabaseManager {
        }
        debugPrint('[DatabaseManager] Upgraded to v9 (phrases audio columns).');
      }
+     if (oldVersion < 10) {
+       try {
+         await db.execute('''
+         CREATE TABLE IF NOT EXISTS pet_milestones (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             event_type TEXT NOT NULL,
+             english_term TEXT,
+             nicobarese_term TEXT,
+             timestamp INTEGER NOT NULL
+         )
+         ''');
+         await db.execute('''
+         CREATE TABLE IF NOT EXISTS pet_diary (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             day_count INTEGER NOT NULL,
+             entry_text TEXT NOT NULL,
+             mood_recorded TEXT NOT NULL,
+             timestamp INTEGER NOT NULL
+         )
+         ''');
+         await db.execute('''
+         CREATE TABLE IF NOT EXISTS pet_personality_traits (
+             playful REAL DEFAULT 0.0,
+             studious REAL DEFAULT 0.0,
+             musical REAL DEFAULT 0.0,
+             adventurous REAL DEFAULT 0.0
+         )
+         ''');
+         await db.execute('''
+         CREATE TABLE IF NOT EXISTS pet_social_history (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             peer_name TEXT NOT NULL,
+             interaction_type TEXT NOT NULL,
+             result TEXT,
+             timestamp INTEGER NOT NULL
+         )
+         ''');
+         await db.execute('''
+         CREATE TABLE IF NOT EXISTS pet_habitat (
+             jungle_unlocked INTEGER DEFAULT 0,
+             creatures_unlocked INTEGER DEFAULT 0,
+             hut_unlocked INTEGER DEFAULT 0,
+             village_unlocked INTEGER DEFAULT 0,
+             campfire_level INTEGER DEFAULT 0
+         )
+         ''');
+         
+         // Seed initial personality & habitat rows
+         final countPers = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM pet_personality_traits'));
+         if (countPers == null || countPers == 0) {
+           await db.insert('pet_personality_traits', {
+               'playful': 0.0,
+               'studious': 0.0,
+               'musical': 0.0,
+               'adventurous': 0.0
+           });
+         }
+         final countHab = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM pet_habitat'));
+         if (countHab == null || countHab == 0) {
+           await db.insert('pet_habitat', {
+               'jungle_unlocked': 0,
+               'creatures_unlocked': 0,
+               'hut_unlocked': 0,
+               'village_unlocked': 0,
+               'campfire_level': 0
+           });
+         }
+       } catch (e) {
+         debugPrint('[DatabaseManager] v10 upgrade error: $e');
+       }
+       debugPrint('[DatabaseManager] Upgraded to v10 (pet subsystem tables).');
+     }
   }
 
   Future _createDB(Database db, int version) async {
@@ -297,6 +369,55 @@ class DatabaseManager {
       english_label TEXT,
       description TEXT,
       audio_asset TEXT
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE pet_milestones (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_type TEXT NOT NULL,
+        english_term TEXT,
+        nicobarese_term TEXT,
+        timestamp INTEGER NOT NULL
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE pet_diary (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        day_count INTEGER NOT NULL,
+        entry_text TEXT NOT NULL,
+        mood_recorded TEXT NOT NULL,
+        timestamp INTEGER NOT NULL
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE pet_personality_traits (
+        playful REAL DEFAULT 0.0,
+        studious REAL DEFAULT 0.0,
+        musical REAL DEFAULT 0.0,
+        adventurous REAL DEFAULT 0.0
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE pet_social_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        peer_name TEXT NOT NULL,
+        interaction_type TEXT NOT NULL,
+        result TEXT,
+        timestamp INTEGER NOT NULL
+    )
+    ''');
+
+    await db.execute('''
+    CREATE TABLE pet_habitat (
+        jungle_unlocked INTEGER DEFAULT 0,
+        creatures_unlocked INTEGER DEFAULT 0,
+        hut_unlocked INTEGER DEFAULT 0,
+        village_unlocked INTEGER DEFAULT 0,
+        campfire_level INTEGER DEFAULT 0
     )
     ''');
   }
@@ -627,6 +748,114 @@ class DatabaseManager {
       'ease_factor': 2.5,
       'next_review_date': DateTime.now().millisecondsSinceEpoch,
       'target_language': 'great_andamanese',
+    });
+  }
+
+  // === Pet Subsystem Helpers ===
+
+  Future<void> addPetMilestone(String eventType, String? englishTerm, String? nicobareseTerm) async {
+    final db = await instance.database;
+    await db.insert('pet_milestones', {
+      'event_type': eventType,
+      'english_term': englishTerm,
+      'nicobarese_term': nicobareseTerm,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getPetMilestones() async {
+    final db = await instance.database;
+    return await db.query('pet_milestones', orderBy: 'timestamp DESC');
+  }
+
+  Future<void> addPetDiaryEntry(int dayCount, String entryText, String moodRecorded) async {
+    final db = await instance.database;
+    await db.insert('pet_diary', {
+      'day_count': dayCount,
+      'entry_text': entryText,
+      'mood_recorded': moodRecorded,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getPetDiary() async {
+    final db = await instance.database;
+    return await db.query('pet_diary', orderBy: 'day_count DESC');
+  }
+
+  Future<Map<String, dynamic>> getPetPersonality() async {
+    final db = await instance.database;
+    final res = await db.query('pet_personality_traits', limit: 1);
+    if (res.isNotEmpty) return res.first;
+    
+    // Fallback seed if empty
+    await db.insert('pet_personality_traits', {
+      'playful': 0.0,
+      'studious': 0.0,
+      'musical': 0.0,
+      'adventurous': 0.0,
+    });
+    final retry = await db.query('pet_personality_traits', limit: 1);
+    return retry.first;
+  }
+
+  Future<void> updatePetPersonality(double playful, double studious, double musical, double adventurous) async {
+    final db = await instance.database;
+    await db.update('pet_personality_traits', {
+      'playful': playful,
+      'studious': studious,
+      'musical': musical,
+      'adventurous': adventurous,
+    });
+  }
+
+  Future<void> addPetSocialHistory(String peerName, String interactionType, String? result) async {
+    final db = await instance.database;
+    await db.insert('pet_social_history', {
+      'peer_name': peerName,
+      'interaction_type': interactionType,
+      'result': result,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getPetSocialHistory() async {
+    final db = await instance.database;
+    return await db.query('pet_social_history', orderBy: 'timestamp DESC');
+  }
+
+  Future<Map<String, dynamic>> getPetHabitat() async {
+    final db = await instance.database;
+    final res = await db.query('pet_habitat', limit: 1);
+    if (res.isNotEmpty) return res.first;
+
+    // Fallback seed if empty
+    await db.insert('pet_habitat', {
+      'jungle_unlocked': 0,
+      'creatures_unlocked': 0,
+      'hut_unlocked': 0,
+      'village_unlocked': 0,
+      'campfire_level': 0,
+    });
+    final retry = await db.query('pet_habitat', limit: 1);
+    return retry.first;
+  }
+
+  Future<void> updatePetHabitat({
+    int? jungle,
+    int? creatures,
+    int? hut,
+    int? village,
+    int? campfire,
+  }) async {
+    final db = await instance.database;
+    final current = await getPetHabitat();
+    await db.update('pet_habitat', {
+      'jungle_unlocked': jungle ?? current['jungle_unlocked'],
+      'creatures_unlocked': creatures ?? current['creatures_unlocked'],
+      'hut_unlocked': hut ?? current['hut_unlocked'],
+      'village_unlocked': village ?? current['village_unlocked'],
+      'campfire_level': campfire ?? current['campfire_level'],
     });
   }
 }

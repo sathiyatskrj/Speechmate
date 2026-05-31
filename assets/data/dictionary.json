@@ -1076,74 +1076,6 @@
         "nicobarese": "Töhêng"
     },
     {
-        "english": "This",
-        "nicobarese": "Ngih"
-    },
-    {
-        "english": "That",
-        "nicobarese": "Ngamò-a"
-    },
-    {
-        "english": "These",
-        "nicobarese": "Në"
-    },
-    {
-        "english": "Those",
-        "nicobarese": "Nup"
-    },
-    {
-        "english": "My",
-        "nicobarese": "Chu"
-    },
-    {
-        "english": "Your",
-        "nicobarese": "Më-ëñ"
-    },
-    {
-        "english": "His",
-        "nicobarese": "Ngòh"
-    },
-    {
-        "english": "Her",
-        "nicobarese": "Ngòh"
-    },
-    {
-        "english": "Its",
-        "nicobarese": "Ngih"
-    },
-    {
-        "english": "Our",
-        "nicobarese": "Hi"
-    },
-    {
-        "english": "Their",
-        "nicobarese": "Cha"
-    },
-    {
-        "english": "Some",
-        "nicobarese": "Harōh tumö"
-    },
-    {
-        "english": "Any",
-        "nicobarese": "Öptöng"
-    },
-    {
-        "english": "Much",
-        "nicobarese": "Pōiyen"
-    },
-    {
-        "english": "Little",
-        "nicobarese": "Kuöñnen"
-    },
-    {
-        "english": "I",
-        "nicobarese": "Chu-ö"
-    },
-    {
-        "english": "You",
-        "nicobarese": "Më-ëñ"
-    },
-    {
         "english": "One",
         "nicobarese": "Kahōk"
     },
@@ -1184,20 +1116,12 @@
         "nicobarese": "Söm"
     },
     {
-        "english": "Afraid",
-        "nicobarese": "paia-kūˑa"
-    },
-    {
         "english": "Alive",
         "nicobarese": "âṅh"
     },
     {
         "english": "All",
         "nicobarese": "ròk-hare"
-    },
-    {
-        "english": "Angry",
-        "nicobarese": "līn"
     },
     {
         "english": "Ankle",
@@ -1224,10 +1148,6 @@
         "nicobarese": "lâmaòk"
     },
     {
-        "english": "Bad",
-        "nicobarese": "at-lāk; at-kôlô"
-    },
-    {
         "english": "Bamboo(B.vulgris)",
         "nicobarese": "hâˑo"
     },
@@ -1248,24 +1168,8 @@
         "nicobarese": "tissâ"
     },
     {
-        "english": "Bird",
-        "nicobarese": "che-chōn"
-    },
-    {
-        "english": "Black",
-        "nicobarese": "turing"
-    },
-    {
         "english": "Blind",
         "nicobarese": "tät-mak"
-    },
-    {
-        "english": "Boat",
-        "nicobarese": "kopòk"
-    },
-    {
-        "english": "Book",
-        "nicobarese": "līˑbar"
     },
     {
         "english": "Bottle(ordinary black)",
@@ -1274,10 +1178,6 @@
     {
         "english": "Breast",
         "nicobarese": "täh"
-    },
-    {
-        "english": "Bring",
-        "nicobarese": "kē-te"
     },
     {
         "english": "Brother(elder)",
@@ -1328,10 +1228,6 @@
         "nicobarese": "sâmâ"
     },
     {
-        "english": "Cloth",
-        "nicobarese": "hillâ"
-    },
-    {
         "english": "Coat",
         "nicobarese": "enyūt"
     },
@@ -1340,20 +1236,12 @@
         "nicobarese": "kok; rong-taôˑka"
     },
     {
-        "english": "Cold",
-        "nicobarese": "lūˑich"
-    },
-    {
         "english": "Come here!",
         "nicobarese": "yīˑhtar ihīh"
     },
     {
         "english": "Cough",
         "nicobarese": "äˑha"
-    },
-    {
-        "english": "Count",
-        "nicobarese": "kâ-hök"
     },
     {
         "english": "Country(region)",
@@ -1374,10 +1262,6 @@
     {
         "english": "Damsel",
         "nicobarese": "dēˑla"
-    },
-    {
-        "english": "Dance",
-        "nicobarese": "kēvryˑam"
     },
     {
         "english": "Daughter",
@@ -1464,20 +1348,8 @@
         "nicobarese": "wūˑe"
     },
     {
-        "english": "Fish",
-        "nicobarese": "kâa"
-    },
-    {
-        "english": "Foot",
-        "nicobarese": "drāin"
-    },
-    {
         "english": "Foreigner",
         "nicobarese": "tâòiṅ (or tâhäng) pūl nga"
-    },
-    {
-        "english": "Forget",
-        "nicobarese": "waitˑnga"
     },
     {
         "english": "Fowl",
@@ -1488,20 +1360,12 @@
         "nicobarese": "châldre"
     },
     {
-        "english": "Give",
-        "nicobarese": "kēˑângâ"
-    },
-    {
         "english": "Go!",
         "nicobarese": "kiranˑngara"
     },
     {
         "english": "Go(return home)",
         "nicobarese": "chūh"
-    },
-    {
-        "english": "Good",
-        "nicobarese": "lāk; kôlô"
     },
     {
         "english": "Hair(of head)",
@@ -1548,16 +1412,8 @@
         "nicobarese": "âm"
     },
     {
-        "english": "Hungry",
-        "nicobarese": "kâpa-hâre"
-    },
-    {
         "english": "Hunt(pigs)",
         "nicobarese": "haichī"
-    },
-    {
-        "english": "I",
-        "nicobarese": "chyūˑa; chian"
     },
     {
         "english": "Iguana",
@@ -1602,10 +1458,6 @@
     {
         "english": "Large",
         "nicobarese": "pôˑya"
-    },
-    {
-        "english": "Laugh",
-        "nicobarese": "haiyīˑl-kūˑa"
     },
     {
         "english": "Left(not right)",
@@ -1660,10 +1512,6 @@
         "nicobarese": "tâā (-kikôˑ-ña)"
     },
     {
-        "english": "Many",
-        "nicobarese": "mârôˑnga"
-    },
-    {
         "english": "Mast",
         "nicobarese": "kânaˑmâ"
     },
@@ -1704,16 +1552,8 @@
         "nicobarese": "tumlatˑ"
     },
     {
-        "english": "My",
-        "nicobarese": "chyūˑa"
-    },
-    {
         "english": "Nail(finger/toe)",
         "nicobarese": "kensòh"
-    },
-    {
-        "english": "Name",
-        "nicobarese": "minaiˑña"
     },
     {
         "english": "Nautilus",
@@ -1836,24 +1676,8 @@
         "nicobarese": "drânūˑma"
     },
     {
-        "english": "Rice",
-        "nicobarese": "saiṙ"
-    },
-    {
         "english": "Right(not left)",
         "nicobarese": "hâm"
-    },
-    {
-        "english": "River",
-        "nicobarese": "tâ-helˑel"
-    },
-    {
-        "english": "Road",
-        "nicobarese": "tâ-löˑka"
-    },
-    {
-        "english": "Rope",
-        "nicobarese": "pisˑsik"
     },
     {
         "english": "Sack",
@@ -1928,20 +1752,12 @@
         "nicobarese": "kâhäm-kikâˑna"
     },
     {
-        "english": "Sit",
-        "nicobarese": "ūˑchâˑkâ"
-    },
-    {
         "english": "Skin",
         "nicobarese": "ok"
     },
     {
         "english": "Sleepy",
         "nicobarese": "harˑrôh-tare"
-    },
-    {
-        "english": "Small",
-        "nicobarese": "kūˑana"
     },
     {
         "english": "Smoke(n.)",
@@ -1962,10 +1778,6 @@
     {
         "english": "Son",
         "nicobarese": "kūˑan-kikôˑna"
-    },
-    {
-        "english": "Song",
-        "nicobarese": "ten-kāˑka"
     },
     {
         "english": "Soth wind",
@@ -1992,10 +1804,6 @@
         "nicobarese": "kāh"
     },
     {
-        "english": "Spoon",
-        "nicobarese": "sanel"
-    },
-    {
         "english": "Squat(sit on one's heels)",
         "nicobarese": "dròichâˑka"
     },
@@ -2018,10 +1826,6 @@
     {
         "english": "Stomach-ache",
         "nicobarese": "chak-el-lōˑan"
-    },
-    {
-        "english": "Stone",
-        "nicobarese": "ēˑhong"
     },
     {
         "english": "Storm",
@@ -2096,10 +1900,6 @@
         "nicobarese": "lōn"
     },
     {
-        "english": "Thirsty",
-        "nicobarese": "yâl"
-    },
-    {
         "english": "Tide(ebb)",
         "nicobarese": "tâhāˑt"
     },
@@ -2144,10 +1944,6 @@
         "nicobarese": "ta-karöˑpa; pēnyūˑt"
     },
     {
-        "english": "Turtle",
-        "nicobarese": "kâp"
-    },
-    {
         "english": "Turtle-shell",
         "nicobarese": "ok-kâp"
     },
@@ -2160,16 +1956,8 @@
         "nicobarese": "trâˑhe"
     },
     {
-        "english": "Village",
-        "nicobarese": "pânòm"
-    },
-    {
         "english": "Vomit",
         "nicobarese": "kūˑaua"
-    },
-    {
-        "english": "Walk",
-        "nicobarese": "wâˑng-ngare"
     },
     {
         "english": "Water(fresh)",
@@ -2198,10 +1986,6 @@
     {
         "english": "Whistle",
         "nicobarese": "fhā"
-    },
-    {
-        "english": "White",
-        "nicobarese": "tisˑsoh"
     },
     {
         "english": "Widow",
@@ -2396,99 +2180,11 @@
         "nicobarese": "sam-lâk"
     },
     {
-        "english": "Their",
-        "nicobarese": "uma-an"
-    },
-    {
-        "english": "Some",
-        "nicobarese": "kāhéng"
-    },
-    {
-        "english": "Any",
-        "nicobarese": "öptöng"
-    },
-    {
-        "english": "Much",
-        "nicobarese": "ōrën"
-    },
-    {
-        "english": "Little",
-        "nicobarese": "kunkun"
-    },
-    {
-        "english": "I",
-        "nicobarese": "chu-ö"
-    },
-    {
-        "english": "You",
-        "nicobarese": "mè-è"
-    },
-    {
-        "english": "We",
-        "nicobarese": "ihö"
-    },
-    {
-        "english": "They",
-        "nicobarese": "acha-aa"
-    },
-    {
-        "english": "Me",
-        "nicobarese": "chu"
-    },
-    {
-        "english": "Myself",
-        "nicobarese": "chu"
-    },
-    {
-        "english": "This",
-        "nicobarese": "ngih"
-    },
-    {
-        "english": "That",
-        "nicobarese": "ngôh"
-    },
-    {
-        "english": "These",
-        "nicobarese": "në"
-    },
-    {
-        "english": "Those",
-        "nicobarese": "yip tö"
-    },
-    {
-        "english": "My",
-        "nicobarese": "chu-ö"
-    },
-    {
-        "english": "Your",
-        "nicobarese": "më-ë"
-    },
-    {
-        "english": "His",
-        "nicobarese": "kikōnyö"
-    },
-    {
-        "english": "Her",
-        "nicobarese": "kikanö"
-    },
-    {
-        "english": "Its",
-        "nicobarese": "angu-ö"
-    },
-    {
-        "english": "Our",
-        "nicobarese": "ayi-ö"
-    },
-    {
         "english": "Goat",
         "nicobarese": "bak-errah"
     },
     {
         "english": "Lizard",
         "nicobarese": "michāka"
-    },
-    {
-        "english": "Monkey",
-        "nicobarese": "oin'che"
     }
 ]

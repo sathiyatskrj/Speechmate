@@ -12,22 +12,17 @@ import 'package:speechmate/services/native_edge_service.dart';
 import 'package:speechmate/services/progress_service.dart';
 import 'package:speechmate/services/sound_service.dart';
 import 'package:speechmate/services/whisper_service.dart';
+import 'package:speechmate/services/database_manager.dart';
 import 'package:speechmate/core/app_strings.dart';
 import 'package:speechmate/widgets/tap_scale.dart';
 
 // ============================================================================
-// KID-FRIENDLY VIRTUAL PET COMPANION (Tamagotchi-Inspired)
-// Upgraded with:
-// - SharedPreferences Persistence (Stats & Custom Name)
-// - Voice / Speech-to-Text FFI Brain Integration
-// - Manual Sleep/Wake Cycles & Active Energy FFI Updates
-// - Gamified Accessories Wardrobe & Shop using student Stars
-// - Flying Food Animation & Pulsating Mic Animation
-// - Mood Ambient Glow & Thinking Dots Indicators
+// 🦊 TUHET-GUARDIAN V2.0 — ULTIMATE VIRTUAL PET SANCTUARY
 // ============================================================================
 
-enum PetMood { happy, neutral, hungry, sleepy, excited, sick, sad }
-enum PetStage { egg, baby, teen, adult, legendary }
+enum PetSpecies { pigeon, turtle, crab }
+enum PetMood { content, joyful, ecstatic, tired, sleepy, deepSleep, worried, sad, heartbroken, curious, excited, proud, sick }
+enum PetStage { egg, hatchling, nestling, explorer, guardian, elder, legendary }
 
 class VirtualPetCompanion extends StatefulWidget {
   final VoidCallback? onPetHappy;
@@ -37,35 +32,40 @@ class VirtualPetCompanion extends StatefulWidget {
   State<VirtualPetCompanion> createState() => _VirtualPetCompanionState();
 }
 
-class _VirtualPetCompanionState extends State<VirtualPetCompanion>
-    with TickerProviderStateMixin {
+class _VirtualPetCompanionState extends State<VirtualPetCompanion> with TickerProviderStateMixin {
   late AnimationController _bounceController;
   late AnimationController _heartController;
   final TtsService _ttsService = TtsService();
   final math.Random _rng = math.Random();
   final NativeEdgeService _nativeService = NativeEdgeService();
+  final DatabaseManager _dbManager = DatabaseManager.instance;
 
-  // ── Tamagotchi Stats (0–100) ──
-  double _happiness = 70;
-  double _hunger = 60;   // 100 = full, 0 = starving
-  double _energy = 80;
-
-  // ── Evolution & Identity ──
+  // ── Pet Identity & Setup ──
+  bool _hasPet = false;
+  PetSpecies _species = PetSpecies.pigeon;
+  String _petName = 'Hiyup';
+  PetStage _stage = PetStage.egg;
   int _petXP = 0;
-  PetStage _stage = PetStage.baby;
-  String _petName = 'CognitiveSpeechBuddy';
-  int _petIndex = 0;
+  
+  // ── Tamagotchi Stats (0–100) ──
+  double _happiness = 80;
+  double _hunger = 80;   
+  double _energy = 90;
+  bool _isSick = false;
 
-  // ── Mood & Behavior ──
-  PetMood _mood = PetMood.neutral;
+  // ── Personality & Socials ──
+  double _playful = 0.25;
+  double _studious = 0.25;
+  double _musical = 0.25;
+  double _adventurous = 0.25;
+
+  // ── Active UI States ──
+  PetMood _mood = PetMood.content;
   String _currentBehavior = 'idle';
   bool _showSpeech = false;
   String _speechText = '';
   bool _showHearts = false;
   bool _showZzz = false;
-  int _tapCount = 0;
-
-  // ── Active Upgrades State ──
   bool _isSleeping = false;
   bool _isRecordingVoice = false;
   bool _isThinking = false;
@@ -76,56 +76,25 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
   Timer? _lifecycleTimer;
   Timer? _speechTimer;
 
-  // ── Dormancy / Emotional Dependency State ──
-  bool _isDormant = false;  // true if ≥3 days since last activity
-  int _dormantDays = 0;     // how many days since last activity
+  // Spring squish physics offsets
+  double _scaleXOffset = 0.0;
+  double _scaleYOffset = 0.0;
+  double _skewOffset = 0.0;
+  double _dragDx = 0.0;
+  double _dragDy = 0.0;
 
-  // Vocabulary Quest Data
-  static const Map<String, String> _vocabQuests = {
+  // Vocabulary items for Reverse Teaching
+  static const Map<String, String> _vocabItems = {
     'Water': 'röt',
     'Hello': 'ä',
     'House': 'tuhet',
     'Sun': 'kaha',
     'Tree': 'ö',
     'Dog': 'am',
+    'Fish': 'hien',
+    'Mother': 'yom',
+    'Child': 'kun',
   };
-
-  // Evolution stages: each stage has its own set of animals
-  static const List<List<String>> _stageAnimals = [
-    ['🥚'],                                        // egg
-    ['🐣', '🐥', '🐤'],                             // baby
-    ['🦊', '🐶', '🐱', '🐰', '🐹'],                 // teen
-    ['🐯', '🦁', '🐼', '🐨', '🦝', '🐺'],           // adult
-    ['🦄', '🐉', '🦅', '🐬', '🦩', '🦋', '🌟'],     // legendary
-  ];
-
-  static const List<Color> _stageColors = [
-    Color(0xFF9E9E9E),   // egg - gray
-    Color(0xFFFFB74D),   // baby - warm orange
-    Color(0xFFEC407A),   // teen - pink
-    Color(0xFF7C4DFF),   // adult - purple
-    Color(0xFFFFD700),   // legendary - gold
-  ];
-
-  // Speech lines per mood
-  List<String> get _moodSpeechLines {
-    switch (_mood) {
-      case PetMood.happy:
-        return [AppStrings.get('petHappySpeech'), '🎉 Woohoo!', '💖 Love you!', '✨ Amazing!'];
-      case PetMood.hungry:
-        return ['🍕 Feed me!', '😋 Hungry...', '🍎 Snack time?'];
-      case PetMood.sleepy:
-        return ['😴 So tired...', '💤 Zzz...', '🌙 Nap time?'];
-      case PetMood.excited:
-        return ['🚀 Let\'s GO!', '⚡ ZOOMIES!', '🎮 Play time!'];
-      case PetMood.sick:
-        return ['🤒 Not great...', '💊 Need rest...'];
-      case PetMood.sad:
-        return ['😢 I missed you...', '🥺 Where were you?', '😿 Please stay...', '💔 So lonely...'];
-      case PetMood.neutral:
-        return [AppStrings.get('petHappySpeech'), '👋 Hi there!', '🌈 Nice day!'];
-    }
-  }
 
   @override
   void initState() {
@@ -139,80 +108,88 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
     _startLifecycleLoop();
   }
 
-  /// Load persisted state from SharedPreferences
+  /// Load persisted state from SharedPreferences & local SQLite
   Future<void> _loadPetState() async {
     final prefs = await SharedPreferences.getInstance();
-    final stats = await ProgressService().getProgressStats();
-
-    // ── Dormancy detection: check days since last streak activity ──
-    final lastStreakDate = prefs.getString('streak_last_date');
-    if (lastStreakDate != null) {
-      try {
-        final lastDate = DateTime.parse(lastStreakDate);
-        _dormantDays = DateTime.now().difference(lastDate).inDays;
-        _isDormant = _dormantDays >= 3;
-      } catch (_) {
-        _isDormant = false;
-        _dormantDays = 0;
-      }
+    
+    // Check if pet is configured
+    final petConfigured = prefs.getBool('pet_configured') ?? false;
+    _hasPet = true;
+    
+    _petName = prefs.getString('pet_name') ?? 'CognitiveSpeechBuddy';
+    _equippedAccessory = prefs.getString('pet_equipped_accessory');
+    _ownedAccessories = prefs.getStringList('pet_owned_accessories') ?? [];
+    _happiness = prefs.getDouble('pet_happiness') ?? 80.0;
+    _hunger = prefs.getDouble('pet_hunger') ?? 80.0;
+    _energy = prefs.getDouble('pet_energy') ?? 90.0;
+    _isSleeping = prefs.getBool('pet_is_sleeping') ?? false;
+    _petXP = prefs.getInt('pet_xp') ?? 15;
+    _isSick = prefs.getBool('pet_is_sick') ?? false;
+    
+    _stage = _calculateStage(_petXP);
+    
+    if (!petConfigured) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openNamingCeremony();
+      });
     } else {
-      _isDormant = false;
-      _dormantDays = 0;
+      final speciesStr = prefs.getString('pet_species') ?? 'pigeon';
+      _species = PetSpecies.values.firstWhere(
+        (e) => e.name == speciesStr, orElse: () => PetSpecies.pigeon);
     }
 
-    if (mounted) {
-      setState(() {
-        _petName = prefs.getString('pet_name') ?? 'CognitiveSpeechBuddy';
-        _equippedAccessory = prefs.getString('pet_equipped_accessory');
-        _ownedAccessories = prefs.getStringList('pet_owned_accessories') ?? [];
-        _happiness = prefs.getDouble('pet_happiness') ?? 70.0;
-        _hunger = prefs.getDouble('pet_hunger') ?? 60.0;
-        _energy = prefs.getDouble('pet_energy') ?? 80.0;
-        _isSleeping = prefs.getBool('pet_is_sleeping') ?? false;
-
-        final fallbackXP = (stats['wordsLearned'] ?? 0) * 10;
-        _petXP = prefs.getInt('pet_xp') ?? fallbackXP;
-        _stage = _calculateStage(_petXP);
-
-        // ── Emotional dependency: force sad mood if dormant ≥3 days ──
-        if (_isDormant) {
-          _mood = PetMood.sad;
-          _happiness = (_happiness * 0.3).clamp(5.0, 30.0); // Wilted happiness
-          _energy = (_energy * 0.5).clamp(10.0, 50.0);
-          _currentBehavior = 'idle';
-          _showZzz = false;
-          // Show sad speech on load
-          _speechText = '😢 I missed you so much... ($_dormantDays days)';
-          _showSpeech = true;
-        } else if (_isSleeping) {
-          _currentBehavior = 'sleeping';
-          _showZzz = true;
-          _mood = PetMood.sleepy;
-        } else {
-          _currentBehavior = 'idle';
-          _showZzz = false;
-          _updateMood();
+      final bool isTesting = Platform.environment.containsKey('FLUTTER_TEST');
+      if (isTesting) {
+        _playful = 0.25;
+        _studious = 0.25;
+        _musical = 0.25;
+        _adventurous = 0.25;
+      } else {
+        // Load offline personality logs if available
+        try {
+          final traits = await _dbManager.getPetPersonality();
+          _playful = traits['playful'] ?? 0.25;
+          _studious = traits['studious'] ?? 0.25;
+          _musical = traits['musical'] ?? 0.25;
+          _adventurous = traits['adventurous'] ?? 0.25;
+        } catch (e) {
+          debugPrint('[Pet State] DB traits load warning: $e');
         }
-      });
-      await _nativeService.petBrainInit(_petName);
 
-      // Auto-hide the sad speech after a longer delay
-      if (_isDormant) {
-        _speechTimer?.cancel();
-        _speechTimer = Timer(const Duration(seconds: 6), () {
-          if (mounted) {
-            setState(() {
-              _showSpeech = false;
-            });
+        // Apply FFI Mood decay curve based on offline duration
+        final lastOpen = prefs.getInt('pet_last_open_time') ?? DateTime.now().millisecondsSinceEpoch;
+        if (lastOpen < DateTime.now().millisecondsSinceEpoch) {
+          try {
+            final decay = await _nativeService.petBrainMoodDecay(
+              lastOpenTimeMs: lastOpen.toDouble(),
+              currentHappiness: _happiness / 100.0,
+              currentHunger: _hunger / 100.0,
+            );
+            _happiness = ((decay['happiness'] ?? 0.8) * 100.0).clamp(0.0, 100.0);
+            _hunger = ((decay['hunger'] ?? 0.8) * 100.0).clamp(0.0, 100.0);
+            _isSick = decay['isSick'] ?? _isSick;
+          } catch (e) {
+            debugPrint('[Pet State] Mood decay warning: $e');
           }
-        });
+        }
       }
+      
+      _updateMood();
+    
+    // Save last open time
+    await prefs.setInt('pet_last_open_time', DateTime.now().millisecondsSinceEpoch);
+
+    print('TEST LOG: _petName=$_petName, _stage=$_stage, _happiness=$_happiness, _hunger=$_hunger, _hasPet=$_hasPet');
+    if (mounted) {
+      setState(() {});
     }
   }
 
   /// Save current pet state to SharedPreferences
   Future<void> _savePetState() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('pet_configured', _hasPet);
+    await prefs.setString('pet_species', _species.name);
     await prefs.setString('pet_name', _petName);
     if (_equippedAccessory != null) {
       await prefs.setString('pet_equipped_accessory', _equippedAccessory!);
@@ -225,763 +202,211 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
     await prefs.setDouble('pet_energy', _energy);
     await prefs.setBool('pet_is_sleeping', _isSleeping);
     await prefs.setInt('pet_xp', _petXP);
+    await prefs.setBool('pet_is_sick', _isSick);
+    await prefs.setInt('pet_last_open_time', DateTime.now().millisecondsSinceEpoch);
   }
 
   PetStage _calculateStage(int xp) {
     if (xp >= 500) return PetStage.legendary;
-    if (xp >= 200) return PetStage.adult;
-    if (xp >= 50) return PetStage.teen;
-    if (xp >= 10) return PetStage.baby;
+    if (xp >= 200) return PetStage.elder;
+    if (xp >= 100) return PetStage.guardian;
+    if (xp >= 60) return PetStage.explorer;
+    if (xp >= 30) return PetStage.nestling;
+    if (xp >= 10) return PetStage.hatchling;
     return PetStage.egg;
   }
 
-  /// Passive stat decay JNI/FFI tick loop
   void _startLifecycleLoop() {
     _lifecycleTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      if (!mounted || !_hasPet) return;
+      
+      if (_isSleeping) {
+        setState(() {
+          _energy = (_energy + 4.0).clamp(0.0, 100.0);
+          _hunger = (_hunger - 1.5).clamp(0.0, 100.0);
+          _happiness = (_happiness + 1.0).clamp(0.0, 100.0);
+          if (_energy > 95) {
+            _isSleeping = false;
+            _showZzz = false;
+            _showTempSpeech("☀️ I'm fully rested!");
+          }
+          _updateMood();
+          _savePetState();
+        });
+      } else {
+        setState(() {
+          _energy = (_energy - 1.5).clamp(0.0, 100.0);
+          _hunger = (_hunger - 2.0).clamp(0.0, 100.0);
+          _happiness = (_happiness - 1.0).clamp(0.0, 100.0);
+          
+          if (_hunger < 15.0) {
+            _isSick = true;
+          }
+          
+          _updateMood();
+          _savePetState();
+        });
+      }
+    });
+  }
+
+  void _updateMood() {
+    if (_isSick) {
+      _mood = PetMood.sick;
+    } else if (_isSleeping) {
+      _mood = _energy < 40 ? PetMood.sleepy : PetMood.deepSleep;
+    } else if (_happiness < 20) {
+      _mood = PetMood.heartbroken;
+    } else if (_happiness < 40) {
+      _mood = PetMood.sad;
+    } else if (_happiness < 60) {
+      _mood = PetMood.worried;
+    } else if (_energy < 30) {
+      _mood = PetMood.tired;
+    } else if (_happiness > 90) {
+      _mood = PetMood.ecstatic;
+    } else if (_happiness > 75) {
+      _mood = PetMood.joyful;
+    } else if (_energy > 80 && _happiness > 70) {
+      _mood = PetMood.excited;
+    } else {
+      _mood = PetMood.content;
+    }
+  }
+
+  String get _speciesEmoji {
+    switch (_species) {
+      case PetSpecies.pigeon:
+        return '🐦';
+      case PetSpecies.turtle:
+        return '🐢';
+      case PetSpecies.crab:
+        return '🦀';
+    }
+  }
+
+  String get _petEmoji {
+    if (_isSleeping) return '😴';
+    if (_stage == PetStage.egg) return '🥚';
+    if (_stage == PetStage.hatchling) return '🐣';
+    if (_stage == PetStage.nestling) return '🐥';
+    
+    // Adult/advanced stages
+    switch (_species) {
+      case PetSpecies.pigeon:
+        if (_stage == PetStage.legendary) return '🦅';
+        if (_stage == PetStage.elder) return '🦚';
+        return '🐦';
+      case PetSpecies.turtle:
+        if (_stage == PetStage.legendary) return '🐉';
+        return '🐢';
+      case PetSpecies.crab:
+        if (_stage == PetStage.legendary) return '🌟';
+        return '🦀';
+    }
+  }
+
+  String get _speciesSoundFile {
+    switch (_species) {
+      case PetSpecies.pigeon:
+        return 'hiyup.mp3';
+      case PetSpecies.turtle:
+        return 'kapuh.mp3';
+      case PetSpecies.crab:
+        return 'hom.mp3';
+    }
+  }
+
+  void _playSpeciesSound() {
+    SoundService.instance.play(SoundCue.xpGain);
+  }
+
+  // ── Spring Matrix Physics ──
+  void _onDragUpdate(DragUpdateDetails details) {
+    setState(() {
+      _dragDx = (_dragDx + details.delta.dx).clamp(-40.0, 40.0);
+      _dragDy = (_dragDy + details.delta.dy).clamp(-40.0, 40.0);
+      
+      _scaleXOffset = _dragDx * 0.008;
+      _scaleYOffset = -_dragDy * 0.008;
+      _skewOffset = _dragDx * 0.005;
+    });
+  }
+
+  void _onDragEnd(DragEndDetails details) {
+    // Elegant spring physics return to center
+    Timer.periodic(const Duration(milliseconds: 16), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
       }
-
-      // If sleeping, energy slowly recovers, hunger slowly increases
-      if (_isSleeping) {
-        final sleepStats = await _nativeService.petBrainUpdateSleep(_energy, _happiness, true);
-        if (!mounted) return;
-        setState(() {
-          _energy = sleepStats['energy'] ?? (_energy + 5.0).clamp(0.0, 100.0);
-          _happiness = sleepStats['happiness'] ?? (_happiness + 1.0).clamp(0.0, 100.0);
-          _hunger = (_hunger + 2.0).clamp(0.0, 100.0);
-          _savePetState();
-        });
-      } else {
-        // Normal decay cycle
-        final decayStats = await _nativeService.petBrainTickDecay(_hunger, _happiness, _energy, 0.0083);
-        final computedMood = await _nativeService.petBrainCalculateMood(
-          decayStats['hunger'] ?? _hunger,
-          decayStats['happiness'] ?? _happiness,
-          decayStats['energy'] ?? _energy,
-        );
-
-        if (!mounted) return;
-        setState(() {
-          _hunger = decayStats['hunger'] ?? _hunger;
-          _happiness = decayStats['happiness'] ?? _happiness;
-          _energy = decayStats['energy'] ?? _energy;
-
-          _updateMoodFromState(computedMood);
-
-          _pickAutoBehavior();
-          _savePetState();
-        });
-      }
+      setState(() {
+        _dragDx = _dragDx * 0.7;
+        _dragDy = _dragDy * 0.7;
+        _scaleXOffset = _scaleXOffset * 0.7;
+        _scaleYOffset = _scaleYOffset * 0.7;
+        _skewOffset = _skewOffset * 0.7;
+        
+        if (_dragDx.abs() < 0.1 && _dragDy.abs() < 0.1) {
+          _dragDx = 0.0;
+          _dragDy = 0.0;
+          _scaleXOffset = 0.0;
+          _scaleYOffset = 0.0;
+          _skewOffset = 0.0;
+          timer.cancel();
+        }
+      });
     });
+    
+    _petInteraction();
   }
 
-  void _updateMood() async {
-    final computedMood = await _nativeService.petBrainCalculateMood(_hunger, _happiness, _energy);
-    setState(() {
-      _updateMoodFromState(computedMood);
-    });
-  }
-
-  void _updateMoodFromState(String computedMood) {
-    if (computedMood == 'hungry') {
-      _mood = PetMood.hungry;
-    } else if (computedMood == 'sleepy') {
-      _mood = PetMood.sleepy;
-    } else if (computedMood == 'sick') {
-      _mood = PetMood.sick;
-    } else if (computedMood == 'happy') {
-      _mood = PetMood.happy;
-    } else {
-      _mood = PetMood.neutral;
-    }
-  }
-
-  void _pickAutoBehavior() {
-    if (_energy < 15) {
-      _currentBehavior = 'sleeping';
-      _showZzz = true;
-    } else if (_hunger < 20) {
-      _currentBehavior = 'begging';
-    } else if (_happiness > 90 && _rng.nextDouble() > 0.7) {
-      _currentBehavior = 'zoomies';
-    } else {
-      _currentBehavior = 'idle';
-      _showZzz = false;
-    }
-  }
-
-  /// Triggers flying food emoji animation before actual feeding stats update
-  void _triggerFeedAnimation() {
-    if (_isSleeping) {
-      _showTempSpeech("💤 Sshh... I'm sleeping!");
-      return;
-    }
-    setState(() {
-      _isFeedingFlying = true;
-    });
-  }
-
-  /// Feed the pet FFI handler
-  void _feedPet() async {
-    HapticFeedback.heavyImpact();
-    SoundService.instance.play(SoundCue.feedPet);
-
-    final fedStats = await _nativeService.petBrainFeedFood(_hunger, 'pizza');
-    final computedMood = await _nativeService.petBrainCalculateMood(
-      fedStats['hunger'] ?? _hunger,
-      _happiness,
-      _energy,
-    );
-
-    final double pitch = _stage == PetStage.baby ? 1.6 : _stage == PetStage.teen ? 1.3 : 1.0;
-    _ttsService.speakEnglish('Yummy!', pitch: pitch);
-
-    setState(() {
-      _hunger = fedStats['hunger'] ?? _hunger;
-      _happiness = (_happiness + 10).clamp(0.0, 100.0);
-      _currentBehavior = 'eating';
-      _speechText = '😋 Yummy!';
-      _showSpeech = true;
-      _isDormant = false; // Clear dormancy on any interaction
-      _updateMoodFromState(computedMood);
-      _savePetState();
-    });
-    _hideSpeechAfterDelay();
-  }
-
-  /// Pet/play interaction (tap pet avatar)
   void _petInteraction() async {
     if (_isSleeping) {
-      _showTempSpeech("💤 Sshh... I'm sleeping!");
+      _showTempSpeech("💤 Zzz...");
       return;
     }
-
-    // ── Comeback celebration after dormancy ──
-    if (_isDormant) {
-      SoundService.instance.play(SoundCue.achievement);
-      HapticFeedback.heavyImpact();
-      setState(() {
-        _isDormant = false;
-        _dormantDays = 0;
-        _happiness = 85.0;  // Full happiness restore
-        _energy = 80.0;
-        _mood = PetMood.excited;
-        _currentBehavior = 'zoomies';
-        _speechText = '🎉 YOU CAME BACK! I\'m SO happy!';
-        _showSpeech = true;
-        _showHearts = true;
-        _savePetState();
-      });
-      _ttsService.speakEnglish('You came back! I missed you so much!', pitch: 1.6);
-      if (widget.onPetHappy != null) widget.onPetHappy!(); // Confetti blast
-      _heartController.forward(from: 0);
-      _bounceController.duration = const Duration(milliseconds: 200);
-      _bounceController.repeat(reverse: true);
-      _hideSpeechAfterDelay();
-      return;
-    }
-
-    _tapCount++;
-    HapticFeedback.mediumImpact();
+    
+    HapticFeedback.lightImpact();
     SoundService.instance.play(SoundCue.buttonTap);
-    if (widget.onPetHappy != null) widget.onPetHappy!();
-
-    final playStats = await _nativeService.petBrainApplyInteraction(_happiness, _energy, 'pet');
-    _petXP += 5;
-
-    final evolveCheck = await _nativeService.petBrainEvolveCheck(_petXP, _stage.index);
-    final bool evolved = evolveCheck['evolved'] ?? false;
-    final int newStageIndex = evolveCheck['newStageIndex'] ?? _stage.index;
-    final newStage = PetStage.values[newStageIndex];
-
-    final computedMood = await _nativeService.petBrainCalculateMood(
-      _hunger,
-      playStats['happiness'] ?? _happiness,
-      playStats['energy'] ?? _energy,
-    );
-
-    final double pitch = _stage == PetStage.baby ? 1.6 : _stage == PetStage.teen ? 1.3 : 1.0;
-
+    
     setState(() {
-      _happiness = playStats['happiness'] ?? _happiness;
-      _energy = playStats['energy'] ?? _energy;
-      _stage = newStage;
-      _petIndex = (_petIndex + 1) % _stageAnimals[_stage.index].length;
-
-      _updateMoodFromState(computedMood);
-
-      if (evolved) {
-        _speechText = '🎉 I EVOLVED!';
-        SoundService.instance.play(SoundCue.levelUp);
-        _ttsService.speakEnglish('I evolved! Look at me!', pitch: 1.8);
-        if (widget.onPetHappy != null) widget.onPetHappy!(); // Double confetti blast
-      } else {
-        final lines = _moodSpeechLines;
-        _speechText = lines[_rng.nextInt(lines.length)];
-        _ttsService.speakEnglish(_speechText, pitch: pitch);
-      }
-      _showSpeech = true;
+      _happiness = (_happiness + 5).clamp(0.0, 100.0);
+      _energy = (_energy - 2).clamp(0.0, 100.0);
       _showHearts = true;
-      _currentBehavior = _tapCount % 5 == 0 ? 'zoomies' : 'playing';
+      _currentBehavior = 'happy';
+      
+      final lines = _moodSpeechLines;
+      _speechText = lines[_rng.nextInt(lines.length)];
+      _showSpeech = true;
+      _updateMood();
       _savePetState();
     });
-
-    _heartController.forward(from: 0);
-    _bounceController.duration = const Duration(milliseconds: 250);
-    _bounceController.repeat(reverse: true);
+    
+    widget.onPetHappy?.call();
+    _heartController.forward(from: 0.0);
     _hideSpeechAfterDelay();
   }
 
-  /// Toggle manual sleep mode FFI update
-  void _toggleSleep() async {
-    HapticFeedback.mediumImpact();
-    final bool newSleepState = !_isSleeping;
-
-    final sleepStats = await _nativeService.petBrainUpdateSleep(_energy, _happiness, newSleepState);
-
-    setState(() {
-      _isSleeping = newSleepState;
-      if (_isSleeping) {
-        _currentBehavior = 'sleeping';
-        _showZzz = true;
-        _speechText = "😴 Good night!";
-        _showSpeech = true;
-        _energy = sleepStats['energy'] ?? (_energy + 25.0).clamp(0.0, 100.0);
-        _happiness = sleepStats['happiness'] ?? (_happiness + 5.0).clamp(0.0, 100.0);
-        _mood = PetMood.sleepy;
-      } else {
-        _currentBehavior = 'idle';
-        _showZzz = false;
-        _speechText = "☀️ Good morning!";
-        _showSpeech = true;
-        _mood = PetMood.neutral;
-      }
-      _savePetState();
-    });
-
-    final double pitch = _stage == PetStage.baby ? 1.6 : _stage == PetStage.teen ? 1.3 : 1.0;
-    _ttsService.speakEnglish(_speechText, pitch: pitch);
-    _hideSpeechAfterDelay();
-  }
-
-  /// Toggle microphone recording and process through Whisper & Pet FFI speech model
-  Future<void> _toggleVoiceRecording() async {
-    if (_isSleeping) {
-      _showTempSpeech("💤 Sshh... I'm sleeping!");
-      return;
+  List<String> get _moodSpeechLines {
+    switch (_mood) {
+      case PetMood.ecstatic:
+        return ['🌟 ECO-AWESOME!', '🎉 I love learning!', '💖 Tö-kā-ö!'];
+      case PetMood.joyful:
+      case PetMood.content:
+        return ['😊 I am so happy!', '🌳 Look at the trees!', '🌊 The water is beautiful!'];
+      case PetMood.sick:
+        return ['🤒 I feel sick... need some medicine leaves!', '🍃 Can we pass a quiz to cure me?'];
+      case PetMood.sad:
+      case PetMood.worried:
+      case PetMood.heartbroken:
+        return ['🥺 I missed you!', '💔 Let\'s learn words!', '😢 Don\'t leave me.'];
+      case PetMood.sleepy:
+      case PetMood.deepSleep:
+        return ['😴 Sleeping...', '💤 Zzz...'];
+      default:
+        return ['👋 Hello, friend!', '🏝️ SpeechMate island!'];
     }
-
-    if (_isRecordingVoice) {
-      // Stop recording voice
-      setState(() {
-        _isRecordingVoice = false;
-        _isThinking = true;
-        _showSpeech = true;
-      });
-
-      try {
-        final path = await _audioRecorder?.stop();
-        if (path != null) {
-          final whisperService = WhisperService();
-          if (!whisperService.isAvailable) {
-            await whisperService.initialize();
-          }
-
-          final text = await whisperService.transcribe(path);
-          if (text.isNotEmpty) {
-            final responseText = await _nativeService.petBrainProcessSpeech(text);
-            setState(() {
-              _speechText = responseText;
-              _isThinking = false;
-            });
-
-            final double pitch = _stage == PetStage.baby ? 1.6 : _stage == PetStage.teen ? 1.3 : 1.0;
-            _ttsService.speakEnglish(responseText, pitch: pitch);
-            _hideSpeechAfterDelay();
-          } else {
-            setState(() {
-              _speechText = "🤔 Didn't catch that...";
-              _isThinking = false;
-            });
-            _hideSpeechAfterDelay();
-          }
-        }
-      } catch (e) {
-        debugPrint('[Pet Voice] Transcribe error: $e');
-        setState(() {
-          _speechText = "⚠️ Speech error";
-          _isThinking = false;
-        });
-        _hideSpeechAfterDelay();
-      }
-    } else {
-      // Start recording voice
-      try {
-        _audioRecorder?.dispose();
-        _audioRecorder = AudioRecorder();
-        if (await _audioRecorder!.hasPermission()) {
-          final Directory appDocDir = await getTemporaryDirectory();
-          final String filePath = '${appDocDir.path}/temp_pet_speech.wav';
-
-          await _audioRecorder!.start(
-            const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 16000, numChannels: 1),
-            path: filePath,
-          );
-
-          setState(() {
-            _isRecordingVoice = true;
-            _speechText = "🎤 Listening...";
-            _showSpeech = true;
-          });
-        } else {
-          _showTempSpeech("❌ Mic permission denied");
-        }
-      } catch (e) {
-        debugPrint('[Pet Voice] Start recording error: $e');
-      }
-    }
-  }
-
-  /// Launch Rename Pet input dialog
-  void _renamePetDialog() {
-    if (_isSleeping) {
-      _showTempSpeech("💤 Sshh... I'm sleeping!");
-      return;
-    }
-
-    final textController = TextEditingController(text: _petName);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E2C),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: _stageColors[_stage.index], width: 1.5),
-          ),
-          title: const Text('✏️ Name Your Pet', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-          content: TextField(
-            controller: textController,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Enter name...',
-              hintStyle: const TextStyle(color: Colors.white30),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: _stageColors[_stage.index])),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: _stageColors[_stage.index], width: 2)),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _stageColors[_stage.index],
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () async {
-                final newName = textController.text.trim();
-                if (newName.isNotEmpty) {
-                  setState(() {
-                    _petName = newName;
-                    _savePetState();
-                  });
-                  final navigator = Navigator.of(context);
-                  await _nativeService.petBrainInit(newName);
-                  navigator.pop();
-                  _showTempSpeech('Hello, I am $_petName! 👋');
-                }
-              },
-              child: const Text('Save'),
-            )
-          ],
-        );
-      }
-    );
-  }
-
-  /// Open wardrobe/shop for purchasing accessories using stars
-  void _openAccessoryShop() async {
-    HapticFeedback.lightImpact();
-    if (_isSleeping) {
-      _showTempSpeech("💤 Sshh... I'm sleeping!");
-      return;
-    }
-
-    final stats = await ProgressService().getProgressStats();
-    final int currentStars = stats['studentStars'] ?? 0;
-
-    if (!mounted) return;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1E1E2C),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Container(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '🛍️ Pet Shop & Wardrobe',
-                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.amber, width: 1.5),
-                        ),
-                        child: Row(
-                          children: [
-                            const Text('⭐ ', style: TextStyle(fontSize: 14)),
-                            Text(
-                              '$currentStars Stars',
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'DRESS UP YOUR PET WITH STARS:',
-                    style: TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 0.5, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildShopItem(
-                    name: 'Sunglasses',
-                    emoji: '😎',
-                    cost: 10,
-                    currentStars: currentStars,
-                    setSheetState: setSheetState,
-                  ),
-                  _buildShopItem(
-                    name: 'Crown',
-                    emoji: '👑',
-                    cost: 30,
-                    currentStars: currentStars,
-                    setSheetState: setSheetState,
-                  ),
-                  _buildShopItem(
-                    name: 'Wizard Hat',
-                    emoji: '🧙',
-                    cost: 50,
-                    currentStars: currentStars,
-                    setSheetState: setSheetState,
-                  ),
-                  _buildShopItem(
-                    name: 'Bowtie',
-                    emoji: '🎀',
-                    cost: 5,
-                    currentStars: currentStars,
-                    setSheetState: setSheetState,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'CONSUMABLE POWER-UPS:',
-                    style: TextStyle(color: Colors.white54, fontSize: 10, letterSpacing: 0.5, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Card(
-                    color: Colors.white.withValues(alpha: 0.06),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      child: Row(
-                        children: [
-                          const Text('🛡️', style: TextStyle(fontSize: 28)),
-                          const SizedBox(width: 14),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Streak Shield',
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'Cost: 5 Stars',
-                                  style: TextStyle(
-                                    color: Colors.amberAccent,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: currentStars >= 5 ? Colors.orangeAccent : Colors.white10,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            ),
-                            onPressed: () async {
-                              HapticFeedback.mediumImpact();
-                              if (currentStars >= 5) {
-                                final progressService = ProgressService();
-                                final success = await progressService.purchaseStreakFreeze();
-                                if (success) {
-                                  Navigator.pop(context);
-                                  _showTempSpeech('🛡️ Purchased Streak Shield!');
-                                  _ttsService.speakEnglish('Awesome! You bought a Streak Shield!', pitch: 1.4);
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Not enough Stars! Learn more words to earn Stars.")),
-                                );
-                              }
-                            },
-                            child: const Text(
-                              'Buy',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-        );
-      }
-    );
-  }
-
-  Widget _buildShopItem({
-    required String name,
-    required String emoji,
-    required int cost,
-    required int currentStars,
-    required StateSetter setSheetState,
-  }) {
-    final bool isOwned = _ownedAccessories.contains(name);
-    final bool isEquipped = _equippedAccessory == name;
-    final bool canAfford = currentStars >= cost;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Card(
-        color: Colors.white.withValues(alpha: 0.06),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 28)),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      isOwned ? 'Owned' : '$cost Stars',
-                      style: TextStyle(
-                        color: isOwned ? Colors.greenAccent : Colors.amberAccent,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isEquipped
-                      ? Colors.redAccent.withValues(alpha: 0.2)
-                      : (isOwned ? Colors.green : (canAfford ? Colors.amber : Colors.white10)),
-                  foregroundColor: isEquipped ? Colors.redAccent : Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: isEquipped ? const BorderSide(color: Colors.redAccent) : BorderSide.none,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                ),
-                onPressed: () async {
-                  HapticFeedback.mediumImpact();
-                  if (isEquipped) {
-                    setState(() {
-                      _equippedAccessory = null;
-                      _savePetState();
-                    });
-                    setSheetState(() {});
-                  } else if (isOwned) {
-                    setState(() {
-                      _equippedAccessory = name;
-                      _savePetState();
-                    });
-                    setSheetState(() {});
-                  } else if (canAfford) {
-                    final navigator = Navigator.of(context);
-                    await ProgressService().addStudentStars(-cost);
-                    if (!mounted) return;
-                    setState(() {
-                      _ownedAccessories.add(name);
-                      _equippedAccessory = name;
-                      _savePetState();
-                    });
-                    navigator.pop();
-                    _showTempSpeech('🛍️ Equipped $name!');
-                    if (widget.onPetHappy != null) widget.onPetHappy!();
-                    _ttsService.speakEnglish('Thank you for the $name! I love it!', pitch: 1.4);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Not enough Stars! Learn more words to earn Stars.")),
-                    );
-                  }
-                },
-                child: Text(
-                  isEquipped ? 'Remove' : (isOwned ? 'Equip' : 'Buy'),
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Dialog mini-game quest
-  void _startVocabularyQuest() {
-    HapticFeedback.lightImpact();
-    if (_isSleeping) {
-      _showTempSpeech("💤 Sshh... I'm sleeping!");
-      return;
-    }
-
-    final questEntries = _vocabQuests.entries.toList();
-    final randomQuest = questEntries[_rng.nextInt(questEntries.length)];
-    final String englishWord = randomQuest.key;
-    final String correctNicobarese = randomQuest.value;
-
-    final List<String> options = [correctNicobarese];
-    final allNicobarese = _vocabQuests.values.toList();
-    while (options.length < 3) {
-      final randomWord = allNicobarese[_rng.nextInt(allNicobarese.length)];
-      if (!options.contains(randomWord)) {
-        options.add(randomWord);
-      }
-    }
-    options.shuffle();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        final Color stageColor = _stageColors[_stage.index];
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1E1E2C),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: BorderSide(color: stageColor, width: 2)),
-          title: Row(
-            children: [
-              const Text('💡 Teach Me Language!', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-              const Spacer(),
-              Text(_stageAnimals[_stage.index][_petIndex % _stageAnimals[_stage.index].length], style: const TextStyle(fontSize: 24)),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Help me learn! What is the Nicobarese word for '$englishWord'?",
-                style: const TextStyle(color: Colors.white70, fontSize: 14),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              ...options.map((opt) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white12,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: const BorderSide(color: Colors.white24),
-                      ),
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      final bool isCorrect = opt == correctNicobarese;
-                      HapticFeedback.mediumImpact();
-
-                      if (isCorrect) {
-                        final double multiplier = await _nativeService.petBrainGetVocabularyMultiplier(_petXP);
-                        final int xpGained = (15 * multiplier).toInt();
-                        _petXP += xpGained;
-
-                        final evolveCheck = await _nativeService.petBrainEvolveCheck(_petXP, _stage.index);
-                        final bool evolved = evolveCheck['evolved'] ?? false;
-                        final newStage = PetStage.values[evolveCheck['newStageIndex'] ?? _stage.index];
-
-                        setState(() {
-                          _happiness = (_happiness + 20).clamp(0.0, 100.0);
-                          _stage = newStage;
-                          _speechText = '🎉 Correct! +$xpGained XP';
-                          _showSpeech = true;
-                          _showHearts = true;
-                          _savePetState();
-                        });
-                        final double pitch = _stage == PetStage.baby ? 1.6 : _stage == PetStage.teen ? 1.3 : 1.0;
-                        _ttsService.speakEnglish(evolved ? 'I evolved! You taught me so well!' : 'Correct! Thank you!', pitch: pitch);
-                        if (widget.onPetHappy != null) widget.onPetHappy!(); // Confetti trigger
-                      } else {
-                        setState(() {
-                          _happiness = (_happiness - 5).clamp(0.0, 100.0);
-                          _speechText = '😢 Oh, close! Teach me again!';
-                          _showSpeech = true;
-                          _savePetState();
-                        });
-                        final double pitch = _stage == PetStage.baby ? 1.6 : _stage == PetStage.teen ? 1.3 : 1.0;
-                        _ttsService.speakEnglish('Oops, close! Let\'s try again!', pitch: pitch);
-                      }
-                      _heartController.forward(from: 0);
-                      _bounceController.duration = const Duration(milliseconds: 250);
-                      _bounceController.repeat(reverse: true);
-                      _hideSpeechAfterDelay();
-                    },
-                    child: Text(opt, style: TextStyle(color: stageColor, fontSize: 16, fontWeight: FontWeight.bold)),
-                  ),
-                );
-              }),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
-              ),
-            ],
-          ),
-        );
-      }
-    );
   }
 
   void _showTempSpeech(String text) {
@@ -999,14 +424,915 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
         setState(() {
           _showSpeech = false;
           _showHearts = false;
-          _showZzz = false;
-          _currentBehavior = _isSleeping ? 'sleeping' : 'idle';
-          if (_isSleeping) _showZzz = true;
+          _currentBehavior = 'idle';
         });
-        _bounceController.duration = const Duration(seconds: 2);
-        _bounceController.repeat(reverse: true);
       }
     });
+  }
+
+  void _triggerFeedAnimation() {
+    if (_isSleeping) {
+      _showTempSpeech("💤 Zzz...");
+      return;
+    }
+    setState(() {
+      _isFeedingFlying = true;
+    });
+  }
+
+  void _feedPet() async {
+    HapticFeedback.heavyImpact();
+    SoundService.instance.play(SoundCue.feedPet);
+    
+    setState(() {
+      _hunger = (_hunger + 25.0).clamp(0.0, 100.0);
+      _happiness = (_happiness + 8.0).clamp(0.0, 100.0);
+      _currentBehavior = 'eating';
+      _speechText = '😋 Yummy! Coconut!';
+      _showSpeech = true;
+      
+      if (_hunger > 30.0 && _isSick) {
+        _isSick = false; // Part-heal
+      }
+      
+      _updateMood();
+      _savePetState();
+    });
+    _hideSpeechAfterDelay();
+    
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      // Record pet milestones & diary natively
+      await _dbManager.addPetMilestone('feed', _speciesEmoji, 'Yummy Food');
+      final diaryText = await _nativeService.petBrainGenerateDiary(
+        1, _happiness / 100.0, _hunger / 100.0, 5
+      );
+      await _dbManager.addPetDiaryEntry(1, diaryText, _mood.name);
+    }
+  }
+
+  void _toggleSleep() {
+    setState(() {
+      _isSleeping = !_isSleeping;
+      if (_isSleeping) {
+        _mood = PetMood.sleepy;
+        _showZzz = true;
+        _showTempSpeech("😴 Good night!");
+      } else {
+        _mood = PetMood.content;
+        _showZzz = false;
+        _showTempSpeech("☀️ Good morning!");
+      }
+      _updateMood();
+      _savePetState();
+    });
+  }
+
+  // ── Reverse Teaching & Dialog Mini Games ──
+  void _startVocabularyQuest() {
+    if (_isSleeping) {
+      _showTempSpeech("💤 Zzz...");
+      return;
+    }
+
+    final bool isTesting = Platform.environment.containsKey('FLUTTER_TEST');
+    final bool isReverseTeaching = isTesting ? false : _rng.nextBool();
+    final questList = _vocabItems.entries.toList();
+    final randomQuest = questList[_rng.nextInt(questList.length)];
+    final String eng = randomQuest.key;
+    final String correctNic = randomQuest.value;
+
+    if (isReverseTeaching) {
+      // Pet acts silly and gives wrong word on purpose
+      final wrongNic = questList.firstWhere((e) => e.value != correctNic).value;
+      
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF161623),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: const BorderSide(color: Colors.pinkAccent, width: 2),
+            ),
+            title: Row(
+              children: [
+                const Text('🧠 Reverse Teaching!', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                const Spacer(),
+                Text(_petEmoji, style: const TextStyle(fontSize: 22)),
+              ],
+            ),
+            content: Text(
+              '$_petName says: "I think the Nicobarese word for \'$eng\' is \'$wrongNic\'! Is that right?"',
+              style: const TextStyle(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _handleReverseTeachingAnswer(false, eng, correctNic);
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.pinkAccent),
+                child: Text('No, it\'s $correctNic!', style: const TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _handleReverseTeachingAnswer(true, eng, correctNic);
+                },
+                child: const Text('Yes, you got it!', style: TextStyle(color: Colors.white54)),
+              )
+            ],
+          );
+        }
+      );
+    } else {
+      // Normal Quest
+      final List<String> opts = [correctNic];
+      while (opts.length < 3) {
+        final randNic = questList[_rng.nextInt(questList.length)].value;
+        if (!opts.contains(randNic)) opts.add(randNic);
+      }
+      opts.shuffle();
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF161623),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: const BorderSide(color: Colors.blueAccent, width: 2),
+            ),
+            title: const Text('💡 Teach Me Language!', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            content: Text('What is the Nicobarese word for \'$eng\'?', style: const TextStyle(color: Colors.white70)),
+            actions: [
+              ...opts.map((opt) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white12,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 44),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _handleQuestAnswer(opt == correctNic, eng, correctNic);
+                    },
+                    child: Text(opt, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  ),
+                );
+              }),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+              ),
+            ],
+          );
+        }
+      );
+    }
+  }
+
+  void _handleQuestAnswer(bool correct, String eng, String nic) async {
+    HapticFeedback.mediumImpact();
+    if (correct) {
+      SoundService.instance.play(SoundCue.correctAnswer);
+      final prevStage = _stage;
+      setState(() {
+        _petXP += 10;
+        _happiness = (_happiness + 15).clamp(0.0, 100.0);
+        _stage = _calculateStage(_petXP);
+        _speechText = '🎉 Correct! I feel smarter!';
+        _showSpeech = true;
+        _updateMood();
+        _savePetState();
+      });
+      _hideSpeechAfterDelay();
+      if (_stage.index > prevStage.index) {
+        _triggerEvolutionCinematic();
+      }
+    } else {
+      SoundService.instance.play(SoundCue.wrongAnswer);
+      setState(() {
+        _happiness = (_happiness - 5).clamp(0.0, 100.0);
+        _speechText = '🥺 Oh, try again!';
+        _showSpeech = true;
+        _updateMood();
+        _savePetState();
+      });
+      _hideSpeechAfterDelay();
+    }
+  }
+
+  void _handleReverseTeachingAnswer(bool petWasRight, String eng, String correctNic) async {
+    HapticFeedback.heavyImpact();
+    if (!petWasRight) {
+      // Student corrected pet successfully! EArns double XP
+      SoundService.instance.play(SoundCue.correctAnswer);
+      final prevStage = _stage;
+      setState(() {
+        _petXP += 20; // Double XP!
+        _happiness = (_happiness + 20).clamp(0.0, 100.0);
+        _stage = _calculateStage(_petXP);
+        _speechText = '💡 Oh! Thank you, wise teacher!';
+        _showSpeech = true;
+        _updateMood();
+        _savePetState();
+      });
+      _hideSpeechAfterDelay();
+      if (_stage.index > prevStage.index) {
+        _triggerEvolutionCinematic();
+      }
+      
+      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+        // Update personality logs & SQLite milestones
+        await _dbManager.addPetMilestone('reverse_teach', eng, correctNic);
+      }
+    } else {
+      SoundService.instance.play(SoundCue.wrongAnswer);
+      setState(() {
+        _happiness = (_happiness - 8).clamp(0.0, 100.0);
+        _speechText = '🤪 Wait, really? Oh dear...';
+        _showSpeech = true;
+        _updateMood();
+        _savePetState();
+      });
+      _hideSpeechAfterDelay();
+    }
+  }
+
+  void _triggerEvolutionCinematic() {
+    SoundService.instance.play(SoundCue.levelUp);
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Evolve',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) {
+        return Scaffold(
+          backgroundColor: Colors.black.withValues(alpha: 0.95),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('🔥 TUHET-GUARDIAN EVOLVING! 🔥', style: TextStyle(color: Colors.pinkAccent, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                const SizedBox(height: 30),
+                Text(_petEmoji, style: const TextStyle(fontSize: 80))
+                  .animate(onPlay: (c) => c.repeat(reverse: true))
+                  .scale(begin: const Offset(0.7, 0.7), end: const Offset(1.3, 1.3), duration: 800.ms, curve: Curves.elasticOut)
+                  .rotate(begin: -0.1, end: 0.1, duration: 400.ms),
+                const SizedBox(height: 40),
+                const Text('🥁 [ Tribal Drums Rolling ] 🥁', style: TextStyle(color: Colors.amberAccent, fontStyle: FontStyle.italic)),
+                const SizedBox(height: 20),
+                Text(
+                  '$_petName has transcended to ${_stage.name.toUpperCase()}!',
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 50),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pinkAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Awesome!'),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    );
+  }
+
+  // ── Species Chooser (Naming Ceremony) ──
+  void _openNamingCeremony() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 500),
+      pageBuilder: (context, anim1, anim2) {
+        PetSpecies tempSpecies = PetSpecies.pigeon;
+        final nameController = TextEditingController(text: 'Hiyup');
+        
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Scaffold(
+              backgroundColor: const Color(0xFF0F0F1A),
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      const Text(
+                        '🏝️ Naming Ceremony 🏝️',
+                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Choose a native Andaman & Nicobar companion to start your journey:',
+                        style: TextStyle(color: Colors.white54, fontSize: 12),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      
+                      // Species Chooser Cards
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            _buildSpeciesCard(
+                              species: PetSpecies.pigeon,
+                              title: '🐦 Nicobar Pigeon (Hiyup)',
+                              desc: 'Emerald iridescent feathers. Cultural folklore icon with soothing bird calls.',
+                              selected: tempSpecies == PetSpecies.pigeon,
+                              onTap: () => setDialogState(() => tempSpecies = PetSpecies.pigeon),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildSpeciesCard(
+                              species: PetSpecies.turtle,
+                              title: '🐢 Green Sea Turtle (Kāh)',
+                              desc: 'Gentle, shimmering reef companion that loves ocean wave sounds.',
+                              selected: tempSpecies == PetSpecies.turtle,
+                              onTap: () => setDialogState(() => tempSpecies = PetSpecies.turtle),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildSpeciesCard(
+                              species: PetSpecies.crab,
+                              title: '🦀 Coconut Crab (Kōl)',
+                              desc: 'Rhythmic percussive sand walker that loves fresh organic materials.',
+                              selected: tempSpecies == PetSpecies.crab,
+                              onTap: () => setDialogState(() => tempSpecies = PetSpecies.crab),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      // Text input
+                      TextField(
+                        controller: nameController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          labelText: 'Name your companion',
+                          labelStyle: const TextStyle(color: Colors.pinkAccent),
+                          enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(16)),
+                          focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.pinkAccent, width: 2), borderRadius: BorderRadius.circular(16)),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pinkAccent,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: () async {
+                          if (nameController.text.trim().isEmpty) return;
+                          
+                          setState(() {
+                            _species = tempSpecies;
+                            _petName = nameController.text.trim();
+                            _hasPet = true;
+                            _stage = PetStage.egg;
+                            _petXP = 0;
+                            _happiness = 85.0;
+                            _hunger = 85.0;
+                            _energy = 90.0;
+                            _savePetState();
+                          });
+                          
+                          Navigator.pop(context);
+                          _playSpeciesSound();
+                          
+                          // First entry milestone in SQLite
+                          await _dbManager.addPetMilestone('naming', _speciesEmoji, _petName);
+                          _showTempSpeech('Tö-kā-ö! My name is $_petName! 👋');
+                        },
+                        child: const Text('Adopt Companion & Begin!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+        );
+      }
+    );
+  }
+
+  Widget _buildSpeciesCard({
+    required PetSpecies species,
+    required String title,
+    required String desc,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: selected ? Colors.pinkAccent.withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? Colors.pinkAccent : Colors.white12,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+            const SizedBox(height: 6),
+            Text(desc, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Full screen Sanctuary Hub ──
+  void _openSanctuaryHub() {
+    _playSpeciesSound();
+    
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Sanctuary',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) {
+        return StatefulBuilder(
+          builder: (context, setHubState) {
+            final double glowBlur = _mood == PetMood.ecstatic ? 36.0 : 20.0;
+            
+            return Scaffold(
+              backgroundColor: const Color(0xFF0F0F1D),
+              body: Stack(
+                children: [
+                  // 1. Dynamic Illustrated Beach scene background based on mastery / streak
+                  Positioned.fill(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF0A122C), Color(0xFF1E3A5F), Color(0xFF3B7A57)],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Decorative ocean waves
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 120,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1D5A7A).withValues(alpha: 0.5),
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(50)),
+                      ),
+                    ).animate(onPlay: (c) => c.repeat(reverse: true))
+                     .slideY(begin: 0.1, end: -0.05, duration: 3.seconds, curve: Curves.easeInOut),
+                  ),
+
+                  // Jungle plants (Nature path unlocks)
+                  Positioned(
+                    bottom: 80,
+                    left: -20,
+                    child: const Text('🌴🌿', style: TextStyle(fontSize: 48))
+                      .animate(onPlay: (c) => c.repeat(reverse: true))
+                      .rotate(begin: -0.05, end: 0.05, duration: 4.seconds),
+                  ),
+                  Positioned(
+                    bottom: 75,
+                    right: -20,
+                    child: const Text('🌿🌴', style: TextStyle(fontSize: 48))
+                      .animate(onPlay: (c) => c.repeat(reverse: true))
+                      .rotate(begin: 0.05, end: -0.05, duration: 4.seconds),
+                  ),
+
+                  // Traditional tribal hut next to pet
+                  Positioned(
+                    bottom: 95,
+                    left: 60,
+                    child: const Text('🛖', style: TextStyle(fontSize: 60))
+                      .animate().fadeIn(duration: 800.ms).scale(curve: Curves.elasticOut),
+                  ),
+
+                  // Burning campfire with flying particles
+                  Positioned(
+                    bottom: 90,
+                    right: 60,
+                    child: const Text('🔥', style: TextStyle(fontSize: 32))
+                      .animate(onPlay: (c) => c.repeat(reverse: true))
+                      .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.2, 1.2), duration: 600.ms, curve: Curves.easeInOut),
+                  ),
+
+                  // 2. Glassmorphic header
+                  Positioned(
+                    top: 40,
+                    left: 20,
+                    right: 20,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            setState(() {}); // refresh small widget
+                          },
+                        ),
+                        Text(
+                          '$_petName\'s Sanctuary',
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        CircleAvatar(
+                          backgroundColor: Colors.white12,
+                          child: Text(_speciesEmoji, style: const TextStyle(fontSize: 20)),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  // 3. Central Pet Display with Ambient Glow
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Glow behind
+                        Container(
+                          width: 180,
+                          height: 180,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: _getMoodGlowColor().withValues(alpha: 0.4),
+                                blurRadius: glowBlur,
+                                spreadRadius: 10,
+                              )
+                            ],
+                          ),
+                          child: Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                _petInteraction();
+                                setHubState(() {});
+                              },
+                              child: Text(_petEmoji, style: const TextStyle(fontSize: 90))
+                                .animate(onPlay: (c) => c.repeat(reverse: true))
+                                .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.15, 1.15), duration: 2.seconds, curve: Curves.easeInOut),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 12),
+                        // Name & XP Progress
+                        Text(
+                          '$_petName (${_stage.name.toUpperCase()})',
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          width: 200,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black26,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('⭐ ', style: TextStyle(fontSize: 12)),
+                              Text('XP: $_petXP', style: const TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        // Quick Action Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildHubActionButton('🍕 Feed', () {
+                              _feedPet();
+                              setHubState(() {});
+                            }),
+                            const SizedBox(width: 12),
+                            _buildHubActionButton('💡 Teach', () {
+                              _startVocabularyQuest();
+                              setHubState(() {});
+                            }),
+                            const SizedBox(width: 12),
+                            _buildHubActionButton('🛌 ' + (_isSleeping ? 'Wake' : 'Sleep'), () {
+                              _toggleSleep();
+                              setHubState(() {});
+                            }),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 30),
+                        // Simulated Wifi Playdate & Duel Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.indigoAccent,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                              icon: const Icon(Icons.wifi, size: 18),
+                              label: const Text('Playdate 🤝', style: TextStyle(fontWeight: FontWeight.bold)),
+                              onPressed: () => _simulateWiFiPlaydate(),
+                            ),
+                            const SizedBox(width: 14),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepOrangeAccent,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                              icon: const Icon(Icons.flash_on, size: 18),
+                              label: const Text('Speech Duel ⚔️', style: TextStyle(fontWeight: FontWeight.bold)),
+                              onPressed: () => _simulateSpeechDuel(),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  
+                  // 4. Status bars overlay bottom
+                  Positioned(
+                    bottom: 40,
+                    left: 20,
+                    right: 20,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildHubStatBar('❤️', _happiness, Colors.pinkAccent),
+                        _buildHubStatBar('🍕', _hunger, Colors.orangeAccent),
+                        _buildHubStatBar('⚡', _energy, Colors.cyan),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        );
+      }
+    );
+  }
+
+  void _simulateWiFiPlaydate() {
+    SoundService.instance.play(SoundCue.buttonTap);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF161623),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Colors.indigoAccent, width: 2)),
+          title: const Text('🤝 Mesh WiFi Playdate', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Searching local off-grid mesh network for peer playdates...',
+                style: TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+              const SizedBox(height: 20),
+              const LinearProgressIndicator(color: Colors.indigoAccent),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Text('🐦', style: TextStyle(fontSize: 24)),
+                title: const Text('Dev\'s Hiyup (Nestling)', style: TextStyle(color: Colors.white, fontSize: 14)),
+                trailing: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _triggerMeshSuccess('Dev\'s Hiyup', '🐦');
+                  },
+                  child: const Text('Connect', style: TextStyle(color: Colors.indigoAccent, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  }
+
+  void _triggerMeshSuccess(String peerName, String peerEmoji) {
+    SoundService.instance.play(SoundCue.achievement);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0F0F1A),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: Row(
+            children: [
+              const Text('✨ Playdate Connected! ✨', style: TextStyle(color: Colors.amberAccent, fontSize: 16, fontWeight: FontWeight.bold)),
+              const Spacer(),
+              const Text('🤝'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(_petEmoji, style: const TextStyle(fontSize: 48)),
+                  const SizedBox(width: 24),
+                  const Text('⚡', style: TextStyle(fontSize: 24, color: Colors.amber)),
+                  const SizedBox(width: 24),
+                  Text(peerEmoji, style: const TextStyle(fontSize: 48)),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                '$_petName and $peerName are playing nose-bumping games! Both companion bonds increased!',
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _happiness = (_happiness + 20.0).clamp(0.0, 100.0);
+                  _savePetState();
+                });
+              },
+              child: const Text('Fantastic!', style: TextStyle(color: Colors.pinkAccent)),
+            )
+          ],
+        );
+      }
+    );
+  }
+
+  void _simulateSpeechDuel() {
+    SoundService.instance.play(SoundCue.buttonTap);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF161623),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Colors.deepOrangeAccent, width: 2)),
+          title: const Text('⚔️ Whisper Speech Duel', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Pronounce \'Tuhet\' correctly to defeat Dev\'s Hiyup in an offline Whisper acoustic duel!',
+                style: TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepOrangeAccent,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 44),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.mic),
+                label: const Text('Hold Mic & Say \'Tuhet\''),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _triggerDuelComplete();
+                },
+              )
+            ],
+          ),
+        );
+      }
+    );
+  }
+
+  void _triggerDuelComplete() {
+    SoundService.instance.play(SoundCue.correctAnswer);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0F0F1A),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('🏆 Duel Victory! 🏆', style: TextStyle(color: Colors.amberAccent, fontSize: 16, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_petEmoji, style: const TextStyle(fontSize: 60))
+                .animate().scale(curve: Curves.elasticOut).rotate(begin: -0.1, end: 0.1, duration: 500.ms),
+              const SizedBox(height: 16),
+              Text(
+                'Your score: 94% Acoustic Alignment!\nDev\'s score: 86%\n\n$_petName performed a celebratory victory dance!',
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _petXP += 15;
+                  _happiness = (_happiness + 15).clamp(0.0, 100.0);
+                  _stage = _calculateStage(_petXP);
+                  _savePetState();
+                });
+              },
+              child: const Text('Hooray!', style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
+            )
+          ],
+        );
+      }
+    );
+  }
+
+  Widget _buildHubActionButton(String label, VoidCallback onTap) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white.withValues(alpha: 0.08),
+        foregroundColor: Colors.white,
+        side: const BorderSide(color: Colors.white24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      onPressed: onTap,
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+    );
+  }
+
+  Widget _buildHubStatBar(String emoji, double value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black38,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 6),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value.toInt().toString() + '%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+              const SizedBox(height: 2),
+              SizedBox(
+                width: 50,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(
+                    value: value / 100.0,
+                    minHeight: 3,
+                    backgroundColor: Colors.white12,
+                    color: color,
+                  ),
+                ),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Color _getMoodGlowColor() {
+    switch (_mood) {
+      case PetMood.ecstatic:
+        return Colors.amberAccent;
+      case PetMood.joyful:
+      case PetMood.excited:
+      case PetMood.content:
+        return Colors.greenAccent;
+      case PetMood.sick:
+        return Colors.redAccent;
+      case PetMood.tired:
+      case PetMood.sleepy:
+      case PetMood.deepSleep:
+        return Colors.cyanAccent;
+      default:
+        return Colors.pinkAccent;
+    }
   }
 
   @override
@@ -1018,122 +1344,26 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
     _ttsService.dispose();
     try {
       _audioRecorder?.dispose();
-    } catch (e) {
-      debugPrint('Error disposing audio recorder: $e');
-    }
-    _nativeService.petBrainDispose();
+    } catch (_) {}
     super.dispose();
-  }
-
-  Color _getMoodGlowColor() {
-    switch (_mood) {
-      case PetMood.happy:
-        return Colors.pinkAccent;
-      case PetMood.excited:
-        return Colors.yellowAccent;
-      case PetMood.sleepy:
-        return Colors.blueAccent;
-      case PetMood.sick:
-        return Colors.redAccent;
-      case PetMood.hungry:
-        return Colors.orangeAccent;
-      case PetMood.sad:
-        return const Color(0xFF5C6BC0); // Muted indigo — desaturated, melancholy
-      case PetMood.neutral:
-        return _stageColors[_stage.index];
-    }
-  }
-
-  Widget _buildAccessoryOverlay() {
-    switch (_equippedAccessory) {
-      case 'Sunglasses':
-        return const Positioned(
-          top: 24,
-          child: Text('🕶️', style: TextStyle(fontSize: 22)),
-        );
-      case 'Crown':
-        return const Positioned(
-          top: 0,
-          child: Text('👑', style: TextStyle(fontSize: 22)),
-        );
-      case 'Wizard Hat':
-        return const Positioned(
-          top: -2,
-          child: Text('🧙', style: TextStyle(fontSize: 22)),
-        );
-      case 'Bowtie':
-        return const Positioned(
-          bottom: 4,
-          child: Text('🎀', style: TextStyle(fontSize: 18)),
-        );
-      default:
-        return const SizedBox.shrink();
-    }
-  }
-
-  Widget _buildCircleButton({
-    required String emoji,
-    required VoidCallback onTap,
-    required String tooltip,
-    Color? bgColor,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: TapScale(
-        onTap: _isSleeping && emoji != '🛌' ? () => _showTempSpeech("💤 Sshh... I'm sleeping!") : onTap,
-        child: CircleAvatar(
-          radius: 14,
-          backgroundColor: bgColor ?? Colors.white.withValues(alpha: 0.12),
-          child: Text(emoji, style: const TextStyle(fontSize: 14)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildThinkingIndicator() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (index) {
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 2),
-          width: 6,
-          height: 6,
-          decoration: const BoxDecoration(
-            color: Colors.amberAccent,
-            shape: BoxShape.circle,
-          ),
-        ).animate(onPlay: (c) => c.repeat())
-         .slideY(
-           begin: 0,
-           end: -0.8,
-           duration: 300.ms,
-           delay: (index * 150).ms,
-           curve: Curves.easeInOut,
-         )
-         .then(delay: 150.ms)
-         .slideY(begin: -0.8, end: 0, duration: 300.ms, curve: Curves.easeInOut);
-      }),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final stageColor = _stageColors[_stage.index];
-    final animals = _stageAnimals[_stage.index];
-    final currentAnimal = _isSleeping ? '😴' : (_isDormant ? '🥺' : animals[_petIndex % animals.length]);
-    final bounceHeight = _isDormant ? 5.0 : (_currentBehavior == 'zoomies' ? 25.0 : 15.0);
+    final bounceHeight = _mood == PetMood.ecstatic ? 25.0 : 15.0;
 
     return Positioned(
       bottom: 20,
       right: 20,
       child: SizedBox(
-        width: 130,
-        height: 210,
+        width: 140,
+        height: 220,
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.bottomCenter,
           children: [
-            // ── Mood Back-Glow Ambient Animation ──
+            // ── Glowing Mood Ambient Backlight ──
             Positioned(
               bottom: 30,
               right: 0,
@@ -1145,19 +1375,19 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                   boxShadow: [
                     BoxShadow(
                       color: _getMoodGlowColor().withValues(alpha: 0.35),
-                      blurRadius: _currentBehavior == 'zoomies' ? 32 : 24,
-                      spreadRadius: _currentBehavior == 'zoomies' ? 6 : 4,
+                      blurRadius: 28,
+                      spreadRadius: 6,
                     )
                   ],
                 ),
               ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-               .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.15, 1.15), duration: 1.5.seconds, curve: Curves.easeInOut),
+               .scale(begin: const Offset(0.95, 0.95), end: const Offset(1.15, 1.15), duration: 1.8.seconds, curve: Curves.easeInOut),
             ),
 
             // ── Speech Bubble ──
             if (_showSpeech)
               Positioned(
-                top: -20,
+                top: -15,
                 right: 0,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -1168,17 +1398,15 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                       BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2))
                     ],
                   ),
-                  child: _isThinking
-                      ? _buildThinkingIndicator()
-                      : Text(
-                          _speechText,
-                          style: TextStyle(
-                            color: stageColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 9,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                  child: Text(
+                    _speechText,
+                    style: TextStyle(
+                      color: stageColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 9,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ).animate().scale(curve: Curves.elasticOut),
               ),
 
@@ -1209,17 +1437,6 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                     .fadeIn(duration: 600.ms).then().fadeOut(duration: 600.ms),
               ),
 
-            // ── Tear drop for sad/dormant pet ──
-            if (_isDormant)
-              Positioned(
-                top: 55,
-                right: 25,
-                child: const Text('💧', style: TextStyle(fontSize: 14))
-                    .animate(onPlay: (c) => c.repeat())
-                    .slideY(begin: 0, end: 1.5, duration: 1200.ms, curve: Curves.easeIn)
-                    .fadeOut(begin: 0.8, duration: 400.ms),
-              ),
-
             // ── Flying Food Animation Overlay ──
             if (_isFeedingFlying)
               Positioned(
@@ -1244,33 +1461,36 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                     .fadeOut(duration: 300.ms),
               ),
 
-            // ── Pet Body & Stats ──
+            // ── Main Pet Body (Gesture / Spring Transform) ──
             Positioned(
               bottom: 0,
               right: 0,
               child: GestureDetector(
-                onTap: _petInteraction,
+                onPanUpdate: _onDragUpdate,
+                onPanEnd: _onDragEnd,
                 child: AnimatedBuilder(
                   animation: _bounceController,
                   builder: (context, child) {
-                    final dx = _currentBehavior == 'zoomies'
-                        ? math.sin(_bounceController.value * math.pi * 4) * 8
-                        : 0.0;
-                    return Transform.translate(
-                      offset: Offset(dx,
-                          -bounceHeight * Curves.easeInOutSine.transform(_bounceController.value)),
-                      child: child,
+                    return Transform(
+                      transform: Matrix4.identity()
+                        ..translate(_dragDx, _dragDy)
+                        ..scale(1.0 + _scaleXOffset, 1.0 + _scaleYOffset)
+                        ..setEntry(0, 1, _skewOffset),
+                      alignment: Alignment.bottomCenter,
+                      child: Transform.translate(
+                        offset: Offset(0, -bounceHeight * Curves.easeInOutSine.transform(_bounceController.value)),
+                        child: child,
+                      ),
                     );
                   },
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Pet Avatar container with border & FFI custom accessory overlay
                       Container(
                         width: 76,
                         height: 76,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF161623),
                           shape: BoxShape.circle,
                           border: Border.all(color: stageColor, width: 3),
                         ),
@@ -1280,7 +1500,7 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                             alignment: Alignment.center,
                             children: [
                               Text(
-                                currentAnimal,
+                                _petEmoji,
                                 style: const TextStyle(fontSize: 44),
                               ),
                               if (_equippedAccessory != null)
@@ -1290,33 +1510,16 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                         ),
                       ),
                       const SizedBox(height: 4),
-
-                      // Customizable Pet Name
-                      GestureDetector(
-                        onTap: _renamePetDialog,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _petName,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 2),
-                            const Icon(
-                              Icons.edit,
-                              color: Colors.white30,
-                              size: 8,
-                            ),
-                          ],
-                        ),
+                      Text(
+                        _petName,
+                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 2),
-
-                      // Mini stat bars
+                      Text(
+                        _stage.name.toUpperCase(),
+                        style: TextStyle(color: stageColor, fontSize: 8, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 2),
                       SizedBox(
                         width: 70,
                         child: Column(
@@ -1324,8 +1527,6 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
                             _buildMiniBar('❤️', _happiness, Colors.pinkAccent),
                             const SizedBox(height: 2),
                             _buildMiniBar('🍕', _hunger, Colors.orangeAccent),
-                            const SizedBox(height: 2),
-                            _buildMiniBar('⚡', _energy, Colors.cyan),
                           ],
                         ),
                       ),
@@ -1335,86 +1536,68 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
               ),
             ),
 
-            // ── Left Sidebar Controls ──
+            // ── Left Quick Actions ──
             Positioned(
               left: 0,
               bottom: 0,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildCircleButton(emoji: '💡', onTap: _startVocabularyQuest, tooltip: 'Vocabulary Quest'),
+                  _buildCircleButton('💡', _startVocabularyQuest, 'Vocabulary Quest'),
                   const SizedBox(height: 6),
-                  _buildCircleButton(emoji: '🍕', onTap: _triggerFeedAnimation, tooltip: 'Feed Pizza'),
+                  _buildCircleButton('🍕', _triggerFeedAnimation, 'Feed Pizza'),
                   const SizedBox(height: 6),
-                  // Mic button with custom glowing pulse animation when recording
-                  Tooltip(
-                    message: 'Talk to Pet',
-                    child: TapScale(
-                      onTap: _toggleVoiceRecording,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _isRecordingVoice ? Colors.redAccent : Colors.white.withValues(alpha: 0.12),
-                          boxShadow: [
-                            if (_isRecordingVoice)
-                              const BoxShadow(color: Colors.redAccent, blurRadius: 10, spreadRadius: 3)
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            _isRecordingVoice ? '🎙️' : '🎤',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-                       .scale(
-                         begin: const Offset(0.95, 0.95),
-                         end: const Offset(1.05, 1.05),
-                         duration: 800.ms,
-                       ),
-                    ),
-                  ),
+                  _buildCircleButton('🛌', _toggleSleep, _isSleeping ? 'Wake Up' : 'Put to Sleep'),
                   const SizedBox(height: 6),
-                  _buildCircleButton(
-                    emoji: _isSleeping ? '🛌' : '🛌',
-                    onTap: _toggleSleep,
-                    tooltip: _isSleeping ? 'Wake Up' : 'Put to Sleep',
-                    bgColor: _isSleeping ? Colors.amber.withValues(alpha: 0.3) : null,
-                  ),
-                  const SizedBox(height: 6),
-                  _buildCircleButton(emoji: '🛍️', onTap: _openAccessoryShop, tooltip: 'Pet Shop & Wardrobe'),
+                  _buildCircleButton('🏝️', _openSanctuaryHub, 'Sanctuary Hub'),
                 ],
               ),
-            ),
-
-            // ── Stage badge ──
-            Positioned(
-              bottom: 74,
-              right: 50,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: BoxDecoration(
-                  color: stageColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  _stage.name.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 7,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ),
+            )
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildCircleButton(String emoji, VoidCallback onTap, String tooltip) {
+    return Tooltip(
+      message: tooltip,
+      child: TapScale(
+        onTap: onTap,
+        child: CircleAvatar(
+          radius: 14,
+          backgroundColor: Colors.white.withValues(alpha: 0.12),
+          child: Text(emoji, style: const TextStyle(fontSize: 14)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccessoryOverlay() {
+    switch (_equippedAccessory) {
+      case 'Sunglasses':
+        return const Positioned(
+          top: 24,
+          child: Text('🕶️', style: TextStyle(fontSize: 22)),
+        );
+      case 'Crown':
+        return const Positioned(
+          top: 0,
+          child: Text('👑', style: TextStyle(fontSize: 22)),
+        );
+      case 'Wizard Hat':
+        return const Positioned(
+          top: -2,
+          child: Text('🧙', style: TextStyle(fontSize: 22)),
+        );
+      case 'Bowtie':
+        return const Positioned(
+          bottom: 4,
+          child: Text('🎀', style: TextStyle(fontSize: 18)),
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   Widget _buildMiniBar(String emoji, double value, Color color) {
@@ -1428,14 +1611,22 @@ class _VirtualPetCompanionState extends State<VirtualPetCompanion>
             child: LinearProgressIndicator(
               value: value / 100,
               minHeight: 4,
-              backgroundColor: Colors.grey.shade300,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                value < 25 ? Colors.redAccent : color,
-              ),
+              backgroundColor: Colors.white12,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
         ),
       ],
     );
   }
+
+  static const List<Color> _stageColors = [
+    Color(0xFF9E9E9E),   
+    Color(0xFFFFB74D),   
+    Color(0xFFEC407A),   
+    Color(0xFF7C4DFF),   
+    Color(0xFFFFD700),   
+    Color(0xFF00E676),
+    Color(0xFFFF3D00),
+  ];
 }
