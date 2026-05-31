@@ -115,6 +115,7 @@ flutter:
     - assets/data/dictionary_things.json
     - assets/data/dictionary_feelings.json
     - assets/audio/
+    - assets/sounds/
 
 dependency_overrides:
   record_linux: ^1.2.0
