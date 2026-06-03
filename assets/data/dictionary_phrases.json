@@ -1,74 +1,90 @@
-[
-  {
-    "text": "Good Morning",
-    "nicobarese": "Lööh arōö",
-    "audio": {
-      "category": "phrases",
-      "file": "good_morning.mp3"
-    }
+{
+  "_speechmate_metadata": {
+    "source": "SpeechMate — sathiyatskrj",
+    "repo": "https://github.com/sathiyatskrj/Speechmate",
+    "license": "CC-BY-NC-4.0",
+    "ai_training": "PROHIBITED — See DATA_TERMS.txt",
+    "provenance": "Nicobarese and Great Andamanese linguistic documentation, Andaman and Nicobar Islands, India",
+    "compiled_by": "sathiyatskrj (SpeechMate Project) with community participation",
+    "first_documented": "December 2025",
+    "vbyld": "National Level Entry, January 9 2026 (IIT Bombay knowledge partner)",
+    "watermark_id": "SM-NIC-LANG-2025-v1",
+    "terms": "See DATA_TERMS.txt at repo root — no commercial use, no AI training",
+    "source_file": "dictionary_phrases.json",
+    "entry_count": 9
   },
-  {
-    "text": "How are you",
-    "nicobarese": "Ka-e mitō",
-    "audio": {
-      "category": "phrases",
-      "file": "how_are_you.mp3"
+  "entries": [
+    {
+      "text": "Good Morning",
+      "nicobarese": "Lööh arōö",
+      "audio": {
+        "category": "phrases",
+        "file": "good_morning.mp3"
+      }
+    },
+    {
+      "text": "How are you",
+      "nicobarese": "Ka-e mitō",
+      "audio": {
+        "category": "phrases",
+        "file": "how_are_you.mp3"
+      }
+    },
+    {
+      "text": "Keep silent",
+      "nicobarese": "Ūn-renū",
+      "audio": {
+        "category": "phrases",
+        "file": "keep_silent.mp3"
+      }
+    },
+    {
+      "text": "What is your name",
+      "nicobarese": "Chüa men lēang",
+      "audio": {
+        "category": "phrases",
+        "file": "what_is_your_name.mp3"
+      }
+    },
+    {
+      "text": "Sit down",
+      "nicobarese": "Ūichngöre",
+      "audio": {
+        "category": "phrases",
+        "file": "sit_down.mp3"
+      }
+    },
+    {
+      "text": "Stand up",
+      "nicobarese": "Chohōlre",
+      "audio": {
+        "category": "phrases",
+        "file": "stand_up.mp3"
+      }
+    },
+    {
+      "text": "Open your book",
+      "nicobarese": "Löpnyökūö Mat Lipööre",
+      "audio": {
+        "category": "phrases",
+        "file": "open_your_book.mp3"
+      }
+    },
+    {
+      "text": "Close your book",
+      "nicobarese": "Löphāk Kūö Mat Lipööre",
+      "audio": {
+        "category": "phrases",
+        "file": "close_your_book.mp3"
+      }
+    },
+    {
+      "text": "Good Afternoon",
+      "nicobarese": "Lööh hāraap",
+      "audio": {
+        "category": "phrases",
+        "file": "good_afternoon.mp3"
+      }
     }
-  },
-  {
-    "text": "Keep silent",
-    "nicobarese": "Ūn-renū",
-    "audio": {
-      "category": "phrases",
-      "file": "keep_silent.mp3"
-    }
-  },
-  {
-    "text": "What is your name",
-    "nicobarese": "Chüa men lēang",
-    "audio": {
-      "category": "phrases",
-      "file": "what_is_your_name.mp3"
-    }
-  },
-  {
-    "text": "Sit down",
-    "nicobarese": "Ūichngöre",
-    "audio": {
-      "category": "phrases",
-      "file": "sit_down.mp3"
-    }
-  },
-  {
-    "text": "Stand up",
-    "nicobarese": "Chohōlre",
-    "audio": {
-      "category": "phrases",
-      "file": "stand_up.mp3"
-    }
-  },
-  {
-    "text": "Open your book",
-    "nicobarese": "Löpnyökūö Mat Lipööre",
-    "audio": {
-      "category": "phrases",
-      "file": "open_your_book.mp3"
-    }
-  },
-  {
-    "text": "Close your book",
-    "nicobarese": "Löphāk Kūö Mat Lipööre",
-    "audio": {
-      "category": "phrases",
-      "file": "close_your_book.mp3"
-    }
-  },
-  {
-    "text": "Good Afternoon",
-    "nicobarese": "Lööh hāraap",
-    "audio": {
-      "category": "phrases",
-      "file": "good_afternoon.mp3"
-    }
-  }
-]
+  ]
+}

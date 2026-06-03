@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use SpeechMate in your research or project, please cite it as below."
+type: software
+title: "SpeechMate — Endangered Language Learning Platform"
+abstract: >
+  SpeechMate is an offline-first Flutter application for learning endangered
+  tribal languages of the Andaman and Nicobar Islands — specifically Nicobarese
+  and Great Andamanese. It features a 10-stage offline NLP pipeline, SM-2
+  spaced repetition system, CRDT-based mesh sync, on-device Whisper ASR,
+  a first-of-its-kind Nicobarese IME keyboard, and 3,400+ documented
+  vocabulary entries compiled with community participation.
+authors:
+  - alias: sathiyatskrj
+    name: "sathiyatskrj"
+repository-code: "https://github.com/sathiyatskrj/Speechmate"
+license: Apache-2.0
+license-url: "https://github.com/sathiyatskrj/Speechmate/blob/main/LICENSE"
+date-released: "2025-12-09"
+keywords:
+  - endangered language
+  - language preservation
+  - Nicobarese
+  - Great Andamanese
+  - Andaman and Nicobar Islands
+  - tribal language
+  - offline NLP
+  - Flutter
+  - spaced repetition
+  - language learning
+  - indigenous language technology
+notes: >
+  The linguistic data (assets/data/) is separately licensed under CC BY-NC 4.0.
+  Commercial use and AI training use of the linguistic data is prohibited.
+  See DATA_TERMS.txt for details.
+  VBYLD 2026 National Level Entry — January 9, 2026 (IIT Bombay knowledge partner).

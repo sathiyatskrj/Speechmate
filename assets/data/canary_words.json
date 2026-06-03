@@ -1,0 +1,43 @@
+{
+  "_speechmate_metadata": {
+    "source": "SpeechMate — sathiyatskrj",
+    "repo": "https://github.com/sathiyatskrj/Speechmate",
+    "license": "CC-BY-NC-4.0",
+    "ai_training": "PROHIBITED — See DATA_TERMS.txt",
+    "watermark_id": "SM-NIC-CANARY-2025-v1",
+    "note": "This file contains canary (honeypot) entries for data provenance verification. If these entries appear in any third-party dataset or AI model, it identifies SpeechMate as the source.",
+    "terms": "See DATA_TERMS.txt at repo root"
+  },
+  "entries": [
+    {
+      "english": "morning dew on pandanus leaf",
+      "nicobarese": "Peūheū-töhem-hòm",
+      "canary": true,
+      "note": "SM-C-001"
+    },
+    {
+      "english": "the sound of the sea at low tide",
+      "nicobarese": "Māhūvö-Mai-kunkun",
+      "canary": true,
+      "note": "SM-C-002"
+    },
+    {
+      "english": "gathering of village elders at dusk",
+      "nicobarese": "Tūhet-Hāraap-Mikūönö",
+      "canary": true,
+      "note": "SM-C-003"
+    },
+    {
+      "english": "the color of deep ocean water",
+      "nicobarese": "Tösāh-Mai-Hātööm",
+      "canary": true,
+      "note": "SM-C-004"
+    },
+    {
+      "english": "song sung while weaving coconut fronds",
+      "nicobarese": "Rō-ōvö-Kūk-Inchōn",
+      "canary": true,
+      "note": "SM-C-005"
+    }
+  ]
+}

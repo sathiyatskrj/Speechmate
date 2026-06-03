@@ -70,3 +70,30 @@ This security policy covers:
 This security policy does **not** cover:
 - ❌ Third-party dependencies (report to their maintainers)
 - ❌ The GitHub wiki (not security-critical)
+
+---
+
+## Data Misuse & Licence Violations
+
+The linguistic data in `assets/data/` is protected under **CC BY-NC 4.0** with an explicit **No AI Training** restriction (see `DATA_TERMS.txt`).
+
+### Report a Data Misuse Violation
+
+If you believe the SpeechMate linguistic data (Nicobarese or Great Andamanese vocabulary, audio, or cultural content) has been:
+
+- Used in a commercial product without permission
+- Included in an AI/ML training dataset
+- Redistributed without the required attribution and license notice
+- Published in another app or dataset without credit
+
+**Please open a GitHub Issue** at https://github.com/sathiyatskrj/Speechmate/issues with the title prefix `[DATA MISUSE]` and include:
+
+1. URL or location where the violation was found
+2. Screenshot or archived copy of the evidence
+3. Which specific data you believe was used
+
+All reports are treated seriously. The maintainer monitors for violations and actively enforces the CC BY-NC 4.0 license.
+
+### Watermark Verification
+
+All dictionary JSON files contain embedded `_speechmate_metadata` blocks with a unique watermark ID (`SM-NIC-LANG-2025-v1`). These blocks survive most copy-paste and reformatting operations. The canary dataset (`assets/data/canary_words.json`) contains additional honeypot entries for provenance verification.

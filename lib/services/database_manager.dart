@@ -357,7 +357,11 @@ class DatabaseManager {
       
       try {
         final String jsonString = await rootBundle.loadString(path);
-        final List<dynamic> jsonList = json.decode(jsonString);
+        final decoded = json.decode(jsonString);
+        // Support watermarked structure: {"_speechmate_metadata": {...}, "entries": [...]}
+        final List<dynamic> jsonList = (decoded is Map && decoded.containsKey('entries'))
+            ? decoded['entries'] as List<dynamic>
+            : decoded as List<dynamic>;
         Batch batch = db.batch();
         for (var item in jsonList) {
           batch.insert(table, mapper(item));
@@ -393,7 +397,7 @@ class DatabaseManager {
     return await db.query(table, where: qCol, whereArgs: args);
   }
 
-  /// P3-05: Reverse lookup — search by Nicobarese word to get English translation.
+  /// Reverse lookup — search by Nicobarese word to get English translation.
   /// Returns the first match found across all word categories.
   Future<Map<String, dynamic>?> searchByNicobarese(String nicobareseQuery) async {
     final db = await instance.database;
@@ -417,7 +421,11 @@ class DatabaseManager {
       
       try {
         final String jsonString = await rootBundle.loadString(path);
-        final List<dynamic> jsonList = json.decode(jsonString);
+        final decoded = json.decode(jsonString);
+        // Support watermarked structure: {"_speechmate_metadata": {...}, "entries": [...]}
+        final List<dynamic> jsonList = (decoded is Map && decoded.containsKey('entries'))
+            ? decoded['entries'] as List<dynamic>
+            : decoded as List<dynamic>;
         
         Batch batch = db.batch();
         for (var item in jsonList) {

@@ -1,52 +1,68 @@
-[
-  {
-    "english": "Are you okay?",
-    "great_andamanese": "dinɔl",
-    "audio": ""
+{
+  "_speechmate_metadata": {
+    "source": "SpeechMate — sathiyatskrj",
+    "repo": "https://github.com/sathiyatskrj/Speechmate",
+    "license": "CC-BY-NC-4.0",
+    "ai_training": "PROHIBITED — See DATA_TERMS.txt",
+    "provenance": "Nicobarese and Great Andamanese linguistic documentation, Andaman and Nicobar Islands, India",
+    "compiled_by": "sathiyatskrj (SpeechMate Project) with community participation",
+    "first_documented": "December 2025",
+    "vbyld": "National Level Entry, January 9 2026 (IIT Bombay knowledge partner)",
+    "watermark_id": "SM-NIC-LANG-2025-v1",
+    "terms": "See DATA_TERMS.txt at repo root — no commercial use, no AI training",
+    "source_file": "phrases_great_andamanese.json",
+    "entry_count": 10
   },
-  {
-    "english": "Now, it's enough",
-    "great_andamanese": "ɖikhɔlɔ",
-    "audio": ""
-  },
-  {
-    "english": "Yes, okay",
-    "great_andamanese": "e:i:a",
-    "audio": ""
-  },
-  {
-    "english": "Got it?",
-    "great_andamanese": "ekrɛ",
-    "audio": ""
-  },
-  {
-    "english": "I love him",
-    "great_andamanese": "rš",
-    "audio": ""
-  },
-  {
-    "english": "I do not love him",
-    "great_andamanese": "ekrše-o",
-    "audio": ""
-  },
-  {
-    "english": "Get lost",
-    "great_andamanese": "uli",
-    "audio": ""
-  },
-  {
-    "english": "Useless",
-    "great_andamanese": "o-cae-cao-o",
-    "audio": ""
-  },
-  {
-    "english": "Oh my god!",
-    "great_andamanese": "š",
-    "audio": ""
-  },
-  {
-    "english": "Absolutely not",
-    "great_andamanese": "tai",
-    "audio": ""
-  }
-]
+  "entries": [
+    {
+      "english": "Are you okay?",
+      "great_andamanese": "dinɔl",
+      "audio": ""
+    },
+    {
+      "english": "Now, it's enough",
+      "great_andamanese": "ɖikhɔlɔ",
+      "audio": ""
+    },
+    {
+      "english": "Yes, okay",
+      "great_andamanese": "e:i:a",
+      "audio": ""
+    },
+    {
+      "english": "Got it?",
+      "great_andamanese": "ekrɛ",
+      "audio": ""
+    },
+    {
+      "english": "I love him",
+      "great_andamanese": "rš",
+      "audio": ""
+    },
+    {
+      "english": "I do not love him",
+      "great_andamanese": "ekrše-o",
+      "audio": ""
+    },
+    {
+      "english": "Get lost",
+      "great_andamanese": "uli",
+      "audio": ""
+    },
+    {
+      "english": "Useless",
+      "great_andamanese": "o-cae-cao-o",
+      "audio": ""
+    },
+    {
+      "english": "Oh my god!",
+      "great_andamanese": "š",
+      "audio": ""
+    },
+    {
+      "english": "Absolutely not",
+      "great_andamanese": "tai",
+      "audio": ""
+    }
+  ]
+}
