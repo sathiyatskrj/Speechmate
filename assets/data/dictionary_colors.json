@@ -1,12 +1,88 @@
-[
-  {"text": "Blue", "nicobarese": "Tö lingū", "emoji": "🌊", "audio": {"category": "colors", "file": "blue.mp3"}},
-  {"text": "Green", "nicobarese": "Tö rōy chōn", "emoji": "🥥", "audio": {"category": "colors", "file": "green.mp3"}},
-  {"text": "Orange", "nicobarese": "Föl", "emoji": "🌅"},
-  {"text": "Red", "nicobarese": "Chöī", "emoji": "🔴", "audio": {"category": "colors", "file": "red.mp3"}},
-  {"text": "Yellow", "nicobarese": "Rōy", "emoji": "🌻"},
-  {"text": "White", "nicobarese": "Fūn", "emoji": "⬜", "audio": {"category": "colors", "file": "white.mp3"}},
-  {"text": "Black", "nicobarese": "Talen", "emoji": "⬛", "audio": {"category": "colors", "file": "black.mp3"}},
-  {"text": "Brown", "nicobarese": "Ūm Talen", "emoji": "🤎"},
-  {"text": "Pink", "nicobarese": "Chöī Fūn", "emoji": "🩷"},
-  {"text": "Purple", "nicobarese": "Tö lingū chöī", "emoji": "🟣"}
-]
+{
+  "_speechmate_metadata": {
+    "source": "SpeechMate — sathiyatskrj",
+    "repo": "https://github.com/sathiyatskrj/Speechmate",
+    "license": "CC-BY-NC-4.0",
+    "ai_training": "PROHIBITED — See DATA_TERMS.txt",
+    "provenance": "Nicobarese and Great Andamanese linguistic documentation, Andaman and Nicobar Islands, India",
+    "compiled_by": "sathiyatskrj (SpeechMate Project) with community participation",
+    "first_documented": "December 2025",
+    "vbyld": "National Level Entry, January 9 2026 (IIT Bombay knowledge partner)",
+    "watermark_id": "SM-NIC-LANG-2025-v1",
+    "terms": "See DATA_TERMS.txt at repo root — no commercial use, no AI training",
+    "source_file": "dictionary_colors.json",
+    "entry_count": 10
+  },
+  "entries": [
+    {
+      "text": "Blue",
+      "nicobarese": "Tö lingū",
+      "emoji": "🌊",
+      "audio": {
+        "category": "colors",
+        "file": "blue.mp3"
+      }
+    },
+    {
+      "text": "Green",
+      "nicobarese": "Tö rōy chōn",
+      "emoji": "🥥",
+      "audio": {
+        "category": "colors",
+        "file": "green.mp3"
+      }
+    },
+    {
+      "text": "Orange",
+      "nicobarese": "Föl",
+      "emoji": "🌅"
+    },
+    {
+      "text": "Red",
+      "nicobarese": "Chöī",
+      "emoji": "🔴",
+      "audio": {
+        "category": "colors",
+        "file": "red.mp3"
+      }
+    },
+    {
+      "text": "Yellow",
+      "nicobarese": "Rōy",
+      "emoji": "🌻"
+    },
+    {
+      "text": "White",
+      "nicobarese": "Fūn",
+      "emoji": "⬜",
+      "audio": {
+        "category": "colors",
+        "file": "white.mp3"
+      }
+    },
+    {
+      "text": "Black",
+      "nicobarese": "Talen",
+      "emoji": "⬛",
+      "audio": {
+        "category": "colors",
+        "file": "black.mp3"
+      }
+    },
+    {
+      "text": "Brown",
+      "nicobarese": "Ūm Talen",
+      "emoji": "🤎"
+    },
+    {
+      "text": "Pink",
+      "nicobarese": "Chöī Fūn",
+      "emoji": "🩷"
+    },
+    {
+      "text": "Purple",
+      "nicobarese": "Tö lingū chöī",
+      "emoji": "🟣"
+    }
+  ]
+}
