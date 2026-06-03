@@ -1,4 +1,47 @@
-﻿Creative Commons Attribution-NonCommercial 4.0 International
+==============================================================================
+SPEECHMATE LINGUISTIC DATA — TERMS OF USE
+SPDX-License-Identifier: CC-BY-NC-4.0
+Scope: All files under assets/data/ in the SpeechMate repository
+       (github.com/sathiyatskrj/Speechmate)
+Compiler: sathiyatskrj (SpeechMate Project)
+Compiled with: Community participation by Nicobarese-speaking members
+               of the Andaman and Nicobar Islands
+First documented: December 2025
+VBYLD 2026 Entry: National Level, January 9 2026 (IIT Bombay knowledge partner)
+Watermark: SM-NIC-LANG-2025-v1
+==============================================================================
+
+ADDITIONAL RESTRICTION — NO AI TRAINING (EXPLICIT)
+----------------------------------------------------
+Notwithstanding any permissions granted under the CC BY-NC 4.0 license below,
+the Licensor explicitly PROHIBITS the use of this dataset (in whole or in part,
+modified or unmodified) for any of the following purposes:
+
+  (a) Training, fine-tuning, or evaluating any machine learning or artificial
+      intelligence model, including but not limited to large language models
+      (LLMs), automatic speech recognition (ASR) models, neural machine
+      translation (NMT) systems, or any generative AI system;
+
+  (b) Inclusion in any dataset, corpus, or knowledge base used as input to
+      the above;
+
+  (c) Any commercial AI product or service, whether or not such use is
+      otherwise permitted under CC BY-NC 4.0.
+
+This restriction is asserted under:
+  - Section 2(a)(1) of the CC BY-NC 4.0 license (NonCommercial restriction),
+  - Moral rights provisions under the Indian Copyright Act 1957, Section 57,
+  - India's Digital Personal Data Protection Act 2023 (DPDP Act) insofar as
+    personal voice data of community members is concerned,
+  - The Traditional Knowledge (TK) Label framework, asserting community
+    cultural stewardship over indigenous linguistic heritage.
+
+To request a separate licence for research, linguistic preservation, or
+academic purposes, contact the repository owner via GitHub Issues.
+
+==============================================================================
+
+Creative Commons Attribution-NonCommercial 4.0 International
 
  Creative Commons Corporation (â€œCreative Commonsâ€) is not a law firm and does not provide legal services or legal advice. Distribution of Creative Commons public licenses does not create a lawyer-client or other relationship. Creative Commons makes its licenses and related information available on an â€œas-isâ€ basis. Creative Commons gives no warranties regarding its licenses, any material licensed under their terms and conditions, or any related information. Creative Commons disclaims all liability for damages resulting from their use to the fullest extent possible.
 

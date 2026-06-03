@@ -21,7 +21,11 @@ class LocalLlmService {
     try {
       debugPrint('[LocalLlmService] Loading dictionary.json for context injection...');
       final String jsonString = await rootBundle.loadString('assets/data/dictionary.json');
-      _dictionaryCache = json.decode(jsonString);
+      final decoded = json.decode(jsonString);
+      // Support watermarked structure: {"_speechmate_metadata": {...}, "entries": [...]}
+      _dictionaryCache = (decoded is Map && decoded.containsKey('entries'))
+          ? decoded['entries'] as List<dynamic>
+          : decoded as List<dynamic>;
 
       final downloader = ModelDownloaderService();
       final isDownloaded = await downloader.isModelDownloaded();

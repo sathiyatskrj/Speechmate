@@ -11,11 +11,34 @@ on:
   workflow_dispatch:  # Allow manual trigger
 
 # ─────────────────────────────────────────────────────────────────────────────
-# JOB 1: Android — Universal APK + Compact arm64 APK + AAB
+# JOB 0: Data Integrity — Verify watermarks on all linguistic data files
+# This is a mandatory gate: if any dictionary file is missing its
+# _speechmate_metadata block, the entire CI pipeline fails.
 # ─────────────────────────────────────────────────────────────────────────────
 jobs:
+  verify-watermarks:
+    name: 🔒 Verify Data Watermarks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify linguistic data watermarks
+        run: python scripts/verify_watermarks.py
+
+# ─────────────────────────────────────────────────────────────────────────────
+# JOB 1: Android — Universal APK + Compact arm64 APK + AAB
+# ─────────────────────────────────────────────────────────────────────────────
   build-android:
     name: 🤖 Build Android
+    needs: verify-watermarks
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
 
@@ -165,6 +188,7 @@ jobs:
 # ─────────────────────────────────────────────────────────────────────────────
   build-ios:
     name: 🍎 Build iOS
+    needs: verify-watermarks
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: macos-latest
 

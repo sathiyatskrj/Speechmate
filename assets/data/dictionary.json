@@ -1,2190 +1,2206 @@
-[
+{
+  "_speechmate_metadata": {
+    "source": "SpeechMate — sathiyatskrj",
+    "repo": "https://github.com/sathiyatskrj/Speechmate",
+    "license": "CC-BY-NC-4.0",
+    "ai_training": "PROHIBITED — See DATA_TERMS.txt",
+    "provenance": "Nicobarese and Great Andamanese linguistic documentation, Andaman and Nicobar Islands, India",
+    "compiled_by": "sathiyatskrj (SpeechMate Project) with community participation",
+    "first_documented": "December 2025",
+    "vbyld": "National Level Entry, January 9 2026 (IIT Bombay knowledge partner)",
+    "watermark_id": "SM-NIC-LANG-2025-v1",
+    "terms": "See DATA_TERMS.txt at repo root — no commercial use, no AI training",
+    "source_file": "dictionary.json",
+    "entry_count": 547
+  },
+  "entries": [
     {
-        "english": "This",
-        "nicobarese": "Ngih"
+      "english": "This",
+      "nicobarese": "Ngih"
     },
     {
-        "english": "That",
-        "nicobarese": "Ngôh"
+      "english": "That",
+      "nicobarese": "Ngôh"
     },
     {
-        "english": "These",
-        "nicobarese": "Në"
+      "english": "These",
+      "nicobarese": "Në"
     },
     {
-        "english": "Those",
-        "nicobarese": "Yip tö"
+      "english": "Those",
+      "nicobarese": "Yip tö"
     },
     {
-        "english": "My",
-        "nicobarese": "Chu-ö"
+      "english": "My",
+      "nicobarese": "Chu-ö"
     },
     {
-        "english": "Your",
-        "nicobarese": "Më-ë"
+      "english": "Your",
+      "nicobarese": "Më-ë"
     },
     {
-        "english": "His",
-        "nicobarese": "Kikōnyö"
+      "english": "His",
+      "nicobarese": "Kikōnyö"
     },
     {
-        "english": "Her",
-        "nicobarese": "Kikanö"
+      "english": "Her",
+      "nicobarese": "Kikanö"
     },
     {
-        "english": "Its",
-        "nicobarese": "Angu-ö"
+      "english": "Its",
+      "nicobarese": "Angu-ö"
     },
     {
-        "english": "Our",
-        "nicobarese": "Ayi-ö"
+      "english": "Our",
+      "nicobarese": "Ayi-ö"
     },
     {
-        "english": "Their",
-        "nicobarese": "Uma-an"
+      "english": "Their",
+      "nicobarese": "Uma-an"
     },
     {
-        "english": "Some",
-        "nicobarese": "Kāhéng"
+      "english": "Some",
+      "nicobarese": "Kāhéng"
     },
     {
-        "english": "Any",
-        "nicobarese": "Öptöng"
+      "english": "Any",
+      "nicobarese": "Öptöng"
     },
     {
-        "english": "Much",
-        "nicobarese": "Ōrën"
+      "english": "Much",
+      "nicobarese": "Ōrën"
     },
     {
-        "english": "Little",
-        "nicobarese": "Kunkun"
+      "english": "Little",
+      "nicobarese": "Kunkun"
     },
     {
-        "english": "I",
-        "nicobarese": "Chu-ö"
+      "english": "I",
+      "nicobarese": "Chu-ö"
     },
     {
-        "english": "You",
-        "nicobarese": "Mè-è"
+      "english": "You",
+      "nicobarese": "Mè-è"
     },
     {
-        "english": "We",
-        "nicobarese": "Ihö"
+      "english": "We",
+      "nicobarese": "Ihö"
     },
     {
-        "english": "They",
-        "nicobarese": "Acha-aa"
+      "english": "They",
+      "nicobarese": "Acha-aa"
     },
     {
-        "english": "Me",
-        "nicobarese": "Chu"
+      "english": "Me",
+      "nicobarese": "Chu"
     },
     {
-        "english": "Myself",
-        "nicobarese": "Chu"
+      "english": "Myself",
+      "nicobarese": "Chu"
     },
     {
-        "english": "Name",
-        "nicobarese": "Lēang"
+      "english": "Name",
+      "nicobarese": "Lēang"
     },
     {
-        "english": "Teacher",
-        "nicobarese": "Mö-hakööpöti"
+      "english": "Teacher",
+      "nicobarese": "Mö-hakööpöti"
     },
     {
-        "english": "Student",
-        "nicobarese": "Möhakööp"
+      "english": "Student",
+      "nicobarese": "Möhakööp"
     },
     {
-        "english": "School",
-        "nicobarese": "Iskul"
+      "english": "School",
+      "nicobarese": "Iskul"
     },
     {
-        "english": "Class",
-        "nicobarese": "Chuök Möhakööp"
+      "english": "Class",
+      "nicobarese": "Chuök Möhakööp"
     },
     {
-        "english": "Classroom",
-        "nicobarese": "Chuök Möhakööp"
+      "english": "Classroom",
+      "nicobarese": "Chuök Möhakööp"
     },
     {
-        "english": "Book",
-        "nicobarese": "Tö hakööpö Mat Lipööre"
+      "english": "Book",
+      "nicobarese": "Tö hakööpö Mat Lipööre"
     },
     {
-        "english": "Notebook",
-        "nicobarese": "Tö kūichö Mat Lipööre"
+      "english": "Notebook",
+      "nicobarese": "Tö kūichö Mat Lipööre"
     },
     {
-        "english": "Pen",
-        "nicobarese": "Kanūich"
+      "english": "Pen",
+      "nicobarese": "Kanūich"
     },
     {
-        "english": "Pencil",
-        "nicobarese": "Pencil"
+      "english": "Pencil",
+      "nicobarese": "Pencil"
     },
     {
-        "english": "Eraser",
-        "nicobarese": "Sānich"
+      "english": "Eraser",
+      "nicobarese": "Sānich"
     },
     {
-        "english": "Sharpener",
-        "nicobarese": "Kättär"
+      "english": "Sharpener",
+      "nicobarese": "Kättär"
     },
     {
-        "english": "Blackboard",
-        "nicobarese": "Tösāh Board"
+      "english": "Blackboard",
+      "nicobarese": "Tösāh Board"
     },
     {
-        "english": "Chalk",
-        "nicobarese": "Chalk"
+      "english": "Chalk",
+      "nicobarese": "Chalk"
     },
     {
-        "english": "Desk",
-        "nicobarese": "Mish (mö ek Iskūl)"
+      "english": "Desk",
+      "nicobarese": "Mish (mö ek Iskūl)"
     },
     {
-        "english": "Chair",
-        "nicobarese": "Anūchö"
+      "english": "Chair",
+      "nicobarese": "Anūchö"
     },
     {
-        "english": "Bag",
-        "nicobarese": "Bag"
+      "english": "Bag",
+      "nicobarese": "Bag"
     },
     {
-        "english": "Bottle",
-        "nicobarese": "Pilūn"
+      "english": "Bottle",
+      "nicobarese": "Pilūn"
     },
     {
-        "english": "Water",
-        "nicobarese": "Mak"
+      "english": "Water",
+      "nicobarese": "Mak"
     },
     {
-        "english": "Lunch",
-        "nicobarese": "Nya-ān"
+      "english": "Lunch",
+      "nicobarese": "Nya-ān"
     },
     {
-        "english": "Lunchbox",
-        "nicobarese": "Chuök Nya-ān"
+      "english": "Lunchbox",
+      "nicobarese": "Chuök Nya-ān"
     },
     {
-        "english": "Lesson",
-        "nicobarese": "Inchōk kūö"
+      "english": "Lesson",
+      "nicobarese": "Inchōk kūö"
     },
     {
-        "english": "Exam",
-        "nicobarese": "Kinlāha"
+      "english": "Exam",
+      "nicobarese": "Kinlāha"
     },
     {
-        "english": "Test",
-        "nicobarese": "Kinlāha"
+      "english": "Test",
+      "nicobarese": "Kinlāha"
     },
     {
-        "english": "Bell",
-        "nicobarese": "Tākôngö"
+      "english": "Bell",
+      "nicobarese": "Tākôngö"
     },
     {
-        "english": "Time",
-        "nicobarese": "Retàk"
+      "english": "Time",
+      "nicobarese": "Retàk"
     },
     {
-        "english": "Period",
-        "nicobarese": "Retàk"
+      "english": "Period",
+      "nicobarese": "Retàk"
     },
     {
-        "english": "Uniform",
-        "nicobarese": "Inyūt"
+      "english": "Uniform",
+      "nicobarese": "Inyūt"
     },
     {
-        "english": "Shoes",
-        "nicobarese": "Kūnröpö"
+      "english": "Shoes",
+      "nicobarese": "Kūnröpö"
     },
     {
-        "english": "Socks",
-        "nicobarese": "Innying"
+      "english": "Socks",
+      "nicobarese": "Innying"
     },
     {
-        "english": "Playground",
-        "nicobarese": "Chūök Nyamamtô"
+      "english": "Playground",
+      "nicobarese": "Chūök Nyamamtô"
     },
     {
-        "english": "Library",
-        "nicobarese": "Chūök Lipööre"
+      "english": "Library",
+      "nicobarese": "Chūök Lipööre"
     },
     {
-        "english": "Map",
-        "nicobarese": "Inchōhökuö Tālöökö"
+      "english": "Map",
+      "nicobarese": "Inchōhökuö Tālöökö"
     },
     {
-        "english": "Dustbin",
-        "nicobarese": "Chūök Chōn"
+      "english": "Dustbin",
+      "nicobarese": "Chūök Chōn"
     },
     {
-        "english": "Window",
-        "nicobarese": "Khirki"
+      "english": "Window",
+      "nicobarese": "Khirki"
     },
     {
-        "english": "Door",
-        "nicobarese": "Inkūp"
+      "english": "Door",
+      "nicobarese": "Inkūp"
     },
     {
-        "english": "Fan",
-        "nicobarese": "Fan"
+      "english": "Fan",
+      "nicobarese": "Fan"
     },
     {
-        "english": "Light",
-        "nicobarese": "Eānvö"
+      "english": "Light",
+      "nicobarese": "Eānvö"
     },
     {
-        "english": "Switch",
-        "nicobarese": "Tinrëp"
+      "english": "Switch",
+      "nicobarese": "Tinrëp"
     },
     {
-        "english": "Clock",
-        "nicobarese": "Kāriyāl"
+      "english": "Clock",
+      "nicobarese": "Kāriyāl"
     },
     {
-        "english": "Table",
-        "nicobarese": "Mish"
+      "english": "Table",
+      "nicobarese": "Mish"
     },
     {
-        "english": "Stand",
-        "nicobarese": "Chohōlre"
+      "english": "Stand",
+      "nicobarese": "Chohōlre"
     },
     {
-        "english": "Sit",
-        "nicobarese": "Ūichngöre"
+      "english": "Sit",
+      "nicobarese": "Ūichngöre"
     },
     {
-        "english": "Open",
-        "nicobarese": "Löpnyökūö"
+      "english": "Open",
+      "nicobarese": "Löpnyökūö"
     },
     {
-        "english": "Close",
-        "nicobarese": "Löphāk Kūö"
+      "english": "Close",
+      "nicobarese": "Löphāk Kūö"
     },
     {
-        "english": "Read",
-        "nicobarese": "Hākööp"
+      "english": "Read",
+      "nicobarese": "Hākööp"
     },
     {
-        "english": "Write",
-        "nicobarese": "Kūich"
+      "english": "Write",
+      "nicobarese": "Kūich"
     },
     {
-        "english": "Listen",
-        "nicobarese": "Hāng"
+      "english": "Listen",
+      "nicobarese": "Hāng"
     },
     {
-        "english": "Speak",
-        "nicobarese": "Rō-ōvö"
+      "english": "Speak",
+      "nicobarese": "Rō-ōvö"
     },
     {
-        "english": "Question",
-        "nicobarese": "Intōnö"
+      "english": "Question",
+      "nicobarese": "Intōnö"
     },
     {
-        "english": "Answer",
-        "nicobarese": "Sānāp"
+      "english": "Answer",
+      "nicobarese": "Sānāp"
     },
     {
-        "english": "Come",
-        "nicobarese": "Imanāh/Yihtöre"
+      "english": "Come",
+      "nicobarese": "Imanāh/Yihtöre"
     },
     {
-        "english": "Go",
-        "nicobarese": "Umā-anh"
+      "english": "Go",
+      "nicobarese": "Umā-anh"
     },
     {
-        "english": "Stop",
-        "nicobarese": "Sōkngöre/Ngösin"
+      "english": "Stop",
+      "nicobarese": "Sōkngöre/Ngösin"
     },
     {
-        "english": "Walk",
-        "nicobarese": "Kiröön"
+      "english": "Walk",
+      "nicobarese": "Kiröön"
     },
     {
-        "english": "Run",
-        "nicobarese": "Fāl"
+      "english": "Run",
+      "nicobarese": "Fāl"
     },
     {
-        "english": "Jump",
-        "nicobarese": "Tisōk"
+      "english": "Jump",
+      "nicobarese": "Tisōk"
     },
     {
-        "english": "Play",
-        "nicobarese": "Nyāmtô"
+      "english": "Play",
+      "nicobarese": "Nyāmtô"
     },
     {
-        "english": "Study",
-        "nicobarese": "Hakööp"
+      "english": "Study",
+      "nicobarese": "Hakööp"
     },
     {
-        "english": "Learn",
-        "nicobarese": "Harūnöre"
+      "english": "Learn",
+      "nicobarese": "Harūnöre"
     },
     {
-        "english": "Teach",
-        "nicobarese": "Hakööpöti"
+      "english": "Teach",
+      "nicobarese": "Hakööpöti"
     },
     {
-        "english": "Eat",
-        "nicobarese": "Nyān"
+      "english": "Eat",
+      "nicobarese": "Nyān"
     },
     {
-        "english": "Drink",
-        "nicobarese": "Òk"
+      "english": "Drink",
+      "nicobarese": "Òk"
     },
     {
-        "english": "Sleep",
-        "nicobarese": "Haròh"
+      "english": "Sleep",
+      "nicobarese": "Haròh"
     },
     {
-        "english": "Wake",
-        "nicobarese": "Chohōlre"
+      "english": "Wake",
+      "nicobarese": "Chohōlre"
     },
     {
-        "english": "Look",
-        "nicobarese": "Meūk"
+      "english": "Look",
+      "nicobarese": "Meūk"
     },
     {
-        "english": "Show",
-        "nicobarese": "Hameūkhö-mat"
+      "english": "Show",
+      "nicobarese": "Hameūkhö-mat"
     },
     {
-        "english": "Bring",
-        "nicobarese": "Kūmöti/Tā-ih"
+      "english": "Bring",
+      "nicobarese": "Kūmöti/Tā-ih"
     },
     {
-        "english": "Take",
-        "nicobarese": "Kēkeh"
+      "english": "Take",
+      "nicobarese": "Kēkeh"
     },
     {
-        "english": "Give",
-        "nicobarese": "Ta-ih kēktën-eh"
+      "english": "Give",
+      "nicobarese": "Ta-ih kēktën-eh"
     },
     {
-        "english": "Help",
-        "nicobarese": "Hayöökën/Inyööken"
+      "english": "Help",
+      "nicobarese": "Hayöökën/Inyööken"
     },
     {
-        "english": "Clean",
-        "nicobarese": "Hët"
+      "english": "Clean",
+      "nicobarese": "Hët"
     },
     {
-        "english": "Wash",
-        "nicobarese": "Hahët"
+      "english": "Wash",
+      "nicobarese": "Hahët"
     },
     {
-        "english": "Count",
-        "nicobarese": "Kaheūk"
+      "english": "Count",
+      "nicobarese": "Kaheūk"
     },
     {
-        "english": "Draw",
-        "nicobarese": "Vi-k"
+      "english": "Draw",
+      "nicobarese": "Vi-k"
     },
     {
-        "english": "Color",
-        "nicobarese": "Kalör"
+      "english": "Color",
+      "nicobarese": "Kalör"
     },
     {
-        "english": "Cut",
-        "nicobarese": "Hārô-ngöti"
+      "english": "Cut",
+      "nicobarese": "Hārô-ngöti"
     },
     {
-        "english": "Paste",
-        "nicobarese": "Hapān"
+      "english": "Paste",
+      "nicobarese": "Hapān"
     },
     {
-        "english": "Start",
-        "nicobarese": "Ranéh"
+      "english": "Start",
+      "nicobarese": "Ranéh"
     },
     {
-        "english": "Finish",
-        "nicobarese": "Keūheūt"
+      "english": "Finish",
+      "nicobarese": "Keūheūt"
     },
     {
-        "english": "Try",
-        "nicobarese": "Kālāh"
+      "english": "Try",
+      "nicobarese": "Kālāh"
     },
     {
-        "english": "Wait",
-        "nicobarese": "Ngö-sin"
+      "english": "Wait",
+      "nicobarese": "Ngö-sin"
     },
     {
-        "english": "Remember",
-        "nicobarese": "Fè-elre"
+      "english": "Remember",
+      "nicobarese": "Fè-elre"
     },
     {
-        "english": "Forget",
-        "nicobarese": "Vāichngö"
+      "english": "Forget",
+      "nicobarese": "Vāichngö"
     },
     {
-        "english": "Think",
-        "nicobarese": "Fè-elre"
+      "english": "Think",
+      "nicobarese": "Fè-elre"
     },
     {
-        "english": "Ask",
-        "nicobarese": "Hātön"
+      "english": "Ask",
+      "nicobarese": "Hātön"
     },
     {
-        "english": "Tell",
-        "nicobarese": "Rō-ōv Ngaich"
+      "english": "Tell",
+      "nicobarese": "Rō-ōv Ngaich"
     },
     {
-        "english": "Repeat",
-        "nicobarese": "Hāvänlen eh"
+      "english": "Repeat",
+      "nicobarese": "Hāvänlen eh"
     },
     {
-        "english": "Correct",
-        "nicobarese": "Sahi"
+      "english": "Correct",
+      "nicobarese": "Sahi"
     },
     {
-        "english": "Wrong",
-        "nicobarese": "Vāich"
+      "english": "Wrong",
+      "nicobarese": "Vāich"
     },
     {
-        "english": "Fast",
-        "nicobarese": "Veut"
+      "english": "Fast",
+      "nicobarese": "Veut"
     },
     {
-        "english": "Slow",
-        "nicobarese": "Hārëmngēnre"
+      "english": "Slow",
+      "nicobarese": "Hārëmngēnre"
     },
     {
-        "english": "Quiet",
-        "nicobarese": "Ūn-renū"
+      "english": "Quiet",
+      "nicobarese": "Ūn-renū"
     },
     {
-        "english": "Loud",
-        "nicobarese": "Pöitö"
+      "english": "Loud",
+      "nicobarese": "Pöitö"
     },
     {
-        "english": "Ready",
-        "nicobarese": "Hālenöre"
+      "english": "Ready",
+      "nicobarese": "Hālenöre"
     },
     {
-        "english": "Late",
-        "nicobarese": "Hāntën"
+      "english": "Late",
+      "nicobarese": "Hāntën"
     },
     {
-        "english": "Early",
-        "nicobarese": "Veūten"
+      "english": "Early",
+      "nicobarese": "Veūten"
     },
     {
-        "english": "Agree",
-        "nicobarese": "Heūn"
+      "english": "Agree",
+      "nicobarese": "Heūn"
     },
     {
-        "english": "Disagree",
-        "nicobarese": "Hö-ö"
+      "english": "Disagree",
+      "nicobarese": "Hö-ö"
     },
     {
-        "english": "Smile",
-        "nicobarese": "Ramlön"
+      "english": "Smile",
+      "nicobarese": "Ramlön"
     },
     {
-        "english": "Cry",
-        "nicobarese": "Peuiny"
+      "english": "Cry",
+      "nicobarese": "Peuiny"
     },
     {
-        "english": "Laugh",
-        "nicobarese": "Hayiöla"
+      "english": "Laugh",
+      "nicobarese": "Hayiöla"
     },
     {
-        "english": "Match",
-        "nicobarese": "Hārōng"
+      "english": "Match",
+      "nicobarese": "Hārōng"
     },
     {
-        "english": "Compare",
-        "nicobarese": "Harōngö-ūh/Asaktö"
+      "english": "Compare",
+      "nicobarese": "Harōngö-ūh/Asaktö"
     },
     {
-        "english": "Practice",
-        "nicobarese": "Harūnöreh"
+      "english": "Practice",
+      "nicobarese": "Harūnöreh"
     },
     {
-        "english": "Improve",
-        "nicobarese": "Halööktit"
+      "english": "Improve",
+      "nicobarese": "Halööktit"
     },
     {
-        "english": "Understand",
-        "nicobarese": "Akāk-el lāng"
+      "english": "Understand",
+      "nicobarese": "Akāk-el lāng"
     },
     {
-        "english": "Tree",
-        "nicobarese": "Chōn"
+      "english": "Tree",
+      "nicobarese": "Chōn"
     },
     {
-        "english": "Flower",
-        "nicobarese": "Pūl"
+      "english": "Flower",
+      "nicobarese": "Pūl"
     },
     {
-        "english": "Leaf",
-        "nicobarese": "Rōi-chōn"
+      "english": "Leaf",
+      "nicobarese": "Rōi-chōn"
     },
     {
-        "english": "Fruit",
-        "nicobarese": "Ròng-chōn"
+      "english": "Fruit",
+      "nicobarese": "Ròng-chōn"
     },
     {
-        "english": "Grass",
-        "nicobarese": "Kui-tingunyö"
+      "english": "Grass",
+      "nicobarese": "Kui-tingunyö"
     },
     {
-        "english": "Forest",
-        "nicobarese": "Inchōn-ngèn"
+      "english": "Forest",
+      "nicobarese": "Inchōn-ngèn"
     },
     {
-        "english": "Mountain",
-        "nicobarese": "Marōngö"
+      "english": "Mountain",
+      "nicobarese": "Marōngö"
     },
     {
-        "english": "River",
-        "nicobarese": "Māk"
+      "english": "River",
+      "nicobarese": "Māk"
     },
     {
-        "english": "Waterfall",
-        "nicobarese": "Töhem-mak"
+      "english": "Waterfall",
+      "nicobarese": "Töhem-mak"
     },
     {
-        "english": "Sea",
-        "nicobarese": "Mai"
+      "english": "Sea",
+      "nicobarese": "Mai"
     },
     {
-        "english": "Beach",
-        "nicobarese": "Küi Mai"
+      "english": "Beach",
+      "nicobarese": "Küi Mai"
     },
     {
-        "english": "Sand",
-        "nicobarese": "Kūyàyö"
+      "english": "Sand",
+      "nicobarese": "Kūyàyö"
     },
     {
-        "english": "Soil",
-        "nicobarese": "Tūmlat"
+      "english": "Soil",
+      "nicobarese": "Tūmlat"
     },
     {
-        "english": "Stone",
-        "nicobarese": "Ihōng"
+      "english": "Stone",
+      "nicobarese": "Ihōng"
     },
     {
-        "english": "Rock",
-        "nicobarese": "Tökirööng ihōng"
+      "english": "Rock",
+      "nicobarese": "Tökirööng ihōng"
     },
     {
-        "english": "Star",
-        "nicobarese": "Taneūsömat"
+      "english": "Star",
+      "nicobarese": "Taneūsömat"
     },
     {
-        "english": "Sky",
-        "nicobarese": "Hāliöngö"
+      "english": "Sky",
+      "nicobarese": "Hāliöngö"
     },
     {
-        "english": "Cloud",
-        "nicobarese": "Tārūl"
+      "english": "Cloud",
+      "nicobarese": "Tārūl"
     },
     {
-        "english": "Wind",
-        "nicobarese": "Kūföt"
+      "english": "Wind",
+      "nicobarese": "Kūföt"
     },
     {
-        "english": "Fire",
-        "nicobarese": "Tāmeūyö"
+      "english": "Fire",
+      "nicobarese": "Tāmeūyö"
     },
     {
-        "english": "Smoke",
-        "nicobarese": "Pōp"
+      "english": "Smoke",
+      "nicobarese": "Pōp"
     },
     {
-        "english": "Heat",
-        "nicobarese": "Tö-Rāch"
+      "english": "Heat",
+      "nicobarese": "Tö-Rāch"
     },
     {
-        "english": "Cold",
-        "nicobarese": "Töchām"
+      "english": "Cold",
+      "nicobarese": "Töchām"
     },
     {
-        "english": "Day",
-        "nicobarese": "Sākāmö"
+      "english": "Day",
+      "nicobarese": "Sākāmö"
     },
     {
-        "english": "Night",
-        "nicobarese": "Hātööm"
+      "english": "Night",
+      "nicobarese": "Hātööm"
     },
     {
-        "english": "Morning",
-        "nicobarese": "Peūheū"
+      "english": "Morning",
+      "nicobarese": "Peūheū"
     },
     {
-        "english": "Evening",
-        "nicobarese": "Hāraap"
+      "english": "Evening",
+      "nicobarese": "Hāraap"
     },
     {
-        "english": "Weather",
-        "nicobarese": "Kuö-panam"
+      "english": "Weather",
+      "nicobarese": "Kuö-panam"
     },
     {
-        "english": "Island",
-        "nicobarese": "Panam"
+      "english": "Island",
+      "nicobarese": "Panam"
     },
     {
-        "english": "Sea wave",
-        "nicobarese": "Māhūvö Mai"
+      "english": "Sea wave",
+      "nicobarese": "Māhūvö Mai"
     },
     {
-        "english": "Coconut",
-        "nicobarese": "Kūk"
+      "english": "Coconut",
+      "nicobarese": "Kūk"
     },
     {
-        "english": "Rainwater",
-        "nicobarese": "Kūmrah"
+      "english": "Rainwater",
+      "nicobarese": "Kūmrah"
     },
     {
-        "english": "Road",
-        "nicobarese": "Tālöktū"
+      "english": "Road",
+      "nicobarese": "Tālöktū"
     },
     {
-        "english": "Village",
-        "nicobarese": "Tūhet"
+      "english": "Village",
+      "nicobarese": "Tūhet"
     },
     {
-        "english": "Field",
-        "nicobarese": "Chuök Tūmlat"
+      "english": "Field",
+      "nicobarese": "Chuök Tūmlat"
     },
     {
-        "english": "Garden",
-        "nicobarese": "Panō-ō"
+      "english": "Garden",
+      "nicobarese": "Panō-ō"
     },
     {
-        "english": "Plant",
-        "nicobarese": "Chōn"
+      "english": "Plant",
+      "nicobarese": "Chōn"
     },
     {
-        "english": "Root",
-        "nicobarese": "El rööntö chōn"
+      "english": "Root",
+      "nicobarese": "El rööntö chōn"
     },
     {
-        "english": "Fish",
-        "nicobarese": "Kāk"
+      "english": "Fish",
+      "nicobarese": "Kāk"
     },
     {
-        "english": "Crab",
-        "nicobarese": "Kānang"
+      "english": "Crab",
+      "nicobarese": "Kānang"
     },
     {
-        "english": "Turtle",
-        "nicobarese": "Kāp"
+      "english": "Turtle",
+      "nicobarese": "Kāp"
     },
     {
-        "english": "Frog",
-        "nicobarese": "Tarônt"
+      "english": "Frog",
+      "nicobarese": "Tarônt"
     },
     {
-        "english": "Bird",
-        "nicobarese": "Chehechōn"
+      "english": "Bird",
+      "nicobarese": "Chehechōn"
     },
     {
-        "english": "Butterfly",
-        "nicobarese": "Chehechōn"
+      "english": "Butterfly",
+      "nicobarese": "Chehechōn"
     },
     {
-        "english": "Child",
-        "nicobarese": "Nyiö/Kūn Nyiö"
+      "english": "Child",
+      "nicobarese": "Nyiö/Kūn Nyiö"
     },
     {
-        "english": "Boy",
-        "nicobarese": "Kikònyö"
+      "english": "Boy",
+      "nicobarese": "Kikònyö"
     },
     {
-        "english": "Girl",
-        "nicobarese": "Kikanö"
+      "english": "Girl",
+      "nicobarese": "Kikanö"
     },
     {
-        "english": "Head",
-        "nicobarese": "Kūi"
+      "english": "Head",
+      "nicobarese": "Kūi"
     },
     {
-        "english": "Hair",
-        "nicobarese": "Keūyö"
+      "english": "Hair",
+      "nicobarese": "Keūyö"
     },
     {
-        "english": "Nose",
-        "nicobarese": "Elmëh"
+      "english": "Nose",
+      "nicobarese": "Elmëh"
     },
     {
-        "english": "Mouth",
-        "nicobarese": "Elvāng"
+      "english": "Mouth",
+      "nicobarese": "Elvāng"
     },
     {
-        "english": "Teeth",
-        "nicobarese": "Kanap"
+      "english": "Teeth",
+      "nicobarese": "Kanap"
     },
     {
-        "english": "Finger",
-        "nicobarese": "Kūnti"
+      "english": "Finger",
+      "nicobarese": "Kūnti"
     },
     {
-        "english": "Foot",
-        "nicobarese": "Kūlòich Röön"
+      "english": "Foot",
+      "nicobarese": "Kūlòich Röön"
     },
     {
-        "english": "Stomach",
-        "nicobarese": "Ellön"
+      "english": "Stomach",
+      "nicobarese": "Ellön"
     },
     {
-        "english": "Back",
-        "nicobarese": "Ùk"
+      "english": "Back",
+      "nicobarese": "Ùk"
     },
     {
-        "english": "Face",
-        "nicobarese": "AreKuö"
+      "english": "Face",
+      "nicobarese": "AreKuö"
     },
     {
-        "english": "Blood",
-        "nicobarese": "Māhām"
+      "english": "Blood",
+      "nicobarese": "Māhām"
     },
     {
-        "english": "Bone",
-        "nicobarese": "Tā-ngën"
+      "english": "Bone",
+      "nicobarese": "Tā-ngën"
     },
     {
-        "english": "Family",
-        "nicobarese": "Mikūönö"
+      "english": "Family",
+      "nicobarese": "Mikūönö"
     },
     {
-        "english": "Mother",
-        "nicobarese": "Kikanö Yöng Nyiö"
+      "english": "Mother",
+      "nicobarese": "Kikanö Yöng Nyiö"
     },
     {
-        "english": "Father",
-        "nicobarese": "Kikònyö Yöng"
+      "english": "Father",
+      "nicobarese": "Kikònyö Yöng"
     },
     {
-        "english": "Brother",
-        "nicobarese": "Kanònyö-Mem/Kahem"
+      "english": "Brother",
+      "nicobarese": "Kanònyö-Mem/Kahem"
     },
     {
-        "english": "Sister",
-        "nicobarese": "Kānanö"
+      "english": "Sister",
+      "nicobarese": "Kānanö"
     },
     {
-        "english": "Friend",
-        "nicobarese": "Hòl"
+      "english": "Friend",
+      "nicobarese": "Hòl"
     },
     {
-        "english": "Teacher (female)",
-        "nicobarese": "Mö-hakööp (Kikanö)"
+      "english": "Teacher (female)",
+      "nicobarese": "Mö-hakööp (Kikanö)"
     },
     {
-        "english": "Happy",
-        "nicobarese": "Ramölön"
+      "english": "Happy",
+      "nicobarese": "Ramölön"
     },
     {
-        "english": "Sad",
-        "nicobarese": "Hārivlön"
+      "english": "Sad",
+      "nicobarese": "Hārivlön"
     },
     {
-        "english": "Angry",
-        "nicobarese": "Tāiny"
+      "english": "Angry",
+      "nicobarese": "Tāiny"
     },
     {
-        "english": "Afraid",
-        "nicobarese": "Tō-vö"
+      "english": "Afraid",
+      "nicobarese": "Tō-vö"
     },
     {
-        "english": "Tired",
-        "nicobarese": "Lārā"
+      "english": "Tired",
+      "nicobarese": "Lārā"
     },
     {
-        "english": "Hungry",
-        "nicobarese": "Hāhëūk"
+      "english": "Hungry",
+      "nicobarese": "Hāhëūk"
     },
     {
-        "english": "Thirsty",
-        "nicobarese": "Hāre-nòmö"
+      "english": "Thirsty",
+      "nicobarese": "Hāre-nòmö"
     },
     {
-        "english": "Safe",
-        "nicobarese": "Hārëmngēnre"
+      "english": "Safe",
+      "nicobarese": "Hārëmngēnre"
     },
     {
-        "english": "Love",
-        "nicobarese": "Hānāngenlön"
+      "english": "Love",
+      "nicobarese": "Hānāngenlön"
     },
     {
-        "english": "Sorry",
-        "nicobarese": "Arēlen/Inrēlen"
+      "english": "Sorry",
+      "nicobarese": "Arēlen/Inrēlen"
     },
     {
-        "english": "Good",
-        "nicobarese": "Vāi"
+      "english": "Good",
+      "nicobarese": "Vāi"
     },
     {
-        "english": "Bad",
-        "nicobarese": "Töchöich"
+      "english": "Bad",
+      "nicobarese": "Töchöich"
     },
     {
-        "english": "Easy",
-        "nicobarese": "Lōrën"
+      "english": "Easy",
+      "nicobarese": "Lōrën"
     },
     {
-        "english": "Hard",
-        "nicobarese": "Töt-Lōrën"
+      "english": "Hard",
+      "nicobarese": "Töt-Lōrën"
     },
     {
-        "english": "Same",
-        "nicobarese": "Hèngrën"
+      "english": "Same",
+      "nicobarese": "Hèngrën"
     },
     {
-        "english": "Different",
-        "nicobarese": "Tö-Hārikngöre"
+      "english": "Different",
+      "nicobarese": "Tö-Hārikngöre"
     },
     {
-        "english": "New",
-        "nicobarese": "Tūfömngöre"
+      "english": "New",
+      "nicobarese": "Tūfömngöre"
     },
     {
-        "english": "Old",
-        "nicobarese": "Hötreh/Tökōiny"
+      "english": "Old",
+      "nicobarese": "Hötreh/Tökōiny"
     },
     {
-        "english": "Dirty",
-        "nicobarese": "Tö mūmūh"
+      "english": "Dirty",
+      "nicobarese": "Tö mūmūh"
     },
     {
-        "english": "Near",
-        "nicobarese": "Rèhtā"
+      "english": "Near",
+      "nicobarese": "Rèhtā"
     },
     {
-        "english": "Far",
-        "nicobarese": "Mārövāt"
+      "english": "Far",
+      "nicobarese": "Mārövāt"
     },
     {
-        "english": "Inside",
-        "nicobarese": "Lā-tūhet"
+      "english": "Inside",
+      "nicobarese": "Lā-tūhet"
     },
     {
-        "english": "Outside",
-        "nicobarese": "Lā-ūknyi"
+      "english": "Outside",
+      "nicobarese": "Lā-ūknyi"
     },
     {
-        "english": "Up",
-        "nicobarese": "Latūlöng"
+      "english": "Up",
+      "nicobarese": "Latūlöng"
     },
     {
-        "english": "Down",
-        "nicobarese": "Lātåreu"
+      "english": "Down",
+      "nicobarese": "Lātåreu"
     },
     {
-        "english": "Left",
-        "nicobarese": "Tāvë"
+      "english": "Left",
+      "nicobarese": "Tāvë"
     },
     {
-        "english": "Right",
-        "nicobarese": "Lāhamö"
+      "english": "Right",
+      "nicobarese": "Lāhamö"
     },
     {
-        "english": "Many",
-        "nicobarese": "Pòiyen"
+      "english": "Many",
+      "nicobarese": "Pòiyen"
     },
     {
-        "english": "Few",
-        "nicobarese": "Rāhēichyen"
+      "english": "Few",
+      "nicobarese": "Rāhēichyen"
     },
     {
-        "english": "Big",
-        "nicobarese": "Tökiröng"
+      "english": "Big",
+      "nicobarese": "Tökiröng"
     },
     {
-        "english": "Small",
-        "nicobarese": "Tökuöno"
+      "english": "Small",
+      "nicobarese": "Tökuöno"
     },
     {
-        "english": "Long",
-        "nicobarese": "Tö Maròta"
+      "english": "Long",
+      "nicobarese": "Tö Maròta"
     },
     {
-        "english": "Short",
-        "nicobarese": "Kuönö"
+      "english": "Short",
+      "nicobarese": "Kuönö"
     },
     {
-        "english": "Red",
-        "nicobarese": "Ngāv"
+      "english": "Red",
+      "nicobarese": "Ngāv"
     },
     {
-        "english": "Blue",
-        "nicobarese": "Lingū"
+      "english": "Blue",
+      "nicobarese": "Lingū"
     },
     {
-        "english": "Green",
-        "nicobarese": "Sā elmat roi chòn"
+      "english": "Green",
+      "nicobarese": "Sā elmat roi chòn"
     },
     {
-        "english": "Yellow",
-        "nicobarese": "Manūl"
+      "english": "Yellow",
+      "nicobarese": "Manūl"
     },
     {
-        "english": "Black",
-        "nicobarese": "Sāh"
+      "english": "Black",
+      "nicobarese": "Sāh"
     },
     {
-        "english": "White",
-        "nicobarese": "Isōh"
+      "english": "White",
+      "nicobarese": "Isōh"
     },
     {
-        "english": "Rope",
-        "nicobarese": "Rehën"
+      "english": "Rope",
+      "nicobarese": "Rehën"
     },
     {
-        "english": "Ball",
-        "nicobarese": "Sūt"
+      "english": "Ball",
+      "nicobarese": "Sūt"
     },
     {
-        "english": "Toy",
-        "nicobarese": "Nyām"
+      "english": "Toy",
+      "nicobarese": "Nyām"
     },
     {
-        "english": "Stick",
-        "nicobarese": "Fānel Chōn"
+      "english": "Stick",
+      "nicobarese": "Fānel Chōn"
     },
     {
-        "english": "Cloth",
-        "nicobarese": "Inyūt"
+      "english": "Cloth",
+      "nicobarese": "Inyūt"
     },
     {
-        "english": "Soap",
-        "nicobarese": "Savòng"
+      "english": "Soap",
+      "nicobarese": "Savòng"
     },
     {
-        "english": "Towel",
-        "nicobarese": "Tūhal"
+      "english": "Towel",
+      "nicobarese": "Tūhal"
     },
     {
-        "english": "Bed",
-        "nicobarese": "Tahāklöö"
+      "english": "Bed",
+      "nicobarese": "Tahāklöö"
     },
     {
-        "english": "House",
-        "nicobarese": "Pati"
+      "english": "House",
+      "nicobarese": "Pati"
     },
     {
-        "english": "Roof",
-        "nicobarese": "Kūi Pati"
+      "english": "Roof",
+      "nicobarese": "Kūi Pati"
     },
     {
-        "english": "Floor",
-        "nicobarese": "Tūm Chāp"
+      "english": "Floor",
+      "nicobarese": "Tūm Chāp"
     },
     {
-        "english": "Wall",
-        "nicobarese": "Kāhā Pati"
+      "english": "Wall",
+      "nicobarese": "Kāhā Pati"
     },
     {
-        "english": "Vehicle",
-        "nicobarese": "Lōrry"
+      "english": "Vehicle",
+      "nicobarese": "Lōrry"
     },
     {
-        "english": "Boat",
-        "nicobarese": "Chōng"
+      "english": "Boat",
+      "nicobarese": "Chōng"
     },
     {
-        "english": "Net",
-        "nicobarese": "Kinvāl"
+      "english": "Net",
+      "nicobarese": "Kinvāl"
     },
     {
-        "english": "Basket",
-        "nicobarese": "Kūvökö"
+      "english": "Basket",
+      "nicobarese": "Kūvökö"
     },
     {
-        "english": "Knife",
-        "nicobarese": "Sūritö"
+      "english": "Knife",
+      "nicobarese": "Sūritö"
     },
     {
-        "english": "Spoon",
-        "nicobarese": "chāmāch"
+      "english": "Spoon",
+      "nicobarese": "chāmāch"
     },
     {
-        "english": "Plate",
-        "nicobarese": "Pingāl"
+      "english": "Plate",
+      "nicobarese": "Pingāl"
     },
     {
-        "english": "Cup",
-        "nicobarese": "Kööp"
+      "english": "Cup",
+      "nicobarese": "Kööp"
     },
     {
-        "english": "Food",
-        "nicobarese": "Nya-ān"
+      "english": "Food",
+      "nicobarese": "Nya-ān"
     },
     {
-        "english": "Rice",
-        "nicobarese": "Sāiny"
+      "english": "Rice",
+      "nicobarese": "Sāiny"
     },
     {
-        "english": "Fish curry",
-        "nicobarese": "Kāry Kāk"
+      "english": "Fish curry",
+      "nicobarese": "Kāry Kāk"
     },
     {
-        "english": "Coconut oil",
-        "nicobarese": "Tavi-i Tarik"
+      "english": "Coconut oil",
+      "nicobarese": "Tavi-i Tarik"
     },
     {
-        "english": "Firewood",
-        "nicobarese": "Tötāmeūyū Chón"
+      "english": "Firewood",
+      "nicobarese": "Tötāmeūyū Chón"
     },
     {
-        "english": "Matchstick",
-        "nicobarese": "Kin-ichò"
+      "english": "Matchstick",
+      "nicobarese": "Kin-ichò"
     },
     {
-        "english": "Backpack",
-        "nicobarese": "Lāmūk bag"
+      "english": "Backpack",
+      "nicobarese": "Lāmūk bag"
     },
     {
-        "english": "School bus",
-        "nicobarese": "Lōrry mö iskul"
+      "english": "School bus",
+      "nicobarese": "Lōrry mö iskul"
     },
     {
-        "english": "Flag",
-        "nicobarese": "Pāntërā"
+      "english": "Flag",
+      "nicobarese": "Pāntërā"
     },
     {
-        "english": "Song",
-        "nicobarese": "Tinköökö"
+      "english": "Song",
+      "nicobarese": "Tinköökö"
     },
     {
-        "english": "Dance",
-        "nicobarese": "Kiriöm"
+      "english": "Dance",
+      "nicobarese": "Kiriöm"
     },
     {
-        "english": "Game",
-        "nicobarese": "Nyām"
+      "english": "Game",
+      "nicobarese": "Nyām"
     },
     {
-        "english": "Picture",
-        "nicobarese": "Nyāt"
+      "english": "Picture",
+      "nicobarese": "Nyāt"
     },
     {
-        "english": "The",
-        "nicobarese": "Ngam"
+      "english": "The",
+      "nicobarese": "Ngam"
     },
     {
-        "english": "A",
-        "nicobarese": "Ök"
+      "english": "A",
+      "nicobarese": "Ök"
     },
     {
-        "english": "An",
-        "nicobarese": "Töhêng"
+      "english": "An",
+      "nicobarese": "Töhêng"
     },
     {
-        "english": "One",
-        "nicobarese": "Kahōk"
+      "english": "One",
+      "nicobarese": "Kahōk"
     },
     {
-        "english": "Two",
-        "nicobarese": "Nët"
+      "english": "Two",
+      "nicobarese": "Nët"
     },
     {
-        "english": "Three",
-        "nicobarese": "Lūöi"
+      "english": "Three",
+      "nicobarese": "Lūöi"
     },
     {
-        "english": "Four",
-        "nicobarese": "Fën"
+      "english": "Four",
+      "nicobarese": "Fën"
     },
     {
-        "english": "Five",
-        "nicobarese": "Taneui"
+      "english": "Five",
+      "nicobarese": "Taneui"
     },
     {
-        "english": "Six",
-        "nicobarese": "Tafūöl"
+      "english": "Six",
+      "nicobarese": "Tafūöl"
     },
     {
-        "english": "Seven",
-        "nicobarese": "Sat"
+      "english": "Seven",
+      "nicobarese": "Sat"
     },
     {
-        "english": "Eight",
-        "nicobarese": "Hevhöre"
+      "english": "Eight",
+      "nicobarese": "Hevhöre"
     },
     {
-        "english": "Nine",
-        "nicobarese": "Machuöhtöre"
+      "english": "Nine",
+      "nicobarese": "Machuöhtöre"
     },
     {
-        "english": "Ten",
-        "nicobarese": "Söm"
+      "english": "Ten",
+      "nicobarese": "Söm"
     },
     {
-        "english": "Alive",
-        "nicobarese": "âṅh"
+      "english": "Alive",
+      "nicobarese": "âṅh"
     },
     {
-        "english": "All",
-        "nicobarese": "ròk-hare"
+      "english": "All",
+      "nicobarese": "ròk-hare"
     },
     {
-        "english": "Ankle",
-        "nicobarese": "lin-kalˑnga"
+      "english": "Ankle",
+      "nicobarese": "lin-kalˑnga"
     },
     {
-        "english": "Arm",
-        "nicobarese": "kel"
+      "english": "Arm",
+      "nicobarese": "kel"
     },
     {
-        "english": "Asleep",
-        "nicobarese": "harrôh"
+      "english": "Asleep",
+      "nicobarese": "harrôh"
     },
     {
-        "english": "Awake(v.i.)",
-        "nicobarese": "â-hän"
+      "english": "Awake(v.i.)",
+      "nicobarese": "â-hän"
     },
     {
-        "english": "Baby",
-        "nicobarese": "tän-a"
+      "english": "Baby",
+      "nicobarese": "tän-a"
     },
     {
-        "english": "Bachelor",
-        "nicobarese": "lâmaòk"
+      "english": "Bachelor",
+      "nicobarese": "lâmaòk"
     },
     {
-        "english": "Bamboo(B.vulgris)",
-        "nicobarese": "hâˑo"
+      "english": "Bamboo(B.vulgris)",
+      "nicobarese": "hâˑo"
     },
     {
-        "english": "Beads",
-        "nicobarese": "täsēˑha"
+      "english": "Beads",
+      "nicobarese": "täsēˑha"
     },
     {
-        "english": "Beat",
-        "nicobarese": "fōh"
+      "english": "Beat",
+      "nicobarese": "fōh"
     },
     {
-        "english": "Belly",
-        "nicobarese": "aich"
+      "english": "Belly",
+      "nicobarese": "aich"
     },
     {
-        "english": "Betelnut tree(A.catechu)",
-        "nicobarese": "tissâ"
+      "english": "Betelnut tree(A.catechu)",
+      "nicobarese": "tissâ"
     },
     {
-        "english": "Blind",
-        "nicobarese": "tät-mak"
+      "english": "Blind",
+      "nicobarese": "tät-mak"
     },
     {
-        "english": "Bottle(ordinary black)",
-        "nicobarese": "pilan"
+      "english": "Bottle(ordinary black)",
+      "nicobarese": "pilan"
     },
     {
-        "english": "Breast",
-        "nicobarese": "täh"
+      "english": "Breast",
+      "nicobarese": "täh"
     },
     {
-        "english": "Brother(elder)",
-        "nicobarese": "mäm"
+      "english": "Brother(elder)",
+      "nicobarese": "mäm"
     },
     {
-        "english": "Brother(younger)",
-        "nicobarese": "kâhäm"
+      "english": "Brother(younger)",
+      "nicobarese": "kâhäm"
     },
     {
-        "english": "Bury",
-        "nicobarese": "michyāˑte"
+      "english": "Bury",
+      "nicobarese": "michyāˑte"
     },
     {
-        "english": "Buy",
-        "nicobarese": "kē; lia-wâh"
+      "english": "Buy",
+      "nicobarese": "kē; lia-wâh"
     },
     {
-        "english": "Can(able)",
-        "nicobarese": "kôˑrn"
+      "english": "Can(able)",
+      "nicobarese": "kôˑrn"
     },
     {
-        "english": "Canoe",
-        "nicobarese": "âp"
+      "english": "Canoe",
+      "nicobarese": "âp"
     },
     {
-        "english": "Cheap",
-        "nicobarese": "kūˑan-arai"
+      "english": "Cheap",
+      "nicobarese": "kūˑan-arai"
     },
     {
-        "english": "Cheek",
-        "nicobarese": "âr a-kūˑa"
+      "english": "Cheek",
+      "nicobarese": "âr a-kūˑa"
     },
     {
-        "english": "Chest",
-        "nicobarese": "kâ -el-nòṅh"
+      "english": "Chest",
+      "nicobarese": "kâ -el-nòṅh"
     },
     {
-        "english": "Chicken",
-        "nicobarese": "kōn-haiyam"
+      "english": "Chicken",
+      "nicobarese": "kōn-haiyam"
     },
     {
-        "english": "Chief",
-        "nicobarese": "mâ-hūˑa"
+      "english": "Chief",
+      "nicobarese": "mâ-hūˑa"
     },
     {
-        "english": "Chin",
-        "nicobarese": "sâmâ"
+      "english": "Chin",
+      "nicobarese": "sâmâ"
     },
     {
-        "english": "Coat",
-        "nicobarese": "enyūt"
+      "english": "Coat",
+      "nicobarese": "enyūt"
     },
     {
-        "english": "Coconut(the fruit)",
-        "nicobarese": "kok; rong-taôˑka"
+      "english": "Coconut(the fruit)",
+      "nicobarese": "kok; rong-taôˑka"
     },
     {
-        "english": "Come here!",
-        "nicobarese": "yīˑhtar ihīh"
+      "english": "Come here!",
+      "nicobarese": "yīˑhtar ihīh"
     },
     {
-        "english": "Cough",
-        "nicobarese": "äˑha"
+      "english": "Cough",
+      "nicobarese": "äˑha"
     },
     {
-        "english": "Country(region)",
-        "nicobarese": "pânòm"
+      "english": "Country(region)",
+      "nicobarese": "pânòm"
     },
     {
-        "english": "Crocodile",
-        "nicobarese": "rēˑu"
+      "english": "Crocodile",
+      "nicobarese": "rēˑu"
     },
     {
-        "english": "Cry(v.)",
-        "nicobarese": "puin"
+      "english": "Cry(v.)",
+      "nicobarese": "puin"
     },
     {
-        "english": "Current(sea or river)",
-        "nicobarese": "tâhāt-mai"
+      "english": "Current(sea or river)",
+      "nicobarese": "tâhāt-mai"
     },
     {
-        "english": "Damsel",
-        "nicobarese": "dēˑla"
+      "english": "Damsel",
+      "nicobarese": "dēˑla"
     },
     {
-        "english": "Daughter",
-        "nicobarese": "kūˑan kikâˑna"
+      "english": "Daughter",
+      "nicobarese": "kūˑan kikâˑna"
     },
     {
-        "english": "Day(sunrise to sunset)",
-        "nicobarese": "sâkàm"
+      "english": "Day(sunrise to sunset)",
+      "nicobarese": "sâkàm"
     },
     {
-        "english": "Dead",
-        "nicobarese": "kâpâh-hâku"
+      "english": "Dead",
+      "nicobarese": "kâpâh-hâku"
     },
     {
-        "english": "Dear(costly)",
-        "nicobarese": "tu-pōˑe-rai"
+      "english": "Dear(costly)",
+      "nicobarese": "tu-pōˑe-rai"
     },
     {
-        "english": "Dew",
-        "nicobarese": "tai-chòm"
+      "english": "Dew",
+      "nicobarese": "tai-chòm"
     },
     {
-        "english": "Dig",
-        "nicobarese": "ūl-mak"
+      "english": "Dig",
+      "nicobarese": "ūl-mak"
     },
     {
-        "english": "Dive",
-        "nicobarese": "hâmat"
+      "english": "Dive",
+      "nicobarese": "hâmat"
     },
     {
-        "english": "Dog",
-        "nicobarese": "am"
+      "english": "Dog",
+      "nicobarese": "am"
     },
     {
-        "english": "Dream(s.)",
-        "nicobarese": "hāˑu"
+      "english": "Dream(s.)",
+      "nicobarese": "hāˑu"
     },
     {
-        "english": "Drink(v.)",
-        "nicobarese": "kâ-öt"
+      "english": "Drink(v.)",
+      "nicobarese": "kâ-öt"
     },
     {
-        "english": "Drunk",
-        "nicobarese": "hīyòiˑe"
+      "english": "Drunk",
+      "nicobarese": "hīyòiˑe"
     },
     {
-        "english": "Ear",
-        "nicobarese": "nâng"
+      "english": "Ear",
+      "nicobarese": "nâng"
     },
     {
-        "english": "Ear-stick",
-        "nicobarese": "harâ-nang"
+      "english": "Ear-stick",
+      "nicobarese": "harâ-nang"
     },
     {
-        "english": "East",
-        "nicobarese": "lâ-chūˑhat"
+      "english": "East",
+      "nicobarese": "lâ-chūˑhat"
     },
     {
-        "english": "East wind",
-        "nicobarese": "chūˑhat"
+      "english": "East wind",
+      "nicobarese": "chūˑhat"
     },
     {
-        "english": "Eat(meat only)",
-        "nicobarese": "kâ"
+      "english": "Eat(meat only)",
+      "nicobarese": "kâ"
     },
     {
-        "english": "Eat(vegetables,rice,&c.,only)",
-        "nicobarese": "ngâ"
+      "english": "Eat(vegetables,rice,&c.,only)",
+      "nicobarese": "ngâ"
     },
     {
-        "english": "Egg",
-        "nicobarese": "o-ha"
+      "english": "Egg",
+      "nicobarese": "o-ha"
     },
     {
-        "english": "Elbow",
-        "nicobarese": "sē-kòng"
+      "english": "Elbow",
+      "nicobarese": "sē-kòng"
     },
     {
-        "english": "Female",
-        "nicobarese": "kikâˑna"
+      "english": "Female",
+      "nicobarese": "kikâˑna"
     },
     {
-        "english": "Fever",
-        "nicobarese": "wūˑe"
+      "english": "Fever",
+      "nicobarese": "wūˑe"
     },
     {
-        "english": "Foreigner",
-        "nicobarese": "tâòiṅ (or tâhäng) pūl nga"
+      "english": "Foreigner",
+      "nicobarese": "tâòiṅ (or tâhäng) pūl nga"
     },
     {
-        "english": "Fowl",
-        "nicobarese": "haiˑyam"
+      "english": "Fowl",
+      "nicobarese": "haiˑyam"
     },
     {
-        "english": "Get up!",
-        "nicobarese": "châldre"
+      "english": "Get up!",
+      "nicobarese": "châldre"
     },
     {
-        "english": "Go!",
-        "nicobarese": "kiranˑngara"
+      "english": "Go!",
+      "nicobarese": "kiranˑngara"
     },
     {
-        "english": "Go(return home)",
-        "nicobarese": "chūh"
+      "english": "Go(return home)",
+      "nicobarese": "chūh"
     },
     {
-        "english": "Hair(of head)",
-        "nicobarese": "küˑya"
+      "english": "Hair(of head)",
+      "nicobarese": "küˑya"
     },
     {
-        "english": "Hair(of head)t",
-        "nicobarese": "küˑya"
+      "english": "Hair(of head)t",
+      "nicobarese": "küˑya"
     },
     {
-        "english": "Hand",
-        "nicobarese": "el-tī"
+      "english": "Hand",
+      "nicobarese": "el-tī"
     },
     {
-        "english": "He",
-        "nicobarese": "ngôˑa"
+      "english": "He",
+      "nicobarese": "ngôˑa"
     },
     {
-        "english": "Headache",
-        "nicobarese": "chak-el-kūˑi"
+      "english": "Headache",
+      "nicobarese": "chak-el-kūˑi"
     },
     {
-        "english": "Hear",
-        "nicobarese": "hang"
+      "english": "Hear",
+      "nicobarese": "hang"
     },
     {
-        "english": "Heel",
-        "nicobarese": "kolòi-drān"
+      "english": "Heel",
+      "nicobarese": "kolòi-drān"
     },
     {
-        "english": "Hot (as the sun)",
-        "nicobarese": "wōˑi-lōn"
+      "english": "Hot (as the sun)",
+      "nicobarese": "wōˑi-lōn"
     },
     {
-        "english": "Hot(of water,metal,&c.)",
-        "nicobarese": "raich"
+      "english": "Hot(of water,metal,&c.)",
+      "nicobarese": "raich"
     },
     {
-        "english": "House(hut)permanent,",
-        "nicobarese": "pâtī"
+      "english": "House(hut)permanent,",
+      "nicobarese": "pâtī"
     },
     {
-        "english": "House(hut)temporary",
-        "nicobarese": "âm"
+      "english": "House(hut)temporary",
+      "nicobarese": "âm"
     },
     {
-        "english": "Hunt(pigs)",
-        "nicobarese": "haichī"
+      "english": "Hunt(pigs)",
+      "nicobarese": "haichī"
     },
     {
-        "english": "Iguana",
-        "nicobarese": "kàu"
+      "english": "Iguana",
+      "nicobarese": "kàu"
     },
     {
-        "english": "In(inside)",
-        "nicobarese": "el"
+      "english": "In(inside)",
+      "nicobarese": "el"
     },
     {
-        "english": "Iron",
-        "nicobarese": "weät"
+      "english": "Iron",
+      "nicobarese": "weät"
     },
     {
-        "english": "Jungle",
-        "nicobarese": "el-enchōn"
+      "english": "Jungle",
+      "nicobarese": "el-enchōn"
     },
     {
-        "english": "Kick",
-        "nicobarese": "dran-hanga"
+      "english": "Kick",
+      "nicobarese": "dran-hanga"
     },
     {
-        "english": "Kill(in any manner)",
-        "nicobarese": "feēˑla"
+      "english": "Kill(in any manner)",
+      "nicobarese": "feēˑla"
     },
     {
-        "english": "Knee",
-        "nicobarese": "kūˑi-kenmôˑna"
+      "english": "Knee",
+      "nicobarese": "kūˑi-kenmôˑna"
     },
     {
-        "english": "Know",
-        "nicobarese": "âkàhâˑlōn"
+      "english": "Know",
+      "nicobarese": "âkàhâˑlōn"
     },
     {
-        "english": "Knuckle",
-        "nicobarese": "mòng"
+      "english": "Knuckle",
+      "nicobarese": "mòng"
     },
     {
-        "english": "Lame",
-        "nicobarese": "kâròk"
+      "english": "Lame",
+      "nicobarese": "kâròk"
     },
     {
-        "english": "Large",
-        "nicobarese": "pôˑya"
+      "english": "Large",
+      "nicobarese": "pôˑya"
     },
     {
-        "english": "Left(not right)",
-        "nicobarese": "tâˑwē"
+      "english": "Left(not right)",
+      "nicobarese": "tâˑwē"
     },
     {
-        "english": "Leg",
-        "nicobarese": "kal-drān"
+      "english": "Leg",
+      "nicobarese": "kal-drān"
     },
     {
-        "english": "Like(adj.)",
-        "nicobarese": "nhâˑti"
+      "english": "Like(adj.)",
+      "nicobarese": "nhâˑti"
     },
     {
-        "english": "Lime(citrus)",
-        "nicobarese": "limˑmòng"
+      "english": "Lime(citrus)",
+      "nicobarese": "limˑmòng"
     },
     {
-        "english": "Lime(shell)",
-        "nicobarese": "namˑma"
+      "english": "Lime(shell)",
+      "nicobarese": "namˑma"
     },
     {
-        "english": "Lip",
-        "nicobarese": "minòṅh"
+      "english": "Lip",
+      "nicobarese": "minòṅh"
     },
     {
-        "english": "Mad",
-        "nicobarese": "kolôˑva"
+      "english": "Mad",
+      "nicobarese": "kolôˑva"
     },
     {
-        "english": "Maiden",
-        "nicobarese": "dēˑla; rēˑla"
+      "english": "Maiden",
+      "nicobarese": "dēˑla; rēˑla"
     },
     {
-        "english": "Male",
-        "nicobarese": "kikôˑña"
+      "english": "Male",
+      "nicobarese": "kikôˑña"
     },
     {
-        "english": "Mama",
-        "nicobarese": "po-po"
+      "english": "Mama",
+      "nicobarese": "po-po"
     },
     {
-        "english": "Man-countryman",
-        "nicobarese": "târik(-kikôˑna)"
+      "english": "Man-countryman",
+      "nicobarese": "târik(-kikôˑna)"
     },
     {
-        "english": "Man-foreigner",
-        "nicobarese": "taoin (-kikôˑña)"
+      "english": "Man-foreigner",
+      "nicobarese": "taoin (-kikôˑña)"
     },
     {
-        "english": "Man-other Nicobars",
-        "nicobarese": "tâā (-kikôˑ-ña)"
+      "english": "Man-other Nicobars",
+      "nicobarese": "tâā (-kikôˑ-ña)"
     },
     {
-        "english": "Mast",
-        "nicobarese": "kânaˑmâ"
+      "english": "Mast",
+      "nicobarese": "kânaˑmâ"
     },
     {
-        "english": "Meat",
-        "nicobarese": "alâˑhah"
+      "english": "Meat",
+      "nicobarese": "alâˑhah"
     },
     {
-        "english": "Monkey",
-        "nicobarese": "òiṅˑche"
+      "english": "Monkey",
+      "nicobarese": "òiṅˑche"
     },
     {
-        "english": "Monsoon(N.E)",
-        "nicobarese": "kòm-fūˑata"
+      "english": "Monsoon(N.E)",
+      "nicobarese": "kòm-fūˑata"
     },
     {
-        "english": "Monsoon(S.W)",
-        "nicobarese": "messūˑnga"
+      "english": "Monsoon(S.W)",
+      "nicobarese": "messūˑnga"
     },
     {
-        "english": "Month",
-        "nicobarese": "nòng"
+      "english": "Month",
+      "nicobarese": "nòng"
     },
     {
-        "english": "Moon",
-        "nicobarese": "chingeät"
+      "english": "Moon",
+      "nicobarese": "chingeät"
     },
     {
-        "english": "More",
-        "nicobarese": "hek"
+      "english": "More",
+      "nicobarese": "hek"
     },
     {
-        "english": "Mosquito",
-        "nicobarese": "misôˑka"
+      "english": "Mosquito",
+      "nicobarese": "misôˑka"
     },
     {
-        "english": "Mud",
-        "nicobarese": "tumlatˑ"
+      "english": "Mud",
+      "nicobarese": "tumlatˑ"
     },
     {
-        "english": "Nail(finger/toe)",
-        "nicobarese": "kensòh"
+      "english": "Nail(finger/toe)",
+      "nicobarese": "kensòh"
     },
     {
-        "english": "Nautilus",
-        "nicobarese": "tamˑa"
+      "english": "Nautilus",
+      "nicobarese": "tamˑa"
     },
     {
-        "english": "Neck",
-        "nicobarese": "lik-kunˑ"
+      "english": "Neck",
+      "nicobarese": "lik-kunˑ"
     },
     {
-        "english": "Needle",
-        "nicobarese": "châˑrum"
+      "english": "Needle",
+      "nicobarese": "châˑrum"
     },
     {
-        "english": "No",
-        "nicobarese": "dra; haˑa"
+      "english": "No",
+      "nicobarese": "dra; haˑa"
     },
     {
-        "english": "Noon",
-        "nicobarese": "sâkâˑm-matal"
+      "english": "Noon",
+      "nicobarese": "sâkâˑm-matal"
     },
     {
-        "english": "North",
-        "nicobarese": "lâôˑla"
+      "english": "North",
+      "nicobarese": "lâôˑla"
     },
     {
-        "english": "North wind",
-        "nicobarese": "kapâ"
+      "english": "North wind",
+      "nicobarese": "kapâ"
     },
     {
-        "english": "Not",
-        "nicobarese": "ar; at; dran"
+      "english": "Not",
+      "nicobarese": "ar; at; dran"
     },
     {
-        "english": "Now",
-        "nicobarese": "tangâˑmo"
+      "english": "Now",
+      "nicobarese": "tangâˑmo"
     },
     {
-        "english": "Orange",
-        "nicobarese": "piku"
+      "english": "Orange",
+      "nicobarese": "piku"
     },
     {
-        "english": "Orania Bentickia",
-        "nicobarese": "châˑmam"
+      "english": "Orania Bentickia",
+      "nicobarese": "châˑmam"
     },
     {
-        "english": "Orphan",
-        "nicobarese": "kūˑan-yòich"
+      "english": "Orphan",
+      "nicobarese": "kūˑan-yòich"
     },
     {
-        "english": "Paddle",
-        "nicobarese": "paiyūˑah"
+      "english": "Paddle",
+      "nicobarese": "paiyūˑah"
     },
     {
-        "english": "Palm(of hand)",
-        "nicobarese": "el-tī"
+      "english": "Palm(of hand)",
+      "nicobarese": "el-tī"
     },
     {
-        "english": "Pandanus",
-        "nicobarese": "ko-wen"
+      "english": "Pandanus",
+      "nicobarese": "ko-wen"
     },
     {
-        "english": "Papa!",
-        "nicobarese": "mamâ"
+      "english": "Papa!",
+      "nicobarese": "mamâ"
     },
     {
-        "english": "Perspiration",
-        "nicobarese": "waṅg"
+      "english": "Perspiration",
+      "nicobarese": "waṅg"
     },
     {
-        "english": "Pig(domestic)",
-        "nicobarese": "hâˑun"
+      "english": "Pig(domestic)",
+      "nicobarese": "hâˑun"
     },
     {
-        "english": "Pig(wild)",
-        "nicobarese": "hân-chōn"
+      "english": "Pig(wild)",
+      "nicobarese": "hân-chōn"
     },
     {
-        "english": "Place(spot,locality)",
-        "nicobarese": "chī-uk"
+      "english": "Place(spot,locality)",
+      "nicobarese": "chī-uk"
     },
     {
-        "english": "Place(village,town)",
-        "nicobarese": "pânòm"
+      "english": "Place(village,town)",
+      "nicobarese": "pânòm"
     },
     {
-        "english": "Plantain",
-        "nicobarese": "taiñgūˑknga"
+      "english": "Plantain",
+      "nicobarese": "taiñgūˑknga"
     },
     {
-        "english": "Pork",
-        "nicobarese": "âlâˑhah-âhˑun"
+      "english": "Pork",
+      "nicobarese": "âlâˑhah-âhˑun"
     },
     {
-        "english": "Porpoise",
-        "nicobarese": "kâ-pēˑòng"
+      "english": "Porpoise",
+      "nicobarese": "kâ-pēˑòng"
     },
     {
-        "english": "Pot(cooking)",
-        "nicobarese": "tânīˑyaya"
+      "english": "Pot(cooking)",
+      "nicobarese": "tânīˑyaya"
     },
     {
-        "english": "Ptychoraphis augusta",
-        "nicobarese": "châˑwat"
+      "english": "Ptychoraphis augusta",
+      "nicobarese": "châˑwat"
     },
     {
-        "english": "Python",
-        "nicobarese": "tūˑlan"
+      "english": "Python",
+      "nicobarese": "tūˑlan"
     },
     {
-        "english": "Rain",
-        "nicobarese": "kòmrâˑh"
+      "english": "Rain",
+      "nicobarese": "kòmrâˑh"
     },
     {
-        "english": "Rainbow",
-        "nicobarese": "mengâˑka"
+      "english": "Rainbow",
+      "nicobarese": "mengâˑka"
     },
     {
-        "english": "Rib",
-        "nicobarese": "drânūˑma"
+      "english": "Rib",
+      "nicobarese": "drânūˑma"
     },
     {
-        "english": "Right(not left)",
-        "nicobarese": "hâm"
+      "english": "Right(not left)",
+      "nicobarese": "hâm"
     },
     {
-        "english": "Sack",
-        "nicobarese": "sâk"
+      "english": "Sack",
+      "nicobarese": "sâk"
     },
     {
-        "english": "Sail",
-        "nicobarese": "en-dēh"
+      "english": "Sail",
+      "nicobarese": "en-dēh"
     },
     {
-        "english": "Salt",
-        "nicobarese": "sâl"
+      "english": "Salt",
+      "nicobarese": "sâl"
     },
     {
-        "english": "Sandy beach",
-        "nicobarese": "koyâˑya"
+      "english": "Sandy beach",
+      "nicobarese": "koyâˑya"
     },
     {
-        "english": "Say/Speak",
-        "nicobarese": "rô"
+      "english": "Say/Speak",
+      "nicobarese": "rô"
     },
     {
-        "english": "See",
-        "nicobarese": "māk"
+      "english": "See",
+      "nicobarese": "māk"
     },
     {
-        "english": "Seed",
-        "nicobarese": "kōˑlal"
+      "english": "Seed",
+      "nicobarese": "kōˑlal"
     },
     {
-        "english": "Sell",
-        "nicobarese": "hâˑwa"
+      "english": "Sell",
+      "nicobarese": "hâˑwa"
     },
     {
-        "english": "Send",
-        "nicobarese": "kēˑngam"
+      "english": "Send",
+      "nicobarese": "kēˑngam"
     },
     {
-        "english": "Sew",
-        "nicobarese": "chōk"
+      "english": "Sew",
+      "nicobarese": "chōk"
     },
     {
-        "english": "Ship",
-        "nicobarese": "chông"
+      "english": "Ship",
+      "nicobarese": "chông"
     },
     {
-        "english": "Shore",
-        "nicobarese": "tuhēˑt"
+      "english": "Shore",
+      "nicobarese": "tuhēˑt"
     },
     {
-        "english": "Shoulder",
-        "nicobarese": "el-tânôˑr"
+      "english": "Shoulder",
+      "nicobarese": "el-tânôˑr"
     },
     {
-        "english": "Sick",
-        "nicobarese": "wâˑhau; at-lāke"
+      "english": "Sick",
+      "nicobarese": "wâˑhau; at-lāke"
     },
     {
-        "english": "Silver",
-        "nicobarese": "chēha-kūˑa"
+      "english": "Silver",
+      "nicobarese": "chēha-kūˑa"
     },
     {
-        "english": "Sing",
-        "nicobarese": "tīkak-rôˑre"
+      "english": "Sing",
+      "nicobarese": "tīkak-rôˑre"
     },
     {
-        "english": "Sister(elder)",
-        "nicobarese": "mäm-kikâˑna"
+      "english": "Sister(elder)",
+      "nicobarese": "mäm-kikâˑna"
     },
     {
-        "english": "Sister(younger)",
-        "nicobarese": "kâhäm-kikâˑna"
+      "english": "Sister(younger)",
+      "nicobarese": "kâhäm-kikâˑna"
     },
     {
-        "english": "Skin",
-        "nicobarese": "ok"
+      "english": "Skin",
+      "nicobarese": "ok"
     },
     {
-        "english": "Sleepy",
-        "nicobarese": "harˑrôh-tare"
+      "english": "Sleepy",
+      "nicobarese": "harˑrôh-tare"
     },
     {
-        "english": "Smoke(n.)",
-        "nicobarese": "lūl"
+      "english": "Smoke(n.)",
+      "nicobarese": "lūl"
     },
     {
-        "english": "Snake(venomous)",
-        "nicobarese": "pē(d)"
+      "english": "Snake(venomous)",
+      "nicobarese": "pē(d)"
     },
     {
-        "english": "Sneeze(n.)",
-        "nicobarese": "yesˑsa"
+      "english": "Sneeze(n.)",
+      "nicobarese": "yesˑsa"
     },
     {
-        "english": "Snore",
-        "nicobarese": "ken-ngôˑka"
+      "english": "Snore",
+      "nicobarese": "ken-ngôˑka"
     },
     {
-        "english": "Son",
-        "nicobarese": "kūˑan-kikôˑna"
+      "english": "Son",
+      "nicobarese": "kūˑan-kikôˑna"
     },
     {
-        "english": "Soth wind",
-        "nicobarese": "lôˑhnga"
+      "english": "Soth wind",
+      "nicobarese": "lôˑhnga"
     },
     {
-        "english": "South",
-        "nicobarese": "lâ-hīˑa"
+      "english": "South",
+      "nicobarese": "lâ-hīˑa"
     },
     {
-        "english": "Spear(bladed)",
-        "nicobarese": "wē"
+      "english": "Spear(bladed)",
+      "nicobarese": "wē"
     },
     {
-        "english": "Spear(Pronged)",
-        "nicobarese": "maâṅ"
+      "english": "Spear(Pronged)",
+      "nicobarese": "maâṅ"
     },
     {
-        "english": "Spinster",
-        "nicobarese": "dēˑla; rēˑla"
+      "english": "Spinster",
+      "nicobarese": "dēˑla; rēˑla"
     },
     {
-        "english": "Spit(expectorate)",
-        "nicobarese": "kāh"
+      "english": "Spit(expectorate)",
+      "nicobarese": "kāh"
     },
     {
-        "english": "Squat(sit on one's heels)",
-        "nicobarese": "dròichâˑka"
+      "english": "Squat(sit on one's heels)",
+      "nicobarese": "dròichâˑka"
     },
     {
-        "english": "Stammer",
-        "nicobarese": "ikˑnyô"
+      "english": "Stammer",
+      "nicobarese": "ikˑnyô"
     },
     {
-        "english": "Stand up!",
-        "nicobarese": "chôˑldre; sakˑlare"
+      "english": "Stand up!",
+      "nicobarese": "chôˑldre; sakˑlare"
     },
     {
-        "english": "Steal",
-        "nicobarese": "olâˑya"
+      "english": "Steal",
+      "nicobarese": "olâˑya"
     },
     {
-        "english": "Steamer",
-        "nicobarese": "tatâm-mue"
+      "english": "Steamer",
+      "nicobarese": "tatâm-mue"
     },
     {
-        "english": "Stomach-ache",
-        "nicobarese": "chak-el-lōˑan"
+      "english": "Stomach-ache",
+      "nicobarese": "chak-el-lōˑan"
     },
     {
-        "english": "Storm",
-        "nicobarese": "ras-hat"
+      "english": "Storm",
+      "nicobarese": "ras-hat"
     },
     {
-        "english": "Straight",
-        "nicobarese": "chip"
+      "english": "Straight",
+      "nicobarese": "chip"
     },
     {
-        "english": "Strong",
-        "nicobarese": "kalī-âˑlah; ngē-âˑlah"
+      "english": "Strong",
+      "nicobarese": "kalī-âˑlah; ngē-âˑlah"
     },
     {
-        "english": "Suck",
-        "nicobarese": "pô"
+      "english": "Suck",
+      "nicobarese": "pô"
     },
     {
-        "english": "Suckle",
-        "nicobarese": "hâpô-nīˑa"
+      "english": "Suckle",
+      "nicobarese": "hâpô-nīˑa"
     },
     {
-        "english": "Sugar",
-        "nicobarese": "kan-sūˑkar"
+      "english": "Sugar",
+      "nicobarese": "kan-sūˑkar"
     },
     {
-        "english": "Sun",
-        "nicobarese": "tâwūˑe"
+      "english": "Sun",
+      "nicobarese": "tâwūˑe"
     },
     {
-        "english": "Surf",
-        "nicobarese": "màu-wa"
+      "english": "Surf",
+      "nicobarese": "màu-wa"
     },
     {
-        "english": "Sweet",
-        "nicobarese": "kuchik"
+      "english": "Sweet",
+      "nicobarese": "kuchik"
     },
     {
-        "english": "Swim",
-        "nicobarese": "yā"
+      "english": "Swim",
+      "nicobarese": "yā"
     },
     {
-        "english": "Tabu",
-        "nicobarese": "tâkôˑya"
+      "english": "Tabu",
+      "nicobarese": "tâkôˑya"
     },
     {
-        "english": "Tail",
-        "nicobarese": "lâm-tit"
+      "english": "Tail",
+      "nicobarese": "lâm-tit"
     },
     {
-        "english": "Taller",
-        "nicobarese": "marôˑlòng (tall)"
+      "english": "Taller",
+      "nicobarese": "marôˑlòng (tall)"
     },
     {
-        "english": "Tame(domesticated)",
-        "nicobarese": "â-pâtī"
+      "english": "Tame(domesticated)",
+      "nicobarese": "â-pâtī"
     },
     {
-        "english": "Tear(s.)",
-        "nicobarese": "mak-mat"
+      "english": "Tear(s.)",
+      "nicobarese": "mak-mat"
     },
     {
-        "english": "They(dual)",
-        "nicobarese": "nâˑa; nan"
+      "english": "They(dual)",
+      "nicobarese": "nâˑa; nan"
     },
     {
-        "english": "They(plural)",
-        "nicobarese": "yin"
+      "english": "They(plural)",
+      "nicobarese": "yin"
     },
     {
-        "english": "Think(regard)",
-        "nicobarese": "lōn"
+      "english": "Think(regard)",
+      "nicobarese": "lōn"
     },
     {
-        "english": "Tide(ebb)",
-        "nicobarese": "tâhāˑt"
+      "english": "Tide(ebb)",
+      "nicobarese": "tâhāˑt"
     },
     {
-        "english": "Tide(flood)",
-        "nicobarese": "pârūˑi"
+      "english": "Tide(flood)",
+      "nicobarese": "pârūˑi"
     },
     {
-        "english": "To-morrow",
-        "nicobarese": "hurēch; huròch"
+      "english": "To-morrow",
+      "nicobarese": "hurēch; huròch"
     },
     {
-        "english": "To-morrow(day after-)",
-        "nicobarese": "taâ"
+      "english": "To-morrow(day after-)",
+      "nicobarese": "taâ"
     },
     {
-        "english": "Tobacco",
-        "nicobarese": "sanòi-am"
+      "english": "Tobacco",
+      "nicobarese": "sanòi-am"
     },
     {
-        "english": "Today",
-        "nicobarese": "tangâˑmo"
+      "english": "Today",
+      "nicobarese": "tangâˑmo"
     },
     {
-        "english": "Toe",
-        "nicobarese": "kun-drān"
+      "english": "Toe",
+      "nicobarese": "kun-drān"
     },
     {
-        "english": "Tongue",
-        "nicobarese": "litâk"
+      "english": "Tongue",
+      "nicobarese": "litâk"
     },
     {
-        "english": "Tooth",
-        "nicobarese": "kânàp"
+      "english": "Tooth",
+      "nicobarese": "kânàp"
     },
     {
-        "english": "Toothache",
-        "nicobarese": "chak-ka-kâˑnàp"
+      "english": "Toothache",
+      "nicobarese": "chak-ka-kâˑnàp"
     },
     {
-        "english": "Tortoise",
-        "nicobarese": "ta-karöˑpa; pēnyūˑt"
+      "english": "Tortoise",
+      "nicobarese": "ta-karöˑpa; pēnyūˑt"
     },
     {
-        "english": "Turtle-shell",
-        "nicobarese": "ok-kâp"
+      "english": "Turtle-shell",
+      "nicobarese": "ok-kâp"
     },
     {
-        "english": "Uncle",
-        "nicobarese": "kânòi.ña"
+      "english": "Uncle",
+      "nicobarese": "kânòi.ña"
     },
     {
-        "english": "Vein",
-        "nicobarese": "trâˑhe"
+      "english": "Vein",
+      "nicobarese": "trâˑhe"
     },
     {
-        "english": "Vomit",
-        "nicobarese": "kūˑaua"
+      "english": "Vomit",
+      "nicobarese": "kūˑaua"
     },
     {
-        "english": "Water(fresh)",
-        "nicobarese": "mak"
+      "english": "Water(fresh)",
+      "nicobarese": "mak"
     },
     {
-        "english": "Water(salt)",
-        "nicobarese": "mai"
+      "english": "Water(salt)",
+      "nicobarese": "mai"
     },
     {
-        "english": "We (dual)",
-        "nicobarese": "hôl-chyū"
+      "english": "We (dual)",
+      "nicobarese": "hôl-chyū"
     },
     {
-        "english": "We(plural)",
-        "nicobarese": "īˑha"
+      "english": "We(plural)",
+      "nicobarese": "īˑha"
     },
     {
-        "english": "West",
-        "nicobarese": "lâ sūng"
+      "english": "West",
+      "nicobarese": "lâ sūng"
     },
     {
-        "english": "What(interrog.)",
-        "nicobarese": "chīˑap; âsūap"
+      "english": "What(interrog.)",
+      "nicobarese": "chīˑap; âsūap"
     },
     {
-        "english": "Whistle",
-        "nicobarese": "fhā"
+      "english": "Whistle",
+      "nicobarese": "fhā"
     },
     {
-        "english": "Widow",
-        "nicobarese": "kâpâh-hâpīˑha"
+      "english": "Widow",
+      "nicobarese": "kâpâh-hâpīˑha"
     },
     {
-        "english": "Wife",
-        "nicobarese": "pīˑha"
+      "english": "Wife",
+      "nicobarese": "pīˑha"
     },
     {
-        "english": "Wing",
-        "nicobarese": "kētü"
+      "english": "Wing",
+      "nicobarese": "kētü"
     },
     {
-        "english": "Woman",
-        "nicobarese": "kikâˑna"
+      "english": "Woman",
+      "nicobarese": "kikâˑna"
     },
     {
-        "english": "Woman(countrywoman)",
-        "nicobarese": "târik-(-kikâna)"
+      "english": "Woman(countrywoman)",
+      "nicobarese": "târik-(-kikâna)"
     },
     {
-        "english": "Woman(other-Nicobar)",
-        "nicobarese": "tâˑa(-kikâna)"
+      "english": "Woman(other-Nicobar)",
+      "nicobarese": "tâˑa(-kikâna)"
     },
     {
-        "english": "Wood",
-        "nicobarese": "chōn"
+      "english": "Wood",
+      "nicobarese": "chōn"
     },
     {
-        "english": "Wrestle",
-        "nicobarese": "kirˑip"
+      "english": "Wrestle",
+      "nicobarese": "kirˑip"
     },
     {
-        "english": "Wrist",
-        "nicobarese": "lin-kalˑnga"
+      "english": "Wrist",
+      "nicobarese": "lin-kalˑnga"
     },
     {
-        "english": "Yam",
-        "nicobarese": "takenīˑa; tâūˑla"
+      "english": "Yam",
+      "nicobarese": "takenīˑa; tâūˑla"
     },
     {
-        "english": "Yawn",
-        "nicobarese": "fâp"
+      "english": "Yawn",
+      "nicobarese": "fâp"
     },
     {
-        "english": "Year",
-        "nicobarese": "sòmyüˑhu"
+      "english": "Year",
+      "nicobarese": "sòmyüˑhu"
     },
     {
-        "english": "Yes",
-        "nicobarese": "haṅ; hòṅ"
+      "english": "Yes",
+      "nicobarese": "haṅ; hòṅ"
     },
     {
-        "english": "Yesterday",
-        "nicobarese": "wâˑhe"
+      "english": "Yesterday",
+      "nicobarese": "wâˑhe"
     },
     {
-        "english": "You(dual)",
-        "nicobarese": "nâˑa"
+      "english": "You(dual)",
+      "nicobarese": "nâˑa"
     },
     {
-        "english": "You(plural)",
-        "nicobarese": "yīˑa"
+      "english": "You(plural)",
+      "nicobarese": "yīˑa"
     },
     {
-        "english": "You(sing.)/Thou",
-        "nicobarese": "meṅ; meṅh; mäh"
+      "english": "You(sing.)/Thou",
+      "nicobarese": "meṅ; meṅh; mäh"
     },
     {
-        "english": "6",
-        "nicobarese": "tafūal"
+      "english": "6",
+      "nicobarese": "tafūal"
     },
     {
-        "english": "7",
-        "nicobarese": "sât"
+      "english": "7",
+      "nicobarese": "sât"
     },
     {
-        "english": "8",
-        "nicobarese": "hēo-hare"
+      "english": "8",
+      "nicobarese": "hēo-hare"
     },
     {
-        "english": "9",
-        "nicobarese": "maichūa-tare"
+      "english": "9",
+      "nicobarese": "maichūa-tare"
     },
     {
-        "english": "10",
-        "nicobarese": "sam"
+      "english": "10",
+      "nicobarese": "sam"
     },
     {
-        "english": "11",
-        "nicobarese": "kahōk-sīan"
+      "english": "11",
+      "nicobarese": "kahōk-sīan"
     },
     {
-        "english": "12",
-        "nicobarese": "neät-sīan"
+      "english": "12",
+      "nicobarese": "neät-sīan"
     },
     {
-        "english": "13",
-        "nicobarese": "lūe-sīan"
+      "english": "13",
+      "nicobarese": "lūe-sīan"
     },
     {
-        "english": "14",
-        "nicobarese": "fän-sīan"
+      "english": "14",
+      "nicobarese": "fän-sīan"
     },
     {
-        "english": "15",
-        "nicobarese": "tanī-sīan"
+      "english": "15",
+      "nicobarese": "tanī-sīan"
     },
     {
-        "english": "20",
-        "nicobarese": "kahōk-michāma; (rarely sam sīan); heng-anai; sam-tahòl"
+      "english": "20",
+      "nicobarese": "kahōk-michāma; (rarely sam sīan); heng-anai; sam-tahòl"
     },
     {
-        "english": "21",
-        "nicobarese": "kahōk-michāma-heng; heng-anai-kahōk"
+      "english": "21",
+      "nicobarese": "kahōk-michāma-heng; heng-anai-kahōk"
     },
     {
-        "english": "30",
-        "nicobarese": "kahōk-michāma-sam; heng-anai-tanī(-tahòl)"
+      "english": "30",
+      "nicobarese": "kahōk-michāma-sam; heng-anai-tanī(-tahòl)"
     },
     {
-        "english": "44",
-        "nicobarese": "neät-michāma-fän; neät-anai-neät(-tahòl)"
+      "english": "44",
+      "nicobarese": "neät-michāma-fän; neät-anai-neät(-tahòl)"
     },
     {
-        "english": "100",
-        "nicobarese": "tanī-michāma; tanī-anai"
+      "english": "100",
+      "nicobarese": "tanī-michāma; tanī-anai"
     },
     {
-        "english": "200",
-        "nicobarese": "sam-michāma; sam-anai; heng-ngòng(or hē-ngòng)"
+      "english": "200",
+      "nicobarese": "sam-michāma; sam-anai; heng-ngòng(or hē-ngòng)"
     },
     {
-        "english": "300",
-        "nicobarese": "tanī-sīan-michāma; tanī-sīan-anai; heng-ngòng-tanī-anai"
+      "english": "300",
+      "nicobarese": "tanī-sīan-michāma; tanī-sīan-anai; heng-ngòng-tanī-anai"
     },
     {
-        "english": "400",
-        "nicobarese": "heng-anai-michāma; kahōk-michāma; neät-tòng)"
+      "english": "400",
+      "nicobarese": "heng-anai-michāma; kahōk-michāma; neät-tòng)"
     },
     {
-        "english": "500",
-        "nicobarese": "heng-anai-tanī-michāma; neät-tòng-tanī(-anai)"
+      "english": "500",
+      "nicobarese": "heng-anai-tanī-michāma; neät-tòng-tanī(-anai)"
     },
     {
-        "english": "600",
-        "nicobarese": "heng-anai-tanī-tahòl-michāma; lūe-yòng"
+      "english": "600",
+      "nicobarese": "heng-anai-tanī-tahòl-michāma; lūe-yòng"
     },
     {
-        "english": "700",
-        "nicobarese": "heng-anai-tanī-sīan-michāma; lūe-yòng-tanī(-anai)"
+      "english": "700",
+      "nicobarese": "heng-anai-tanī-sīan-michāma; lūe-yòng-tanī(-anai)"
     },
     {
-        "english": "850",
-        "nicobarese": "neät-anai-neät-michāma-sam; fän-ngòng-heng-anai-tanī(-tahòl)"
+      "english": "850",
+      "nicobarese": "neät-anai-neät-michāma-sam; fän-ngòng-heng-anai-tanī(-tahòl)"
     },
     {
-        "english": "1000",
-        "nicobarese": "neät-anai-tanī-tahòl-michāma; tanī-yòng"
+      "english": "1000",
+      "nicobarese": "neät-anai-tanī-tahòl-michāma; tanī-yòng"
     },
     {
-        "english": "2000",
-        "nicobarese": "tanī-anai-michāma; sam-mòng; heng-kaiñe"
+      "english": "2000",
+      "nicobarese": "tanī-anai-michāma; sam-mòng; heng-kaiñe"
     },
     {
-        "english": "3000",
-        "nicobarese": "heng-kaiñe-tanī-yòng"
+      "english": "3000",
+      "nicobarese": "heng-kaiñe-tanī-yòng"
     },
     {
-        "english": "4000",
-        "nicobarese": "sam-anai-michāma; neät-kaiñe"
+      "english": "4000",
+      "nicobarese": "sam-anai-michāma; neät-kaiñe"
     },
     {
-        "english": "10000",
-        "nicobarese": "tanī-kaiñe; dròngte-lâk"
+      "english": "10000",
+      "nicobarese": "tanī-kaiñe; dròngte-lâk"
     },
     {
-        "english": "20000",
-        "nicobarese": "sam-kaiñe; heng-lâk"
+      "english": "20000",
+      "nicobarese": "sam-kaiñe; heng-lâk"
     },
     {
-        "english": "40000",
-        "nicobarese": "heng-anai-kaiñe; neät-lâk"
+      "english": "40000",
+      "nicobarese": "heng-anai-kaiñe; neät-lâk"
     },
     {
-        "english": "100000",
-        "nicobarese": "neät-anai-tanī-tahòl-kaiñe; tanī-lâk"
+      "english": "100000",
+      "nicobarese": "neät-anai-tanī-tahòl-kaiñe; tanī-lâk"
     },
     {
-        "english": "200000",
-        "nicobarese": "sam-lâk"
+      "english": "200000",
+      "nicobarese": "sam-lâk"
     },
     {
-        "english": "Goat",
-        "nicobarese": "bak-errah"
+      "english": "Goat",
+      "nicobarese": "bak-errah"
     },
     {
-        "english": "Lizard",
-        "nicobarese": "michāka"
+      "english": "Lizard",
+      "nicobarese": "michāka"
     }
-]
+  ]
+}

@@ -478,7 +478,11 @@ class DatabaseManager {
       
       try {
         final String jsonString = await rootBundle.loadString(path);
-        final List<dynamic> jsonList = json.decode(jsonString);
+        final decoded = json.decode(jsonString);
+        // Support watermarked structure: {"_speechmate_metadata": {...}, "entries": [...]}
+        final List<dynamic> jsonList = (decoded is Map && decoded.containsKey('entries'))
+            ? decoded['entries'] as List<dynamic>
+            : decoded as List<dynamic>;
         Batch batch = db.batch();
         for (var item in jsonList) {
           batch.insert(table, mapper(item));
@@ -538,7 +542,11 @@ class DatabaseManager {
       
       try {
         final String jsonString = await rootBundle.loadString(path);
-        final List<dynamic> jsonList = json.decode(jsonString);
+        final decoded = json.decode(jsonString);
+        // Support watermarked structure: {"_speechmate_metadata": {...}, "entries": [...]}
+        final List<dynamic> jsonList = (decoded is Map && decoded.containsKey('entries'))
+            ? decoded['entries'] as List<dynamic>
+            : decoded as List<dynamic>;
         
         Batch batch = db.batch();
         for (var item in jsonList) {

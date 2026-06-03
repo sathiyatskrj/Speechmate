@@ -1,0 +1,37 @@
+SpeechMate — Endangered Language Learning Platform
+Copyright 2025 sathiyatskrj
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file at the root of this repository for the full license text.
+
+---
+
+LINGUISTIC DATA NOTICE
+The tribal linguistic data contained in assets/data/ is separately licensed
+under Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
+Commercial use and AI/ML training use of this data is explicitly prohibited.
+See DATA_TERMS.txt for the complete terms.
+
+The linguistic data was compiled through community-supported documentation
+of the Nicobarese and Great Andamanese languages of the Andaman and Nicobar
+Islands, India. The compilation represents original authorship work.
+
+---
+
+PRIOR ART NOTICE
+This software was first created in December 2025 and publicly submitted to
+the Vision Beyond Youth Leadership Development (VBYLD) 2026 competition at
+national level on January 9, 2026, with IIT Bombay as knowledge partner.
+GitHub commit history provides cryptographic timestamping of all work.
+
+---
+
+THIRD-PARTY COMPONENTS
+This project uses open-source dependencies listed in pubspec.yaml.
+Each dependency retains its own license. See pubspec.lock for exact versions.
+
+Key dependencies include:
+- Flutter SDK (BSD 3-Clause)
+- sqflite (MIT)
+- provider (MIT)
+- Various Flutter community packages (MIT/BSD)
